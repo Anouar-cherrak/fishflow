@@ -50,6 +50,7 @@ export default function Generer() {
   const [user, setUser] = useState<User | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -92,6 +93,25 @@ export default function Generer() {
     await supabase.auth.signOut();
     setUser(null);
     router.refresh();
+  };
+
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Erreur, réessaie.");
+        setPortalLoading(false);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      alert("Erreur de connexion. Réessaie.");
+      setPortalLoading(false);
+    }
   };
 
   const handleGenerate = async () => {
@@ -223,9 +243,18 @@ export default function Generer() {
 
           {/* Statut Pro actif */}
           {user && usage?.isPro && (
-            <div className="mb-4 px-4 py-3 rounded-xl text-sm border border-[#7C3AED]/40 bg-gradient-to-r from-[#2563EB]/20 to-[#EC4899]/20 backdrop-blur-md flex items-center gap-2">
-              <span className="text-lg">✨</span>
-              <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
+            <div className="mb-4 px-4 py-3 rounded-xl text-sm border border-[#7C3AED]/40 bg-gradient-to-r from-[#2563EB]/20 to-[#EC4899]/20 backdrop-blur-md flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">✨</span>
+                <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
+              </div>
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="text-xs font-semibold underline text-white/90 hover:text-white disabled:opacity-50"
+              >
+                {portalLoading ? "Redirection..." : "Gérer mon abonnement"}
+              </button>
             </div>
           )}
 
