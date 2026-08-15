@@ -117,7 +117,7 @@ export default function Landing() {
       {/* Hero */}
       <section className="relative w-full max-w-3xl mx-auto text-center px-4 pt-16 pb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-sm text-white/70 mb-6">
-          ✨ IA nouvelle génération
+          ⚡ Ta fiche de révision prête en quelques secondes
         </div>
 
         <h1 className="font-display text-4xl sm:text-5xl font-bold mb-5 leading-tight">
@@ -146,7 +146,7 @@ export default function Landing() {
           event="cta_click_hero"
           className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899] hover:opacity-90 transition shadow-[0_0_40px_-10px_rgba(124,58,237,0.6)]"
         >
-          Créer ma fiche gratuitement ✨
+          Essayer gratuitement ✨
         </TrackedLink>
         <p className="text-white/40 text-sm mt-3">3 fiches gratuites par mois · Sans carte bancaire</p>
       </section>
@@ -267,7 +267,7 @@ export default function Landing() {
       {/* Offres */}
       <section className="relative w-full max-w-3xl mx-auto px-4 pb-20">
         <h2 className="font-display text-2xl font-semibold text-center mb-10">
-          Commence gratuitement, passe Pro quand tu veux
+          Commence gratuitement, passe Premium quand tu veux
         </h2>
         <div className="grid sm:grid-cols-2 gap-5">
           <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-6">
@@ -339,7 +339,7 @@ export default function Landing() {
           event="cta_click_final"
           className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899] hover:opacity-90 transition shadow-[0_0_40px_-10px_rgba(124,58,237,0.6)]"
         >
-          Commencer gratuitement
+          Essayer gratuitement
         </TrackedLink>
         <p className="text-white/40 text-sm mt-3">3 fiches gratuites par mois · Sans carte bancaire</p>
       </section>
