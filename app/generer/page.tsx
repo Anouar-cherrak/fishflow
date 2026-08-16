@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { InstallPWA } from "@/components/InstallPWA";
 import type { User } from "@supabase/supabase-js";
 
 type Mode = "text" | "pdf" | "photo";
@@ -240,6 +241,9 @@ export default function Generer() {
               <p className="text-white/40 text-sm">Transforme ton cours en fiche de révision.</p>
             </div>
           </div>
+
+          {/* Installation PWA */}
+          <InstallPWA />
 
           {/* Statut Pro actif */}
           {user && usage?.isPro && (
