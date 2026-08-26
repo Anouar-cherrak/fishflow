@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +29,13 @@ export default function Signup() {
       setMessage(error.message);
       setLoading(false);
       return;
+    }
+
+    // Conversion Google Ads : uniquement déclenchée si l'inscription a réellement réussi
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", "conversion", {
+        send_to: "AW-18394032288/P97kCIqRtegcEKDR-sJE",
+      });
     }
 
     setMessage("Compte créé ! Vérifie ta boîte mail pour confirmer ton inscription.");
