@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Logo, Wordmark } from "@/components/Logo";
 import { TrackedLink } from "@/components/TrackedLink";
+import { FicheCounter } from "@/components/FicheCounter";
 
 export const metadata: Metadata = {
   title: "FishFlow — Fiches de révision, résumés et quiz par IA | Essai gratuit",
@@ -22,7 +23,6 @@ const PARTICLES = [
 export default function Landing() {
   return (
     <main className="min-h-screen bg-[#0B0F1A] text-white overflow-hidden relative">
-      {/* Données structurées pour les moteurs de recherche */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -148,7 +148,9 @@ export default function Landing() {
         >
           Essayer gratuitement ✨
         </TrackedLink>
-        <p className="text-white/40 text-sm mt-3">3 fiches gratuites par mois · Sans carte bancaire</p>
+        <p className="text-white/40 text-sm mt-3 mb-4">3 fiches gratuites par mois · Sans carte bancaire</p>
+
+        <FicheCounter />
       </section>
 
       {/* Démonstration — pipeline visuel */}
