@@ -49,6 +49,7 @@ function GenererContent() {
   const [length, setLength] = useState<Length>("moyen");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [user, setUser] = useState<User | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
@@ -84,12 +85,19 @@ function GenererContent() {
   useEffect(() => {
     if (!loading) {
       setLoadingStep(0);
+      setProgress(0);
       return;
     }
-    const interval = setInterval(() => {
+    const messageInterval = setInterval(() => {
       setLoadingStep((prev) => (prev + 1) % LOADING_MESSAGES.length);
     }, 3000);
-    return () => clearInterval(interval);
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => (prev < 92 ? prev + (92 - prev) * 0.08 : prev));
+    }, 300);
+    return () => {
+      clearInterval(messageInterval);
+      clearInterval(progressInterval);
+    };
   }, [loading]);
 
   const toggleOutput = (key: OutputKey) => {
@@ -188,7 +196,8 @@ function GenererContent() {
         trackEvent("quota_utilise", { remaining: updatedUsage.remaining });
       }
 
-      router.push("/result");
+      setProgress(100);
+      setTimeout(() => router.push("/result"), 150);
     } catch (err) {
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
       alert("Erreur de connexion. Vérifie ta connexion internet et réessaie.");
@@ -202,10 +211,16 @@ function GenererContent() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#7C3AED] rounded-full blur-3xl opacity-20 pointer-events-none" />
 
       {loading && (
-        <div className="fixed inset-0 bg-[#0B0F1A]/90 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[#0B0F1A]/90 backdrop-blur-sm flex flex-col items-center justify-center z-50 px-6">
           <div className="w-10 h-10 border-4 border-white/10 border-t-[#7C3AED] rounded-full animate-spin mb-4" />
-          <p className="text-white font-medium">{LOADING_MESSAGES[loadingStep]}</p>
-          <p className="text-white/40 text-sm mt-1">Ça peut prendre jusqu'à 20-30 secondes.</p>
+          <p className="text-white font-medium mb-4">{LOADING_MESSAGES[loadingStep]}</p>
+          <div className="w-full max-w-xs h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899] transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-white/40 text-sm mt-3">Ça peut prendre jusqu'à 20-30 secondes.</p>
         </div>
       )}
 

@@ -32,17 +32,17 @@ export default function Signup() {
       return;
     }
 
-    // Conversion Google Ads
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "conversion", {
         send_to: "AW-18394032288/P97kCIqRtegcEKDR-sJE",
       });
     }
 
-    // Événement GA4
     trackEvent("sign_up", { method: "email" });
 
-    setMessage("Compte créé ! Vérifie ta boîte mail pour confirmer ton inscription.");
+    setMessage(
+      "Compte créé ! Vérifie ta boîte mail pour confirmer ton inscription (pense aussi à regarder tes spams)."
+    );
     setLoading(false);
   };
 
@@ -96,7 +96,11 @@ export default function Signup() {
           {loading ? "Création..." : "Créer mon compte"}
         </button>
 
-        <p className="text-sm text-white/40 text-center mt-4">
+        <p className="text-xs text-white/30 text-center mt-4 flex items-center justify-center gap-1.5">
+          🔒 Tes données restent privées · Résiliable en un clic
+        </p>
+
+        <p className="text-sm text-white/40 text-center mt-3">
           Déjà un compte ?{" "}
           <button onClick={() => router.push("/login")} className="text-white hover:underline">
             Se connecter

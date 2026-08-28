@@ -61,6 +61,12 @@ export default function MesFiches() {
     );
   }
 
+  const now = new Date();
+  const thisMonthCount = fiches.filter((f) => {
+    const d = new Date(f.created_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
   return (
     <main className="min-h-screen bg-[#0B0F1A] text-white px-4 py-10 relative overflow-hidden">
       <div className="absolute top-[-10%] left-[20%] w-[400px] h-[400px] bg-[#7C3AED] rounded-full blur-3xl opacity-15 pointer-events-none" />
@@ -71,7 +77,7 @@ export default function MesFiches() {
           <Wordmark className="text-sm" />
         </div>
 
-        <div className="flex items-center justify-between mb-6 mt-4">
+        <div className="flex items-center justify-between mb-4 mt-4">
           <h1 className="text-xl font-semibold">Mes fiches</h1>
           <button
             onClick={() => router.push("/generer")}
@@ -80,6 +86,21 @@ export default function MesFiches() {
             + Nouvelle fiche
           </button>
         </div>
+
+        {fiches.length > 0 && (
+          <div className="flex gap-3 mb-6">
+            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-center">
+              <p className="text-2xl font-semibold bg-gradient-to-r from-[#2563EB] to-[#EC4899] bg-clip-text text-transparent">
+                {thisMonthCount}
+              </p>
+              <p className="text-xs text-white/40 mt-0.5">fiche{thisMonthCount > 1 ? "s" : ""} ce mois-ci</p>
+            </div>
+            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-center">
+              <p className="text-2xl font-semibold text-white">{fiches.length}</p>
+              <p className="text-xs text-white/40 mt-0.5">au total</p>
+            </div>
+          </div>
+        )}
 
         {fiches.length === 0 ? (
           <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-10 text-center">

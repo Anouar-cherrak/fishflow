@@ -44,12 +44,10 @@ export default function Landing() {
         }}
       />
 
-      {/* Halos de couleur animés */}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#2563EB] rounded-full blur-3xl animate-glow-1 pointer-events-none" />
       <div className="absolute top-[10%] right-[-10%] w-[500px] h-[500px] bg-[#7C3AED] rounded-full blur-3xl animate-glow-2 pointer-events-none" />
       <div className="absolute bottom-[0%] left-[20%] w-[400px] h-[400px] bg-[#EC4899] rounded-full blur-3xl animate-glow-3 pointer-events-none" />
 
-      {/* Vagues animées en fond */}
       <div className="absolute top-0 left-0 w-full h-[600px] overflow-hidden pointer-events-none opacity-60">
         <svg className="absolute w-[200%] h-full animate-wave-1" viewBox="0 0 1600 600" preserveAspectRatio="none">
           <path
@@ -85,7 +83,6 @@ export default function Landing() {
         </svg>
       </div>
 
-      {/* Particules flottantes */}
       {PARTICLES.map((p, i) => (
         <div
           key={i}
@@ -94,7 +91,6 @@ export default function Landing() {
         />
       ))}
 
-      {/* Header */}
       <header className="relative w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-6">
         <div className="flex items-center gap-2">
           <Logo size={26} />
@@ -114,7 +110,6 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="relative w-full max-w-3xl mx-auto text-center px-4 pt-16 pb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-sm text-white/70 mb-6">
           ⚡ Ta fiche de révision prête en quelques secondes
@@ -153,7 +148,58 @@ export default function Landing() {
         <FicheCounter />
       </section>
 
-      {/* Démonstration — pipeline visuel */}
+      {/* Exemple concret d'une fiche générée */}
+      <section className="relative w-full max-w-2xl mx-auto px-4 pb-20">
+        <h2 className="font-display text-2xl font-semibold text-center mb-2">
+          Voici à quoi ressemble une fiche FishFlow
+        </h2>
+        <p className="text-white/50 text-center mb-8 text-sm">
+          Exemple généré à partir d'un cours sur la photosynthèse
+        </p>
+
+        <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-6 space-y-5">
+          <div>
+            <p className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-2">
+              📝 Résumé
+            </p>
+            <p className="text-sm text-white/80 leading-relaxed">
+              La photosynthèse est le processus par lequel les plantes convertissent la lumière du soleil en énergie chimique, produisant du glucose et de l'oxygène à partir de CO₂ et d'eau.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-2">
+              📌 Points clés
+            </p>
+            <ul className="text-sm text-white/80 space-y-1.5">
+              <li className="flex gap-2"><span className="text-[#7C3AED]">•</span> Se déroule dans les chloroplastes</li>
+              <li className="flex gap-2"><span className="text-[#7C3AED]">•</span> Nécessite la chlorophylle, la lumière et l'eau</li>
+              <li className="flex gap-2"><span className="text-[#7C3AED]">•</span> Produit du glucose et libère de l'oxygène</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-2">
+              🎴 Flashcard
+            </p>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+              <p className="text-sm text-white font-medium mb-1">Où se déroule la photosynthèse ?</p>
+              <p className="text-sm text-white/50">Dans les chloroplastes des cellules végétales</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center mt-6">
+          <TrackedLink
+            href="/generer"
+            event="cta_click_exemple"
+            className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] to-[#EC4899] hover:underline"
+          >
+            Crée la tienne maintenant →
+          </TrackedLink>
+        </div>
+      </section>
+
       <section className="relative w-full max-w-4xl mx-auto px-4 pb-20">
         <h2 className="font-display text-2xl font-semibold text-center mb-3">
           Ton cours, transformé en quelques secondes
@@ -198,7 +244,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Pourquoi FishFlow (vs ChatGPT) */}
       <section className="relative w-full max-w-4xl mx-auto px-4 pb-20">
         <h2 className="font-display text-2xl font-semibold text-center mb-10">
           Pourquoi pas juste ChatGPT ?
@@ -240,7 +285,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Comment ça marche */}
       <section className="relative w-full max-w-4xl mx-auto px-4 pb-20">
         <h2 className="font-display text-2xl font-semibold text-center mb-10">
           Comment ça marche ?
@@ -266,7 +310,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Offres */}
       <section className="relative w-full max-w-3xl mx-auto px-4 pb-20">
         <h2 className="font-display text-2xl font-semibold text-center mb-10">
           Commence gratuitement, passe Premium quand tu veux
@@ -318,7 +361,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Confiance */}
       <section className="relative w-full max-w-3xl mx-auto px-4 pb-20">
         <div className="grid sm:grid-cols-3 gap-4 text-center">
           {[
@@ -334,7 +376,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA final */}
       <section className="relative w-full max-w-2xl mx-auto px-4 pb-24 text-center">
         <TrackedLink
           href="/generer"
@@ -346,7 +387,6 @@ export default function Landing() {
         <p className="text-white/40 text-sm mt-3">3 fiches gratuites par mois · Sans carte bancaire</p>
       </section>
 
-      {/* Footer */}
       <footer className="relative w-full max-w-5xl mx-auto px-4 py-6 border-t border-white/10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-white/30 text-sm">© {new Date().getFullYear()} FishFlow</p>
