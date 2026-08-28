@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -35,7 +35,7 @@ const LOADING_MESSAGES = [
   "Presque fini...",
 ];
 
-export default function Generer() {
+function GenererContent() {
   const [mode, setMode] = useState<Mode>("text");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -70,7 +70,6 @@ export default function Generer() {
     });
   }, []);
 
-  // Détecte le retour réussi de Stripe (?checkout=success) et déclenche l'événement une seule fois
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
       const alreadyTracked = sessionStorage.getItem("ff_achat_tracked") === "1";
@@ -462,5 +461,13 @@ export default function Generer() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Generer() {
+  return (
+    <Suspense fallback={null}>
+      <GenererContent />
+    </Suspense>
   );
 }
