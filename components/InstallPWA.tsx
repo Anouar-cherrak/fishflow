@@ -45,72 +45,70 @@ export function InstallPWA() {
   if (isStandalone) return null;
 
   return (
-    <div className="mb-4 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
+    <div className="mb-4 bg-[#EFEBF7] border border-[#6D28D9]/15 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#7C3AED] flex items-center justify-center text-sm shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#6D28D9] flex items-center justify-center text-lg shrink-0">
           📲
         </div>
         <div>
-          <p className="text-sm font-medium text-white">Installe FishFlow</p>
-          <p className="text-xs text-white/40">Retrouve tes fiches directement depuis ton écran d'accueil.</p>
+          <p className="text-sm font-semibold text-[#1E1533]">✨ L'app FishFlow est disponible !</p>
+          <p className="text-xs text-[#1E1533]/50">Installe-la sur ton téléphone ou ton PC en un clic.</p>
         </div>
       </div>
 
       <button
         onClick={handleClick}
-        className="text-xs font-semibold px-4 py-2 rounded-lg bg-gradient-to-r from-[#2563EB] to-[#7C3AED] hover:opacity-90 transition"
+        className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition shrink-0"
       >
-        Télécharger l'application
+        📥 Télécharger l'application
       </button>
 
       {showGuide && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4"
           onClick={() => setShowGuide(false)}
         >
           <div
-            className="bg-[#0B0F1A] border border-white/10 rounded-2xl p-6 max-w-sm w-full"
+            className="bg-white border border-[#6D28D9]/10 rounded-2xl p-6 max-w-sm w-full shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {guideType === "ios" ? (
               <>
-                <p className="font-medium text-white mb-4">Installer FishFlow sur iPhone</p>
-                <ol className="text-sm text-white/70 space-y-3 list-decimal list-inside">
+                <p className="font-medium text-[#1E1533] mb-4">Installer FishFlow sur iPhone</p>
+                <ol className="text-sm text-[#1E1533]/70 space-y-3 list-decimal list-inside">
                   <li>
-                    Ouvre ce site dans <strong className="text-white">Safari</strong>
+                    Ouvre ce site dans <strong className="text-[#1E1533]">Safari</strong>
                   </li>
                   <li>
-                    Appuie sur le bouton <strong className="text-white">Partager</strong> (carré avec une flèche)
+                    Appuie sur le bouton <strong className="text-[#1E1533]">Partager</strong> (carré avec une flèche)
                   </li>
                   <li>
-                    Choisis <strong className="text-white">« Sur l'écran d'accueil »</strong>
+                    Choisis <strong className="text-[#1E1533]">« Sur l'écran d'accueil »</strong>
                   </li>
                   <li>
-                    Confirme avec <strong className="text-white">Ajouter</strong>
+                    Confirme avec <strong className="text-[#1E1533]">Ajouter</strong>
                   </li>
                 </ol>
               </>
             ) : (
               <>
-                <p className="font-medium text-white mb-4">Installer FishFlow</p>
-                <p className="text-sm text-white/70 mb-3">
-                  Sur Chrome ou Edge (PC, Android) :
-                </p>
-                <ol className="text-sm text-white/70 space-y-3 list-decimal list-inside mb-4">
+                <p className="font-medium text-[#1E1533] mb-4">Installer FishFlow</p>
+                <p className="text-sm text-[#1E1533]/70 mb-3">Sur Chrome ou Edge (PC, Android) :</p>
+                <ol className="text-sm text-[#1E1533]/70 space-y-3 list-decimal list-inside mb-4">
                   <li>Clique sur le menu du navigateur (⋮ en haut à droite)</li>
                   <li>
-                    Choisis <strong className="text-white">« Installer FishFlow »</strong> ou{" "}
-                    <strong className="text-white">« Ajouter à l'écran d'accueil »</strong>
+                    Choisis <strong className="text-[#1E1533]">« Installer FishFlow »</strong> ou{" "}
+                    <strong className="text-[#1E1533]">« Ajouter à l'écran d'accueil »</strong>
                   </li>
                 </ol>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-[#1E1533]/40">
                   Astuce : cherche aussi une petite icône ⊕ directement dans la barre d'adresse.
                 </p>
               </>
             )}
             <button
               onClick={() => setShowGuide(false)}
-              className="mt-5 w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/20 transition text-sm"
+              className="mt-5 w-full py-2.5 rounded-lg bg-[#EFEBF7] hover:bg-[#e5dff5] transition text-sm text-[#1E1533]"
             >
               Compris
             </button>

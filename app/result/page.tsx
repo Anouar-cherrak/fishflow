@@ -112,7 +112,7 @@ export default function Result() {
 
       for (const block of blocks) {
         const canvas = await html2canvas(block, {
-          backgroundColor: "#f9fafb",
+          backgroundColor: "#ffffff",
           scale: 2,
         });
 
@@ -148,9 +148,8 @@ export default function Result() {
 
   if (!data) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#0B0F1A] text-white px-4 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#2563EB] rounded-full blur-3xl opacity-20 pointer-events-none" />
-        <p className="relative text-white/50">Aucun résultat trouvé. Retourne à l'accueil pour en générer un.</p>
+      <main className="min-h-screen flex items-center justify-center bg-[#F7F5FC] text-[#1E1533] px-4">
+        <p className="text-[#1E1533]/50">Aucun résultat trouvé. Retourne à l'accueil pour en générer un.</p>
       </main>
     );
   }
@@ -159,11 +158,11 @@ export default function Result() {
     <button
       onClick={() => regenerateSection(sectionKey)}
       disabled={!data.sourceText || regeneratingKey === sectionKey}
-      className="flex items-center gap-1.5 text-xs text-blue-600 font-medium hover:underline disabled:opacity-50 disabled:no-underline"
+      className="flex items-center gap-1.5 text-xs text-[#6D28D9] font-medium hover:underline disabled:opacity-50 disabled:no-underline"
     >
       {regeneratingKey === sectionKey ? (
         <>
-          <span className="w-3 h-3 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+          <span className="w-3 h-3 border-2 border-[#6D28D9]/25 border-t-[#6D28D9] rounded-full animate-spin" />
           Régénération...
         </>
       ) : (
@@ -176,65 +175,62 @@ export default function Result() {
     regeneratingKey === key ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity";
 
   return (
-    <main className="min-h-screen bg-[#0B0F1A] text-white py-10 px-4 relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#2563EB] rounded-full blur-3xl opacity-15 pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#7C3AED] rounded-full blur-3xl opacity-15 pointer-events-none" />
-
-      <div className="relative max-w-3xl mx-auto">
+    <main className="min-h-screen bg-[#F7F5FC] text-[#1E1533] py-10 px-4">
+      <div className="max-w-3xl mx-auto">
         <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-          <button onClick={handleClear} className="text-sm text-white/30 hover:text-red-400 transition">
+          <button onClick={handleClear} className="text-sm text-[#1E1533]/30 hover:text-red-500 transition">
             🗑️ Effacer cette fiche
           </button>
           <button
             onClick={() => router.push("/generer")}
-            className="text-sm text-white/60 hover:text-white font-medium transition"
+            className="text-sm text-[#1E1533]/60 hover:text-[#1E1533] font-medium transition"
           >
             ← Nouveau document
           </button>
         </div>
 
-        <div ref={logoRef} className="bg-[#F4F7FB] rounded-t-2xl px-6 pt-6 pb-4">
+        <div ref={logoRef} className="bg-white rounded-t-2xl border border-[#6D28D9]/10 border-b-0 px-6 pt-6 pb-4">
           <div className="flex items-center gap-2">
             <Logo size={22} />
-            <Wordmark className="text-lg text-gray-900" />
+            <Wordmark className="text-lg" />
           </div>
-          <p className="text-gray-500 text-sm mt-1">Ta fiche de révision générée</p>
+          <p className="text-[#1E1533]/50 text-sm mt-1">Ta fiche de révision générée</p>
         </div>
 
-        <div className="bg-[#F4F7FB] px-1 pb-1 rounded-b-sm" />
+        <div className="h-1 bg-white border-x border-[#6D28D9]/10" />
         <div className="h-4" />
 
         {data.summary !== undefined && (
           <div ref={summaryRef} className={`pb-6 ${sectionOpacity("summary")}`}>
-            <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <section className="bg-white rounded-xl shadow-sm border border-[#6D28D9]/10 p-6">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">📝 Résumé</h2>
+                <h2 className="text-lg font-semibold text-[#1E1533] flex items-center gap-2">📝 Résumé</h2>
                 <RegenButton sectionKey="summary" />
               </div>
-              <p className="text-gray-700 leading-relaxed">{data.summary}</p>
+              <p className="text-[#1E1533]/70 leading-relaxed">{data.summary}</p>
             </section>
           </div>
         )}
 
         {data.sheet !== undefined && (
           <div className={`pb-6 ${sectionOpacity("sheet")}`}>
-            <div ref={sheetHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-gray-200 px-6 pt-4 pb-2">
+            <div ref={sheetHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-[#6D28D9]/10 px-6 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">📌 Fiche de révision</h2>
+                <h2 className="text-lg font-semibold text-[#1E1533] flex items-center gap-2">📌 Fiche de révision</h2>
                 <RegenButton sectionKey="sheet" />
               </div>
             </div>
-            <div className="bg-white border-x border-b border-gray-200 rounded-b-xl p-6 pt-2 space-y-2">
+            <div className="bg-white border-x border-b border-[#6D28D9]/10 rounded-b-xl p-6 pt-2 space-y-2">
               {data.sheet.map((point, i) => (
                 <div
                   key={i}
                   ref={(el) => {
                     sheetItemRefs.current[i] = el;
                   }}
-                  className="bg-gray-50 rounded-lg border border-gray-200 p-3 flex gap-2"
+                  className="bg-[#F7F5FC] rounded-lg border border-[#6D28D9]/10 p-3 flex gap-2"
                 >
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span className="text-gray-700">{point}</span>
+                  <span className="text-[#6D28D9] font-bold">•</span>
+                  <span className="text-[#1E1533]/70">{point}</span>
                 </div>
               ))}
             </div>
@@ -243,23 +239,23 @@ export default function Result() {
 
         {data.flashcards !== undefined && (
           <div className={`pb-6 ${sectionOpacity("flashcards")}`}>
-            <div ref={flashcardsHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-gray-200 px-6 pt-4 pb-2">
+            <div ref={flashcardsHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-[#6D28D9]/10 px-6 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">🎴 Flashcards</h2>
+                <h2 className="text-lg font-semibold text-[#1E1533] flex items-center gap-2">🎴 Flashcards</h2>
                 <RegenButton sectionKey="flashcards" />
               </div>
             </div>
-            <div className="bg-white border-x border-b border-gray-200 rounded-b-xl p-6 pt-2 grid gap-3">
+            <div className="bg-white border-x border-b border-[#6D28D9]/10 rounded-b-xl p-6 pt-2 grid gap-3">
               {data.flashcards.map((card, i) => (
                 <div
                   key={i}
                   ref={(el) => {
                     flashcardItemRefs.current[i] = el;
                   }}
-                  className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                  className="border border-[#6D28D9]/10 rounded-lg p-4 bg-[#F7F5FC]"
                 >
-                  <p className="font-medium text-gray-900 mb-1">{i + 1}. {card.question}</p>
-                  <p className="text-gray-600 text-sm">{card.answer}</p>
+                  <p className="font-medium text-[#1E1533] mb-1">{i + 1}. {card.question}</p>
+                  <p className="text-[#1E1533]/60 text-sm">{card.answer}</p>
                 </div>
               ))}
             </div>
@@ -268,30 +264,30 @@ export default function Result() {
 
         {data.quiz !== undefined && (
           <div className={`pb-6 ${sectionOpacity("quiz")}`}>
-            <div ref={quizHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-gray-200 px-6 pt-4 pb-2">
+            <div ref={quizHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-[#6D28D9]/10 px-6 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">❓ Quiz</h2>
+                <h2 className="text-lg font-semibold text-[#1E1533] flex items-center gap-2">❓ Quiz</h2>
                 <RegenButton sectionKey="quiz" />
               </div>
             </div>
-            <div className="bg-white border-x border-b border-gray-200 rounded-b-xl p-6 pt-2 space-y-3">
+            <div className="bg-white border-x border-b border-[#6D28D9]/10 rounded-b-xl p-6 pt-2 space-y-3">
               {data.quiz.map((q, i) => (
                 <div
                   key={i}
                   ref={(el) => {
                     quizItemRefs.current[i] = el;
                   }}
-                  className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                  className="border border-[#6D28D9]/10 rounded-lg p-4 bg-[#F7F5FC]"
                 >
-                  <p className="font-medium text-gray-900 mb-3">{i + 1}. {q.question}</p>
+                  <p className="font-medium text-[#1E1533] mb-3">{i + 1}. {q.question}</p>
                   <ul className="space-y-2">
                     {q.options.map((opt, j) => (
                       <li
                         key={j}
                         className={`px-3 py-2 rounded-md text-sm ${
                           j === q.correctIndex
-                            ? "bg-blue-50 text-blue-800 font-semibold border border-blue-200"
-                            : "bg-white text-gray-700 border border-gray-200"
+                            ? "bg-[#EFEBF7] text-[#6D28D9] font-semibold border border-[#6D28D9]/25"
+                            : "bg-white text-[#1E1533]/70 border border-[#6D28D9]/10"
                         }`}
                       >
                         {opt}
@@ -307,7 +303,7 @@ export default function Result() {
         <button
           onClick={handleDownloadPDF}
           disabled={downloading}
-          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899] hover:opacity-90 transition w-full disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_30px_-10px_rgba(124,58,237,0.6)]"
+          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#6D28D9]/20"
         >
           {downloading ? (
             <>
