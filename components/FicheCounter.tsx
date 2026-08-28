@@ -15,8 +15,8 @@ export function FicheCounter() {
   if (!count) return null;
 
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-sm text-white/70">
-      📚 <span className="font-semibold text-white">+{count.toLocaleString("fr-FR")}</span> fiches crées avec FishFlow
+    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#EFEBF7] border border-[#6D28D9]/15 text-sm text-[#1E1533]/70">
+      📚 <span className="font-semibold text-[#6D28D9]">{count.toLocaleString("fr-FR")}</span> fiches créées avec FishFlow
     </div>
   );
 }

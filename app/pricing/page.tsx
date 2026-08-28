@@ -56,34 +56,26 @@ export default function Pricing() {
     }
   };
 
-  const Background = () => (
-    <>
-      <div className="absolute top-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#2563EB] rounded-full blur-3xl opacity-20 pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#EC4899] rounded-full blur-3xl opacity-20 pointer-events-none" />
-    </>
-  );
-
   if (checkingStatus) {
     return (
-      <main className="min-h-screen bg-[#0B0F1A] flex items-center justify-center">
-        <p className="text-white/30 text-sm">Chargement...</p>
+      <main className="min-h-screen bg-[#F7F5FC] flex items-center justify-center">
+        <p className="text-[#1E1533]/40 text-sm">Chargement...</p>
       </main>
     );
   }
 
   if (isPro) {
     return (
-      <main className="min-h-screen bg-[#0B0F1A] text-white flex items-center justify-center px-4 relative overflow-hidden">
-        <Background />
-        <div className="relative w-full max-w-sm bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
+      <main className="min-h-screen bg-[#F7F5FC] text-[#1E1533] flex items-center justify-center px-4">
+        <div className="w-full max-w-sm bg-white border border-[#6D28D9]/10 shadow-sm rounded-2xl p-8 text-center">
           <div className="text-3xl mb-3">✨</div>
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
-          <p className="text-white/40 text-sm mb-6">
+          <p className="text-[#1E1533]/50 text-sm mb-6">
             Génération illimitée déjà active sur ton compte.
           </p>
           <button
             onClick={() => router.push("/generer")}
-            className="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899] hover:opacity-90 transition"
+            className="w-full py-3 rounded-xl font-medium bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition"
           >
             Retour à l'outil
           </button>
@@ -93,21 +85,20 @@ export default function Pricing() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0B0F1A] text-white flex items-center justify-center px-4 relative overflow-hidden">
-      <Background />
-      <div className="relative w-full max-w-sm bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
+    <main className="min-h-screen bg-[#F7F5FC] text-[#1E1533] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white border border-[#6D28D9]/10 shadow-sm rounded-2xl p-8 text-center">
         <div className="flex items-center justify-center gap-2 mb-6">
           <Logo size={24} />
           <Wordmark />
         </div>
 
         <h1 className="text-xl font-semibold mb-1">FishFlow Pro</h1>
-        <p className="text-white/40 text-sm mb-6">Génération illimitée de fiches de révision.</p>
+        <p className="text-[#1E1533]/50 text-sm mb-6">Génération illimitée de fiches de révision.</p>
 
         <div className="text-3xl font-bold mb-1">4,99 €</div>
-        <p className="text-white/30 text-sm mb-6">par mois, résiliable à tout moment</p>
+        <p className="text-[#1E1533]/40 text-sm mb-6">par mois, résiliable à tout moment</p>
 
-        <ul className="text-left text-sm text-white/60 space-y-2 mb-6">
+        <ul className="text-left text-sm text-[#1E1533]/70 space-y-2 mb-6">
           <li>✓ Fiches illimitées</li>
           <li>✓ Texte, PDF et photo</li>
           <li>✓ Résumé, fiche, flashcards, quiz</li>
@@ -117,14 +108,14 @@ export default function Pricing() {
         <button
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899] hover:opacity-90 transition disabled:opacity-50"
+          className="w-full py-3 rounded-xl font-medium bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition disabled:opacity-50"
         >
           {loading ? "Redirection..." : "Passer Pro"}
         </button>
 
         <button
           onClick={() => router.push("/generer")}
-          className="w-full mt-3 text-sm text-white/40 hover:text-white hover:underline transition"
+          className="w-full mt-3 text-sm text-[#1E1533]/40 hover:text-[#1E1533] hover:underline transition"
         >
           Retour
         </button>
