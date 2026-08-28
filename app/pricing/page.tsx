@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { trackEvent } from "@/lib/tracking";
 
 export default function Pricing() {
   const [loading, setLoading] = useState(false);
@@ -47,6 +48,7 @@ export default function Pricing() {
         return;
       }
 
+      trackEvent("clic_passage_premium");
       window.location.href = data.url;
     } catch {
       alert("Erreur de connexion. Réessaie.");

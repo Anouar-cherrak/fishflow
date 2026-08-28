@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 import { InstallPWA } from "@/components/InstallPWA";
+import { trackEvent } from "@/lib/tracking";
 import type { User } from "@supabase/supabase-js";
 
 type Mode = "text" | "pdf" | "photo";
@@ -53,6 +54,7 @@ export default function Generer() {
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const supabase = createClient();
@@ -67,6 +69,18 @@ export default function Generer() {
       }
     });
   }, []);
+
+  // Détecte le retour réussi de Stripe (?checkout=success) et déclenche l'événement une seule fois
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success") {
+      const alreadyTracked = sessionStorage.getItem("ff_achat_tracked") === "1";
+      if (!alreadyTracked) {
+        trackEvent("achat_premium", { value: 4.99, currency: "EUR" });
+        sessionStorage.setItem("ff_achat_tracked", "1");
+      }
+      router.replace("/generer");
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     if (!loading) {
@@ -143,11 +157,14 @@ export default function Generer() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Une erreur est survenue.");
         setLoading(false);
         if (data.quotaExceeded) {
-          fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d));
+          trackEvent("quota_atteint", { mode });
+        } else {
+          trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
         }
+        alert(data.error || "Une erreur est survenue.");
+        fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d));
         return;
       }
 
@@ -164,10 +181,17 @@ export default function Generer() {
         "Fiche sans titre";
       await supabase.from("fiches").insert({ title, data });
 
-      fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d));
+      trackEvent("generation_reussie", { mode, outputs: outputs.join(",") });
+
+      const updatedUsage = await fetch("/api/usage").then((r) => r.json());
+      setUsage(updatedUsage);
+      if (!updatedUsage.isPro) {
+        trackEvent("quota_utilise", { remaining: updatedUsage.remaining });
+      }
 
       router.push("/result");
     } catch (err) {
+      trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
       alert("Erreur de connexion. Vérifie ta connexion internet et réessaie.");
       setLoading(false);
     }
@@ -187,7 +211,6 @@ export default function Generer() {
       )}
 
       <div className="relative w-full flex flex-col items-center px-4 py-6">
-        {/* Barre du haut */}
         <div className="w-full max-w-lg flex flex-wrap justify-between items-center gap-3 mb-6">
           <Link href="/" className="text-sm text-white/40 hover:text-white transition">
             ← FishFlow
@@ -231,7 +254,6 @@ export default function Generer() {
         </div>
 
         <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
-          {/* Logo */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center shrink-0">
               <Logo size={22} />
@@ -242,10 +264,8 @@ export default function Generer() {
             </div>
           </div>
 
-          {/* Installation PWA */}
           <InstallPWA />
 
-          {/* Statut Pro actif */}
           {user && usage?.isPro && (
             <div className="mb-4 px-4 py-3 rounded-xl text-sm border border-[#7C3AED]/40 bg-gradient-to-r from-[#2563EB]/20 to-[#EC4899]/20 backdrop-blur-md flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2">
@@ -262,7 +282,6 @@ export default function Generer() {
             </div>
           )}
 
-          {/* Carte Gratuit vs Pro */}
           {user && usage && !usage.isPro && (
             <div className="mb-4 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl overflow-hidden">
               <div
@@ -318,7 +337,6 @@ export default function Generer() {
           )}
 
           <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-8">
-            {/* Onglets source */}
             <div className="flex gap-1 mb-6 bg-white/5 rounded-lg p-1">
               {(["text", "pdf", "photo"] as Mode[]).map((m) => (
                 <button
@@ -365,7 +383,6 @@ export default function Generer() {
               </label>
             )}
 
-            {/* Choix des sorties */}
             <div className="mb-5">
               <p className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-2">
                 Sorties
@@ -392,7 +409,6 @@ export default function Generer() {
               </div>
             </div>
 
-            {/* Difficulté et longueur */}
             <div className="mb-7 grid grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-semibold text-white/40 uppercase tracking-wide block mb-1">

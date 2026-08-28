@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { trackEvent } from "@/lib/tracking";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,6 +25,8 @@ export default function Login() {
       setLoading(false);
       return;
     }
+
+    trackEvent("login", { method: "email" });
 
     router.push("/generer");
     router.refresh();

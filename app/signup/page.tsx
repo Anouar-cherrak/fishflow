@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { trackEvent } from "@/lib/tracking";
 
 declare global {
   interface Window {
@@ -31,12 +32,15 @@ export default function Signup() {
       return;
     }
 
-    // Conversion Google Ads : uniquement déclenchée si l'inscription a réellement réussi
+    // Conversion Google Ads
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "conversion", {
         send_to: "AW-18394032288/P97kCIqRtegcEKDR-sJE",
       });
     }
+
+    // Événement GA4
+    trackEvent("sign_up", { method: "email" });
 
     setMessage("Compte créé ! Vérifie ta boîte mail pour confirmer ton inscription.");
     setLoading(false);

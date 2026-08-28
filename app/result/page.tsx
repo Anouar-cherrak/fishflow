@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas-pro";
 import { Logo, Wordmark } from "@/components/Logo";
+import { trackEvent } from "@/lib/tracking";
 
 type Flashcard = { question: string; answer: string };
 type QuizQuestion = {
@@ -129,6 +130,7 @@ export default function Result() {
       }
 
       pdf.save("fishflow-fiche.pdf");
+      trackEvent("fiche_telechargee");
     } catch (err) {
       console.error(err);
       alert("Erreur pendant la génération du PDF. Réessaie.");
@@ -191,7 +193,6 @@ export default function Result() {
           </button>
         </div>
 
-        {/* Logo — capturé pour le PDF, reste sur fond clair volontairement */}
         <div ref={logoRef} className="bg-[#F4F7FB] rounded-t-2xl px-6 pt-6 pb-4">
           <div className="flex items-center gap-2">
             <Logo size={22} />
