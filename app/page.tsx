@@ -13,6 +13,48 @@ export const metadata: Metadata = {
 export default function Landing() {
   return (
     <main className="min-h-screen bg-white text-black">
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .ff-fade-up {
+          opacity: 0;
+          animation: fadeInUp 0.6s ease forwards;
+        }
+        .ff-fade {
+          opacity: 0;
+          animation: fadeIn 0.8s ease forwards;
+        }
+        .ff-card {
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .ff-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .ff-link-underline {
+          position: relative;
+        }
+        .ff-link-underline::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: -2px;
+          width: 0;
+          height: 1px;
+          background: currentColor;
+          transition: width 0.25s ease;
+        }
+        .ff-link-underline:hover::after {
+          width: 100%;
+        }
+      `}</style>
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -34,19 +76,19 @@ export default function Landing() {
         }}
       />
 
-      <header className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-6">
+      <header className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-6 ff-fade">
         <div className="flex items-center gap-2">
           <Logo size={26} />
           <Wordmark className="text-lg" />
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm text-black/60 hover:text-black transition">
+          <Link href="/login" className="text-sm text-black/60 hover:text-black transition ff-link-underline">
             Connexion
           </Link>
           <TrackedLink
             href="/signup"
             event="cta_click_header_signup"
-            className="text-sm bg-white border border-black/20 px-4 py-2 rounded-full font-medium hover:border-black/40 transition"
+            className="text-sm bg-white border border-black/20 px-4 py-2 rounded-full font-medium hover:border-black/40 hover:scale-[1.03] transition"
           >
             Créer un compte
           </TrackedLink>
@@ -54,21 +96,33 @@ export default function Landing() {
       </header>
 
       <section className="w-full max-w-3xl mx-auto text-center px-4 pt-16 pb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/15 text-sm text-black mb-6">
+        <div
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/15 text-sm text-black mb-6 ff-fade-up"
+          style={{ animationDelay: "0.05s" }}
+        >
           ⚡ Ta fiche de révision prête en quelques secondes
         </div>
 
-        <h1 className="font-display text-4xl sm:text-5xl font-bold mb-5 leading-tight">
+        <h1
+          className="font-display text-4xl sm:text-5xl font-bold mb-5 leading-tight ff-fade-up"
+          style={{ animationDelay: "0.15s" }}
+        >
           Transforme ton cours
           <br />
           en fiches de révision.
         </h1>
 
-        <p className="text-black/60 text-lg mb-2 max-w-xl mx-auto">
+        <p
+          className="text-black/60 text-lg mb-2 max-w-xl mx-auto ff-fade-up"
+          style={{ animationDelay: "0.25s" }}
+        >
           Colle un texte, dépose un PDF ou prends ton cours en photo. FishFlow génère résumé, fiche, flashcards et quiz — un outil pensé pour réviser, pas un simple chat généraliste.
         </p>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 mt-6">
+        <div
+          className="flex flex-wrap items-center justify-center gap-2 mb-8 mt-6 ff-fade-up"
+          style={{ animationDelay: "0.35s" }}
+        >
           {["⚡ Rapide", "🎯 Précis", "🧠 Intelligent", "🔒 Sécurisé"].map((tag) => (
             <span key={tag} className="text-sm px-4 py-1.5 rounded-full bg-[#F4F4F5] text-black/70">
               {tag}
@@ -76,16 +130,18 @@ export default function Landing() {
           ))}
         </div>
 
-        <TrackedLink
-          href="/generer"
-          event="cta_click_hero"
-          className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-black text-white hover:bg-[#1a1a1a] transition"
-        >
-          Essayer gratuitement
-        </TrackedLink>
-        <p className="text-black/40 text-sm mt-3 mb-4">3 fiches gratuites par mois · Sans carte bancaire</p>
+        <div className="ff-fade-up" style={{ animationDelay: "0.45s" }}>
+          <TrackedLink
+            href="/generer"
+            event="cta_click_hero"
+            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-black text-white hover:bg-[#1a1a1a] hover:scale-[1.03] transition"
+          >
+            Essayer gratuitement
+          </TrackedLink>
+          <p className="text-black/40 text-sm mt-3 mb-4">3 fiches gratuites par mois · Sans carte bancaire</p>
 
-        <FicheCounter />
+          <FicheCounter />
+        </div>
       </section>
 
       <section className="w-full max-w-3xl mx-auto px-4 pb-24">
@@ -96,7 +152,7 @@ export default function Landing() {
           Exemple généré à partir d'un cours sur la photosynthèse
         </p>
 
-        <div className="bg-white border border-black/10 shadow-md rounded-3xl p-8 sm:p-10 space-y-8">
+        <div className="bg-white border border-black/10 shadow-md rounded-3xl p-8 sm:p-10 space-y-8 ff-card">
           <div>
             <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">📝 Résumé</p>
             <p className="text-base text-black/80 leading-relaxed">
@@ -123,7 +179,7 @@ export default function Landing() {
         </div>
 
         <div className="text-center mt-8">
-          <TrackedLink href="/generer" event="cta_click_exemple" className="text-base font-medium text-black hover:underline">
+          <TrackedLink href="/generer" event="cta_click_exemple" className="text-base font-medium text-black hover:underline ff-link-underline">
             Crée la tienne maintenant →
           </TrackedLink>
         </div>
@@ -138,14 +194,14 @@ export default function Landing() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <div className="bg-white border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto">
+          <div className="bg-white border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto ff-card">
             <div className="text-2xl mb-1">📄</div>
             <p className="text-sm font-medium text-black/80">Cours, PDF ou photo</p>
           </div>
 
           <div className="text-black/30 text-2xl rotate-90 sm:rotate-0">→</div>
 
-          <div className="bg-[#F4F4F5] border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto">
+          <div className="bg-[#F4F4F5] border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto ff-card">
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <Logo size={20} />
             </div>
@@ -161,7 +217,7 @@ export default function Landing() {
               { icon: "🎴", label: "Flashcards" },
               { icon: "❓", label: "Quiz" },
             ].map((item) => (
-              <div key={item.label} className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-center">
+              <div key={item.label} className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-center ff-card">
                 <div className="text-lg">{item.icon}</div>
                 <p className="text-xs font-medium text-black/70">{item.label}</p>
               </div>
@@ -181,7 +237,7 @@ export default function Landing() {
             { icon: "💾", title: "Tes fiches, sauvegardées", desc: "Retrouve tout ton historique dans « Mes fiches », sans perdre une conversation dans le vide." },
             { icon: "📥", title: "Export PDF prêt à réviser", desc: "Un document propre, téléchargeable, imprimable — pas un texte à copier-coller toi-même." },
           ].map((item) => (
-            <div key={item.title} className="bg-white border border-black/10 rounded-2xl p-5 flex gap-4">
+            <div key={item.title} className="bg-white border border-black/10 rounded-2xl p-5 flex gap-4 ff-card">
               <div className="text-2xl shrink-0">{item.icon}</div>
               <div>
                 <h3 className="font-medium text-sm mb-1">{item.title}</h3>
@@ -201,7 +257,7 @@ export default function Landing() {
             { icon: "✨", title: "3. Ta fiche est générée", desc: "Résumé, fiche, flashcards et quiz prêts" },
             { icon: "📤", title: "4. Révise", desc: "Consulte, télécharge, révise efficacement" },
           ].map((step) => (
-            <div key={step.title} className="bg-white border border-black/10 rounded-2xl p-5 text-center hover:shadow-md transition">
+            <div key={step.title} className="bg-white border border-black/10 rounded-2xl p-5 text-center ff-card">
               <div className="w-11 h-11 mx-auto mb-3 rounded-full bg-black flex items-center justify-center text-lg">
                 {step.icon}
               </div>
@@ -217,7 +273,7 @@ export default function Landing() {
           Commence gratuitement, passe Premium quand tu veux
         </h2>
         <div className="grid sm:grid-cols-2 gap-5">
-          <div className="bg-white border border-black/10 rounded-2xl p-6">
+          <div className="bg-white border border-black/10 rounded-2xl p-6 ff-card">
             <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-2">Gratuit</p>
             <p className="text-3xl font-bold mb-1">0 €</p>
             <p className="text-black/40 text-sm mb-5">3 fiches par mois</p>
@@ -236,7 +292,7 @@ export default function Landing() {
             </TrackedLink>
           </div>
 
-          <div className="bg-black text-white rounded-2xl p-6 relative">
+          <div className="bg-black text-white rounded-2xl p-6 relative ff-card">
             <span className="absolute -top-3 left-6 text-xs font-semibold px-3 py-1 rounded-full bg-white text-black">
               Populaire
             </span>
@@ -280,7 +336,7 @@ export default function Landing() {
         <TrackedLink
           href="/generer"
           event="cta_click_final"
-          className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-black text-white hover:bg-[#1a1a1a] transition"
+          className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-black text-white hover:bg-[#1a1a1a] hover:scale-[1.03] transition"
         >
           Essayer gratuitement
         </TrackedLink>
@@ -289,11 +345,11 @@ export default function Landing() {
 
       <footer className="w-full max-w-5xl mx-auto px-4 py-6 border-t border-black/10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-black/30 text-sm">© {new Date().getFullYear()} FishFlow</p>
+          <p className="text-black/30 text-sm">© {new Date().getFullYear()} FishFlow — Projet créé par un étudiant en MMI</p>
           <div className="flex gap-4 text-sm text-black/30">
-            <Link href="/mentions-legales" className="hover:text-black/60 hover:underline">Mentions légales</Link>
-            <Link href="/cgu" className="hover:text-black/60 hover:underline">CGU</Link>
-            <Link href="/confidentialite" className="hover:text-black/60 hover:underline">Confidentialité</Link>
+            <Link href="/mentions-legales" className="hover:text-black/60 hover:underline ff-link-underline">Mentions légales</Link>
+            <Link href="/cgu" className="hover:text-black/60 hover:underline ff-link-underline">CGU</Link>
+            <Link href="/confidentialite" className="hover:text-black/60 hover:underline ff-link-underline">Confidentialité</Link>
           </div>
         </div>
       </footer>

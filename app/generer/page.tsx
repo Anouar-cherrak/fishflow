@@ -9,7 +9,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { trackEvent } from "@/lib/tracking";
 import type { User } from "@supabase/supabase-js";
 
-type Mode = "text" | "pdf" | "photo";
+type Mode = "text" | "pdf" | "pptx" | "photo";
 type OutputKey = "summary" | "sheet" | "flashcards" | "quiz";
 type Difficulty = "facile" | "moyen" | "difficile";
 type Length = "court" | "moyen" | "detaille";
@@ -265,7 +265,7 @@ function GenererContent() {
                   <p className="text-xs font-semibold text-black/30 uppercase tracking-wide mb-2">Gratuit</p>
                   <ul className="text-sm text-black/60 space-y-1.5">
                     <li>3 fiches / mois</li>
-                    <li>Texte, PDF, photo</li>
+                    <li>Texte, PDF, PowerPoint, photo</li>
                     <li>Export PDF</li>
                   </ul>
                 </div>
@@ -273,7 +273,7 @@ function GenererContent() {
                   <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
                   <ul className="text-sm text-black space-y-1.5">
                     <li className="font-medium">Fiches illimitées</li>
-                    <li>Texte, PDF, photo</li>
+                    <li>Texte, PDF, PowerPoint, photo</li>
                     <li>Export PDF</li>
                   </ul>
                 </div>
@@ -295,15 +295,15 @@ function GenererContent() {
 
           <div className="bg-white border border-black/10 rounded-2xl p-8">
             <div className="flex gap-1 mb-6 bg-[#F4F4F5] rounded-lg p-1">
-              {(["text", "pdf", "photo"] as Mode[]).map((m) => (
+              {(["text", "pdf", "pptx", "photo"] as Mode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => { setMode(m); setFile(null); }}
-                  className={`flex-1 px-3 py-2 rounded-md font-medium text-sm transition ${
+                  className={`flex-1 px-2 py-2 rounded-md font-medium text-xs sm:text-sm transition ${
                     mode === m ? "bg-black text-white" : "text-black/50 hover:text-black/80"
                   }`}
                 >
-                  {m === "text" ? "Texte" : m === "pdf" ? "PDF" : "Photo"}
+                  {m === "text" ? "Texte" : m === "pdf" ? "PDF" : m === "pptx" ? "PowerPoint" : "Photo"}
                 </button>
               ))}
             </div>
@@ -317,18 +317,24 @@ function GenererContent() {
               />
             )}
 
-            {(mode === "pdf" || mode === "photo") && (
+            {(mode === "pdf" || mode === "pptx" || mode === "photo") && (
               <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
-                <span className="text-3xl mb-2">{mode === "pdf" ? "📄" : "🖼️"}</span>
+                <span className="text-3xl mb-2">{mode === "pdf" ? "📄" : mode === "pptx" ? "📊" : "🖼️"}</span>
                 <span className="text-black font-medium text-sm mb-1">
-                  {file ? file.name : `Choisir ${mode === "pdf" ? "un PDF" : "une photo"}`}
+                  {file ? file.name : `Choisir ${mode === "pdf" ? "un PDF" : mode === "pptx" ? "un PowerPoint" : "une photo"}`}
                 </span>
                 <span className="text-black/40 text-xs">
                   {file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}
                 </span>
                 <input
                   type="file"
-                  accept={mode === "pdf" ? "application/pdf" : "image/*"}
+                  accept={
+                    mode === "pdf"
+                      ? "application/pdf"
+                      : mode === "pptx"
+                      ? ".pptx,.ppt,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                      : "image/*"
+                  }
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />

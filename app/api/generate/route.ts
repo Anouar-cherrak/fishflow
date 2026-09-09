@@ -9,8 +9,8 @@ export const runtime = "nodejs";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const MAX_CHARS = 15000;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 Mo
-const TIMEOUT_MS = 30000; // 30 secondes
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const TIMEOUT_MS = 30000;
 
 const DIFFICULTY_TEXT: Record<string, string> = {
   facile: "Utilise un langage très simple, accessible à un débutant, évite tout jargon technique.",
@@ -19,16 +19,16 @@ const DIFFICULTY_TEXT: Record<string, string> = {
 };
 
 const LENGTH_TEXT: Record<string, string> = {
-  court: "Sois très concis : résumé en 2-3 phrases, 3 à 4 points clés maximum, 4 à 5 flashcards, 3 questions de quiz.",
-  moyen: "Longueur standard : résumé en un paragraphe, 5 à 7 points clés, 6 à 8 flashcards, 5 questions de quiz.",
-  detaille: "Sois complet et détaillé : résumé développé, 8 à 10 points clés, 10 à 12 flashcards, 8 questions de quiz.",
+  court: "Résumé en 3 à 4 phrases maximum. 3 à 4 points clés. 4 à 5 flashcards. 3 questions de quiz.",
+  moyen: "Résumé en 5 à 8 phrases maximum. 5 à 7 points clés. 6 à 8 flashcards. 5 questions de quiz.",
+  detaille: "Résumé en 8 à 12 phrases. 8 à 10 points clés. 10 à 12 flashcards. 8 questions de quiz.",
 };
 
 const OUTPUT_SCHEMAS: Record<string, string> = {
   summary: `"summary": string`,
   sheet: `"sheet": array de strings (points clés)`,
   flashcards: `"flashcards": array d'objets {question, answer}`,
-  quiz: `"quiz": array d'objets {question, options (array de 4 strings), correctIndex}`,
+  quiz: `"quiz": array d'objets {question, options (array de 4 strings), correctIndex (index numérique 0 à 3 de la bonne réponse dans options)}`,
 };
 
 function buildSystemPrompt(outputs: string[], difficulty: string, length: string) {
@@ -37,11 +37,26 @@ function buildSystemPrompt(outputs: string[], difficulty: string, length: string
     .map((o) => OUTPUT_SCHEMAS[o])
     .join(", ");
 
-  return `Tu es un assistant pédagogique. À partir du contenu fourni, génère un JSON avec exactement ces clés :
+  return `Tu es un excellent assistant pédagogique, spécialisé dans la création de fiches de révision de haute qualité pour des étudiants.
+
+Le contenu que tu reçois peut provenir de sources très variées : texte brut, PDF de cours, PDF scanné, diapositives de PowerPoint (souvent avec peu de texte par diapositive, des listes à puces, des titres courts, une structure implicite), ou une photo de notes manuscrites ou de tableau.
+
+Ta mission : quelle que soit la source, identifie les concepts réellement importants — pas juste ce qui est écrit en gros, mais ce qui structure le cours (définitions, mécanismes, exemples clés, relations de cause à effet, chiffres et dates importants). Ignore le bruit (numéros de page, en-têtes/pieds de page répétitifs, mentions de copyright, éléments purement décoratifs).
+
+Si le contenu est fragmenté ou peu détaillé (typique d'un support de diapositives), reconstruis intelligemment la logique du cours à partir des titres, listes et mots-clés fournis, sans jamais inventer d'information qui ne peut raisonnablement être déduite du contenu donné.
+
+À partir de ce contenu, génère un JSON avec exactement ces clés :
 "sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}.
-${DIFFICULTY_TEXT[difficulty] || DIFFICULTY_TEXT.moyen}
-${LENGTH_TEXT[length] || LENGTH_TEXT.moyen}
-Ne génère QUE les clés listées ci-dessus. Réponds uniquement en JSON, rien d'autre.`;
+
+Règles strictes de qualité :
+- N'invente jamais un fait, un chiffre ou une définition qui n'apparaît pas dans le contenu fourni.
+- Priorise la clarté et l'utilité pour la révision plutôt que l'exhaustivité : mieux vaut peu de points clés vraiment importants que beaucoup de détails secondaires.
+- Reste direct, sans tournures compliquées inutiles.
+- ${DIFFICULTY_TEXT[difficulty] || DIFFICULTY_TEXT.moyen}
+- ${LENGTH_TEXT[length] || LENGTH_TEXT.moyen}
+- Pour le quiz, correctIndex doit être l'index exact (0, 1, 2 ou 3) de la bonne réponse dans le tableau options — jamais le texte de la réponse. Les 3 mauvaises réponses doivent être plausibles, pas absurdes.
+- Ne génère QUE les clés listées ci-dessus, rien d'autre.
+- Réponds uniquement en JSON valide, sans texte avant ou après, sans balises markdown.`;
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -54,7 +69,6 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 }
 
 export async function POST(req: Request) {
-  // --- Authentification ---
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -65,7 +79,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // --- Vérification du quota (avant tout traitement, pour ne pas gaspiller de ressources) ---
   const pro = await isProUser(user.id);
 
   if (!pro) {
@@ -121,7 +134,7 @@ export async function POST(req: Request) {
       const limitedText = text.slice(0, MAX_CHARS);
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: limitedText },
+        { role: "user", content: `Contenu du cours :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "pdf") {
       const file = formData.get("file") as File;
@@ -152,7 +165,49 @@ export async function POST(req: Request) {
 
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: limitedText },
+        { role: "user", content: `Contenu du cours (extrait d'un PDF) :\n"""\n${limitedText}\n"""` },
+      ];
+    } else if (mode === "pptx") {
+      const file = formData.get("file") as File;
+      if (!file) {
+        return NextResponse.json({ error: "Aucun fichier PowerPoint reçu." }, { status: 400 });
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { error: "Le fichier est trop volumineux (10 Mo maximum)." },
+          { status: 400 }
+        );
+      }
+
+      const officeParser = await import("officeparser");
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+      let extracted: string;
+      try {
+        const parsed: any = await officeParser.parseOffice(buffer);
+        extracted = typeof parsed === "string" ? parsed : JSON.stringify(parsed);
+      } catch {
+        return NextResponse.json(
+          { error: "Impossible de lire ce fichier PowerPoint. Vérifie qu'il n'est pas corrompu." },
+          { status: 400 }
+        );
+      }
+
+      const limitedText = extracted.slice(0, MAX_CHARS);
+
+      if (limitedText.trim().length < 20) {
+        return NextResponse.json(
+          { error: "Ce fichier PowerPoint ne contient pas assez de texte exploitable." },
+          { status: 400 }
+        );
+      }
+
+      messages = [
+        { role: "system", content: SYSTEM_PROMPT },
+        {
+          role: "user",
+          content: `Contenu du cours (extrait de diapositives PowerPoint, texte fragmenté par diapositive) :\n"""\n${limitedText}\n"""`,
+        },
       ];
     } else if (mode === "photo") {
       const file = formData.get("file") as File;
@@ -173,7 +228,7 @@ export async function POST(req: Request) {
         {
           role: "user",
           content: [
-            { type: "text", text: "Lis le contenu de cette image et génère le JSON demandé." },
+            { type: "text", text: "Lis le contenu de cette image (le cours) et génère le JSON demandé." },
             { type: "image_url", image_url: { url: `data:${file.type};base64,${base64}` } },
           ],
         },
@@ -212,7 +267,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Comptabilise l'usage seulement après un succès réel (on ne pénalise pas les échecs techniques)
     if (!pro) {
       await incrementUsage(user.id);
     }
