@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { extractText, getDocumentProxy } from "unpdf";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getUsage, incrementUsage, isProUser } from "@/lib/usage";
 
 export const runtime = "nodejs";
@@ -11,7 +12,6 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const MAX_CHARS_FREE = 15000;
 const MAX_CHARS_PRO = 60000;
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const TIMEOUT_MS = 50000;
 
 const DIFFICULTY_TEXT: Record<string, string> = {
@@ -95,10 +95,9 @@ export async function POST(req: Request) {
     }
   }
 
-  let formData: FormData;
-
+  let body: any;
   try {
-    formData = await req.formData();
+    body = await req.json();
   } catch {
     return NextResponse.json(
       { error: "Impossible de lire les données envoyées. Réessaie." },
@@ -106,11 +105,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const mode = formData.get("mode") as string;
-  const outputsRaw = (formData.get("outputs") as string) || "summary,sheet,flashcards,quiz";
-  const outputs = outputsRaw.split(",").filter(Boolean);
-  const difficulty = (formData.get("difficulty") as string) || "moyen";
-  const length = (formData.get("length") as string) || "moyen";
+  const { mode, storagePath } = body;
+  const outputsRaw = body.outputs || "summary,sheet,flashcards,quiz";
+  const outputs = String(outputsRaw).split(",").filter(Boolean);
+  const difficulty = body.difficulty || "moyen";
+  const length = body.length || "moyen";
 
   if (outputs.length === 0) {
     return NextResponse.json(
@@ -120,42 +119,55 @@ export async function POST(req: Request) {
   }
 
   const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length);
-
+  const admin = createAdminClient();
   let messages: any[];
   let wasTruncated = false;
 
   try {
     if (mode === "text") {
-      const text = formData.get("text") as string;
+      const text = body.text as string;
       if (!text || text.trim().length < 10) {
         return NextResponse.json(
           { error: "Le texte est trop court ou vide. Ajoute plus de contenu." },
           { status: 400 }
         );
       }
-      wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: `Contenu du cours :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "pdf") {
-      const file = formData.get("file") as File;
-      if (!file) {
+      if (!storagePath) {
         return NextResponse.json({ error: "Aucun fichier PDF reçu." }, { status: 400 });
       }
-      if (file.size > MAX_FILE_SIZE) {
+
+      const { data: fileBlob, error: downloadError } = await admin.storage
+        .from("cours-uploads")
+        .download(storagePath);
+
+      if (downloadError || !fileBlob) {
         return NextResponse.json(
-          { error: "Le fichier est trop volumineux (10 Mo maximum)." },
+          {
+            error: "Impossible de récupérer le fichier envoyé. Réessaie.",
+            debug: {
+              storagePath,
+              downloadError: downloadError ? JSON.stringify(downloadError) : null,
+              supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+            },
+          },
           { status: 400 }
         );
       }
 
-      const buffer = new Uint8Array(await file.arrayBuffer());
+      const arrayBuffer = await fileBlob.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
       const pdf = await getDocumentProxy(buffer);
       const { text } = await extractText(pdf, { mergePages: true });
       wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
+
+      await admin.storage.from("cours-uploads").remove([storagePath]);
 
       if (limitedText.trim().length < 20) {
         return NextResponse.json(
@@ -183,26 +195,42 @@ export async function POST(req: Request) {
         { role: "user", content: `Contenu du cours (extrait d'un PDF) :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "photo") {
-      const file = formData.get("file") as File;
-      if (!file) {
+      if (!storagePath) {
         return NextResponse.json({ error: "Aucune photo reçue." }, { status: 400 });
       }
-      if (file.size > MAX_FILE_SIZE) {
+
+      const { data: fileBlob, error: downloadError } = await admin.storage
+        .from("cours-uploads")
+        .download(storagePath);
+
+      if (downloadError || !fileBlob) {
         return NextResponse.json(
-          { error: "L'image est trop volumineuse (10 Mo maximum)." },
+          {
+            error: "Impossible de récupérer le fichier envoyé. Réessaie.",
+            debug: {
+              storagePath,
+              downloadError: downloadError ? JSON.stringify(downloadError) : null,
+              supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+            },
+          },
           { status: 400 }
         );
       }
 
-      const buffer = Buffer.from(await file.arrayBuffer());
+      const arrayBuffer = await fileBlob.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
       const base64 = buffer.toString("base64");
+      const mimeType = fileBlob.type || "image/jpeg";
+
+      await admin.storage.from("cours-uploads").remove([storagePath]);
+
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
           content: [
             { type: "text", text: "Lis le contenu de cette image (le cours) et génère le JSON demandé." },
-            { type: "image_url", image_url: { url: `data:${file.type};base64,${base64}` } },
+            { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64}` } },
           ],
         },
       ];
@@ -211,6 +239,9 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("Erreur lecture/extraction fichier:", err);
+    if (storagePath) {
+      await admin.storage.from("cours-uploads").remove([storagePath]).catch(() => {});
+    }
     return NextResponse.json(
       { error: "Impossible de lire ce fichier. Vérifie qu'il n'est pas corrompu et réessaie." },
       { status: 400 }
