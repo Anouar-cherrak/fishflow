@@ -29,11 +29,14 @@ const OUTPUT_OPTIONS: { key: OutputKey; label: string }[] = [
 ];
 
 const LOADING_MESSAGES = [
+  "Envoi du fichier...",
   "Lecture du contenu...",
   "Analyse en cours...",
   "Génération de ta fiche...",
   "Presque fini...",
 ];
+
+const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
 
 function GenererContent() {
   const [mode, setMode] = useState<Mode>("text");
@@ -132,21 +135,52 @@ function GenererContent() {
       return;
     }
 
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("mode", mode);
-    formData.append("outputs", outputs.join(","));
-    formData.append("difficulty", difficulty);
-    formData.append("length", length);
-
-    if (mode === "text") {
-      formData.append("text", text);
-    } else if (file) {
-      formData.append("file", file);
+    if ((mode === "pdf" || mode === "photo") && file && file.size > MAX_UPLOAD_SIZE) {
+      alert("Ce fichier dépasse la taille maximale autorisée (50 Mo).");
+      return;
     }
 
+    setLoading(true);
+
     try {
-      const res = await fetch("/api/generate", { method: "POST", body: formData });
+      let storagePath: string | undefined;
+
+      if (mode === "pdf" || mode === "photo") {
+        if (!file) {
+          setLoading(false);
+          return;
+        }
+
+        const supabase = createClient();
+        const path = `${user.id}/${Date.now()}-${file.name}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("cours-uploads")
+          .upload(path, file, { upsert: true });
+
+        if (uploadError) {
+          trackEvent("generation_echouee", { mode, reason: "upload_echoue" });
+          alert("Impossible d'envoyer ce fichier. Réessaie.");
+          setLoading(false);
+          return;
+        }
+
+        storagePath = path;
+      }
+
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode,
+          outputs: outputs.join(","),
+          difficulty,
+          length,
+          text: mode === "text" ? text : undefined,
+          storagePath,
+        }),
+      });
+
       const data = await res.json();
 
       if (!res.ok) {
