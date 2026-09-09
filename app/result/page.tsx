@@ -162,10 +162,10 @@ export default function Result() {
     <main className="min-h-screen bg-white text-black py-10 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-          <button onClick={handleClear} className="text-sm text-black/30 hover:text-black transition">
+          <button onClick={handleClear} className="text-sm text-black/30 hover:text-black transition ff-link-underline">
             🗑️ Effacer cette fiche
           </button>
-          <button onClick={() => router.push("/generer")} className="text-sm text-black/60 hover:text-black font-medium transition">
+          <button onClick={() => router.push("/generer")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
             ← Nouveau document
           </button>
         </div>
@@ -266,7 +266,7 @@ export default function Result() {
         <button
           onClick={handleDownloadPDF}
           disabled={downloading}
-          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-black text-white hover:bg-[#1a1a1a] transition w-full disabled:opacity-50 flex items-center justify-center gap-2"
+          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-black text-white hover:bg-[#1a1a1a] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 ff-btn"
         >
           {downloading ? (
             <>

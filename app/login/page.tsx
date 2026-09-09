@@ -32,7 +32,7 @@ export default function Login() {
 
   return (
     <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8">
+      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card">
         <div className="flex items-center gap-2 mb-6">
           <Logo size={24} />
           <Wordmark />
@@ -46,7 +46,7 @@ export default function Login() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
           placeholder="toi@exemple.com"
         />
 
@@ -55,12 +55,12 @@ export default function Login() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
           placeholder="Ton mot de passe"
         />
 
         {error && (
-          <p className="text-sm text-black bg-black/5 border border-black/20 rounded-lg p-3 mb-4 font-medium">
+          <p className="text-sm text-black bg-black/5 border border-black/20 rounded-lg p-3 mb-4 font-medium ff-fade">
             {error}
           </p>
         )}
@@ -68,14 +68,14 @@ export default function Login() {
         <button
           onClick={handleLogin}
           disabled={loading || !email || !password}
-          className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30"
+          className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>
 
         <p className="text-sm text-black/50 text-center mt-4">
           Pas encore de compte ?{" "}
-          <button onClick={() => router.push("/signup")} className="text-black hover:underline font-medium">
+          <button onClick={() => router.push("/signup")} className="text-black hover:underline font-medium ff-link-underline">
             Créer un compte
           </button>
         </p>

@@ -42,7 +42,7 @@ export default function Signup() {
 
   return (
     <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8">
+      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card">
         <div className="flex items-center gap-2 mb-6">
           <Logo size={24} />
           <Wordmark />
@@ -56,7 +56,7 @@ export default function Signup() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
           placeholder="toi@exemple.com"
         />
 
@@ -65,12 +65,12 @@ export default function Signup() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
           placeholder="6 caractères minimum"
         />
 
         {message && (
-          <p className="text-sm text-black bg-[#F4F4F5] border border-black/15 rounded-lg p-3 mb-4">
+          <p className="text-sm text-black bg-[#F4F4F5] border border-black/15 rounded-lg p-3 mb-4 ff-fade">
             {message}
           </p>
         )}
@@ -78,7 +78,7 @@ export default function Signup() {
         <button
           onClick={handleSignup}
           disabled={loading || !email || !password}
-          className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30"
+          className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Création..." : "Créer mon compte"}
         </button>
@@ -89,7 +89,7 @@ export default function Signup() {
 
         <p className="text-sm text-black/50 text-center mt-3">
           Déjà un compte ?{" "}
-          <button onClick={() => router.push("/login")} className="text-black hover:underline font-medium">
+          <button onClick={() => router.push("/login")} className="text-black hover:underline font-medium ff-link-underline">
             Se connecter
           </button>
         </p>

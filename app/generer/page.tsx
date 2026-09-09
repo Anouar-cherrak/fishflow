@@ -9,7 +9,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { trackEvent } from "@/lib/tracking";
 import type { User } from "@supabase/supabase-js";
 
-type Mode = "text" | "pdf" | "pptx" | "photo";
+type Mode = "text" | "pdf" | "photo";
 type OutputKey = "summary" | "sheet" | "flashcards" | "quiz";
 type Difficulty = "facile" | "moyen" | "difficile";
 type Length = "court" | "moyen" | "detaille";
@@ -153,6 +153,12 @@ function GenererContent() {
         setLoading(false);
         if (data.quotaExceeded) {
           trackEvent("quota_atteint", { mode });
+        } else if (data.requiresPro) {
+          trackEvent("pdf_trop_volumineux", { mode });
+          if (confirm(data.error + "\n\nVoir les tarifs Pro ?")) {
+            router.push("/pricing");
+          }
+          return;
         } else {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
         }
@@ -190,22 +196,25 @@ function GenererContent() {
       {loading && (
         <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-50 px-6">
           <div className="w-10 h-10 border-4 border-black/10 border-t-black rounded-full animate-spin mb-4" />
-          <p className="text-black font-medium mb-4">{LOADING_MESSAGES[loadingStep]}</p>
+          <p className="text-black font-medium mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
           <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
-            <div className="h-full bg-black transition-all duration-300 ease-out" style={{ width: `${progress}%` }} />
+            <div
+              className="h-full ff-progress-shimmer transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
           </div>
-          <p className="text-black/40 text-sm mt-3">Ça peut prendre jusqu'à 20-30 secondes.</p>
+          <p className="text-black/40 text-sm mt-3">Ça peut prendre jusqu'à 30-40 secondes.</p>
         </div>
       )}
 
       <div className="w-full flex flex-col items-center px-4 py-6">
-        <div className="w-full max-w-lg flex flex-wrap justify-between items-center gap-3 mb-6">
-          <Link href="/" className="text-sm text-black/50 hover:text-black transition">← FishFlow</Link>
+        <div className="w-full max-w-lg flex flex-wrap justify-between items-center gap-3 mb-6 ff-fade">
+          <Link href="/" className="text-sm text-black/50 hover:text-black transition ff-link-underline">← FishFlow</Link>
           <div className="flex items-center gap-3">
             {!checkingAuth && (
               user ? (
                 <>
-                  <button onClick={() => router.push("/mes-fiches")} className="text-sm text-black/60 hover:text-black font-medium transition">
+                  <button onClick={() => router.push("/mes-fiches")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
                     Mes fiches
                   </button>
                   <span className="hidden sm:inline text-sm text-black/40">{user.email}</span>
@@ -215,10 +224,10 @@ function GenererContent() {
                 </>
               ) : (
                 <>
-                  <button onClick={() => router.push("/login")} className="text-sm text-black/60 hover:text-black font-medium transition">
+                  <button onClick={() => router.push("/login")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
                     Connexion
                   </button>
-                  <button onClick={() => router.push("/signup")} className="text-sm bg-white border border-black/20 px-3 py-1.5 rounded-full font-medium hover:border-black/40 transition">
+                  <button onClick={() => router.push("/signup")} className="text-sm bg-white border border-black/20 px-3 py-1.5 rounded-full font-medium hover:border-black/40 transition ff-btn">
                     Créer un compte
                   </button>
                 </>
@@ -228,7 +237,7 @@ function GenererContent() {
         </div>
 
         <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4 ff-fade-up" style={{ animationDelay: "0.05s" }}>
             <div className="w-11 h-11 bg-white border border-black/10 rounded-xl flex items-center justify-center shrink-0">
               <Logo size={22} />
             </div>
@@ -238,10 +247,12 @@ function GenererContent() {
             </div>
           </div>
 
-          <InstallPWA />
+          <div className="ff-fade-up" style={{ animationDelay: "0.1s" }}>
+            <InstallPWA />
+          </div>
 
           {user && usage?.isPro && (
-            <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-black text-white flex items-center justify-between gap-3 flex-wrap">
+            <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-black text-white flex items-center justify-between gap-3 flex-wrap ff-fade-up" style={{ animationDelay: "0.15s" }}>
               <div className="flex items-center gap-2">
                 <span className="text-lg">✨</span>
                 <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
@@ -253,7 +264,7 @@ function GenererContent() {
           )}
 
           {user && usage && !usage.isPro && (
-            <div className="mb-4 bg-white border border-black/10 rounded-2xl overflow-hidden">
+            <div className="mb-4 bg-white border border-black/10 rounded-2xl overflow-hidden ff-fade-up ff-card" style={{ animationDelay: "0.15s" }}>
               <div className={`px-5 py-3 text-sm font-medium ${usage.remaining === 0 ? "bg-black/5 text-black" : "bg-[#F4F4F5] text-black/70"}`}>
                 {usage.remaining === 0
                   ? "Tu as atteint ta limite gratuite de ce mois-ci."
@@ -265,7 +276,8 @@ function GenererContent() {
                   <p className="text-xs font-semibold text-black/30 uppercase tracking-wide mb-2">Gratuit</p>
                   <ul className="text-sm text-black/60 space-y-1.5">
                     <li>3 fiches / mois</li>
-                    <li>Texte, PDF, PowerPoint, photo</li>
+                    <li>Texte, PDF, photo</li>
+                    <li>PDF jusqu'à ~15 pages</li>
                     <li>Export PDF</li>
                   </ul>
                 </div>
@@ -273,14 +285,15 @@ function GenererContent() {
                   <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
                   <ul className="text-sm text-black space-y-1.5">
                     <li className="font-medium">Fiches illimitées</li>
-                    <li>Texte, PDF, PowerPoint, photo</li>
+                    <li>Texte, PDF, photo</li>
+                    <li className="font-medium">PDF jusqu'à 60+ pages</li>
                     <li>Export PDF</li>
                   </ul>
                 </div>
               </div>
 
               <div className="px-5 pb-5">
-                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition">
+                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition ff-btn">
                   Passer Pro — 4,99 €/mois
                 </button>
               </div>
@@ -288,22 +301,22 @@ function GenererContent() {
           )}
 
           {!user && !checkingAuth && (
-            <div className="mb-4 px-4 py-2.5 rounded-lg text-sm bg-[#F4F4F5] text-black/60">
+            <div className="mb-4 px-4 py-2.5 rounded-lg text-sm bg-[#F4F4F5] text-black/60 ff-fade-up" style={{ animationDelay: "0.15s" }}>
               Connecte-toi pour générer des fiches (3 gratuites par mois).
             </div>
           )}
 
-          <div className="bg-white border border-black/10 rounded-2xl p-8">
+          <div className="bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card" style={{ animationDelay: "0.2s" }}>
             <div className="flex gap-1 mb-6 bg-[#F4F4F5] rounded-lg p-1">
-              {(["text", "pdf", "pptx", "photo"] as Mode[]).map((m) => (
+              {(["text", "pdf", "photo"] as Mode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => { setMode(m); setFile(null); }}
-                  className={`flex-1 px-2 py-2 rounded-md font-medium text-xs sm:text-sm transition ${
+                  className={`flex-1 px-3 py-2 rounded-md font-medium text-sm transition ${
                     mode === m ? "bg-black text-white" : "text-black/50 hover:text-black/80"
                   }`}
                 >
-                  {m === "text" ? "Texte" : m === "pdf" ? "PDF" : m === "pptx" ? "PowerPoint" : "Photo"}
+                  {m === "text" ? "Texte" : m === "pdf" ? "PDF" : "Photo"}
                 </button>
               ))}
             </div>
@@ -313,28 +326,22 @@ function GenererContent() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Colle ton texte ici..."
-                className="w-full h-40 p-4 border border-black/15 rounded-xl mb-5 text-black placeholder-black/30 bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                className="w-full h-40 p-4 border border-black/15 rounded-xl mb-5 text-black placeholder-black/30 bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm ff-input"
               />
             )}
 
-            {(mode === "pdf" || mode === "pptx" || mode === "photo") && (
+            {(mode === "pdf" || mode === "photo") && (
               <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
-                <span className="text-3xl mb-2">{mode === "pdf" ? "📄" : mode === "pptx" ? "📊" : "🖼️"}</span>
+                <span className="text-3xl mb-2">{mode === "pdf" ? "📄" : "🖼️"}</span>
                 <span className="text-black font-medium text-sm mb-1">
-                  {file ? file.name : `Choisir ${mode === "pdf" ? "un PDF" : mode === "pptx" ? "un PowerPoint" : "une photo"}`}
+                  {file ? file.name : `Choisir ${mode === "pdf" ? "un PDF" : "une photo"}`}
                 </span>
                 <span className="text-black/40 text-xs">
                   {file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}
                 </span>
                 <input
                   type="file"
-                  accept={
-                    mode === "pdf"
-                      ? "application/pdf"
-                      : mode === "pptx"
-                      ? ".pptx,.ppt,application/vnd.openxmlformats-officedocument.presentationml.presentation"
-                      : "image/*"
-                  }
+                  accept={mode === "pdf" ? "application/pdf" : "image/*"}
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
@@ -369,7 +376,7 @@ function GenererContent() {
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                  className="w-full p-2.5 border border-black/15 rounded-lg bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full p-2.5 border border-black/15 rounded-lg bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
                 >
                   <option value="facile">Facile</option>
                   <option value="moyen">Moyen</option>
@@ -382,7 +389,7 @@ function GenererContent() {
                 <select
                   value={length}
                   onChange={(e) => setLength(e.target.value as Length)}
-                  className="w-full p-2.5 border border-black/15 rounded-lg bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full p-2.5 border border-black/15 rounded-lg bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
                 >
                   <option value="court">Court</option>
                   <option value="moyen">Moyen</option>
@@ -400,7 +407,7 @@ function GenererContent() {
                 outputs.length === 0 ||
                 (!!user && !!usage && !usage.isPro && usage.remaining === 0)
               }
-              className="w-full py-3 rounded-xl font-display font-semibold bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30"
+              className="w-full py-3 rounded-xl font-display font-semibold bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer"}
             </button>

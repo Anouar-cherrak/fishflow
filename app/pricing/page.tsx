@@ -61,11 +61,11 @@ export default function Pricing() {
   if (isPro) {
     return (
       <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-        <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center">
+        <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
           <div className="text-3xl mb-3">✨</div>
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
           <p className="text-black/50 text-sm mb-6">Génération illimitée déjà active sur ton compte.</p>
-          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-xl font-medium bg-black text-white hover:bg-[#1a1a1a] transition">
+          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-xl font-medium bg-black text-white hover:bg-[#1a1a1a] transition ff-btn">
             Retour à l'outil
           </button>
         </div>
@@ -75,7 +75,7 @@ export default function Pricing() {
 
   return (
     <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center">
+      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
         <div className="flex items-center justify-center gap-2 mb-6">
           <Logo size={24} />
           <Wordmark />
@@ -90,6 +90,7 @@ export default function Pricing() {
         <ul className="text-left text-sm text-black/70 space-y-2 mb-6">
           <li>✓ Fiches illimitées</li>
           <li>✓ Texte, PDF et photo</li>
+          <li className="font-medium">✓ PDF volumineux (60+ pages)</li>
           <li>✓ Résumé, fiche, flashcards, quiz</li>
           <li>✓ Export PDF</li>
         </ul>
@@ -97,12 +98,12 @@ export default function Pricing() {
         <button
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full py-3 rounded-xl font-medium bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-50"
+          className="w-full py-3 rounded-xl font-medium bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-50 ff-btn"
         >
           {loading ? "Redirection..." : "Passer Pro"}
         </button>
 
-        <button onClick={() => router.push("/generer")} className="w-full mt-3 text-sm text-black/40 hover:text-black hover:underline transition">
+        <button onClick={() => router.push("/generer")} className="w-full mt-3 text-sm text-black/40 hover:text-black hover:underline transition ff-link-underline">
           Retour
         </button>
       </div>

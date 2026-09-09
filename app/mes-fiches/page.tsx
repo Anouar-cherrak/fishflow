@@ -91,25 +91,25 @@ export default function MesFiches() {
   return (
     <main className="min-h-screen bg-white text-black px-4 py-10">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 ff-fade">
           <Logo size={22} />
           <Wordmark className="text-sm" />
         </div>
 
-        <div className="flex items-center justify-between mb-4 mt-4">
+        <div className="flex items-center justify-between mb-4 mt-4 ff-fade-up">
           <h1 className="text-xl font-semibold">Mes fiches</h1>
-          <button onClick={() => router.push("/generer")} className="text-sm bg-white border border-black/20 px-3 py-1.5 rounded-full font-medium hover:border-black/40 transition">
+          <button onClick={() => router.push("/generer")} className="text-sm bg-white border border-black/20 px-3 py-1.5 rounded-full font-medium hover:border-black/40 transition ff-btn">
             + Nouvelle fiche
           </button>
         </div>
 
         {fiches.length > 0 && (
-          <div className="flex gap-3 mb-6">
-            <div className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-center">
+          <div className="flex gap-3 mb-6 ff-fade-up" style={{ animationDelay: "0.05s" }}>
+            <div className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-center ff-card">
               <p className="text-2xl font-semibold text-black">{thisMonthCount}</p>
               <p className="text-xs text-black/40 mt-0.5">fiche{thisMonthCount > 1 ? "s" : ""} ce mois-ci</p>
             </div>
-            <div className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-center">
+            <div className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-center ff-card">
               <p className="text-2xl font-semibold text-black">{fiches.length}</p>
               <p className="text-xs text-black/40 mt-0.5">au total</p>
             </div>
@@ -117,16 +117,20 @@ export default function MesFiches() {
         )}
 
         {fiches.length === 0 ? (
-          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center">
+          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
             <p className="text-black/50 mb-4">Tu n'as pas encore de fiche sauvegardée.</p>
-            <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition">
+            <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition ff-btn">
               Créer ma première fiche
             </button>
           </div>
         ) : (
           <div className="space-y-3">
-            {fiches.map((fiche) => (
-              <div key={fiche.id} className="bg-white border border-black/10 rounded-xl p-4 flex items-center justify-between gap-4">
+            {fiches.map((fiche, i) => (
+              <div
+                key={fiche.id}
+                className="bg-white border border-black/10 rounded-xl p-4 flex items-center justify-between gap-4 ff-fade-up ff-card"
+                style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
+              >
                 <div className="min-w-0 flex-1">
                   {editingId === fiche.id ? (
                     <div className="flex items-center gap-2">
@@ -161,7 +165,7 @@ export default function MesFiches() {
                   </p>
                 </div>
                 <div className="flex gap-3 shrink-0">
-                  <button onClick={() => handleView(fiche)} className="text-sm text-black font-medium hover:underline transition">
+                  <button onClick={() => handleView(fiche)} className="text-sm text-black font-medium hover:underline transition ff-link-underline">
                     Voir
                   </button>
                   <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition">

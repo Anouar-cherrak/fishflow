@@ -5,12 +5,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getUsage, incrementUsage, isProUser } from "@/lib/usage";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const MAX_CHARS = 15000;
+const MAX_CHARS_FREE = 15000;
+const MAX_CHARS_PRO = 60000;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const TIMEOUT_MS = 30000;
+const TIMEOUT_MS = 50000;
 
 const DIFFICULTY_TEXT: Record<string, string> = {
   facile: "Utilise un langage très simple, accessible à un débutant, évite tout jargon technique.",
@@ -39,11 +41,9 @@ function buildSystemPrompt(outputs: string[], difficulty: string, length: string
 
   return `Tu es un excellent assistant pédagogique, spécialisé dans la création de fiches de révision de haute qualité pour des étudiants.
 
-Le contenu que tu reçois peut provenir de sources très variées : texte brut, PDF de cours, PDF scanné, diapositives de PowerPoint (souvent avec peu de texte par diapositive, des listes à puces, des titres courts, une structure implicite), ou une photo de notes manuscrites ou de tableau.
+Le contenu que tu reçois peut provenir de sources variées : texte brut, PDF de cours (parfois volumineux, plusieurs dizaines de pages), PDF scanné, ou une photo de notes manuscrites ou de tableau.
 
-Ta mission : quelle que soit la source, identifie les concepts réellement importants — pas juste ce qui est écrit en gros, mais ce qui structure le cours (définitions, mécanismes, exemples clés, relations de cause à effet, chiffres et dates importants). Ignore le bruit (numéros de page, en-têtes/pieds de page répétitifs, mentions de copyright, éléments purement décoratifs).
-
-Si le contenu est fragmenté ou peu détaillé (typique d'un support de diapositives), reconstruis intelligemment la logique du cours à partir des titres, listes et mots-clés fournis, sans jamais inventer d'information qui ne peut raisonnablement être déduite du contenu donné.
+Ta mission : identifie les concepts réellement importants — pas juste ce qui est écrit en gros, mais ce qui structure le cours (définitions, mécanismes, exemples clés, relations de cause à effet, chiffres et dates importants). Ignore le bruit (numéros de page, en-têtes/pieds de page répétitifs, mentions de copyright, éléments purement décoratifs). Si le document est long, synthétise l'ensemble plutôt que de te concentrer uniquement sur le début.
 
 À partir de ce contenu, génère un JSON avec exactement ces clés :
 "sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}.
@@ -80,6 +80,7 @@ export async function POST(req: Request) {
   }
 
   const pro = await isProUser(user.id);
+  const MAX_CHARS = pro ? MAX_CHARS_PRO : MAX_CHARS_FREE;
 
   if (!pro) {
     const usage = await getUsage(user.id);
@@ -121,6 +122,7 @@ export async function POST(req: Request) {
   const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length);
 
   let messages: any[];
+  let wasTruncated = false;
 
   try {
     if (mode === "text") {
@@ -131,6 +133,7 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
+      wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
@@ -151,6 +154,7 @@ export async function POST(req: Request) {
       const buffer = new Uint8Array(await file.arrayBuffer());
       const pdf = await getDocumentProxy(buffer);
       const { text } = await extractText(pdf, { mergePages: true });
+      wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
 
       if (limitedText.trim().length < 20) {
@@ -163,51 +167,20 @@ export async function POST(req: Request) {
         );
       }
 
+      if (wasTruncated && !pro) {
+        return NextResponse.json(
+          {
+            error:
+              "Ce PDF est trop volumineux pour un compte gratuit. Passe à FishFlow Pro pour analyser des documents de plus de 60 pages.",
+            requiresPro: true,
+          },
+          { status: 403 }
+        );
+      }
+
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: `Contenu du cours (extrait d'un PDF) :\n"""\n${limitedText}\n"""` },
-      ];
-    } else if (mode === "pptx") {
-      const file = formData.get("file") as File;
-      if (!file) {
-        return NextResponse.json({ error: "Aucun fichier PowerPoint reçu." }, { status: 400 });
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        return NextResponse.json(
-          { error: "Le fichier est trop volumineux (10 Mo maximum)." },
-          { status: 400 }
-        );
-      }
-
-      const officeParser = await import("officeparser");
-      const buffer = Buffer.from(await file.arrayBuffer());
-
-      let extracted: string;
-      try {
-        const parsed: any = await officeParser.parseOffice(buffer);
-        extracted = typeof parsed === "string" ? parsed : JSON.stringify(parsed);
-      } catch {
-        return NextResponse.json(
-          { error: "Impossible de lire ce fichier PowerPoint. Vérifie qu'il n'est pas corrompu." },
-          { status: 400 }
-        );
-      }
-
-      const limitedText = extracted.slice(0, MAX_CHARS);
-
-      if (limitedText.trim().length < 20) {
-        return NextResponse.json(
-          { error: "Ce fichier PowerPoint ne contient pas assez de texte exploitable." },
-          { status: 400 }
-        );
-      }
-
-      messages = [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Contenu du cours (extrait de diapositives PowerPoint, texte fragmenté par diapositive) :\n"""\n${limitedText}\n"""`,
-        },
       ];
     } else if (mode === "photo") {
       const file = formData.get("file") as File;
