@@ -150,7 +150,7 @@ export default function Result() {
           Régénération...
         </>
       ) : (
-        "🔄 Régénérer"
+        "Régénérer"
       )}
     </button>
   );
@@ -163,7 +163,7 @@ export default function Result() {
       <div className="max-w-3xl mx-auto">
         <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
           <button onClick={handleClear} className="text-sm text-black/30 hover:text-black transition ff-link-underline">
-            🗑️ Effacer cette fiche
+            Effacer cette fiche
           </button>
           <button onClick={() => router.push("/generer")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
             ← Nouveau document
@@ -185,7 +185,7 @@ export default function Result() {
           <div ref={summaryRef} className={`pb-6 ${sectionOpacity("summary")}`}>
             <section className="bg-white rounded-xl shadow-sm border border-black/10 p-6">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-black flex items-center gap-2">📝 Résumé</h2>
+                <h2 className="text-lg font-semibold text-black">Résumé</h2>
                 <RegenButton sectionKey="summary" />
               </div>
               <p className="text-black/70 leading-relaxed">{data.summary}</p>
@@ -197,7 +197,7 @@ export default function Result() {
           <div className={`pb-6 ${sectionOpacity("sheet")}`}>
             <div ref={sheetHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-black flex items-center gap-2">📌 Fiche de révision</h2>
+                <h2 className="text-lg font-semibold text-black">Fiche de révision</h2>
                 <RegenButton sectionKey="sheet" />
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function Result() {
           <div className={`pb-6 ${sectionOpacity("flashcards")}`}>
             <div ref={flashcardsHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-black flex items-center gap-2">🎴 Flashcards</h2>
+                <h2 className="text-lg font-semibold text-black">Flashcards</h2>
                 <RegenButton sectionKey="flashcards" />
               </div>
             </div>
@@ -235,7 +235,7 @@ export default function Result() {
           <div className={`pb-6 ${sectionOpacity("quiz")}`}>
             <div ref={quizHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-black flex items-center gap-2">❓ Quiz</h2>
+                <h2 className="text-lg font-semibold text-black">Quiz</h2>
                 <RegenButton sectionKey="quiz" />
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function Result() {
         <button
           onClick={handleDownloadPDF}
           disabled={downloading}
-          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-black text-white hover:bg-[#1a1a1a] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 ff-btn"
+          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-white hover:bg-[#16A34A] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 ff-btn"
         >
           {downloading ? (
             <>
@@ -274,7 +274,7 @@ export default function Result() {
               Génération du PDF...
             </>
           ) : (
-            "📥 Télécharger en PDF"
+            "Télécharger en PDF"
           )}
         </button>
       </div>

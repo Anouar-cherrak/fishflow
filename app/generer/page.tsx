@@ -22,21 +22,18 @@ type UsageInfo = {
 };
 
 const OUTPUT_OPTIONS: { key: OutputKey; label: string }[] = [
-  { key: "summary", label: "📝 Résumé" },
-  { key: "sheet", label: "📌 Fiche de révision" },
-  { key: "flashcards", label: "🎴 Flashcards" },
-  { key: "quiz", label: "❓ Quiz" },
+  { key: "summary", label: "Résumé" },
+  { key: "sheet", label: "Fiche de révision" },
+  { key: "flashcards", label: "Flashcards" },
+  { key: "quiz", label: "Quiz" },
 ];
 
 const LOADING_MESSAGES = [
-  "Envoi du fichier...",
   "Lecture du contenu...",
   "Analyse en cours...",
   "Génération de ta fiche...",
   "Presque fini...",
 ];
-
-const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
 
 function GenererContent() {
   const [mode, setMode] = useState<Mode>("text");
@@ -135,52 +132,21 @@ function GenererContent() {
       return;
     }
 
-    if ((mode === "pdf" || mode === "photo") && file && file.size > MAX_UPLOAD_SIZE) {
-      alert("Ce fichier dépasse la taille maximale autorisée (50 Mo).");
-      return;
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("mode", mode);
+    formData.append("outputs", outputs.join(","));
+    formData.append("difficulty", difficulty);
+    formData.append("length", length);
+
+    if (mode === "text") {
+      formData.append("text", text);
+    } else if (file) {
+      formData.append("file", file);
     }
 
-    setLoading(true);
-
     try {
-      let storagePath: string | undefined;
-
-      if (mode === "pdf" || mode === "photo") {
-        if (!file) {
-          setLoading(false);
-          return;
-        }
-
-        const supabase = createClient();
-        const path = `${user.id}/${Date.now()}-${file.name}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("cours-uploads")
-          .upload(path, file, { upsert: true });
-
-        if (uploadError) {
-          trackEvent("generation_echouee", { mode, reason: "upload_echoue" });
-          alert("Impossible d'envoyer ce fichier. Réessaie.");
-          setLoading(false);
-          return;
-        }
-
-        storagePath = path;
-      }
-
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode,
-          outputs: outputs.join(","),
-          difficulty,
-          length,
-          text: mode === "text" ? text : undefined,
-          storagePath,
-        }),
-      });
-
+      const res = await fetch("/api/generate", { method: "POST", body: formData });
       const data = await res.json();
 
       if (!res.ok) {
@@ -261,7 +227,7 @@ function GenererContent() {
                   <button onClick={() => router.push("/login")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
                     Connexion
                   </button>
-                  <button onClick={() => router.push("/signup")} className="text-sm bg-white border border-black/20 px-3 py-1.5 rounded-full font-medium hover:border-black/40 transition ff-btn">
+                  <button onClick={() => router.push("/signup")} className="text-sm bg-[#22C55E] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
                     Créer un compte
                   </button>
                 </>
@@ -287,10 +253,7 @@ function GenererContent() {
 
           {user && usage?.isPro && (
             <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-black text-white flex items-center justify-between gap-3 flex-wrap ff-fade-up" style={{ animationDelay: "0.15s" }}>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">✨</span>
-                <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
-              </div>
+              <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
               <button onClick={handleManageSubscription} disabled={portalLoading} className="text-xs font-semibold underline text-white/90 hover:text-white disabled:opacity-50">
                 {portalLoading ? "Redirection..." : "Gérer mon abonnement"}
               </button>
@@ -327,7 +290,7 @@ function GenererContent() {
               </div>
 
               <div className="px-5 pb-5">
-                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition ff-btn">
+                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn">
                   Passer Pro — 4,99 €/mois
                 </button>
               </div>
@@ -366,7 +329,6 @@ function GenererContent() {
 
             {(mode === "pdf" || mode === "photo") && (
               <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
-                <span className="text-3xl mb-2">{mode === "pdf" ? "📄" : "🖼️"}</span>
                 <span className="text-black font-medium text-sm mb-1">
                   {file ? file.name : `Choisir ${mode === "pdf" ? "un PDF" : "une photo"}`}
                 </span>
@@ -396,7 +358,7 @@ function GenererContent() {
                       type="checkbox"
                       checked={outputs.includes(opt.key)}
                       onChange={() => toggleOutput(opt.key)}
-                      className="accent-black"
+                      className="accent-[#22C55E]"
                     />
                     {opt.label}
                   </label>
@@ -441,7 +403,7 @@ function GenererContent() {
                 outputs.length === 0 ||
                 (!!user && !!usage && !usage.isPro && usage.remaining === 0)
               }
-              className="w-full py-3 rounded-xl font-display font-semibold bg-black text-white hover:bg-[#1a1a1a] transition disabled:opacity-30 ff-btn"
+              className="w-full py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer"}
             </button>

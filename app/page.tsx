@@ -47,7 +47,7 @@ export default function Landing() {
           <TrackedLink
             href="/signup"
             event="cta_click_header_signup"
-            className="text-sm bg-white border border-black/20 px-4 py-2 rounded-full font-medium hover:border-black/40 transition ff-btn"
+            className="text-sm bg-[#22C55E] text-white px-4 py-2 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn"
           >
             Créer un compte
           </TrackedLink>
@@ -57,7 +57,7 @@ export default function Landing() {
       <section className="w-full max-w-3xl mx-auto text-center px-4 pt-16 pb-16">
         <ScrollReveal delay={0.05}>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/15 text-sm text-black mb-6">
-            <span className="w-2 h-2 rounded-full bg-black ff-glow-dot" />
+            <span className="w-2 h-2 rounded-full bg-[#22C55E] ff-glow-dot" />
             Ta fiche de révision prête en quelques secondes
           </div>
         </ScrollReveal>
@@ -78,7 +78,7 @@ export default function Landing() {
 
         <ScrollReveal delay={0.35}>
           <div className="flex flex-wrap items-center justify-center gap-2 mb-8 mt-6">
-            {["⚡ Rapide", "🎯 Précis", "🧠 Intelligent", "🔒 Sécurisé"].map((tag) => (
+            {["Rapide", "Précis", "Intelligent", "Sécurisé"].map((tag) => (
               <span key={tag} className="text-sm px-4 py-1.5 rounded-full bg-[#F4F4F5] text-black/70">
                 {tag}
               </span>
@@ -90,7 +90,7 @@ export default function Landing() {
           <TrackedLink
             href="/generer"
             event="cta_click_hero"
-            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-black text-white hover:bg-[#1a1a1a] transition ff-btn"
+            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
           >
             Essayer gratuitement
           </TrackedLink>
@@ -112,14 +112,14 @@ export default function Landing() {
         <ScrollReveal delay={0.1} direction="scale">
           <div className="bg-white border border-black/10 shadow-md rounded-3xl p-8 sm:p-10 space-y-8 ff-card">
             <div>
-              <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">📝 Résumé</p>
+              <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">Résumé</p>
               <p className="text-base text-black/80 leading-relaxed">
                 La photosynthèse est le processus par lequel les plantes convertissent la lumière du soleil en énergie chimique, produisant du glucose et de l'oxygène à partir de CO₂ et d'eau.
               </p>
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">📌 Points clés</p>
+              <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">Points clés</p>
               <ul className="text-base text-black/80 space-y-2.5">
                 <li className="flex gap-2"><span className="text-black">•</span> Se déroule dans les chloroplastes</li>
                 <li className="flex gap-2"><span className="text-black">•</span> Nécessite la chlorophylle, la lumière et l'eau</li>
@@ -128,7 +128,7 @@ export default function Landing() {
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">🎴 Flashcard</p>
+              <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">Flashcard</p>
               <div className="bg-[#F4F4F5] rounded-xl p-5">
                 <p className="text-base text-black font-medium mb-1.5">Où se déroule la photosynthèse ?</p>
                 <p className="text-base text-black/50">Dans les chloroplastes des cellules végétales</p>
@@ -159,7 +159,6 @@ export default function Landing() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <ScrollReveal direction="left" delay={0.05}>
             <div className="bg-white border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto ff-card ff-float">
-              <div className="text-2xl mb-1">📄</div>
               <p className="text-sm font-medium text-black/80">Cours, PDF ou photo</p>
             </div>
           </ScrollReveal>
@@ -179,15 +178,9 @@ export default function Landing() {
 
           <ScrollReveal direction="right" delay={0.25}>
             <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
-              {[
-                { icon: "📝", label: "Résumé" },
-                { icon: "📌", label: "Fiche" },
-                { icon: "🎴", label: "Flashcards" },
-                { icon: "❓", label: "Quiz" },
-              ].map((item) => (
-                <div key={item.label} className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-center ff-card">
-                  <div className="text-lg">{item.icon}</div>
-                  <p className="text-xs font-medium text-black/70">{item.label}</p>
+              {["Résumé", "Fiche", "Flashcards", "Quiz"].map((label) => (
+                <div key={label} className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-center ff-card">
+                  <p className="text-xs font-medium text-black/70">{label}</p>
                 </div>
               ))}
             </div>
@@ -203,18 +196,15 @@ export default function Landing() {
         </ScrollReveal>
         <div className="grid sm:grid-cols-2 gap-4">
           {[
-            { icon: "🎯", title: "Pensé uniquement pour réviser", desc: "Pas de chat à faire dériver : un format structuré, pensé dès le départ pour l'apprentissage." },
-            { icon: "⚡", title: "4 formats en un clic", desc: "Résumé, fiche, flashcards et quiz générés en même temps, sans reformuler ta demande 4 fois." },
-            { icon: "💾", title: "Tes fiches, sauvegardées", desc: "Retrouve tout ton historique dans « Mes fiches », sans perdre une conversation dans le vide." },
-            { icon: "📥", title: "Export PDF prêt à réviser", desc: "Un document propre, téléchargeable, imprimable — pas un texte à copier-coller toi-même." },
+            { title: "Pensé uniquement pour réviser", desc: "Pas de chat à faire dériver : un format structuré, pensé dès le départ pour l'apprentissage." },
+            { title: "4 formats en un clic", desc: "Résumé, fiche, flashcards et quiz générés en même temps, sans reformuler ta demande 4 fois." },
+            { title: "Tes fiches, sauvegardées", desc: "Retrouve tout ton historique dans « Mes fiches », sans perdre une conversation dans le vide." },
+            { title: "Export PDF prêt à réviser", desc: "Un document propre, téléchargeable, imprimable — pas un texte à copier-coller toi-même." },
           ].map((item, i) => (
             <ScrollReveal key={item.title} delay={i * 0.08} direction={i % 2 === 0 ? "left" : "right"}>
-              <div className="bg-white border border-black/10 rounded-2xl p-5 flex gap-4 ff-card h-full">
-                <div className="text-2xl shrink-0">{item.icon}</div>
-                <div>
-                  <h3 className="font-medium text-sm mb-1">{item.title}</h3>
-                  <p className="text-black/50 text-xs leading-relaxed">{item.desc}</p>
-                </div>
+              <div className="bg-white border border-black/10 rounded-2xl p-5 ff-card h-full">
+                <h3 className="font-medium text-sm mb-1">{item.title}</h3>
+                <p className="text-black/50 text-xs leading-relaxed">{item.desc}</p>
               </div>
             </ScrollReveal>
           ))}
@@ -227,15 +217,15 @@ export default function Landing() {
         </ScrollReveal>
         <div className="grid sm:grid-cols-4 gap-6">
           {[
-            { icon: "📥", title: "1. Importe ton cours", desc: "Texte, PDF ou photo — comme tu veux" },
-            { icon: "🔍", title: "2. FishFlow l'analyse", desc: "L'IA comprend le contenu en quelques secondes" },
-            { icon: "✨", title: "3. Ta fiche est générée", desc: "Résumé, fiche, flashcards et quiz prêts" },
-            { icon: "📤", title: "4. Révise", desc: "Consulte, télécharge, révise efficacement" },
+            { title: "1. Importe ton cours", desc: "Texte, PDF ou photo — comme tu veux" },
+            { title: "2. FishFlow l'analyse", desc: "L'IA comprend le contenu en quelques secondes" },
+            { title: "3. Ta fiche est générée", desc: "Résumé, fiche, flashcards et quiz prêts" },
+            { title: "4. Révise", desc: "Consulte, télécharge, révise efficacement" },
           ].map((step, i) => (
             <ScrollReveal key={step.title} delay={i * 0.1} direction="up">
               <div className="bg-white border border-black/10 rounded-2xl p-5 text-center ff-card h-full">
-                <div className="w-11 h-11 mx-auto mb-3 rounded-full bg-black flex items-center justify-center text-lg">
-                  {step.icon}
+                <div className="w-11 h-11 mx-auto mb-3 rounded-full bg-black flex items-center justify-center text-sm font-semibold text-white">
+                  {step.title.charAt(0)}
                 </div>
                 <h3 className="font-medium text-sm mb-1">{step.title}</h3>
                 <p className="text-black/50 text-xs leading-relaxed">{step.desc}</p>
@@ -276,7 +266,7 @@ export default function Landing() {
 
           <ScrollReveal direction="right" delay={0.1}>
             <div className="bg-black text-white rounded-2xl p-6 relative ff-card h-full">
-              <span className="absolute -top-3 left-6 text-xs font-semibold px-3 py-1 rounded-full bg-white text-black">
+              <span className="absolute -top-3 left-6 text-xs font-semibold px-3 py-1 rounded-full bg-[#22C55E] text-white">
                 Populaire
               </span>
               <p className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Premium</p>
@@ -293,7 +283,7 @@ export default function Landing() {
               <TrackedLink
                 href="/pricing"
                 event="cta_click_offer_premium"
-                className="block text-center w-full py-2.5 rounded-lg font-medium bg-white text-black hover:bg-[#F4F4F5] transition ff-btn"
+                className="block text-center w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
               >
                 Passer Premium
               </TrackedLink>
@@ -304,16 +294,9 @@ export default function Landing() {
 
       <section className="w-full max-w-3xl mx-auto px-4 pb-20">
         <div className="grid sm:grid-cols-3 gap-4 text-center">
-          {[
-            { icon: "🔒", label: "Paiement sécurisé via Stripe" },
-            { icon: "↩️", label: "Résiliation en un clic" },
-            { icon: "🛡️", label: "Tes fiches restent privées" },
-          ].map((item, i) => (
-            <ScrollReveal key={item.label} delay={i * 0.1}>
-              <div className="text-black/50 text-sm flex flex-col items-center gap-2">
-                <span className="text-xl">{item.icon}</span>
-                {item.label}
-              </div>
+          {["Paiement sécurisé via Stripe", "Résiliation en un clic", "Tes fiches restent privées"].map((label, i) => (
+            <ScrollReveal key={label} delay={i * 0.1}>
+              <div className="text-black/50 text-sm">{label}</div>
             </ScrollReveal>
           ))}
         </div>
@@ -324,7 +307,7 @@ export default function Landing() {
           <TrackedLink
             href="/generer"
             event="cta_click_final"
-            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-black text-white hover:bg-[#1a1a1a] transition ff-btn"
+            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
           >
             Essayer gratuitement
           </TrackedLink>

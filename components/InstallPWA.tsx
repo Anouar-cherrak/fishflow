@@ -46,21 +46,16 @@ export function InstallPWA() {
 
   return (
     <div className="mb-4 bg-[#F4F4F5] border border-black/10 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-lg shrink-0">
-          📲
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-black">L'app FishFlow est disponible !</p>
-          <p className="text-xs text-black/50">Installe-la sur ton téléphone ou ton PC en un clic.</p>
-        </div>
+      <div>
+        <p className="text-sm font-semibold text-black">L'app FishFlow est disponible !</p>
+        <p className="text-xs text-black/50">Installe-la sur ton téléphone ou ton PC en un clic.</p>
       </div>
 
       <button
         onClick={handleClick}
-        className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-black text-white hover:bg-[#1a1a1a] transition shrink-0"
+        className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-[#22C55E] text-white hover:bg-[#16A34A] transition shrink-0 ff-btn"
       >
-        📥 Télécharger l'application
+        Télécharger l'application
       </button>
 
       {showGuide && (
