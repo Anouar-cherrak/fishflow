@@ -39,7 +39,7 @@ export default function Signup() {
     }
 
     setStep("code");
-    setMessage("Un code à 6 chiffres vient de t'être envoyé par email.");
+    setMessage("Un code vient de t'être envoyé par email.");
     setLoading(false);
   };
 
@@ -126,11 +126,11 @@ export default function Signup() {
             <input
               type="text"
               inputMode="numeric"
-              maxLength={6}
+              maxLength={8}
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className="w-full p-3 border border-black/15 rounded-lg mb-4 bg-white text-black text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-black ff-input"
-              placeholder="000000"
+              className="w-full p-3 border border-black/15 rounded-lg mb-4 bg-white text-black text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-black ff-input"
+              placeholder="00000000"
             />
 
             {message && (
@@ -141,7 +141,7 @@ export default function Signup() {
 
             <button
               onClick={handleVerify}
-              disabled={loading || code.length !== 6}
+              disabled={loading || code.length < 6}
               className="w-full py-2.5 rounded-lg font-medium bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Vérification..." : "Confirmer mon compte"}
