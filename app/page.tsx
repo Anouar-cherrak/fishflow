@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Logo, Wordmark } from "@/components/Logo";
 import { TrackedLink } from "@/components/TrackedLink";
-import { FicheCounter } from "@/components/FicheCounter";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 export const metadata: Metadata = {
@@ -94,8 +93,7 @@ export default function Landing() {
           >
             Essayer gratuitement
           </TrackedLink>
-          <p className="text-black/40 text-sm mt-3 mb-4">3 fiches gratuites par mois · Sans carte bancaire</p>
-          <FicheCounter />
+          <p className="text-black/40 text-sm mt-3">3 fiches gratuites par mois · Sans carte bancaire</p>
         </ScrollReveal>
       </section>
 
@@ -248,10 +246,8 @@ export default function Landing() {
               <p className="text-3xl font-bold mb-1">0 €</p>
               <p className="text-black/40 text-sm mb-5">3 fiches par mois</p>
               <ul className="text-sm text-black/70 space-y-2 mb-6">
-                <li>✓ Texte, PDF et photo</li>
+                <li>✓ Documents courts et moyens</li>
                 <li>✓ Résumé, fiche, flashcards, quiz</li>
-                <li>✓ PDF jusqu'à ~15 pages</li>
-                <li>✓ Export PDF</li>
                 <li>✓ Sans carte bancaire</li>
               </ul>
               <TrackedLink
@@ -274,10 +270,7 @@ export default function Landing() {
               <p className="text-white/60 text-sm mb-5">Générations illimitées</p>
               <ul className="text-sm text-white/90 space-y-2 mb-6">
                 <li className="font-medium">✓ Fiches illimitées</li>
-                <li>✓ Texte, PDF et photo</li>
-                <li className="font-medium">✓ PDF volumineux (60+ pages)</li>
-                <li>✓ Résumé, fiche, flashcards, quiz</li>
-                <li>✓ Export PDF</li>
+                <li className="font-medium">✓ Documents volumineux</li>
                 <li>✓ Résiliable en un clic</li>
               </ul>
               <TrackedLink

@@ -268,25 +268,22 @@ function GenererContent() {
                   : `${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} restante${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
               </div>
 
-              <div className="p-5 grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs font-semibold text-black/30 uppercase tracking-wide mb-2">Gratuit</p>
-                  <ul className="text-sm text-black/60 space-y-1.5">
-                    <li>3 fiches / mois</li>
-                    <li>Texte, PDF, photo</li>
-                    <li>PDF jusqu'à ~15 pages</li>
-                    <li>Export PDF</li>
-                  </ul>
+              <div className="p-5">
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <p className="text-xs font-semibold text-black/30 uppercase tracking-wide mb-2">Gratuit</p>
+                    <p className="text-sm text-black/60">3 fiches / mois</p>
+                    <p className="text-sm text-black/60">Documents courts et moyens</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
+                    <p className="text-sm text-black font-medium">Fiches illimitées</p>
+                    <p className="text-sm text-black font-medium">Documents volumineux</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
-                  <ul className="text-sm text-black space-y-1.5">
-                    <li className="font-medium">Fiches illimitées</li>
-                    <li>Texte, PDF, photo</li>
-                    <li className="font-medium">PDF jusqu'à 60+ pages</li>
-                    <li>Export PDF</li>
-                  </ul>
-                </div>
+                <p className="text-xs text-black/30 pt-2 border-t border-black/10">
+                  Inclus dans les deux : texte, PDF, photo, export PDF
+                </p>
               </div>
 
               <div className="px-5 pb-5">

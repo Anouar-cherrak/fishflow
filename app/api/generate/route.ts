@@ -95,9 +95,10 @@ export async function POST(req: Request) {
     }
   }
 
-  let body: any;
+  let formData: FormData;
+
   try {
-    body = await req.json();
+    formData = await req.formData();
   } catch {
     return NextResponse.json(
       { error: "Impossible de lire les données envoyées. Réessaie." },
@@ -105,11 +106,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const { mode, storagePath } = body;
-  const outputsRaw = body.outputs || "summary,sheet,flashcards,quiz";
-  const outputs = String(outputsRaw).split(",").filter(Boolean);
-  const difficulty = body.difficulty || "moyen";
-  const length = body.length || "moyen";
+  const mode = formData.get("mode") as string;
+  const outputsRaw = (formData.get("outputs") as string) || "summary,sheet,flashcards,quiz";
+  const outputs = outputsRaw.split(",").filter(Boolean);
+  const difficulty = (formData.get("difficulty") as string) || "moyen";
+  const length = (formData.get("length") as string) || "moyen";
 
   if (outputs.length === 0) {
     return NextResponse.json(
@@ -119,55 +120,36 @@ export async function POST(req: Request) {
   }
 
   const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length);
-  const admin = createAdminClient();
+
   let messages: any[];
   let wasTruncated = false;
 
   try {
     if (mode === "text") {
-      const text = body.text as string;
+      const text = formData.get("text") as string;
       if (!text || text.trim().length < 10) {
         return NextResponse.json(
           { error: "Le texte est trop court ou vide. Ajoute plus de contenu." },
           { status: 400 }
         );
       }
+      wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: `Contenu du cours :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "pdf") {
-      if (!storagePath) {
+      const file = formData.get("file") as File;
+      if (!file) {
         return NextResponse.json({ error: "Aucun fichier PDF reçu." }, { status: 400 });
       }
 
-      const { data: fileBlob, error: downloadError } = await admin.storage
-        .from("cours-uploads")
-        .download(storagePath);
-
-      if (downloadError || !fileBlob) {
-        return NextResponse.json(
-          {
-            error: "Impossible de récupérer le fichier envoyé. Réessaie.",
-            debug: {
-              storagePath,
-              downloadError: downloadError ? JSON.stringify(downloadError) : null,
-              supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-            },
-          },
-          { status: 400 }
-        );
-      }
-
-      const arrayBuffer = await fileBlob.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
+      const buffer = new Uint8Array(await file.arrayBuffer());
       const pdf = await getDocumentProxy(buffer);
       const { text } = await extractText(pdf, { mergePages: true });
       wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
-
-      await admin.storage.from("cours-uploads").remove([storagePath]);
 
       if (limitedText.trim().length < 20) {
         return NextResponse.json(
@@ -183,7 +165,7 @@ export async function POST(req: Request) {
         return NextResponse.json(
           {
             error:
-              "Ce PDF est trop volumineux pour un compte gratuit. Passe à FishFlow Pro pour analyser des documents de plus de 60 pages.",
+              "Ce document est trop long pour un compte gratuit. Passe à FishFlow Pro pour analyser des documents plus volumineux.",
             requiresPro: true,
           },
           { status: 403 }
@@ -195,42 +177,20 @@ export async function POST(req: Request) {
         { role: "user", content: `Contenu du cours (extrait d'un PDF) :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "photo") {
-      if (!storagePath) {
+      const file = formData.get("file") as File;
+      if (!file) {
         return NextResponse.json({ error: "Aucune photo reçue." }, { status: 400 });
       }
 
-      const { data: fileBlob, error: downloadError } = await admin.storage
-        .from("cours-uploads")
-        .download(storagePath);
-
-      if (downloadError || !fileBlob) {
-        return NextResponse.json(
-          {
-            error: "Impossible de récupérer le fichier envoyé. Réessaie.",
-            debug: {
-              storagePath,
-              downloadError: downloadError ? JSON.stringify(downloadError) : null,
-              supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-            },
-          },
-          { status: 400 }
-        );
-      }
-
-      const arrayBuffer = await fileBlob.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      const buffer = Buffer.from(await file.arrayBuffer());
       const base64 = buffer.toString("base64");
-      const mimeType = fileBlob.type || "image/jpeg";
-
-      await admin.storage.from("cours-uploads").remove([storagePath]);
-
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
           content: [
             { type: "text", text: "Lis le contenu de cette image (le cours) et génère le JSON demandé." },
-            { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64}` } },
+            { type: "image_url", image_url: { url: `data:${file.type};base64,${base64}` } },
           ],
         },
       ];
@@ -239,9 +199,6 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("Erreur lecture/extraction fichier:", err);
-    if (storagePath) {
-      await admin.storage.from("cours-uploads").remove([storagePath]).catch(() => {});
-    }
     return NextResponse.json(
       { error: "Impossible de lire ce fichier. Vérifie qu'il n'est pas corrompu et réessaie." },
       { status: 400 }
