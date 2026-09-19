@@ -109,7 +109,7 @@ export default function Signup() {
             <button
               onClick={handleSignup}
               disabled={loading || !email || !password}
-              className="w-full py-2.5 rounded-lg font-medium bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition disabled:opacity-30 ff-btn"
+              className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Envoi du code..." : "Créer mon compte"}
             </button>
@@ -142,7 +142,7 @@ export default function Signup() {
             <button
               onClick={handleVerify}
               disabled={loading || code.length < 6}
-              className="w-full py-2.5 rounded-lg font-medium bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition disabled:opacity-30 ff-btn"
+              className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Vérification..." : "Confirmer mon compte"}
             </button>
