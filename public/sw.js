@@ -1,11 +1,16 @@
-const CACHE_NAME = "fishflow-shell-v2";
+const CACHE_NAME = "fishflow-shell-v3";
 const APP_SHELL = ["/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).catch(() => {})
   );
-  self.skipWaiting();
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
@@ -25,8 +30,6 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
 
-  // Les pages HTML (/, /generer, etc.) : toujours réseau en priorité,
-  // jamais depuis un vieux cache — seules les icônes sont mises en cache.
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;

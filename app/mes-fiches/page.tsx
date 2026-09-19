@@ -98,8 +98,8 @@ export default function MesFiches() {
 
         <div className="flex items-center justify-between mb-4 mt-4 ff-fade-up">
           <h1 className="text-xl font-semibold">Mes fiches</h1>
-          <button onClick={() => router.push("/generer")} className="text-sm bg-white border border-black/20 px-3 py-1.5 rounded-full font-medium hover:border-black/40 transition ff-btn">
-            + Nouvelle fiche
+          <button onClick={() => router.push("/generer")} className="text-sm bg-[#6D28D9] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#5B21B6] transition ff-btn">
+            Nouvelle fiche
           </button>
         </div>
 
@@ -119,7 +119,7 @@ export default function MesFiches() {
         {fiches.length === 0 ? (
           <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
             <p className="text-black/50 mb-4">Tu n'as pas encore de fiche sauvegardée.</p>
-            <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-black text-white hover:bg-[#1a1a1a] transition ff-btn">
+            <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-[#6D28D9] text-white hover:bg-[#5B21B6] transition ff-btn">
               Créer ma première fiche
             </button>
           </div>
@@ -145,18 +145,18 @@ export default function MesFiches() {
                         autoFocus
                         className="w-full px-2 py-1 border border-black/30 rounded-md text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
                       />
-                      <button onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-xs font-semibold text-black shrink-0 disabled:opacity-50">
-                        ✓
+                      <button onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-xs font-semibold text-[#6D28D9] shrink-0 disabled:opacity-50">
+                        OK
                       </button>
                       <button onClick={cancelEditing} className="text-xs text-black/40 shrink-0">
-                        ✕
+                        Annuler
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 group">
                       <p className="font-medium text-black truncate">{fiche.title}</p>
-                      <button onClick={() => startEditing(fiche)} className="text-black/30 hover:text-black transition text-sm shrink-0" title="Renommer">
-                        ✏️
+                      <button onClick={() => startEditing(fiche)} className="text-black/30 hover:text-black transition text-xs shrink-0" title="Renommer">
+                        Renommer
                       </button>
                     </div>
                   )}
@@ -165,7 +165,7 @@ export default function MesFiches() {
                   </p>
                 </div>
                 <div className="flex gap-3 shrink-0">
-                  <button onClick={() => handleView(fiche)} className="text-sm text-black font-medium hover:underline transition ff-link-underline">
+                  <button onClick={() => handleView(fiche)} className="text-sm text-[#6D28D9] font-medium hover:underline transition ff-link-underline">
                     Voir
                   </button>
                   <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition">
