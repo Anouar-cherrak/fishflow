@@ -85,7 +85,7 @@ body {
 }
 
 .ff-progress-shimmer {
-  background: linear-gradient(90deg, #111111 0%, #444444 50%, #111111 100%);
+  background: linear-gradient(90deg, #22C55E 0%, #4ADE80 50%, #22C55E 100%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }

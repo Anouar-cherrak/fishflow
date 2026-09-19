@@ -195,7 +195,7 @@ function GenererContent() {
     <main className="min-h-screen bg-white text-black">
       {loading && (
         <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-50 px-6">
-          <div className="w-10 h-10 border-4 border-black/10 border-t-black rounded-full animate-spin mb-4" />
+          <div className="w-10 h-10 border-4 border-black/10 border-t-[#22C55E] rounded-full animate-spin mb-4" />
           <p className="text-black font-medium mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
           <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
             <div
