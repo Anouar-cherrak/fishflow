@@ -27,6 +27,7 @@ export async function POST(req: Request) {
 
   for (const user of users) {
     if (!user.email) continue;
+    await new Promise((resolve) => setTimeout(resolve, 150));
     try {
       const result = await resend.emails.send({
         from: "FishFlow <noreply@fishflow.fr>",

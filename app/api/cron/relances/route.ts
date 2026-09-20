@@ -23,6 +23,7 @@ export async function GET(req: Request) {
 
   for (const user of users) {
     if (!user.email) continue;
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     const { data: dernieresFiches } = await admin
       .from("fiches")
@@ -46,7 +47,7 @@ export async function GET(req: Request) {
 
     if (!dejaMensuel?.length) {
       try {
-        await resend.emails.send({
+        const result = await resend.emails.send({
           from: "FishFlow <noreply@fishflow.fr>",
           to: user.email,
           subject: "Tes fiches gratuites sont renouvelées ce mois-ci",
@@ -54,8 +55,10 @@ export async function GET(req: Request) {
             `<p style="color:#333333;font-size:15px;">Un nouveau mois commence, et tes fiches gratuites sont de retour ! Transforme un nouveau cours en fiche de révision en quelques secondes.</p>`
           ),
         });
-        await admin.from("email_relances").insert({ user_id: user.id, type: `mensuel-${currentMonthKey}` });
-        mensuelEnvoyes++;
+        if (!result.error) {
+          await admin.from("email_relances").insert({ user_id: user.id, type: `mensuel-${currentMonthKey}` });
+          mensuelEnvoyes++;
+        }
       } catch (err) {
         console.error("Erreur envoi email mensuel:", err);
       }
@@ -72,8 +75,9 @@ export async function GET(req: Request) {
         .limit(1);
 
       if (!dejaInactivite?.length) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
         try {
-          await resend.emails.send({
+          const result = await resend.emails.send({
             from: "FishFlow <noreply@fishflow.fr>",
             to: user.email,
             subject: "Ça fait un moment... reviens réviser avec FishFlow",
@@ -81,8 +85,10 @@ export async function GET(req: Request) {
               `<p style="color:#333333;font-size:15px;">Tu n'as pas généré de fiche depuis un moment. Un cours à réviser ? FishFlow s'en occupe en quelques secondes.</p>`
             ),
           });
-          await admin.from("email_relances").insert({ user_id: user.id, type: "inactivite" });
-          inactiviteEnvoyes++;
+          if (!result.error) {
+            await admin.from("email_relances").insert({ user_id: user.id, type: "inactivite" });
+            inactiviteEnvoyes++;
+          }
         } catch (err) {
           console.error("Erreur envoi email inactivité:", err);
         }
