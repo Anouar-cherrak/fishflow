@@ -192,7 +192,6 @@ export default function MesFiches() {
           </div>
         )}
 
-        {/* Dossiers */}
         <div className="mb-5 ff-fade-up" style={{ animationDelay: "0.08s" }}>
           <div className="flex items-center gap-2 flex-wrap">
             <button
@@ -346,34 +345,14 @@ export default function MesFiches() {
                       {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0 relative">
+                  <div className="flex items-center gap-3 shrink-0">
                     <button
-                      onClick={() => setMovingFicheId(movingFicheId === fiche.id ? null : fiche.id)}
+                      onClick={() => setMovingFicheId(fiche.id)}
                       className="text-sm text-black/40 hover:text-black transition"
                       title="Déplacer vers un dossier"
                     >
                       Dossier
                     </button>
-                    {movingFicheId === fiche.id && (
-                      <div className="absolute right-0 top-8 z-10 bg-white border border-black/10 rounded-xl shadow-lg p-2 w-48">
-                        <button
-                          onClick={() => moveFicheToFolder(fiche.id, null)}
-                          className="w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-[#F4F4F5] transition"
-                        >
-                          Sans dossier
-                        </button>
-                        {folders.map((folder) => (
-                          <button
-                            key={folder.id}
-                            onClick={() => moveFicheToFolder(fiche.id, folder.id)}
-                            className="w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-[#F4F4F5] transition flex items-center gap-2"
-                          >
-                            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: folder.color }} />
-                            {folder.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                     <button onClick={() => handleView(fiche)} className="text-sm text-[#22C55E] font-medium hover:underline transition ff-link-underline">
                       Voir
                     </button>
@@ -387,6 +366,45 @@ export default function MesFiches() {
           </div>
         )}
       </div>
+
+      {movingFicheId && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4"
+          onClick={() => setMovingFicheId(null)}
+        >
+          <div
+            className="bg-white border border-black/10 rounded-2xl shadow-xl p-4 w-full max-w-xs"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-sm font-medium text-black mb-3 px-1">Déplacer vers</p>
+            <button
+              onClick={() => moveFicheToFolder(movingFicheId, null)}
+              className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-[#F4F4F5] transition"
+            >
+              Sans dossier
+            </button>
+            {folders.map((folder) => (
+              <button
+                key={folder.id}
+                onClick={() => moveFicheToFolder(movingFicheId, folder.id)}
+                className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-[#F4F4F5] transition flex items-center gap-2"
+              >
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: folder.color }} />
+                {folder.name}
+              </button>
+            ))}
+            {folders.length === 0 && (
+              <p className="text-xs text-black/30 px-3 py-2">Crée d'abord un dossier plus haut.</p>
+            )}
+            <button
+              onClick={() => setMovingFicheId(null)}
+              className="w-full mt-2 text-center text-sm px-3 py-2.5 rounded-lg bg-[#F4F4F5] text-black/60 hover:text-black transition"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
