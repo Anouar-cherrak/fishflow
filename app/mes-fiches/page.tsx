@@ -10,14 +10,38 @@ type FicheRow = {
   title: string;
   data: any;
   created_at: string;
+  folder_id: string | null;
 };
+
+type FolderRow = {
+  id: string;
+  name: string;
+  color: string;
+};
+
+const PASTEL_COLORS = [
+  { name: "Violet", value: "#E9D5FF" },
+  { name: "Rose", value: "#FBCFE8" },
+  { name: "Bleu", value: "#BFDBFE" },
+  { name: "Vert", value: "#BBF7D0" },
+  { name: "Jaune", value: "#FEF08A" },
+  { name: "Orange", value: "#FED7AA" },
+  { name: "Rouge", value: "#FECACA" },
+  { name: "Gris", value: "#E5E7EB" },
+];
 
 export default function MesFiches() {
   const [fiches, setFiches] = useState<FicheRow[]>([]);
+  const [folders, setFolders] = useState<FolderRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
+  const [activeFolder, setActiveFolder] = useState<string | "all" | "none">("all");
+  const [showNewFolder, setShowNewFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderColor, setNewFolderColor] = useState(PASTEL_COLORS[0].value);
+  const [movingFicheId, setMovingFicheId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,8 +52,14 @@ export default function MesFiches() {
         router.push("/login");
         return;
       }
-      const { data, error } = await supabase.from("fiches").select("*").order("created_at", { ascending: false });
-      if (!error && data) setFiches(data as FicheRow[]);
+
+      const [fichesRes, foldersRes] = await Promise.all([
+        supabase.from("fiches").select("*").order("created_at", { ascending: false }),
+        supabase.from("folders").select("*").order("created_at", { ascending: true }),
+      ]);
+
+      if (!fichesRes.error && fichesRes.data) setFiches(fichesRes.data as FicheRow[]);
+      if (!foldersRes.error && foldersRes.data) setFolders(foldersRes.data as FolderRow[]);
       setLoading(false);
     };
     load();
@@ -74,6 +104,44 @@ export default function MesFiches() {
     setEditValue("");
   };
 
+  const createFolder = async () => {
+    const trimmed = newFolderName.trim();
+    if (!trimmed) return;
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+
+    const { data, error } = await supabase
+      .from("folders")
+      .insert({ name: trimmed, color: newFolderColor, user_id: userData.user.id })
+      .select()
+      .single();
+
+    if (!error && data) {
+      setFolders((prev) => [...prev, data as FolderRow]);
+      setNewFolderName("");
+      setNewFolderColor(PASTEL_COLORS[0].value);
+      setShowNewFolder(false);
+    }
+  };
+
+  const deleteFolder = async (id: string) => {
+    if (!confirm("Supprimer ce dossier ? Les fiches à l'intérieur ne seront pas supprimées, juste déclassées.")) return;
+    const supabase = createClient();
+    await supabase.from("folders").delete().eq("id", id);
+    setFolders((prev) => prev.filter((f) => f.id !== id));
+    setFiches((prev) => prev.map((f) => (f.folder_id === id ? { ...f, folder_id: null } : f)));
+    if (activeFolder === id) setActiveFolder("all");
+  };
+
+  const moveFicheToFolder = async (ficheId: string, folderId: string | null) => {
+    const supabase = createClient();
+    await supabase.from("fiches").update({ folder_id: folderId }).eq("id", ficheId);
+    setFiches((prev) => prev.map((f) => (f.id === ficheId ? { ...f, folder_id: folderId } : f)));
+    setMovingFicheId(null);
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-white flex items-center justify-center">
@@ -87,6 +155,14 @@ export default function MesFiches() {
     const d = new Date(f.created_at);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
+
+  const filteredFiches = fiches.filter((f) => {
+    if (activeFolder === "all") return true;
+    if (activeFolder === "none") return !f.folder_id;
+    return f.folder_id === activeFolder;
+  });
+
+  const noneCount = fiches.filter((f) => !f.folder_id).length;
 
   return (
     <main className="min-h-screen bg-white text-black px-4 py-10">
@@ -116,64 +192,198 @@ export default function MesFiches() {
           </div>
         )}
 
-        {fiches.length === 0 ? (
-          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
-            <p className="text-black/50 mb-4">Tu n'as pas encore de fiche sauvegardée.</p>
-            <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn">
-              Créer ma première fiche
+        {/* Dossiers */}
+        <div className="mb-5 ff-fade-up" style={{ animationDelay: "0.08s" }}>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setActiveFolder("all")}
+              className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
+                activeFolder === "all" ? "bg-black text-white" : "bg-[#F4F4F5] text-black/60 hover:bg-black/10"
+              }`}
+            >
+              Toutes ({fiches.length})
             </button>
+
+            {folders.map((folder) => (
+              <div key={folder.id} className="relative group">
+                <button
+                  onClick={() => setActiveFolder(folder.id)}
+                  className={`text-sm pl-3 pr-7 py-1.5 rounded-full font-medium transition flex items-center gap-2 ${
+                    activeFolder === folder.id ? "ring-2 ring-black/40" : ""
+                  }`}
+                  style={{ backgroundColor: folder.color, color: "#1a1a1a" }}
+                >
+                  {folder.name} ({fiches.filter((f) => f.folder_id === folder.id).length})
+                </button>
+                <button
+                  onClick={() => deleteFolder(folder.id)}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black text-xs opacity-0 group-hover:opacity-100 transition"
+                  title="Supprimer le dossier"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+            {noneCount > 0 && (
+              <button
+                onClick={() => setActiveFolder("none")}
+                className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
+                  activeFolder === "none" ? "bg-black text-white" : "bg-[#F4F4F5] text-black/60 hover:bg-black/10"
+                }`}
+              >
+                Sans dossier ({noneCount})
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowNewFolder(!showNewFolder)}
+              className="text-sm px-3 py-1.5 rounded-full font-medium border border-dashed border-black/25 text-black/50 hover:border-black/40 hover:text-black transition"
+            >
+              + Nouveau dossier
+            </button>
+          </div>
+
+          {showNewFolder && (
+            <div className="mt-3 bg-white border border-black/10 rounded-xl p-4 ff-fade">
+              <input
+                type="text"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                placeholder="Nom de la matière (ex: Anglais, Droit...)"
+                className="w-full p-2.5 border border-black/15 rounded-lg mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                autoFocus
+              />
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                {PASTEL_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    onClick={() => setNewFolderColor(c.value)}
+                    className={`w-7 h-7 rounded-full transition ${
+                      newFolderColor === c.value ? "ring-2 ring-offset-2 ring-black" : ""
+                    }`}
+                    style={{ backgroundColor: c.value }}
+                    title={c.name}
+                  />
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={createFolder}
+                  disabled={!newFolderName.trim()}
+                  className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-white font-medium hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+                >
+                  Créer
+                </button>
+                <button
+                  onClick={() => { setShowNewFolder(false); setNewFolderName(""); }}
+                  className="text-sm px-4 py-2 rounded-lg text-black/50 hover:text-black transition"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {filteredFiches.length === 0 ? (
+          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
+            <p className="text-black/50 mb-4">
+              {fiches.length === 0 ? "Tu n'as pas encore de fiche sauvegardée." : "Aucune fiche dans cette section."}
+            </p>
+            {fiches.length === 0 && (
+              <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn">
+                Créer ma première fiche
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
-            {fiches.map((fiche, i) => (
-              <div
-                key={fiche.id}
-                className="bg-white border border-black/10 rounded-xl p-4 flex items-center justify-between gap-4 ff-fade-up ff-card"
-                style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
-              >
-                <div className="min-w-0 flex-1">
-                  {editingId === fiche.id ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") saveTitle(fiche.id);
-                          if (e.key === "Escape") cancelEditing();
-                        }}
-                        autoFocus
-                        className="w-full px-2 py-1 border border-black/30 rounded-md text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
-                      />
-                      <button onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-xs font-semibold text-[#22C55E] shrink-0 disabled:opacity-50">
-                        OK
-                      </button>
-                      <button onClick={cancelEditing} className="text-xs text-black/40 shrink-0">
-                        Annuler
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 group">
-                      <p className="font-medium text-black truncate">{fiche.title}</p>
-                      <button onClick={() => startEditing(fiche)} className="text-black/30 hover:text-black transition text-xs shrink-0" title="Renommer">
-                        Renommer
-                      </button>
-                    </div>
-                  )}
-                  <p className="text-xs text-black/30 mt-0.5">
-                    {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-                  </p>
+            {filteredFiches.map((fiche, i) => {
+              const ficheFolder = folders.find((f) => f.id === fiche.folder_id);
+              return (
+                <div
+                  key={fiche.id}
+                  className="bg-white border border-black/10 rounded-xl p-4 flex items-center justify-between gap-4 ff-fade-up ff-card"
+                  style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
+                >
+                  <div className="min-w-0 flex-1">
+                    {editingId === fiche.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveTitle(fiche.id);
+                            if (e.key === "Escape") cancelEditing();
+                          }}
+                          autoFocus
+                          className="w-full px-2 py-1 border border-black/30 rounded-md text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
+                        />
+                        <button onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-xs font-semibold text-[#22C55E] shrink-0 disabled:opacity-50">
+                          OK
+                        </button>
+                        <button onClick={cancelEditing} className="text-xs text-black/40 shrink-0">
+                          Annuler
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {ficheFolder && (
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: ficheFolder.color }}
+                          />
+                        )}
+                        <p className="font-medium text-black truncate">{fiche.title}</p>
+                        <button onClick={() => startEditing(fiche)} className="text-black/30 hover:text-black transition text-xs shrink-0" title="Renommer">
+                          Renommer
+                        </button>
+                      </div>
+                    )}
+                    <p className="text-xs text-black/30 mt-0.5">
+                      {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0 relative">
+                    <button
+                      onClick={() => setMovingFicheId(movingFicheId === fiche.id ? null : fiche.id)}
+                      className="text-sm text-black/40 hover:text-black transition"
+                      title="Déplacer vers un dossier"
+                    >
+                      Dossier
+                    </button>
+                    {movingFicheId === fiche.id && (
+                      <div className="absolute right-0 top-8 z-10 bg-white border border-black/10 rounded-xl shadow-lg p-2 w-48">
+                        <button
+                          onClick={() => moveFicheToFolder(fiche.id, null)}
+                          className="w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-[#F4F4F5] transition"
+                        >
+                          Sans dossier
+                        </button>
+                        {folders.map((folder) => (
+                          <button
+                            key={folder.id}
+                            onClick={() => moveFicheToFolder(fiche.id, folder.id)}
+                            className="w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-[#F4F4F5] transition flex items-center gap-2"
+                          >
+                            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: folder.color }} />
+                            {folder.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <button onClick={() => handleView(fiche)} className="text-sm text-[#22C55E] font-medium hover:underline transition ff-link-underline">
+                      Voir
+                    </button>
+                    <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition">
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-3 shrink-0">
-                  <button onClick={() => handleView(fiche)} className="text-sm text-[#22C55E] font-medium hover:underline transition ff-link-underline">
-                    Voir
-                  </button>
-                  <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition">
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
