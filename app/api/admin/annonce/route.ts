@@ -23,20 +23,26 @@ export async function POST(req: Request) {
   const users = usersData?.users || [];
 
   let envoyes = 0;
+  const erreurs: string[] = [];
+
   for (const user of users) {
     if (!user.email) continue;
     try {
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: "FishFlow <noreply@fishflow.fr>",
         to: user.email,
         subject,
         html: emailLayout(`<p style="color:#333333;font-size:15px;">${message}</p>`),
       });
-      envoyes++;
-    } catch (err) {
-      console.error("Erreur envoi annonce:", err);
+      if (result.error) {
+        erreurs.push(JSON.stringify(result.error));
+      } else {
+        envoyes++;
+      }
+    } catch (err: any) {
+      erreurs.push(err?.message || JSON.stringify(err));
     }
   }
 
-  return NextResponse.json({ envoyes, totalUsers: users.length });
+  return NextResponse.json({ envoyes, totalUsers: users.length, erreurs: erreurs.slice(0, 3) });
 }
