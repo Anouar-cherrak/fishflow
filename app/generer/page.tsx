@@ -35,10 +35,13 @@ const LOADING_MESSAGES = [
   "Presque fini...",
 ];
 
+const FREE_FICHES_LIMIT = 5;
+
 function GenererContent() {
   const [mode, setMode] = useState<Mode>("text");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [outputs, setOutputs] = useState<OutputKey[]>(["summary", "sheet", "flashcards", "quiz"]);
   const [difficulty, setDifficulty] = useState<Difficulty>("moyen");
   const [length, setLength] = useState<Length>("moyen");
@@ -132,6 +135,18 @@ function GenererContent() {
       return;
     }
 
+    const supabase = createClient();
+
+    if (usage && !usage.isPro) {
+      const { count } = await supabase.from("fiches").select("*", { count: "exact", head: true });
+      if ((count ?? 0) >= FREE_FICHES_LIMIT) {
+        if (confirm(`Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche, ou passe Pro pour un historique illimité.\n\nVoir les tarifs Pro ?`)) {
+          router.push("/pricing");
+        }
+        return;
+      }
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append("mode", mode);
@@ -141,6 +156,8 @@ function GenererContent() {
 
     if (mode === "text") {
       formData.append("text", text);
+    } else if (mode === "pdf" && usage?.isPro && files.length > 0) {
+      files.forEach((f) => formData.append("files", f));
     } else if (file) {
       formData.append("file", file);
     }
@@ -167,7 +184,6 @@ function GenererContent() {
         return;
       }
 
-      const supabase = createClient();
       const title = data.summary?.slice(0, 60) || data.sheet?.[0]?.slice(0, 60) || "Fiche sans titre";
       const { data: inserted } = await supabase.from("fiches").insert({ title, data }).select().single();
 
@@ -191,6 +207,8 @@ function GenererContent() {
       setLoading(false);
     }
   };
+
+  const isMultiPdfPro = mode === "pdf" && usage?.isPro;
 
   return (
     <main className="min-h-screen bg-white text-black">
@@ -275,12 +293,15 @@ function GenererContent() {
                     <p className="text-xs font-semibold text-black/30 uppercase tracking-wide mb-2">Gratuit</p>
                     <p className="text-sm text-black/60">3 fiches / mois</p>
                     <p className="text-sm text-black/60">Documents courts et moyens</p>
+                    <p className="text-sm text-black/60">Historique limité à 5 fiches</p>
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
                     <p className="text-sm text-black font-medium">Fiches illimitées</p>
                     <p className="text-sm text-black font-medium">Documents volumineux</p>
-                    <p className="text-sm text-black font-medium">Quiz interactif + suivi</p>
+                    <p className="text-sm text-black font-medium">Plusieurs PDF à la fois</p>
+                    <p className="text-sm text-black font-medium">Quiz de 12 questions + audio</p>
+                    <p className="text-sm text-black font-medium">Historique illimité</p>
                   </div>
                 </div>
                 <p className="text-xs text-black/30 pt-2 border-t border-black/10">
@@ -307,7 +328,7 @@ function GenererContent() {
               {(["text", "pdf", "photo"] as Mode[]).map((m) => (
                 <button
                   key={m}
-                  onClick={() => { setMode(m); setFile(null); }}
+                  onClick={() => { setMode(m); setFile(null); setFiles([]); }}
                   className={`flex-1 px-3 py-2 rounded-md font-medium text-sm transition ${
                     mode === m ? "bg-black text-white" : "text-black/50 hover:text-black/80"
                   }`}
@@ -326,17 +347,62 @@ function GenererContent() {
               />
             )}
 
-            {(mode === "pdf" || mode === "photo") && (
+            {mode === "pdf" && isMultiPdfPro && (
+              <div className="mb-5">
+                <label className="w-full p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
+                  <span className="text-black font-medium text-sm mb-1">
+                    {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
+                  </span>
+                  <span className="text-black/40 text-xs">Fonctionnalité Pro : combine plusieurs PDF en une seule fiche</span>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    multiple
+                    onChange={(e) => setFiles(e.target.files ? Array.from(e.target.files) : [])}
+                    className="hidden"
+                  />
+                </label>
+                {files.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {files.map((f, i) => (
+                      <li key={i} className="text-xs text-black/50 flex items-center justify-between px-1">
+                        <span className="truncate">{f.name}</span>
+                        <button onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="text-black/30 hover:text-black shrink-0 ml-2">✕</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            {mode === "pdf" && !isMultiPdfPro && (
               <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
                 <span className="text-black font-medium text-sm mb-1">
-                  {file ? file.name : `Choisir ${mode === "pdf" ? "un PDF" : "une photo"}`}
+                  {file ? file.name : "Choisir un PDF"}
                 </span>
                 <span className="text-black/40 text-xs">
                   {file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}
                 </span>
                 <input
                   type="file"
-                  accept={mode === "pdf" ? "application/pdf" : "image/*"}
+                  accept="application/pdf"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+              </label>
+            )}
+
+            {mode === "photo" && (
+              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
+                <span className="text-black font-medium text-sm mb-1">
+                  {file ? file.name : "Choisir une photo"}
+                </span>
+                <span className="text-black/40 text-xs">
+                  {file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
@@ -398,7 +464,7 @@ function GenererContent() {
               onClick={handleGenerate}
               disabled={
                 loading ||
-                (mode === "text" ? !text : !file) ||
+                (mode === "text" ? !text : mode === "pdf" && isMultiPdfPro ? files.length === 0 : !file) ||
                 outputs.length === 0 ||
                 (!!user && !!usage && !usage.isPro && usage.remaining === 0)
               }

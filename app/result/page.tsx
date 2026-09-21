@@ -31,6 +31,7 @@ export default function Result() {
   const [isPro, setIsPro] = useState(false);
   const [bestScore, setBestScore] = useState<number | null>(null);
   const [ficheId, setFicheId] = useState<string>("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const logoRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -62,6 +63,12 @@ export default function Result() {
       } catch {}
     };
     checkPro();
+
+    return () => {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
   }, []);
 
   const regenerateSection = async (key: "summary" | "sheet" | "flashcards" | "quiz") => {
@@ -91,6 +98,21 @@ export default function Result() {
     } finally {
       setRegeneratingKey(null);
     }
+  };
+
+  const toggleSpeak = () => {
+    if (!data?.summary) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(data.summary);
+    utterance.lang = "fr-FR";
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
   };
 
   const handleDownloadPDF = async () => {
@@ -206,7 +228,17 @@ export default function Result() {
             <section className="bg-white rounded-xl shadow-sm border border-black/10 p-6">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-black">Résumé</h2>
-                <RegenButton sectionKey="summary" />
+                <div className="flex items-center gap-3">
+                  {isPro && (
+                    <button
+                      onClick={toggleSpeak}
+                      className="text-xs text-[#22C55E] font-medium hover:underline"
+                    >
+                      {isSpeaking ? "Arrêter" : "Écouter"}
+                    </button>
+                  )}
+                  <RegenButton sectionKey="summary" />
+                </div>
               </div>
               <p className="text-black/70 leading-relaxed">{data.summary}</p>
             </section>

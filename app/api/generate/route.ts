@@ -2,7 +2,6 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { extractText, getDocumentProxy } from "unpdf";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { getUsage, incrementUsage, isProUser } from "@/lib/usage";
 
 export const runtime = "nodejs";
@@ -33,17 +32,22 @@ const OUTPUT_SCHEMAS: Record<string, string> = {
   quiz: `"quiz": array d'objets {question, options (array de 4 strings), correctIndex (index numérique 0 à 3 de la bonne réponse dans options)}`,
 };
 
-function buildSystemPrompt(outputs: string[], difficulty: string, length: string) {
+function buildSystemPrompt(outputs: string[], difficulty: string, length: string, pro: boolean) {
   const schemaLines = outputs
     .filter((o) => OUTPUT_SCHEMAS[o])
     .map((o) => OUTPUT_SCHEMAS[o])
     .join(", ");
 
+  const quizBoost =
+    pro && outputs.includes("quiz")
+      ? "\n- Le quiz doit contenir exactement 12 questions, indépendamment de la longueur choisie (avantage réservé aux comptes Pro)."
+      : "";
+
   return `Tu es un excellent assistant pédagogique, spécialisé dans la création de fiches de révision de haute qualité pour des étudiants.
 
-Le contenu que tu reçois peut provenir de sources variées : texte brut, PDF de cours (parfois volumineux, plusieurs dizaines de pages), PDF scanné, ou une photo de notes manuscrites ou de tableau.
+Le contenu que tu reçois peut provenir de sources variées : texte brut, PDF de cours (parfois volumineux, plusieurs dizaines de pages, parfois plusieurs documents concaténés), PDF scanné, ou une photo de notes manuscrites ou de tableau.
 
-Ta mission : identifie les concepts réellement importants — pas juste ce qui est écrit en gros, mais ce qui structure le cours (définitions, mécanismes, exemples clés, relations de cause à effet, chiffres et dates importants). Ignore le bruit (numéros de page, en-têtes/pieds de page répétitifs, mentions de copyright, éléments purement décoratifs). Si le document est long, synthétise l'ensemble plutôt que de te concentrer uniquement sur le début.
+Ta mission : identifie les concepts réellement importants — pas juste ce qui est écrit en gros, mais ce qui structure le cours (définitions, mécanismes, exemples clés, relations de cause à effet, chiffres et dates importants). Ignore le bruit (numéros de page, en-têtes/pieds de page répétitifs, mentions de copyright, éléments purement décoratifs). Si le document est long ou combine plusieurs sources, synthétise l'ensemble plutôt que de te concentrer uniquement sur le début.
 
 À partir de ce contenu, génère un JSON avec exactement ces clés :
 "sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}.
@@ -53,7 +57,7 @@ Règles strictes de qualité :
 - Priorise la clarté et l'utilité pour la révision plutôt que l'exhaustivité : mieux vaut peu de points clés vraiment importants que beaucoup de détails secondaires.
 - Reste direct, sans tournures compliquées inutiles.
 - ${DIFFICULTY_TEXT[difficulty] || DIFFICULTY_TEXT.moyen}
-- ${LENGTH_TEXT[length] || LENGTH_TEXT.moyen}
+- ${LENGTH_TEXT[length] || LENGTH_TEXT.moyen}${quizBoost}
 - Pour le quiz, correctIndex doit être l'index exact (0, 1, 2 ou 3) de la bonne réponse dans le tableau options — jamais le texte de la réponse. Les 3 mauvaises réponses doivent être plausibles, pas absurdes.
 - Ne génère QUE les clés listées ci-dessus, rien d'autre.
 - Réponds uniquement en JSON valide, sans texte avant ou après, sans balises markdown.`;
@@ -66,6 +70,13 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
       setTimeout(() => reject(new Error("TIMEOUT")), ms)
     ),
   ]);
+}
+
+async function extractPdfText(file: File): Promise<string> {
+  const buffer = new Uint8Array(await file.arrayBuffer());
+  const pdf = await getDocumentProxy(buffer);
+  const { text } = await extractText(pdf, { mergePages: true });
+  return text;
 }
 
 export async function POST(req: Request) {
@@ -119,7 +130,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length);
+  const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length, pro);
 
   let messages: any[];
   let wasTruncated = false;
@@ -140,14 +151,33 @@ export async function POST(req: Request) {
         { role: "user", content: `Contenu du cours :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "pdf") {
-      const file = formData.get("file") as File;
-      if (!file) {
+      const files = formData.getAll("files") as File[];
+      const singleFile = formData.get("file") as File | null;
+      const allFiles = files.length > 0 ? files : singleFile ? [singleFile] : [];
+
+      if (allFiles.length === 0) {
         return NextResponse.json({ error: "Aucun fichier PDF reçu." }, { status: 400 });
       }
 
-      const buffer = new Uint8Array(await file.arrayBuffer());
-      const pdf = await getDocumentProxy(buffer);
-      const { text } = await extractText(pdf, { mergePages: true });
+      if (allFiles.length > 1 && !pro) {
+        return NextResponse.json(
+          {
+            error: "L'envoi de plusieurs PDF à la fois est réservé aux comptes Pro.",
+            requiresPro: true,
+          },
+          { status: 403 }
+        );
+      }
+
+      const textParts: string[] = [];
+      for (const f of allFiles) {
+        const extracted = await extractPdfText(f);
+        if (extracted.trim().length > 0) {
+          textParts.push(`--- Document : ${f.name} ---\n${extracted}`);
+        }
+      }
+      const text = textParts.join("\n\n");
+
       wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
 
@@ -174,7 +204,7 @@ export async function POST(req: Request) {
 
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Contenu du cours (extrait d'un PDF) :\n"""\n${limitedText}\n"""` },
+        { role: "user", content: `Contenu du cours (extrait d'un ou plusieurs PDF) :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "photo") {
       const file = formData.get("file") as File;
@@ -210,7 +240,7 @@ export async function POST(req: Request) {
       openai.chat.completions.create({
         model: "gpt-4o-mini",
         response_format: { type: "json_object" },
-        max_tokens: 2000,
+        max_tokens: pro ? 3000 : 2000,
         messages,
       }),
       TIMEOUT_MS
