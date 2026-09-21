@@ -88,10 +88,12 @@ export default function Pricing() {
 
         <ul className="text-left text-sm text-black/70 space-y-2 mb-6">
           <li>✓ Fiches illimitées</li>
-          <li>✓ Texte, PDF et photo</li>
-          <li className="font-medium">✓ PDF volumineux (60+ pages)</li>
-          <li>✓ Résumé, fiche, flashcards, quiz</li>
-          <li>✓ Export PDF</li>
+          <li>✓ Documents volumineux</li>
+          <li>✓ Plusieurs PDF fusionnés en une fiche</li>
+          <li>✓ Quiz interactif, 12 questions</li>
+          <li>✓ Suivi de progression par fiche</li>
+          <li>✓ Résumé lu à voix haute</li>
+          <li>✓ Historique illimité</li>
         </ul>
 
         <button

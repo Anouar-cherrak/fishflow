@@ -248,6 +248,7 @@ export default function Landing() {
               <ul className="text-sm text-black/70 space-y-2 mb-6">
                 <li>✓ Documents courts et moyens</li>
                 <li>✓ Résumé, fiche, flashcards, quiz</li>
+                <li>✓ Historique jusqu'à 5 fiches</li>
                 <li>✓ Sans carte bancaire</li>
               </ul>
               <TrackedLink
@@ -271,6 +272,11 @@ export default function Landing() {
               <ul className="text-sm text-white/90 space-y-2 mb-6">
                 <li className="font-medium">✓ Fiches illimitées</li>
                 <li className="font-medium">✓ Documents volumineux</li>
+                <li className="font-medium">✓ Plusieurs PDF fusionnés en une fiche</li>
+                <li className="font-medium">✓ Quiz interactif, 12 questions</li>
+                <li className="font-medium">✓ Suivi de progression par fiche</li>
+                <li className="font-medium">✓ Résumé lu à voix haute</li>
+                <li className="font-medium">✓ Historique illimité</li>
                 <li>✓ Résiliable en un clic</li>
               </ul>
               <TrackedLink
