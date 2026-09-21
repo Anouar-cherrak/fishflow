@@ -167,12 +167,13 @@ function GenererContent() {
         return;
       }
 
-      localStorage.setItem("fishflow_result", JSON.stringify(data));
-      localStorage.setItem("fishflow_settings", JSON.stringify({ difficulty, length }));
-
       const supabase = createClient();
       const title = data.summary?.slice(0, 60) || data.sheet?.[0]?.slice(0, 60) || "Fiche sans titre";
-      await supabase.from("fiches").insert({ title, data });
+      const { data: inserted } = await supabase.from("fiches").insert({ title, data }).select().single();
+
+      const dataWithId = { ...data, id: inserted?.id };
+      localStorage.setItem("fishflow_result", JSON.stringify(dataWithId));
+      localStorage.setItem("fishflow_settings", JSON.stringify({ difficulty, length }));
 
       trackEvent("generation_reussie", { mode, outputs: outputs.join(",") });
 
@@ -279,6 +280,7 @@ function GenererContent() {
                     <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
                     <p className="text-sm text-black font-medium">Fiches illimitées</p>
                     <p className="text-sm text-black font-medium">Documents volumineux</p>
+                    <p className="text-sm text-black font-medium">Quiz interactif + suivi</p>
                   </div>
                 </div>
                 <p className="text-xs text-black/30 pt-2 border-t border-black/10">

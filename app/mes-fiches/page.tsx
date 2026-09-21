@@ -11,6 +11,7 @@ type FicheRow = {
   data: any;
   created_at: string;
   folder_id: string | null;
+  best_score: number | null;
 };
 
 type FolderRow = {
@@ -66,7 +67,10 @@ export default function MesFiches() {
   }, [router]);
 
   const handleView = (fiche: FicheRow) => {
-    localStorage.setItem("fishflow_result", JSON.stringify(fiche.data));
+    localStorage.setItem(
+      "fishflow_result",
+      JSON.stringify({ ...fiche.data, id: fiche.id, best_score: fiche.best_score })
+    );
     router.push("/result");
   };
 
@@ -216,7 +220,7 @@ export default function MesFiches() {
                 </button>
                 <button
                   onClick={() => deleteFolder(folder.id)}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black text-xs opacity-0 group-hover:opacity-100 transition"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-black/50 hover:text-black text-sm font-bold transition"
                   title="Supprimer le dossier"
                 >
                   ✕
@@ -336,6 +340,17 @@ export default function MesFiches() {
                           />
                         )}
                         <p className="font-medium text-black truncate">{fiche.title}</p>
+                        {fiche.best_score !== null && (
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                              fiche.best_score >= 80
+                                ? "bg-[#DCFCE7] text-[#16A34A]"
+                                : "bg-[#F4F4F5] text-black/50"
+                            }`}
+                          >
+                            {fiche.best_score}%
+                          </span>
+                        )}
                         <button onClick={() => startEditing(fiche)} className="text-black/30 hover:text-black transition text-xs shrink-0" title="Renommer">
                           Renommer
                         </button>

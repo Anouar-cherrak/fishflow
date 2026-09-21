@@ -6,16 +6,19 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas-pro";
 import { Logo, Wordmark } from "@/components/Logo";
 import { trackEvent } from "@/lib/tracking";
+import { QuizPlayer } from "@/components/QuizPlayer";
 
 type Flashcard = { question: string; answer: string };
 type QuizQuestion = { question: string; options: string[]; correctIndex: number };
 
 type FishFlowResult = {
+  id?: string;
   sourceText?: string;
   summary?: string;
   sheet?: string[];
   flashcards?: Flashcard[];
   quiz?: QuizQuestion[];
+  best_score?: number | null;
 };
 
 type Settings = { difficulty: string; length: string };
@@ -25,6 +28,9 @@ export default function Result() {
   const [settings, setSettings] = useState<Settings>({ difficulty: "moyen", length: "moyen" });
   const [downloading, setDownloading] = useState(false);
   const [regeneratingKey, setRegeneratingKey] = useState<string | null>(null);
+  const [isPro, setIsPro] = useState(false);
+  const [bestScore, setBestScore] = useState<number | null>(null);
+  const [ficheId, setFicheId] = useState<string>("");
 
   const logoRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -39,9 +45,23 @@ export default function Result() {
 
   useEffect(() => {
     const stored = localStorage.getItem("fishflow_result");
-    if (stored) setData(JSON.parse(stored));
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setData(parsed);
+      setBestScore(parsed.best_score ?? null);
+      if (parsed.id) setFicheId(parsed.id);
+    }
     const storedSettings = localStorage.getItem("fishflow_settings");
     if (storedSettings) setSettings(JSON.parse(storedSettings));
+
+    const checkPro = async () => {
+      try {
+        const res = await fetch("/api/usage");
+        const usageData = await res.json();
+        setIsPro(!!usageData.isPro);
+      } catch {}
+    };
+    checkPro();
   }, []);
 
   const regenerateSection = async (key: "summary" | "sheet" | "flashcards" | "quiz") => {
@@ -93,7 +113,7 @@ export default function Result() {
         if (flashcardsHeaderRef.current) blocks.push(flashcardsHeaderRef.current);
         flashcardItemRefs.current.forEach((el) => el && blocks.push(el));
       }
-      if (data?.quiz !== undefined) {
+      if (data?.quiz !== undefined && !isPro) {
         if (quizHeaderRef.current) blocks.push(quizHeaderRef.current);
         quizItemRefs.current.forEach((el) => el && blocks.push(el));
       }
@@ -234,31 +254,67 @@ export default function Result() {
         {data.quiz !== undefined && (
           <div className={`pb-6 ${sectionOpacity("quiz")}`}>
             <div ref={quizHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-semibold text-black">Quiz</h2>
                 <RegenButton sectionKey="quiz" />
               </div>
-            </div>
-            <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2 space-y-3">
-              {data.quiz.map((q, i) => (
-                <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-[#F4F4F5]">
-                  <p className="font-medium text-black mb-3">{i + 1}. {q.question}</p>
-                  <ul className="space-y-2">
-                    {q.options.map((opt, j) => (
-                      <li
-                        key={j}
-                        className={`px-3 py-2 rounded-md text-sm ${
-                          j === q.correctIndex
-                            ? "bg-black text-white font-semibold"
-                            : "bg-white text-black/70 border border-black/10"
-                        }`}
-                      >
-                        {opt}
-                      </li>
-                    ))}
-                  </ul>
+              {isPro && bestScore !== null && (
+                <div className="mb-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-black/50">
+                      {bestScore >= 80 ? "Fiche maîtrisée" : "Meilleur score"}
+                    </span>
+                    <span className="text-xs font-semibold text-black">{bestScore}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${bestScore >= 80 ? "bg-[#22C55E]" : "bg-black/40"}`}
+                      style={{ width: `${bestScore}%` }}
+                    />
+                  </div>
                 </div>
-              ))}
+              )}
+            </div>
+            <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2">
+              {isPro ? (
+                <QuizPlayer
+                  quiz={data.quiz}
+                  ficheId={ficheId}
+                  currentBestScore={bestScore}
+                  onScoreUpdate={setBestScore}
+                />
+              ) : (
+                <div className="space-y-3">
+                  {data.quiz.map((q, i) => (
+                    <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-[#F4F4F5]">
+                      <p className="font-medium text-black mb-3">{i + 1}. {q.question}</p>
+                      <ul className="space-y-2">
+                        {q.options.map((opt, j) => (
+                          <li
+                            key={j}
+                            className={`px-3 py-2 rounded-md text-sm ${
+                              j === q.correctIndex
+                                ? "bg-black text-white font-semibold"
+                                : "bg-white text-black/70 border border-black/10"
+                            }`}
+                          >
+                            {opt}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                  <div className="text-center pt-2">
+                    <p className="text-xs text-black/40 mb-2">Passe Pro pour jouer le quiz et suivre ta progression</p>
+                    <button
+                      onClick={() => router.push("/pricing")}
+                      className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-white font-medium hover:bg-[#16A34A] transition ff-btn"
+                    >
+                      Découvrir FishFlow Pro
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
