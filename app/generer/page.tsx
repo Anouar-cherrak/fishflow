@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 import { InstallPWA } from "@/components/InstallPWA";
+import { UpgradeModal } from "@/components/UpgradeModal";
 import { trackEvent } from "@/lib/tracking";
 import type { User } from "@supabase/supabase-js";
 
@@ -52,6 +53,7 @@ function GenererContent() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -140,9 +142,11 @@ function GenererContent() {
     if (usage && !usage.isPro) {
       const { count } = await supabase.from("fiches").select("*", { count: "exact", head: true });
       if ((count ?? 0) >= FREE_FICHES_LIMIT) {
-        if (confirm(`Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche, ou passe Pro pour un historique illimité.\n\nVoir les tarifs Pro ?`)) {
-          router.push("/pricing");
-        }
+        trackEvent("historique_plein", { mode });
+        setUpgradeModal({
+          title: "Ton historique est plein",
+          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour un historique illimité.`,
+        });
         return;
       }
     }
@@ -170,16 +174,20 @@ function GenererContent() {
         setLoading(false);
         if (data.quotaExceeded) {
           trackEvent("quota_atteint", { mode });
+          setUpgradeModal({
+            title: "Limite gratuite atteinte",
+            message: data.error || "Tu as atteint ta limite de fiches gratuites ce mois-ci. Passe Pro pour continuer à réviser sans limite.",
+          });
         } else if (data.requiresPro) {
           trackEvent("pdf_trop_volumineux", { mode });
-          if (confirm(data.error + "\n\nVoir les tarifs Pro ?")) {
-            router.push("/pricing");
-          }
-          return;
+          setUpgradeModal({
+            title: "Fonctionnalité Pro",
+            message: data.error,
+          });
         } else {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
+          alert(data.error || "Une erreur est survenue.");
         }
-        alert(data.error || "Une erreur est survenue.");
         fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d));
         return;
       }
@@ -224,6 +232,18 @@ function GenererContent() {
           </div>
           <p className="text-black/40 text-sm mt-3">Ça peut prendre jusqu'à 30-40 secondes.</p>
         </div>
+      )}
+
+      {upgradeModal && (
+        <UpgradeModal
+          title={upgradeModal.title}
+          message={upgradeModal.message}
+          onClose={() => setUpgradeModal(null)}
+          onUpgrade={() => {
+            trackEvent("clic_modal_upgrade");
+            router.push("/pricing");
+          }}
+        />
       )}
 
       <div className="w-full flex flex-col items-center px-4 py-6">
