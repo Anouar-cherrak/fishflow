@@ -85,15 +85,15 @@ export function QuizPlayer({
 
   return (
     <div className="border border-black/10 rounded-xl p-6 bg-[#F4F4F5]">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-xs font-semibold text-black/40 uppercase tracking-wide">
+      <div className="flex items-center justify-between mb-4 gap-2">
+        <p className="text-xs font-semibold text-black/40 uppercase tracking-wide shrink-0">
           Question {current + 1} / {quiz.length}
         </p>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap justify-end gap-1 min-w-0">
           {quiz.map((_, i) => (
             <div
               key={i}
-              className={`w-6 h-1.5 rounded-full ${i <= current ? "bg-[#22C55E]" : "bg-black/10"}`}
+              className={`w-3 sm:w-6 h-1.5 rounded-full shrink-0 ${i <= current ? "bg-[#22C55E]" : "bg-black/10"}`}
             />
           ))}
         </div>
