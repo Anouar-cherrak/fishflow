@@ -12,6 +12,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const MAX_CHARS_FREE = 15000;
 const MAX_CHARS_PRO = 60000;
 const TIMEOUT_MS = 50000;
+const MAX_PHOTO_BYTES = 4 * 1024 * 1024; // 4 Mo — marge de sécurité sous la limite de payload de Vercel (~4.5 Mo)
 
 const DIFFICULTY_TEXT: Record<string, string> = {
   facile: "Utilise un langage très simple, accessible à un débutant, évite tout jargon technique.",
@@ -210,6 +211,15 @@ export async function POST(req: Request) {
       const file = formData.get("file") as File;
       if (!file) {
         return NextResponse.json({ error: "Aucune photo reçue." }, { status: 400 });
+      }
+
+      if (file.size > MAX_PHOTO_BYTES) {
+        return NextResponse.json(
+          {
+            error: "Cette photo est trop volumineuse (max 4 Mo). Réduis la qualité ou recadre l'image, puis réessaie.",
+          },
+          { status: 400 }
+        );
       }
 
       const buffer = Buffer.from(await file.arrayBuffer());
