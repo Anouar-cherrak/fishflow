@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
 import { SplashScreen } from "@/components/SplashScreen";
+import { ThemeSync } from "@/components/ThemeSync";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,10 +43,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
+            try {
+              if (localStorage.getItem('ff-theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+              }
+            } catch (e) {}
+          `}
+        </Script>
         <RegisterSW />
         <SplashScreen />
+        <ThemeSync />
         {children}
 
         <Script

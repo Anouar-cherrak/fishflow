@@ -1,12 +1,30 @@
 @import "tailwindcss";
 
+@theme {
+  --color-white: var(--ff-bg);
+  --color-black: var(--ff-fg);
+  --color-surface: var(--ff-surface);
+}
+
 :root {
   --font-body: 'Inter', sans-serif;
   --font-display: 'Poppins', sans-serif;
+  --ff-bg: #ffffff;
+  --ff-fg: #111111;
+  --ff-surface: #F4F4F5;
+}
+
+:root.dark {
+  --ff-bg: #0a0a0a;
+  --ff-fg: #f2f2f2;
+  --ff-surface: #1c1c1f;
+  color-scheme: dark;
 }
 
 body {
   font-family: var(--font-body), sans-serif;
+  background: var(--ff-bg);
+  transition: background-color 0.2s ease;
 }
 
 .font-display {
@@ -84,6 +102,16 @@ body {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Empêche le zoom automatique de Safari iOS quand on touche un champ
+   (il zoome dès qu'un input a une taille de police < 16px). */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 .ff-progress-shimmer {
   background: linear-gradient(90deg, #22C55E 0%, #4ADE80 50%, #22C55E 100%);
   background-size: 200% 100%;
@@ -109,7 +137,7 @@ body {
   bottom: -4px;
   width: 100%;
   height: 3px;
-  background: black;
+  background: var(--ff-fg);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);

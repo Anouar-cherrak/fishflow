@@ -201,7 +201,7 @@ export default function MesFiches() {
             <button
               onClick={() => setActiveFolder("all")}
               className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
-                activeFolder === "all" ? "bg-black text-white" : "bg-[#F4F4F5] text-black/60 hover:bg-black/10"
+                activeFolder === "all" ? "bg-black text-white" : "bg-surface text-black/60 hover:bg-black/10"
               }`}
             >
               Toutes ({fiches.length})
@@ -232,7 +232,7 @@ export default function MesFiches() {
               <button
                 onClick={() => setActiveFolder("none")}
                 className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
-                  activeFolder === "none" ? "bg-black text-white" : "bg-[#F4F4F5] text-black/60 hover:bg-black/10"
+                  activeFolder === "none" ? "bg-black text-white" : "bg-surface text-black/60 hover:bg-black/10"
                 }`}
               >
                 Sans dossier ({noneCount})
@@ -307,7 +307,7 @@ export default function MesFiches() {
               return (
                 <div
                   key={fiche.id}
-                  className="bg-white border border-black/10 rounded-xl p-4 flex items-center justify-between gap-4 ff-fade-up ff-card"
+                  className="bg-white border border-black/10 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 ff-fade-up ff-card"
                   style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
                 >
                   <div className="min-w-0 flex-1">
@@ -345,7 +345,7 @@ export default function MesFiches() {
                             className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
                               fiche.best_score >= 80
                                 ? "bg-[#DCFCE7] text-[#16A34A]"
-                                : "bg-[#F4F4F5] text-black/50"
+                                : "bg-surface text-black/50"
                             }`}
                           >
                             {fiche.best_score}%
@@ -360,18 +360,18 @@ export default function MesFiches() {
                       {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0 -mx-2 sm:mx-0">
                     <button
                       onClick={() => setMovingFicheId(fiche.id)}
-                      className="text-sm text-black/40 hover:text-black transition"
+                      className="text-sm text-black/40 hover:text-black transition px-2 py-1.5 rounded-lg hover:bg-surface"
                       title="Déplacer vers un dossier"
                     >
                       Dossier
                     </button>
-                    <button onClick={() => handleView(fiche)} className="text-sm text-[#22C55E] font-medium hover:underline transition ff-link-underline">
+                    <button onClick={() => handleView(fiche)} className="text-sm text-[#22C55E] font-medium hover:underline transition ff-link-underline px-2 py-1.5 rounded-lg hover:bg-surface">
                       Voir
                     </button>
-                    <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition">
+                    <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition px-2 py-1.5 rounded-lg hover:bg-surface">
                       Supprimer
                     </button>
                   </div>
@@ -394,7 +394,7 @@ export default function MesFiches() {
             <p className="text-sm font-medium text-black mb-3 px-1">Déplacer vers</p>
             <button
               onClick={() => moveFicheToFolder(movingFicheId, null)}
-              className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-[#F4F4F5] transition"
+              className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-surface transition"
             >
               Sans dossier
             </button>
@@ -402,7 +402,7 @@ export default function MesFiches() {
               <button
                 key={folder.id}
                 onClick={() => moveFicheToFolder(movingFicheId, folder.id)}
-                className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-[#F4F4F5] transition flex items-center gap-2"
+                className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-surface transition flex items-center gap-2"
               >
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: folder.color }} />
                 {folder.name}
@@ -413,7 +413,7 @@ export default function MesFiches() {
             )}
             <button
               onClick={() => setMovingFicheId(null)}
-              className="w-full mt-2 text-center text-sm px-3 py-2.5 rounded-lg bg-[#F4F4F5] text-black/60 hover:text-black transition"
+              className="w-full mt-2 text-center text-sm px-3 py-2.5 rounded-lg bg-surface text-black/60 hover:text-black transition"
             >
               Annuler
             </button>

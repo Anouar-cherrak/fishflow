@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { resend, emailLayout } from "@/lib/resend";
+import { resend, emailLayout, unsubscribeHeaders } from "@/lib/resend";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -22,18 +22,28 @@ export async function POST(req: Request) {
   const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const users = usersData?.users || [];
 
+  const { data: optOutRows } = await admin.from("profiles").select("id").eq("email_opt_out", true);
+  const optedOut = new Set((optOutRows || []).map((r) => r.id));
+
   let envoyes = 0;
   const erreurs: string[] = [];
 
   for (const user of users) {
     if (!user.email) continue;
+    if (optedOut.has(user.id)) continue;
     await new Promise((resolve) => setTimeout(resolve, 150));
     try {
       const result = await resend.emails.send({
         from: "FishFlow <noreply@fishflow.fr>",
         to: user.email,
         subject,
-        html: emailLayout(`<p style="color:#333333;font-size:15px;">${message}</p>`),
+        html: emailLayout(
+          `<p style="color:#333333;font-size:15px;">${message}</p>`,
+          undefined,
+          undefined,
+          `https://fishflow.fr/api/unsubscribe?id=${user.id}`
+        ),
+        headers: unsubscribeHeaders(user.id),
       });
       if (result.error) {
         erreurs.push(JSON.stringify(result.error));

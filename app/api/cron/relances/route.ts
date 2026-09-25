@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { resend, emailLayout } from "@/lib/resend";
+import { resend, emailLayout, unsubscribeHeaders } from "@/lib/resend";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -18,11 +18,15 @@ export async function GET(req: Request) {
   const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const users = usersData?.users || [];
 
+  const { data: optOutRows } = await admin.from("profiles").select("id").eq("email_opt_out", true);
+  const optedOut = new Set((optOutRows || []).map((r) => r.id));
+
   let mensuelEnvoyes = 0;
   let inactiviteEnvoyes = 0;
 
   for (const user of users) {
     if (!user.email) continue;
+    if (optedOut.has(user.id)) continue;
     await new Promise((resolve) => setTimeout(resolve, 150));
 
     const { data: dernieresFiches } = await admin
@@ -52,8 +56,12 @@ export async function GET(req: Request) {
           to: user.email,
           subject: "Tes fiches gratuites sont renouvelées ce mois-ci",
           html: emailLayout(
-            `<p style="color:#333333;font-size:15px;">Un nouveau mois commence, et tes fiches gratuites sont de retour ! Transforme un nouveau cours en fiche de révision en quelques secondes.</p>`
+            `<p style="color:#333333;font-size:15px;">Un nouveau mois commence, et tes fiches gratuites sont de retour ! Transforme un nouveau cours en fiche de révision en quelques secondes.</p>`,
+            undefined,
+            undefined,
+            `https://fishflow.fr/api/unsubscribe?id=${user.id}`
           ),
+          headers: unsubscribeHeaders(user.id),
         });
         if (!result.error) {
           await admin.from("email_relances").insert({ user_id: user.id, type: `mensuel-${currentMonthKey}` });
@@ -82,8 +90,12 @@ export async function GET(req: Request) {
             to: user.email,
             subject: "Ça fait un moment... reviens réviser avec FishFlow",
             html: emailLayout(
-              `<p style="color:#333333;font-size:15px;">Tu n'as pas généré de fiche depuis un moment. Un cours à réviser ? FishFlow s'en occupe en quelques secondes.</p>`
+              `<p style="color:#333333;font-size:15px;">Tu n'as pas généré de fiche depuis un moment. Un cours à réviser ? FishFlow s'en occupe en quelques secondes.</p>`,
+              undefined,
+              undefined,
+              `https://fishflow.fr/api/unsubscribe?id=${user.id}`
             ),
+            headers: unsubscribeHeaders(user.id),
           });
           if (!result.error) {
             await admin.from("email_relances").insert({ user_id: user.id, type: "inactivite" });

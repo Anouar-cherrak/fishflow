@@ -78,7 +78,7 @@ export default function Landing() {
         <ScrollReveal delay={0.35}>
           <div className="flex flex-wrap items-center justify-center gap-2 mb-8 mt-6">
             {["Rapide", "Précis", "Intelligent", "Sécurisé"].map((tag) => (
-              <span key={tag} className="text-sm px-4 py-1.5 rounded-full bg-[#F4F4F5] text-black/70">
+              <span key={tag} className="text-sm px-4 py-1.5 rounded-full bg-surface text-black/70">
                 {tag}
               </span>
             ))}
@@ -127,7 +127,7 @@ export default function Landing() {
 
             <div>
               <p className="text-sm font-semibold text-black uppercase tracking-wide mb-3">Flashcard</p>
-              <div className="bg-[#F4F4F5] rounded-xl p-5">
+              <div className="bg-surface rounded-xl p-5">
                 <p className="text-base text-black font-medium mb-1.5">Où se déroule la photosynthèse ?</p>
                 <p className="text-base text-black/50">Dans les chloroplastes des cellules végétales</p>
               </div>
@@ -164,7 +164,7 @@ export default function Landing() {
           <div className="text-black/30 text-2xl rotate-90 sm:rotate-0">→</div>
 
           <ScrollReveal delay={0.15} direction="scale">
-            <div className="bg-[#F4F4F5] border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto ff-card">
+            <div className="bg-surface border border-black/10 rounded-2xl px-6 py-5 text-center w-full sm:w-auto ff-card">
               <div className="flex items-center justify-center gap-1.5 mb-1">
                 <Logo size={20} />
               </div>
@@ -222,7 +222,7 @@ export default function Landing() {
           ].map((step, i) => (
             <ScrollReveal key={step.title} delay={i * 0.1} direction="up">
               <div className="bg-white border border-black/10 rounded-2xl p-5 text-center ff-card h-full">
-                <div className="w-11 h-11 mx-auto mb-3 rounded-full bg-black flex items-center justify-center text-sm font-semibold text-white">
+                <div className="w-11 h-11 mx-auto mb-3 rounded-full bg-[#111111] flex items-center justify-center text-sm font-semibold text-[#ffffff]">
                   {step.title.charAt(0)}
                 </div>
                 <h3 className="font-medium text-sm mb-1">{step.title}</h3>
@@ -254,7 +254,7 @@ export default function Landing() {
               <TrackedLink
                 href="/generer"
                 event="cta_click_offer_free"
-                className="block text-center w-full py-2.5 rounded-lg font-medium border border-black/20 hover:bg-[#F4F4F5] transition ff-btn"
+                className="block text-center w-full py-2.5 rounded-lg font-medium border border-black/20 hover:bg-surface transition ff-btn"
               >
                 Créer ma fiche gratuitement
               </TrackedLink>
@@ -262,14 +262,14 @@ export default function Landing() {
           </ScrollReveal>
 
           <ScrollReveal direction="right" delay={0.1}>
-            <div className="bg-black text-white rounded-2xl p-6 relative ff-card h-full">
+            <div className="bg-[#111111] text-[#ffffff] rounded-2xl p-6 relative ff-card h-full">
               <span className="absolute -top-3 left-6 text-xs font-semibold px-3 py-1 rounded-full bg-[#22C55E] text-white">
                 Populaire
               </span>
-              <p className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Premium</p>
-              <p className="text-3xl font-bold mb-1">4,99 €<span className="text-base font-normal text-white/60">/mois</span></p>
-              <p className="text-white/60 text-sm mb-5">Générations illimitées</p>
-              <ul className="text-sm text-white/90 space-y-2 mb-6">
+              <p className="text-xs font-semibold text-[#ffffff]/70 uppercase tracking-wide mb-2">Premium</p>
+              <p className="text-3xl font-bold mb-1">4,99 €<span className="text-base font-normal text-[#ffffff]/60">/mois</span></p>
+              <p className="text-[#ffffff]/60 text-sm mb-5">Générations illimitées</p>
+              <ul className="text-sm text-[#ffffff]/90 space-y-2 mb-6">
                 <li className="font-medium">✓ Fiches illimitées</li>
                 <li className="font-medium">✓ Documents volumineux</li>
                 <li className="font-medium">✓ Plusieurs PDF fusionnés en une fiche</li>

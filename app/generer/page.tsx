@@ -249,21 +249,36 @@ function GenererContent() {
       <div className="w-full flex flex-col items-center px-4 py-6">
         <div className="w-full max-w-lg flex flex-wrap justify-between items-center gap-3 mb-6 ff-fade">
           <Link href="/" className="text-sm text-black/50 hover:text-black transition ff-link-underline">← FishFlow</Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {!checkingAuth && (
               user ? (
                 <>
-                  <button onClick={() => router.push("/mes-fiches")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
+                  <button
+                    onClick={() => router.push("/mes-fiches")}
+                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
+                  >
                     Mes fiches
                   </button>
+                  <button
+                    onClick={() => router.push("/parametres")}
+                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
+                  >
+                    Paramètres
+                  </button>
                   <span className="hidden sm:inline text-sm text-black/40">{user.email}</span>
-                  <button onClick={handleLogout} className="text-sm text-black/40 hover:text-black hover:underline transition">
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
+                  >
                     Déconnexion
                   </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => router.push("/login")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
+                  <button
+                    onClick={() => router.push("/login")}
+                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
+                  >
                     Connexion
                   </button>
                   <button onClick={() => router.push("/signup")} className="text-sm bg-[#22C55E] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
@@ -301,7 +316,7 @@ function GenererContent() {
 
           {user && usage && !usage.isPro && (
             <div className="mb-4 bg-white border border-black/10 rounded-2xl overflow-hidden ff-fade-up ff-card" style={{ animationDelay: "0.15s" }}>
-              <div className={`px-5 py-3 text-sm font-medium ${usage.remaining === 0 ? "bg-black/5 text-black" : "bg-[#F4F4F5] text-black/70"}`}>
+              <div className={`px-5 py-3 text-sm font-medium ${usage.remaining === 0 ? "bg-black/5 text-black" : "bg-surface text-black/70"}`}>
                 {usage.remaining === 0
                   ? "Tu as atteint ta limite gratuite de ce mois-ci."
                   : `${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} restante${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
@@ -338,13 +353,13 @@ function GenererContent() {
           )}
 
           {!user && !checkingAuth && (
-            <div className="mb-4 px-4 py-2.5 rounded-lg text-sm bg-[#F4F4F5] text-black/60 ff-fade-up" style={{ animationDelay: "0.15s" }}>
+            <div className="mb-4 px-4 py-2.5 rounded-lg text-sm bg-surface text-black/60 ff-fade-up" style={{ animationDelay: "0.15s" }}>
               Connecte-toi pour générer des fiches (3 gratuites par mois).
             </div>
           )}
 
           <div className="bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card" style={{ animationDelay: "0.2s" }}>
-            <div className="flex gap-1 mb-6 bg-[#F4F4F5] rounded-lg p-1">
+            <div className="flex gap-1 mb-6 bg-surface rounded-lg p-1">
               {(["text", "pdf", "photo"] as Mode[]).map((m) => (
                 <button
                   key={m}
@@ -369,7 +384,7 @@ function GenererContent() {
 
             {mode === "pdf" && isMultiPdfPro && (
               <div className="mb-5">
-                <label className="w-full p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
+                <label className="w-full p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-surface transition">
                   <span className="text-black font-medium text-sm mb-1">
                     {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
                   </span>
@@ -396,7 +411,7 @@ function GenererContent() {
             )}
 
             {mode === "pdf" && !isMultiPdfPro && (
-              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
+              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-surface transition">
                 <span className="text-black font-medium text-sm mb-1">
                   {file ? file.name : "Choisir un PDF"}
                 </span>
@@ -413,7 +428,7 @@ function GenererContent() {
             )}
 
             {mode === "photo" && (
-              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-[#F4F4F5] transition">
+              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-surface transition">
                 <span className="text-black font-medium text-sm mb-1">
                   {file ? file.name : "Choisir une photo"}
                 </span>
@@ -436,7 +451,7 @@ function GenererContent() {
                   <label
                     key={opt.key}
                     className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer text-sm transition ${
-                      outputs.includes(opt.key) ? "bg-[#F4F4F5] border-black/40 text-black" : "bg-white border-black/10 text-black/50"
+                      outputs.includes(opt.key) ? "bg-surface border-black/40 text-black" : "bg-white border-black/10 text-black/50"
                     }`}
                   >
                     <input

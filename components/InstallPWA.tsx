@@ -45,7 +45,7 @@ export function InstallPWA() {
   if (isStandalone) return null;
 
   return (
-    <div className="mb-4 bg-[#F4F4F5] border border-black/10 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
+    <div className="mb-4 bg-surface border border-black/10 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
       <div>
         <p className="text-sm font-semibold text-black">L'app FishFlow est disponible !</p>
         <p className="text-xs text-black/50">Installe-la sur ton téléphone ou ton PC en un clic.</p>
@@ -95,7 +95,7 @@ export function InstallPWA() {
             )}
             <button
               onClick={() => setShowGuide(false)}
-              className="mt-5 w-full py-2.5 rounded-lg bg-[#F4F4F5] hover:bg-black/10 transition text-sm text-black"
+              className="mt-5 w-full py-2.5 rounded-lg bg-surface hover:bg-black/10 transition text-sm text-black"
             >
               Compris
             </button>

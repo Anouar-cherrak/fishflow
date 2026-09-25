@@ -255,7 +255,7 @@ export default function Result() {
             </div>
             <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2 space-y-2">
               {data.sheet.map((point, i) => (
-                <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className="bg-[#F4F4F5] rounded-lg border border-black/10 p-3 flex gap-2">
+                <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className="bg-surface rounded-lg border border-black/10 p-3 flex gap-2">
                   <span className="text-black font-bold">•</span>
                   <span className="text-black/70">{point}</span>
                 </div>
@@ -274,7 +274,7 @@ export default function Result() {
             </div>
             <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2 grid gap-3">
               {data.flashcards.map((card, i) => (
-                <div key={i} ref={(el) => { flashcardItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-[#F4F4F5]">
+                <div key={i} ref={(el) => { flashcardItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-surface">
                   <p className="font-medium text-black mb-1">{i + 1}. {card.question}</p>
                   <p className="text-black/60 text-sm">{card.answer}</p>
                 </div>
@@ -318,7 +318,7 @@ export default function Result() {
               ) : (
                 <div className="space-y-3">
                   {data.quiz.map((q, i) => (
-                    <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-[#F4F4F5]">
+                    <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-surface">
                       <p className="font-medium text-black mb-3">{i + 1}. {q.question}</p>
                       <ul className="space-y-2">
                         {q.options.map((opt, j) => (

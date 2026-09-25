@@ -62,7 +62,7 @@ export function QuizPlayer({
     const mastered = score >= 80;
 
     return (
-      <div className="border border-black/10 rounded-xl p-6 bg-[#F4F4F5] text-center">
+      <div className="border border-black/10 rounded-xl p-6 bg-surface text-center">
         <p className="text-3xl font-bold text-black mb-1">{score}%</p>
         <p className="text-sm text-black/60 mb-4">
           {correctCount} / {quiz.length} bonnes réponses
@@ -84,7 +84,7 @@ export function QuizPlayer({
   const q = quiz[current];
 
   return (
-    <div className="border border-black/10 rounded-xl p-6 bg-[#F4F4F5]">
+    <div className="border border-black/10 rounded-xl p-6 bg-surface">
       <div className="flex items-center justify-between mb-4 gap-2">
         <p className="text-xs font-semibold text-black/40 uppercase tracking-wide shrink-0">
           Question {current + 1} / {quiz.length}
