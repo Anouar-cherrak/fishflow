@@ -46,7 +46,7 @@ export default function Landing() {
           <TrackedLink
             href="/signup"
             event="cta_click_header_signup"
-            className="text-sm bg-[#22C55E] text-white px-4 py-2 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn"
+            className="text-sm bg-[#22C55E] text-[#ffffff] px-4 py-2 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn"
           >
             Créer un compte
           </TrackedLink>
@@ -89,7 +89,7 @@ export default function Landing() {
           <TrackedLink
             href="/generer"
             event="cta_click_hero"
-            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
+            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
           >
             Essayer gratuitement
           </TrackedLink>
@@ -263,7 +263,7 @@ export default function Landing() {
 
           <ScrollReveal direction="right" delay={0.1}>
             <div className="bg-[#111111] text-[#ffffff] rounded-2xl p-6 relative ff-card h-full">
-              <span className="absolute -top-3 left-6 text-xs font-semibold px-3 py-1 rounded-full bg-[#22C55E] text-white">
+              <span className="absolute -top-3 left-6 text-xs font-semibold px-3 py-1 rounded-full bg-[#22C55E] text-[#ffffff]">
                 Populaire
               </span>
               <p className="text-xs font-semibold text-[#ffffff]/70 uppercase tracking-wide mb-2">Premium</p>
@@ -282,7 +282,7 @@ export default function Landing() {
               <TrackedLink
                 href="/pricing"
                 event="cta_click_offer_premium"
-                className="block text-center w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
+                className="block text-center w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
               >
                 Passer Premium
               </TrackedLink>
@@ -306,7 +306,7 @@ export default function Landing() {
           <TrackedLink
             href="/generer"
             event="cta_click_final"
-            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
+            className="inline-block px-8 py-3.5 rounded-full font-display font-semibold text-lg bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
           >
             Essayer gratuitement
           </TrackedLink>

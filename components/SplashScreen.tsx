@@ -72,7 +72,7 @@ export function SplashScreen() {
       </svg>
 
       <p
-        className="text-white font-semibold text-lg mt-4"
+        className="text-[#ffffff] font-semibold text-lg mt-4"
         style={{
           opacity: 0,
           animation: "ff-fade-up 0.5s ease forwards 0.9s",

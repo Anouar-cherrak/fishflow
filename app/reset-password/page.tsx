@@ -68,7 +68,7 @@ export default function ResetPasswordRequest() {
         <button
           onClick={handleSubmit}
           disabled={loading || !email}
-          className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+          className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Envoi..." : "Envoyer le lien"}
         </button>

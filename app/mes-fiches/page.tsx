@@ -178,7 +178,7 @@ export default function MesFiches() {
 
         <div className="flex items-center justify-between mb-4 mt-4 ff-fade-up">
           <h1 className="text-xl font-semibold">Mes fiches</h1>
-          <button onClick={() => router.push("/generer")} className="text-sm bg-[#22C55E] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
+          <button onClick={() => router.push("/generer")} className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
             Nouvelle fiche
           </button>
         </div>
@@ -201,7 +201,7 @@ export default function MesFiches() {
             <button
               onClick={() => setActiveFolder("all")}
               className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
-                activeFolder === "all" ? "bg-black text-white" : "bg-surface text-black/60 hover:bg-black/10"
+                activeFolder === "all" ? "bg-[#111111] text-[#ffffff]" : "bg-surface text-black/60 hover:bg-black/10"
               }`}
             >
               Toutes ({fiches.length})
@@ -232,7 +232,7 @@ export default function MesFiches() {
               <button
                 onClick={() => setActiveFolder("none")}
                 className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
-                  activeFolder === "none" ? "bg-black text-white" : "bg-surface text-black/60 hover:bg-black/10"
+                  activeFolder === "none" ? "bg-[#111111] text-[#ffffff]" : "bg-surface text-black/60 hover:bg-black/10"
                 }`}
               >
                 Sans dossier ({noneCount})
@@ -274,7 +274,7 @@ export default function MesFiches() {
                 <button
                   onClick={createFolder}
                   disabled={!newFolderName.trim()}
-                  className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-white font-medium hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+                  className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-[#ffffff] font-medium hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
                 >
                   Créer
                 </button>
@@ -295,7 +295,7 @@ export default function MesFiches() {
               {fiches.length === 0 ? "Tu n'as pas encore de fiche sauvegardée." : "Aucune fiche dans cette section."}
             </p>
             {fiches.length === 0 && (
-              <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn">
+              <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
                 Créer ma première fiche
               </button>
             )}

@@ -53,7 +53,7 @@ export function InstallPWA() {
 
       <button
         onClick={handleClick}
-        className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-[#22C55E] text-white hover:bg-[#16A34A] transition shrink-0 ff-btn"
+        className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition shrink-0 ff-btn"
       >
         Télécharger l'application
       </button>
@@ -64,35 +64,38 @@ export function InstallPWA() {
           onClick={() => setShowGuide(false)}
         >
           <div
-            className="bg-white border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl"
+            className="bg-white border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="flex items-start justify-between mb-4">
+              <p className="font-medium text-black">
+                {guideType === "ios" ? "Installer FishFlow sur iPhone" : "Installer FishFlow"}
+              </p>
+              <button
+                onClick={() => setShowGuide(false)}
+                className="text-black/30 hover:text-black text-xl leading-none shrink-0 ml-3"
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
+
             {guideType === "ios" ? (
-              <>
-                <p className="font-medium text-black mb-4">Installer FishFlow sur iPhone</p>
-                <ol className="text-sm text-black/70 space-y-3 list-decimal list-inside">
-                  <li>Ouvre ce site dans <strong className="text-black">Safari</strong></li>
-                  <li>Appuie sur le bouton <strong className="text-black">Partager</strong> (carré avec une flèche)</li>
-                  <li>Choisis <strong className="text-black">« Sur l'écran d'accueil »</strong></li>
-                  <li>Confirme avec <strong className="text-black">Ajouter</strong></li>
-                </ol>
-              </>
+              <ol className="text-sm text-black/70 space-y-3 list-decimal list-inside">
+                <li>Ouvre ce site dans <strong className="text-black">Safari</strong></li>
+                <li>Appuie sur le bouton <strong className="text-black">Partager</strong> (carré avec une flèche)</li>
+                <li>Choisis <strong className="text-black">« Sur l'écran d'accueil »</strong></li>
+                <li>Confirme avec <strong className="text-black">Ajouter</strong></li>
+              </ol>
             ) : (
               <>
-                <p className="font-medium text-black mb-4">Installer FishFlow</p>
-                <p className="text-sm text-black/70 mb-3">Sur Chrome ou Edge (PC, Android) :</p>
-                <ol className="text-sm text-black/70 space-y-3 list-decimal list-inside mb-4">
-                  <li>Clique sur le menu du navigateur (⋮ en haut à droite)</li>
-                  <li>
-                    Choisis <strong className="text-black">« Installer FishFlow »</strong> ou{" "}
-                    <strong className="text-black">« Ajouter à l'écran d'accueil »</strong>
-                  </li>
-                </ol>
+                <p className="text-sm text-black/70 mb-3">Sur Chrome ou Edge (PC, Android), cherche la petite icône d'installation directement dans la barre d'adresse (à droite, à côté de l'URL) et clique dessus.</p>
                 <p className="text-xs text-black/40">
-                  Astuce : cherche aussi une petite icône ⊕ directement dans la barre d'adresse.
+                  Si tu ne la vois pas : ouvre le menu du navigateur (⋮ en haut à droite) puis choisis « Installer FishFlow ».
                 </p>
               </>
             )}
+
             <button
               onClick={() => setShowGuide(false)}
               className="mt-5 w-full py-2.5 rounded-lg bg-surface hover:bg-black/10 transition text-sm text-black"

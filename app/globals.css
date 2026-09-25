@@ -21,6 +21,26 @@
   color-scheme: dark;
 }
 
+/* Couleurs de feedback du quiz (bonne/mauvaise réponse) — adaptées au thème
+   pour garder un bon contraste en mode sombre (sinon texte quasi blanc sur
+   fond pastel clair = illisible). */
+:root {
+  --quiz-correct-bg: #DCFCE7;
+  --quiz-correct-border: #22C55E;
+  --quiz-correct-text: #14532D;
+  --quiz-wrong-bg: #FEE2E2;
+  --quiz-wrong-border: #EF4444;
+  --quiz-wrong-text: #7F1D1D;
+}
+:root.dark {
+  --quiz-correct-bg: #14532D40;
+  --quiz-correct-border: #4ADE80;
+  --quiz-correct-text: #86EFAC;
+  --quiz-wrong-bg: #7F1D1D40;
+  --quiz-wrong-border: #F87171;
+  --quiz-wrong-text: #FCA5A5;
+}
+
 body {
   font-family: var(--font-body), sans-serif;
   background: var(--ff-bg);

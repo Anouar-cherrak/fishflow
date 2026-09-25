@@ -64,7 +64,7 @@ export default function Pricing() {
         <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
           <p className="text-black/50 text-sm mb-6">Génération illimitée déjà active sur ton compte.</p>
-          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn">
+          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
             Retour à l'outil
           </button>
         </div>
@@ -99,7 +99,7 @@ export default function Pricing() {
         <button
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
+          className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
         >
           {loading ? "Redirection..." : "Passer Pro"}
         </button>

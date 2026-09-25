@@ -326,7 +326,7 @@ export default function Result() {
                             key={j}
                             className={`px-3 py-2 rounded-md text-sm ${
                               j === q.correctIndex
-                                ? "bg-black text-white font-semibold"
+                                ? "bg-[#111111] text-[#ffffff] font-semibold"
                                 : "bg-white text-black/70 border border-black/10"
                             }`}
                           >
@@ -340,7 +340,7 @@ export default function Result() {
                     <p className="text-xs text-black/40 mb-2">Passe Pro pour jouer le quiz et suivre ta progression</p>
                     <button
                       onClick={() => router.push("/pricing")}
-                      className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-white font-medium hover:bg-[#16A34A] transition ff-btn"
+                      className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-[#ffffff] font-medium hover:bg-[#16A34A] transition ff-btn"
                     >
                       Découvrir FishFlow Pro
                     </button>
@@ -354,11 +354,11 @@ export default function Result() {
         <button
           onClick={handleDownloadPDF}
           disabled={downloading}
-          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-white hover:bg-[#16A34A] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 ff-btn"
+          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 ff-btn"
         >
           {downloading ? (
             <>
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-[#ffffff]/30 border-t-[#ffffff] rounded-full animate-spin" />
               Génération du PDF...
             </>
           ) : (

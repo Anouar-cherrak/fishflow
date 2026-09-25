@@ -75,7 +75,7 @@ export default function Login() {
         <button
           onClick={handleLogin}
           disabled={loading || !email || !password}
-          className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+          className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>

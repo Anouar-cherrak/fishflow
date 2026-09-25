@@ -204,7 +204,7 @@ export default function Parametres() {
             ) : (
               <button
                 onClick={() => router.push("/pricing")}
-                className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn"
+                className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
               >
                 Passer Pro — 4,99 €/mois
               </button>
@@ -265,7 +265,7 @@ export default function Parametres() {
                   <button
                     onClick={handleDeleteAccount}
                     disabled={deleteText !== "SUPPRIMER" || deleting}
-                    className="flex-1 py-2.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition disabled:opacity-30 ff-btn"
+                    className="flex-1 py-2.5 rounded-lg font-medium bg-red-600 text-[#ffffff] hover:bg-red-700 transition disabled:opacity-30 ff-btn"
                   >
                     {deleting ? "Suppression..." : "Confirmer la suppression"}
                   </button>

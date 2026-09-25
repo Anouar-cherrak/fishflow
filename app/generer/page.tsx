@@ -281,7 +281,7 @@ function GenererContent() {
                   >
                     Connexion
                   </button>
-                  <button onClick={() => router.push("/signup")} className="text-sm bg-[#22C55E] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
+                  <button onClick={() => router.push("/signup")} className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
                     Créer un compte
                   </button>
                 </>
@@ -306,9 +306,9 @@ function GenererContent() {
           </div>
 
           {user && usage?.isPro && (
-            <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-black text-white flex items-center justify-between gap-3 flex-wrap ff-fade-up" style={{ animationDelay: "0.15s" }}>
+            <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-[#111111] text-[#ffffff] flex items-center justify-between gap-3 flex-wrap ff-fade-up" style={{ animationDelay: "0.15s" }}>
               <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
-              <button onClick={handleManageSubscription} disabled={portalLoading} className="text-xs font-semibold underline text-white/90 hover:text-white disabled:opacity-50">
+              <button onClick={handleManageSubscription} disabled={portalLoading} className="text-xs font-semibold underline text-[#ffffff]/90 hover:text-[#ffffff] disabled:opacity-50">
                 {portalLoading ? "Redirection..." : "Gérer mon abonnement"}
               </button>
             </div>
@@ -345,7 +345,7 @@ function GenererContent() {
               </div>
 
               <div className="px-5 pb-5">
-                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-white hover:bg-[#16A34A] transition ff-btn">
+                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
                   Passer Pro — 4,99 €/mois
                 </button>
               </div>
@@ -365,7 +365,7 @@ function GenererContent() {
                   key={m}
                   onClick={() => { setMode(m); setFile(null); setFiles([]); }}
                   className={`flex-1 px-3 py-2 rounded-md font-medium text-sm transition ${
-                    mode === m ? "bg-black text-white" : "text-black/50 hover:text-black/80"
+                    mode === m ? "bg-[#111111] text-[#ffffff]" : "text-black/50 hover:text-black/80"
                   }`}
                 >
                   {m === "text" ? "Texte" : m === "pdf" ? "PDF" : "Photo"}
@@ -503,7 +503,7 @@ function GenererContent() {
                 outputs.length === 0 ||
                 (!!user && !!usage && !usage.isPro && usage.remaining === 0)
               }
-              className="w-full py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-white hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+              className="w-full py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer"}
             </button>
