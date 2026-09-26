@@ -1,5 +1,7 @@
 "use client";
 
+import { createPortal } from "react-dom";
+
 export function UpgradeModal({
   title,
   message,
@@ -11,7 +13,9 @@ export function UpgradeModal({
   onClose: () => void;
   onUpgrade: () => void;
 }) {
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 ff-fade"
       onClick={onClose}
@@ -54,6 +58,7 @@ export function UpgradeModal({
           Plus tard
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

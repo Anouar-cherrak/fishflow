@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
@@ -382,7 +383,7 @@ export default function MesFiches() {
         )}
       </div>
 
-      {movingFicheId && (
+      {movingFicheId && typeof document !== "undefined" && createPortal(
         <div
           className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-sm flex items-center justify-center px-4"
           onClick={() => setMovingFicheId(null)}
@@ -418,7 +419,8 @@ export default function MesFiches() {
               Annuler
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </main>
   );

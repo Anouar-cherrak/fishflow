@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 export function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -58,7 +59,7 @@ export function InstallPWA() {
         Télécharger l'application
       </button>
 
-      {showGuide && (
+      {showGuide && typeof document !== "undefined" && createPortal(
         <div
           className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-sm flex items-center justify-center px-4"
           onClick={() => setShowGuide(false)}
@@ -103,7 +104,8 @@ export function InstallPWA() {
               Compris
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
