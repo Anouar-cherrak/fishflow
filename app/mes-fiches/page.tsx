@@ -384,11 +384,11 @@ export default function MesFiches() {
 
       {movingFicheId && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-sm flex items-center justify-center px-4"
           onClick={() => setMovingFicheId(null)}
         >
           <div
-            className="bg-white border border-black/10 rounded-2xl shadow-xl p-4 w-full max-w-xs"
+            className="bg-surface border border-black/10 rounded-2xl shadow-xl p-4 w-full max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-sm font-medium text-black mb-3 px-1">Déplacer vers</p>

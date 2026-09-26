@@ -60,11 +60,11 @@ export function InstallPWA() {
 
       {showGuide && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-sm flex items-center justify-center px-4"
           onClick={() => setShowGuide(false)}
         >
           <div
-            className="bg-white border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl max-h-[85vh] overflow-y-auto"
+            className="bg-surface border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">

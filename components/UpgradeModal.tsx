@@ -13,11 +13,11 @@ export function UpgradeModal({
 }) {
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 ff-fade"
+      className="fixed inset-0 bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 ff-fade"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm bg-white rounded-2xl p-6 ff-card ff-fade-up max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-sm bg-surface rounded-2xl p-6 ff-card ff-fade-up max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-3">
