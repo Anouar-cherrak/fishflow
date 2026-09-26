@@ -52,7 +52,6 @@ function GenererContent() {
   const [user, setUser] = useState<User | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
-  const [portalLoading, setPortalLoading] = useState(false);
   const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -112,23 +111,6 @@ function GenererContent() {
     await supabase.auth.signOut();
     setUser(null);
     router.refresh();
-  };
-
-  const handleManageSubscription = async () => {
-    setPortalLoading(true);
-    try {
-      const res = await fetch("/api/stripe/portal", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || "Erreur, réessaie.");
-        setPortalLoading(false);
-        return;
-      }
-      window.location.href = data.url;
-    } catch {
-      alert("Erreur de connexion. Réessaie.");
-      setPortalLoading(false);
-    }
   };
 
   const handleGenerate = async () => {
@@ -304,15 +286,6 @@ function GenererContent() {
           <div className="ff-fade-up" style={{ animationDelay: "0.1s" }}>
             <InstallPWA />
           </div>
-
-          {user && usage?.isPro && (
-            <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-[#111111] text-[#ffffff] flex items-center justify-between gap-3 flex-wrap ff-fade-up" style={{ animationDelay: "0.15s" }}>
-              <span className="font-medium">FishFlow Pro actif — générations illimitées</span>
-              <button onClick={handleManageSubscription} disabled={portalLoading} className="text-xs font-semibold underline text-[#ffffff]/90 hover:text-[#ffffff] disabled:opacity-50">
-                {portalLoading ? "Redirection..." : "Gérer mon abonnement"}
-              </button>
-            </div>
-          )}
 
           {user && usage && !usage.isPro && (
             <div className="mb-4 bg-white border border-black/10 rounded-2xl overflow-hidden ff-fade-up ff-card" style={{ animationDelay: "0.15s" }}>
