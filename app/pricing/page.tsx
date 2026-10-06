@@ -13,7 +13,7 @@ const ROWS: { label: string; free: string; pro: string }[] = [
   { label: "Résumé, fiche, flashcards", free: "Oui", pro: "Oui" },
   { label: "Quiz", free: "À lire, avec les bonnes réponses", pro: "À jouer, 12 questions, meilleur score" },
   { label: "Réviser avec rappels", free: "Oui", pro: "Oui" },
-  { label: "Apprendre (questions avec sources)", free: "1 essai", pro: "20 questions par jour" },
+  { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
   { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },
   { label: "Résumé lu à voix haute", free: "Non", pro: "Oui" },
   { label: "Historique de fiches", free: "5 fiches", pro: "Illimité" },

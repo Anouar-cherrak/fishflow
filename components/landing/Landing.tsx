@@ -502,7 +502,7 @@ export function Landing() {
                 <h3>Poser une question</h3>
                 <dl>
                   <div><dt>Tu donnes</dt><dd>Une question, sur n&apos;importe quel sujet.</dd></div>
-                  <div><dt>Tu reçois</dt><dd>Une réponse courte, des images libres de droits et les sources pour vérifier.</dd></div>
+                  <div><dt>Tu reçois</dt><dd>Une réponse claire et bien expliquée, des images libres de droits et des liens pour aller plus loin.</dd></div>
                 </dl>
               </article>
               <article className="tool">
@@ -610,7 +610,7 @@ export function Landing() {
         <section id="apprendre" aria-labelledby="t-app">
           <div className="wrap">
             <h2 id="t-app">Et si tu as une question ?</h2>
-            <p className="sub">FishFlow répond aussi à n&apos;importe quelle question, avec des images libres de droits et ses sources. Essaie avec un exemple.</p>
+            <p className="sub">FishFlow répond aussi à n&apos;importe quelle question, avec des images libres de droits et des liens Wikipédia pour aller plus loin. Essaie avec un exemple.</p>
             <div className="demo">
               <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
                 <div className="slot-demo" data-slot="demo" aria-hidden="true" />
@@ -637,7 +637,7 @@ export function Landing() {
               <div className="demo-panel" aria-live="polite">
                 {!answer && !notice && (
                   <p className="note">
-                    {phase === "thinking" ? "FishFlow cherche des sources…" : "La réponse apparaît ici, avec ses images et ses sources."}
+                    {phase === "thinking" ? "FishFlow réfléchit…" : "La réponse apparaît ici, avec ses images."}
                   </p>
                 )}
                 {!answer && notice && (
@@ -674,12 +674,12 @@ export function Landing() {
         {/* Confiance */}
         <section aria-labelledby="t-c">
           <div className="wrap">
-            <h2 id="t-c">Des réponses que tu peux vérifier.</h2>
-            <p className="sub">Quand tu poses une question, FishFlow ne devine pas. Il lit des sources, puis te les montre.</p>
+            <h2 id="t-c">Des réponses claires, et honnêtes sur leurs limites.</h2>
+            <p className="sub">Quand tu poses une question, une IA te répond avec ses connaissances. Elle peut se tromper, alors on te donne de quoi vérifier.</p>
             <ul className="trust">
-              <li><strong>Des sources connues</strong>Wikipédia et une liste de sites reconnus, comme Le Monde, le CNRS ou la NASA.</li>
-              <li><strong>Chaque idée a sa source</strong>Tu cliques sur le numéro et tu ouvres l&apos;article d&apos;origine.</li>
-              <li><strong>Pas de source, pas de réponse</strong>Si FishFlow ne trouve rien de fiable, il te le dit au lieu d&apos;inventer.</li>
+              <li><strong>Des liens pour vérifier</strong>Les articles Wikipédia sur le sujet sont proposés sous la réponse, pour aller plus loin.</li>
+              <li><strong>Des images libres de droits</strong>Elles viennent de Wikipédia, avec leur auteur et leur licence.</li>
+              <li><strong>Il dit quand il hésite</strong>Si un détail est incertain ou peut avoir changé, la réponse te le signale au lieu de l'inventer.</li>
             </ul>
           </div>
         </section>
@@ -700,7 +700,7 @@ export function Landing() {
                   <tr><th scope="row">Résumé, fiche, flashcards</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
                   <tr><th scope="row">Quiz</th><td data-label="Gratuit">À lire, avec les bonnes réponses</td><td data-label="Pro" className="pro">À jouer, 12 questions, avec ton meilleur score</td></tr>
                   <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Apprendre (questions avec sources)</th><td data-label="Gratuit">1 essai</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
+                  <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 essai</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
                   <tr><th scope="row">Documents</th><td data-label="Gratuit">Courts et moyens</td><td data-label="Pro" className="pro">Volumineux, plusieurs PDF fusionnés en une fiche</td></tr>
                   <tr><th scope="row">Résumé lu à voix haute</th><td data-label="Gratuit">Non</td><td data-label="Pro" className="pro">Oui</td></tr>
                   <tr><th scope="row">Historique de fiches</th><td data-label="Gratuit">5 fiches</td><td data-label="Pro" className="pro">Illimité</td></tr>
@@ -722,7 +722,7 @@ export function Landing() {
             <div className="faq">
               <details><summary>C&apos;est pour qui ?</summary><p>Pour tout le monde : élèves, étudiants, ou simples curieux qui veulent comprendre un sujet.</p></details>
               <details><summary>C&apos;est gratuit ?</summary><p>Oui pour commencer : 3 fiches par mois et un essai d&apos;Apprendre, sans carte bancaire. Pro enlève les limites.</p></details>
-              <details><summary>Les réponses sont-elles vraies ?</summary><p>Elles viennent de sources que tu peux ouvrir. Une IA les résume : pour un détail important, vérifie dans la source.</p></details>
+              <details><summary>Les réponses sont-elles vraies ?</summary><p>Pour les fiches, elles viennent de ton propre cours. Pour les questions d&apos;Apprendre, c&apos;est une IA qui répond : elle peut se tromper, donc pour un détail important, vérifie dans les liens proposés ou dans ton cours.</p></details>
             </div>
           </div>
         </section>

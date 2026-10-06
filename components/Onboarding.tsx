@@ -29,8 +29,8 @@ const STEPS: Step[] = [
     art: "boxes",
   },
   {
-    title: "Pose une question, vérifie les sources",
-    text: "Dans « Apprendre », tu reçois une réponse courte, des images libres de droits et les liens pour vérifier. Tu as un essai gratuit.",
+    title: "Pose une question, comprends vite",
+    text: "Dans « Apprendre », tu reçois une réponse bien expliquée, des images libres de droits et des liens pour aller plus loin. Tu as un essai gratuit.",
     art: "orb",
   },
 ];

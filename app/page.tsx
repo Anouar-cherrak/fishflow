@@ -5,7 +5,7 @@ import "./landing.css";
 export const metadata: Metadata = {
   title: "FishFlow — Fiches de révision, résumés et quiz par IA | Essai gratuit",
   description:
-    "Transforme ton cours, PDF ou photo en fiche de révision, résumé, flashcards et quiz en quelques secondes grâce à l'IA, et pose n'importe quelle question pour une réponse avec ses sources. 3 fiches gratuites par mois, sans carte bancaire.",
+    "Transforme ton cours, PDF ou photo en fiche de révision, résumé, flashcards et quiz en quelques secondes grâce à l'IA, et pose n'importe quelle question pour une réponse claire avec images. 3 fiches gratuites par mois, sans carte bancaire.",
 };
 
 export default function Landing() {

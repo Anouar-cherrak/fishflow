@@ -13,6 +13,7 @@ type Answer = {
   title: string;
   summary: string;
   points: { text: string; sources: number[] }[];
+  caution?: string;
   sources: Source[];
   images: ImageItem[];
 };
@@ -33,7 +34,6 @@ export default function Apprendre() {
   const [asked, setAsked] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "empty" | "error" | "pro">("idle");
   const [message, setMessage] = useState("");
-  const [reason, setReason] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [shift, setShift] = useState(0);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -107,7 +107,7 @@ export default function Apprendre() {
         return;
       }
       if (!data.found) {
-        setReason(typeof data.reason === "string" ? data.reason : "");
+        setMessage(typeof data.message === "string" ? data.message : "");
         setStatus("empty");
         return;
       }
@@ -141,7 +141,7 @@ export default function Apprendre() {
           <div className="text-center ff-fade-up">
             <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Que veux-tu savoir ?</h1>
             <p className="text-black/60 text-sm sm:text-base max-w-sm mx-auto mb-6">
-              Pose une question. Tu reçois une réponse courte, des images et les sources pour vérifier.
+              Pose une question. Tu reçois une réponse claire et bien expliquée, des images et des liens pour aller plus loin.
             </p>
             <ul className="flex flex-wrap justify-center gap-2">
               {EXAMPLES.map((example) => (
@@ -164,16 +164,15 @@ export default function Apprendre() {
 
         <div aria-live="polite" className="w-full">
           {status === "loading" && (
-            <p className="text-center text-black/60 text-sm ff-fade">Je cherche des sources fiables…</p>
+            <p className="text-center text-black/60 text-sm ff-fade">Je réfléchis à ta question…</p>
           )}
 
           {status === "empty" && (
             <div className="bg-surface border border-black/10 rounded-2xl p-6 text-center ff-fade-up">
-              <p className="font-medium mb-1">Je n&apos;ai pas trouvé de source fiable.</p>
+              <p className="font-medium mb-1">Je ne peux pas répondre à celle-ci.</p>
               <p className="text-sm text-black/60">
-                Plutôt que d&apos;inventer, je préfère ne rien dire. Essaie avec d&apos;autres mots ou une question plus précise.
+                {message || "Essaie avec une vraie question de culture ou de cours, par exemple « Comment fonctionne un trou noir ? »."}
               </p>
-              {reason && <p className="text-xs text-black/30 mt-3">code : {reason}</p>}
             </div>
           )}
 
@@ -271,11 +270,16 @@ export default function Apprendre() {
                 ))}
               </ul>
 
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-black/40 mb-3">Sources</h2>
+              {answer.caution && (
+                <p className="text-sm text-black/70 border border-black/15 rounded-xl px-4 py-3 mb-6">{answer.caution}</p>
+              )}
+
+              {answer.sources.length > 0 && (
+              <>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-black/40 mb-3">Pour aller plus loin</h2>
               <ol className="space-y-2 mb-4">
                 {answer.sources.map((source) => (
                   <li key={source.id} id={`source-${source.id}`} className="text-sm scroll-mt-20">
-                    <span className="text-black/40 mr-2">[{source.id}]</span>
                     <a
                       href={source.url}
                       target="_blank"
@@ -287,8 +291,10 @@ export default function Apprendre() {
                   </li>
                 ))}
               </ol>
-              <p className="text-xs text-black/40">
-                Réponse résumée par l&apos;IA à partir de ces articles. Ouvre les sources pour vérifier les détails.
+              </>
+              )}
+              <p className="text-xs text-black/50">
+                Réponse écrite par l&apos;IA à partir de ses connaissances. Elle peut se tromper : vérifie les infos importantes, par exemple dans les articles ci-dessus.
               </p>
             </article>
           )}
