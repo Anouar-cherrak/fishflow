@@ -238,6 +238,12 @@ function GenererContent() {
               user ? (
                 <>
                   <button
+                    onClick={() => router.push("/apprendre")}
+                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
+                  >
+                    Apprendre
+                  </button>
+                  <button
                     onClick={() => router.push("/mes-fiches")}
                     className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
                   >

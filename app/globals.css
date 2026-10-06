@@ -165,3 +165,99 @@ body {
 .ff-underline-grow.is-active::after {
   transform: scaleX(1);
 }
+/* ===== Page « Apprendre » : la boule lumineuse ===== */
+.ff-orb {
+  --orb-size: clamp(150px, 46vw, 230px);
+  --speed: 1;
+  position: relative;
+  width: var(--orb-size);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  filter: hue-rotate(var(--orb-shift, 0deg));
+  transition: filter 1.4s ease, width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: ffOrbBreathe calc(6s / var(--speed)) ease-in-out infinite;
+  will-change: transform;
+}
+.ff-orb[data-compact="true"] {
+  --orb-size: clamp(76px, 20vw, 100px);
+}
+.ff-orb[data-state="thinking"] {
+  --speed: 3;
+}
+.ff-orb-glow {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.5), transparent 65%);
+  filter: blur(22px);
+  animation: ffOrbPulse calc(4s / var(--speed)) ease-in-out infinite;
+}
+.ff-orb-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 32% 28%, #c7d2fe 0%, #6366f1 42%, #1e1b4b 100%);
+  box-shadow: inset -10px -14px 30px rgba(15, 12, 60, 0.55), inset 8px 10px 24px rgba(255, 255, 255, 0.25);
+}
+.ff-orb-blob {
+  position: absolute;
+  inset: 0;
+  animation: ffOrbSpin calc(var(--d) / var(--speed)) linear infinite;
+}
+.ff-orb-blob::before {
+  content: "";
+  position: absolute;
+  width: 62%;
+  height: 62%;
+  top: var(--y, 0);
+  left: var(--x, 0);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c), transparent 68%);
+  filter: blur(8px);
+}
+.ff-orb-shine {
+  position: absolute;
+  top: 9%;
+  left: 18%;
+  width: 34%;
+  height: 20%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
+  transform: rotate(-24deg);
+}
+
+@keyframes ffOrbSpin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ffOrbBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+@keyframes ffOrbPulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+/* Les images « sortent » de la boule, depuis le haut, vers leur place. */
+@keyframes ffFly {
+  from { opacity: 0; transform: translate3d(var(--fx, 0), -70px, 0) scale(0.45); }
+  to { opacity: 1; transform: none; }
+}
+.ff-fly {
+  opacity: 0;
+  animation: ffFly 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pour les personnes qui demandent moins de mouvement : tout reste lisible, rien ne bouge. */
+@media (prefers-reduced-motion: reduce) {
+  .ff-orb,
+  .ff-orb-glow,
+  .ff-orb-blob {
+    animation: none;
+  }
+  .ff-fly,
+  .ff-fade-up,
+  .ff-fade {
+    animation-duration: 0.01ms;
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
@@ -180,6 +181,9 @@ export default function MesFiches() {
         <div className="flex items-center gap-2 mb-2 ff-fade">
           <Logo size={22} />
           <Wordmark className="text-sm" />
+          <Link href="/apprendre" className="ml-auto text-sm text-black/60 hover:text-black transition ff-link-underline">
+            Apprendre
+          </Link>
         </div>
 
         <div className="flex items-center justify-between mb-4 mt-4 ff-fade-up">
