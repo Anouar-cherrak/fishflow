@@ -66,6 +66,17 @@ function GenererContent() {
     });
   }, []);
 
+  // Un texte envoyé depuis Apprendre (« En faire une fiche de révision »)
+  useEffect(() => {
+    try {
+      const prefill = sessionStorage.getItem("ff-prefill");
+      if (prefill) {
+        sessionStorage.removeItem("ff-prefill");
+        queueMicrotask(() => setText(prefill.slice(0, 20000)));
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
       const alreadyTracked = sessionStorage.getItem("ff_achat_tracked") === "1";

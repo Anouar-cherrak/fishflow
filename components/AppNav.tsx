@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/generer", label: "Générer", hint: "Crée une fiche à partir d'un cours" },
   { href: "/mes-fiches", label: "Mes fiches", hint: "Retrouve toutes tes fiches" },
   { href: "/reviser", label: "Réviser", hint: "Tes cartes du jour" },
+  { href: "/examens", label: "Examens", hint: "Prépare une date d'examen" },
   { href: "/apprendre", label: "Apprendre", hint: "Pose une question, comprends vite" },
   { href: "/pricing", label: "Pro", hint: "Les avantages et le prix" },
   { href: "/parametres", label: "Paramètres", hint: "Compte et apparence" },

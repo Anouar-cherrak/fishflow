@@ -10,8 +10,10 @@ const SKIP_EXACT = new Set([
   "/mentions-legales",
   "/sw.js",
   "/manifest.webmanifest",
+  "/sitemap.xml",
+  "/robots.txt",
 ]);
-const SKIP_PREFIXES = ["/api/stripe/webhook", "/api/cron", "/api/admin", "/api/unsubscribe"];
+const SKIP_PREFIXES = ["/p/", "/api/stripe/webhook", "/api/cron", "/api/admin", "/api/unsubscribe"];
 
 export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;

@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 const KEY = "ff-tuto-v1";
 const NEW_ACCOUNT_DAYS = 7;
 // Pages où le tutoriel ne doit jamais s'ouvrir tout seul
-const QUIET = ["/", "/login", "/signup", "/reset-password", "/cgu", "/mentions-legales", "/confidentialite"];
+const QUIET = ["/", "/login", "/signup", "/reset-password", "/cgu", "/mentions-legales", "/confidentialite", "/p"];
 
 type Step = { title: string; text: string; art: "doc" | "pack" | "boxes" | "orb" };
 

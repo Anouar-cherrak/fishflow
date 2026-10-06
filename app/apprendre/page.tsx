@@ -122,6 +122,23 @@ export default function Apprendre() {
     }
   };
 
+  // Le texte de la réponse devient le point de départ d'une fiche (la génération normale s'applique).
+  const makeSheet = () => {
+    if (!answer) return;
+    const text = [
+      answer.title,
+      "",
+      answer.summary,
+      "",
+      ...answer.points.map((p) => `- ${p.text}`),
+    ].join("\n");
+    try {
+      sessionStorage.setItem("ff-prefill", text);
+    } catch {}
+    trackEvent("apprendre_vers_fiche");
+    router.push("/generer");
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     ask(question);
@@ -269,6 +286,13 @@ export default function Apprendre() {
                   </li>
                 ))}
               </ul>
+
+              <div className="mb-6 flex flex-wrap items-center gap-3 border border-black/10 rounded-2xl bg-surface px-4 py-3">
+                <p className="text-sm text-black/70 flex-1 min-w-[200px]">Tu veux t&apos;en souvenir ? FishFlow en fait une fiche, des flashcards et un quiz.</p>
+                <button type="button" onClick={makeSheet} className="ff-primary text-sm min-h-[44px] ff-btn">
+                  En faire une fiche de révision
+                </button>
+              </div>
 
               {answer.caution && (
                 <p className="text-sm text-black/70 border border-black/15 rounded-xl px-4 py-3 mb-6">{answer.caution}</p>

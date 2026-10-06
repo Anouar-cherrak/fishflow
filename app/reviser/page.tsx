@@ -38,19 +38,45 @@ export default function Reviser() {
 
       getProgress().then(setProgress);
 
-      const { data: dueRows, count, error } = await supabase
+      // Depuis « Examens » : on ne révise que les fiches de cet examen.
+      const only = (new URLSearchParams(window.location.search).get("fiches") ?? "")
+        .split(",")
+        .filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+
+      let query = supabase
         .from("card_reviews")
         .select("fiche_id, card_index", { count: "exact" })
-        .lte("due_at", new Date().toISOString())
-        .order("due_at", { ascending: true })
-        .limit(SESSION_SIZE);
+        .lte("due_at", new Date().toISOString());
+      if (only.length > 0) query = query.in("fiche_id", only);
+      const { data: dueData, count, error } = await query.order("due_at", { ascending: true }).limit(SESSION_SIZE);
+      if (error) {
+        setStatus("empty");
+        return;
+      }
+      const dueRows: { fiche_id: string; card_index: number }[] = (dueData ?? []) as { fiche_id: string; card_index: number }[];
 
-      if (error || !dueRows || dueRows.length === 0) {
+      // Pour un examen, les cartes jamais étudiées comptent aussi : elles arrivent après celles à revoir.
+      let newRows: { fiche_id: string; card_index: number }[] = [];
+      let ficheSource = dueRows.map((r) => r.fiche_id);
+      if (only.length > 0) {
+        const { data: tracked } = await supabase.from("card_reviews").select("fiche_id, card_index").in("fiche_id", only);
+        const seen = new Set((tracked ?? []).map((r) => `${r.fiche_id}:${r.card_index}`));
+        const { data: examFiches } = await supabase.from("fiches").select("id, data").in("id", only);
+        for (const f of examFiches ?? []) {
+          const total = Array.isArray(f.data?.flashcards) ? f.data.flashcards.length : 0;
+          for (let i = 0; i < total; i++) if (!seen.has(`${f.id}:${i}`)) newRows.push({ fiche_id: f.id as string, card_index: i });
+        }
+        newRows = newRows.slice(0, Math.max(0, SESSION_SIZE - dueRows.length));
+        ficheSource = [...ficheSource, ...newRows.map((r) => r.fiche_id)];
+      }
+
+      const allRows = [...dueRows, ...newRows];
+      if (allRows.length === 0) {
         setStatus("empty");
         return;
       }
 
-      const ficheIds = Array.from(new Set(dueRows.map((r) => r.fiche_id as string)));
+      const ficheIds = Array.from(new Set(ficheSource));
       const { data: fiches } = await supabase.from("fiches").select("id, data").in("id", ficheIds);
 
       const flashcardsByFiche = new Map<string, { question: string; answer: string }[]>();
@@ -60,14 +86,14 @@ export default function Reviser() {
       }
 
       const due: DueCard[] = [];
-      for (const row of dueRows) {
-        const card = flashcardsByFiche.get(row.fiche_id as string)?.[row.card_index as number];
+      for (const row of allRows) {
+        const card = flashcardsByFiche.get(row.fiche_id)?.[row.card_index];
         if (card?.question && card?.answer) {
           due.push({
             question: card.question,
             answer: card.answer,
-            ficheId: row.fiche_id as string,
-            cardIndex: row.card_index as number,
+            ficheId: row.fiche_id,
+            cardIndex: row.card_index,
           });
         }
       }
@@ -78,7 +104,7 @@ export default function Reviser() {
       }
 
       setCards(due);
-      setDueTotal(count ?? due.length);
+      setDueTotal((count ?? dueRows.length) + newRows.length);
       setStatus("ready");
     };
 

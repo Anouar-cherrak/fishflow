@@ -1,5 +1,6 @@
 "use client";
 
+import { ShareFiche } from "@/components/ShareFiche";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
@@ -283,6 +284,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               <button type="button" onClick={() => router.push("/mes-fiches")} className={actionClass}>
                 Mes fiches
               </button>
+              {data.id && <ShareFiche ficheId={data.id} className={actionClass} />}
             </div>
             <button type="button" onClick={handleClear} className="text-sm text-black/50 hover:text-black transition ff-link-underline justify-self-start mt-1 min-h-[44px]">
               Effacer cette fiche

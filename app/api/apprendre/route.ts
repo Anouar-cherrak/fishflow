@@ -83,6 +83,46 @@ function normalizeAnswer(raw: unknown): Answer | null {
   return { title, summary, points: points.slice(0, 6), caution: asText(obj.caution).slice(0, 300), queries, refusal: "" };
 }
 
+// Demande à l'IA quels articles et quelles images parlent vraiment du sujet de la question.
+async function pickRelevant(
+  openai: OpenAI,
+  question: string,
+  title: string,
+  articles: WikiArticle[],
+  imageLabels: string[]
+): Promise<{ articles: number[]; images: number[] } | null> {
+  if (articles.length === 0) return { articles: [], images: [] };
+  const completion = await openai.chat.completions.create(
+    {
+      model: "gpt-4o-mini",
+      temperature: 0,
+      max_tokens: 120,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content:
+            'On illustre la réponse à une question. Tu reçois la question, une liste d\'articles Wikipédia et une liste de descriptions d\'images. Garde SEULEMENT ce qui parle directement du sujet de la question (pas un sujet voisin, pas un exemple lointain, pas une personne ou un lieu sans rapport). En cas de doute, ne garde pas. Réponds en JSON : {"articles": [numéros], "images": [numéros]}. Au plus 2 articles et 3 images. Les numéros commencent à 0.',
+        },
+        {
+          role: "user",
+          content: JSON.stringify({
+            question,
+            titre_reponse: title,
+            articles: articles.map((a, i) => ({ n: i, titre: a.title, debut: a.text.slice(0, 160) })),
+            images: imageLabels.map((l, i) => ({ n: i, description: l.slice(0, 120) })),
+          }),
+        },
+      ],
+    },
+    { signal: AbortSignal.timeout(10000) }
+  );
+  const raw = JSON.parse(completion.choices[0]?.message?.content ?? "{}") as { articles?: unknown; images?: unknown };
+  const ints = (v: unknown, max: number) =>
+    (Array.isArray(v) ? v : []).filter((n): n is number => Number.isInteger(n) && n >= 0 && n < max);
+  return { articles: ints(raw.articles, articles.length).slice(0, 2), images: ints(raw.images, imageLabels.length).slice(0, 3) };
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -144,34 +184,34 @@ export async function POST(req: Request) {
   // Wikipédia (gratuit) sert seulement à illustrer et à proposer des liens. Si ça échoue, la réponse reste affichée.
   let articles: WikiArticle[] = [];
   try {
-    articles = await searchArticles(answer.queries.length > 0 ? answer.queries : [cleanQuery(question).slice(0, 80)], 2);
+    articles = await searchArticles(answer.queries.length > 0 ? answer.queries : [cleanQuery(question).slice(0, 80)], 3);
   } catch {
     articles = [];
   }
 
-  const sources = articles.map((a, i) => ({ id: i + 1, title: a.title, url: a.url, site: a.site }));
-
-  // Images libres de l'article principal : l'image de l'article d'abord, puis celles avec auteur et licence.
-  const images: CommonsImage[] = [];
-  const main = articles[0];
-  if (main?.image) {
-    images.push({
-      src: main.image.src,
-      width: main.image.width,
-      height: main.image.height,
-      alt: main.title,
-      credit: "Wikipédia",
-      license: "Licence libre",
-      pageUrl: main.url,
-    });
-  }
-  if (main && images.length < 3) {
-    const extra = await imagesFromArticle(main.title, 3).catch(() => [] as CommonsImage[]);
-    for (const img of extra) {
-      if (images.length >= 3) break;
-      if (!images.some((i) => i.src === img.src)) images.push(img);
+  // Candidates : l'image principale de chaque article, puis d'autres images du premier article.
+  type Candidate = { image: CommonsImage; article: number };
+  const candidates: Candidate[] = [];
+  articles.slice(0, 2).forEach((a, idx) => {
+    if (a.image) {
+      candidates.push({
+        article: idx,
+        image: { src: a.image.src, width: a.image.width, height: a.image.height, alt: a.title, credit: "Wikipédia", license: "Licence libre", pageUrl: a.url },
+      });
     }
+  });
+  if (articles[0]) {
+    const extra = await imagesFromArticle(articles[0].title, 8).catch(() => [] as CommonsImage[]);
+    for (const img of extra) if (!candidates.some((c) => c.image.src === img.src)) candidates.push({ article: 0, image: img });
   }
+
+  // Une petite vérification par l'IA (sur les titres, pas sur les images) : on ne garde que ce qui a un vrai rapport avec la question.
+  const verdict = await pickRelevant(openai, question, answer.title, articles, candidates.map((c) => c.image.alt)).catch(() => null);
+  const keptArticles = verdict ? articles.filter((_, i) => verdict.articles.includes(i)) : articles.slice(0, 1);
+  const keptImages = verdict ? candidates.filter((_, i) => verdict.images.includes(i)).map((c) => c.image) : [];
+
+  const sources = keptArticles.map((a, i) => ({ id: i + 1, title: a.title, url: a.url, site: a.site }));
+  const images: CommonsImage[] = keptImages.slice(0, 3);
 
   return NextResponse.json({
     found: true,
@@ -180,6 +220,6 @@ export async function POST(req: Request) {
     points: answer.points,
     caution: answer.caution,
     sources,
-    images: images.slice(0, 3),
+    images,
   });
 }
