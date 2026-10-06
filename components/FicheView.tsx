@@ -15,6 +15,7 @@ type QuizQuestion = { question: string; options: string[]; correctIndex: number 
 
 export type FishFlowResult = {
   id?: string;
+  title?: string;
   sourceText?: string;
   summary?: string;
   sheet?: string[];
@@ -294,7 +295,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
           <div className="lg:order-1 min-w-0">
             <div ref={logoRef} className="mb-6">
               <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision</p>
-              <h1 className="ff-title">Ta fiche est prête.</h1>
+              <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
               <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
             </div>
 

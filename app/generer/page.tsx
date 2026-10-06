@@ -177,7 +177,7 @@ function GenererContent() {
         return;
       }
 
-      const title = data.summary?.slice(0, 60) || data.sheet?.[0]?.slice(0, 60) || "Fiche sans titre";
+      const title = data.title || data.summary?.slice(0, 40) || data.sheet?.[0]?.slice(0, 40) || "Fiche sans titre";
       const { data: inserted } = await supabase.from("fiches").insert({ title, data }).select().single();
 
       const dataWithId = { ...data, id: inserted?.id };

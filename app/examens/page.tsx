@@ -8,7 +8,8 @@ import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
 
 type Exam = { id: string; title: string; exam_date: string; fiche_ids: string[] };
-type FicheLite = { id: string; title: string; cards: number };
+type FicheLite = { id: string; title: string; cards: number; folder_id: string | null };
+type FolderLite = { id: string; name: string; color: string };
 type Review = { fiche_id: string; box: number; due_at: string };
 
 const DAY_MS = 86400000;
@@ -30,6 +31,8 @@ export default function Examens() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [fiches, setFiches] = useState<FicheLite[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [folders, setFolders] = useState<FolderLite[]>([]);
+  const [folderFilter, setFolderFilter] = useState<string>("all");
   const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -54,14 +57,18 @@ export default function Examens() {
       return;
     }
 
-    const { data: ficheRows } = await supabase.from("fiches").select("id, title, data").order("created_at", { ascending: false });
+    const { data: ficheRows } = await supabase.from("fiches").select("id, title, data, folder_id").order("created_at", { ascending: false });
     setFiches(
       (ficheRows ?? []).map((f) => ({
         id: f.id as string,
         title: (f.title as string) || "Fiche sans titre",
         cards: Array.isArray(f.data?.flashcards) ? f.data.flashcards.length : 0,
+        folder_id: (f.folder_id as string | null) ?? null,
       }))
     );
+
+    const { data: folderRows } = await supabase.from("folders").select("id, name, color").order("created_at", { ascending: true });
+    setFolders((folderRows ?? []) as FolderLite[]);
 
     const { data: reviewRows } = await supabase.from("card_reviews").select("fiche_id, box, due_at").limit(5000);
     setReviews((reviewRows ?? []) as Review[]);
@@ -73,6 +80,22 @@ export default function Examens() {
     // Chargement au démarrage de la page
     queueMicrotask(load);
   }, [load]);
+
+  const visibleFiches = fiches.filter((f) =>
+    folderFilter === "all" ? true : folderFilter === "none" ? !f.folder_id : f.folder_id === folderFilter
+  );
+  const allVisibleSelected = visibleFiches.length > 0 && visibleFiches.every((f) => selected.includes(f.id));
+  const toggleVisible = () =>
+    setSelected((cur) =>
+      allVisibleSelected
+        ? cur.filter((id) => !visibleFiches.some((f) => f.id === id))
+        : Array.from(new Set([...cur, ...visibleFiches.map((f) => f.id)]))
+    );
+
+  const chip = (active: boolean) =>
+    `shrink-0 min-h-[40px] px-4 rounded-full text-sm font-semibold whitespace-nowrap transition border ${
+      active ? "bg-black text-white border-transparent" : "bg-white text-black/70 border-black/15 hover:text-black"
+    }`;
 
   const toggle = (id: string) => setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
@@ -149,8 +172,27 @@ export default function Examens() {
                 Tu n&apos;as pas encore de fiche. <Link href="/generer" className="underline underline-offset-4">Crées-en une</Link> d&apos;abord.
               </p>
             ) : (
+              <>
+              {folders.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filtrer par dossier">
+                  <button type="button" aria-pressed={folderFilter === "all"} onClick={() => setFolderFilter("all")} className={chip(folderFilter === "all")}>Toutes</button>
+                  {folders.map((fo) => (
+                    <button key={fo.id} type="button" aria-pressed={folderFilter === fo.id} onClick={() => setFolderFilter(fo.id)} className={`${chip(folderFilter === fo.id)} inline-flex items-center gap-2`}>
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: fo.color }} aria-hidden="true" />
+                      {fo.name}
+                    </button>
+                  ))}
+                  <button type="button" aria-pressed={folderFilter === "none"} onClick={() => setFolderFilter("none")} className={chip(folderFilter === "none")}>Sans dossier</button>
+                </div>
+              )}
+              {visibleFiches.length > 0 && (
+                <button type="button" onClick={toggleVisible} className="justify-self-start text-sm font-semibold underline underline-offset-4 min-h-[44px]">
+                  {allVisibleSelected ? "Tout décocher" : folderFilter === "all" ? "Tout cocher" : "Cocher tout ce dossier"}
+                </button>
+              )}
+              {visibleFiches.length === 0 && <p className="text-sm text-black/60">Aucune fiche dans ce dossier.</p>}
               <ul className="grid gap-2 max-h-72 overflow-y-auto pr-1">
-                {fiches.map((f) => (
+                {visibleFiches.map((f) => (
                   <li key={f.id}>
                     <label className="flex items-center gap-3 min-h-[44px] px-3 rounded-xl border border-black/10 bg-white cursor-pointer">
                       <input type="checkbox" checked={selected.includes(f.id)} onChange={() => toggle(f.id)} className="w-5 h-5 accent-[#22C55E]" />
@@ -160,6 +202,8 @@ export default function Examens() {
                   </li>
                 ))}
               </ul>
+              {selected.length > 0 && <p className="text-xs text-black/60" aria-live="polite">{selected.length} fiche{selected.length > 1 ? "s" : ""} choisie{selected.length > 1 ? "s" : ""}</p>}
+              </>
             )}
           </fieldset>
 

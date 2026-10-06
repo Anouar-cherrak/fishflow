@@ -68,8 +68,9 @@ export default function Confidentialite() {
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">6. Cookies</h2>
             <p>
               FishFlow utilise des cookies strictement nécessaires au fonctionnement du site (maintien
-              de ta session de connexion). Aucun cookie publicitaire ou de mesure d'audience tiers
-              n'est utilisé à ce jour.
+              de ta session de connexion). Des cookies de mesure d'audience et de publicité (Google
+              Analytics / Google Ads) ne sont déposés que si tu cliques sur « Accepter » dans le
+              bandeau. Si tu refuses, rien n'est chargé. Ton choix est gardé sur ton appareil.
             </p>
           </section>
 

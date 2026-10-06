@@ -1,3 +1,4 @@
+import { Analytics } from "@/components/Analytics";
 import { Onboarding } from "@/components/Onboarding";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
@@ -33,8 +34,6 @@ export const viewport: Viewport = {
   themeColor: "#0a0a0a",
 };
 
-const GA4_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -58,19 +57,7 @@ export default function RootLayout({
         <Onboarding />
         {children}
 
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18394032288"
-          strategy="afterInteractive"
-        />
-        <Script id="google-ads-tag" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-18394032288');
-            ${GA4_ID ? `gtag('config', '${GA4_ID}');` : ""}
-          `}
-        </Script>
+        <Analytics />
       </body>
     </html>
   );

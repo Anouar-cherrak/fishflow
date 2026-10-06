@@ -46,9 +46,25 @@ function asArray(value: unknown): unknown[] {
 
 // Vérifie et nettoie la réponse de l'IA avant de l'envoyer au navigateur.
 // Renvoie null si une sortie demandée est vide ou inutilisable.
+// Titre court : 5 mots au plus, sans « Document qui parle de… ». Vide si inutilisable (on retombera sur un titre de secours).
+function cleanTitle(value: unknown): string {
+  let t = asText(value).replace(/^["«“'\s]+|["»”'\s.]+$/g, "");
+  t = t.replace(/^(le |la |l'|un |une )?(document|texte|cours|pdf|fichier|extrait)\s+(qui\s+)?(parle|traite|porte|présente|explique|décrit)\s+(de |du |des |d'|sur |à propos (de |du |des |d')?)?/i, "");
+  t = t.replace(/^(cours|fiche|résumé)\s+(de |du |des |d'|sur )/i, "");
+  t = t.replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  const words = t.split(" ");
+  if (words.length > 6) t = words.slice(0, 6).join(" ");
+  t = t.slice(0, 48).trim();
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
 function normalizeResult(raw: Record<string, unknown> | null, outputs: string[]) {
   if (!raw || typeof raw !== "object") return null;
   const out: Record<string, unknown> = {};
+
+  const title = cleanTitle(raw.title);
+  if (title) out.title = title;
 
   if (outputs.includes("summary")) {
     const summary = Array.isArray(raw.summary)
@@ -114,9 +130,10 @@ function buildSystemPrompt(
 
   // Pour un texte ou un PDF, c'est le serveur qui garde le texte du cours.
   // On ne demande à l'IA de le recopier que pour une photo (il faut le lire sur l'image).
+  const titleKey = `"title": string (titre très court, 2 à 5 mots, qui NOMME le sujet, par exemple "La photosynthèse" ou "Les contrats en droit" ; jamais une phrase, jamais « Document sur… », « Cours de… » ni « Ce texte parle de… »)`;
   const keysLine = transcribe
-    ? `"sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}`
-    : schemaLines;
+    ? `${titleKey}, "sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}`
+    : `${titleKey}, ${schemaLines}`;
 
   const quizBoost =
     pro && outputs.includes("quiz")
