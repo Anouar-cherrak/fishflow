@@ -232,3 +232,31 @@
   .lp .cmp td.pro::before { color: var(--hot); }
   .lp .cmp td.pro { background: none; }
 }
+
+/* La boule n'apparaît que près de la démo « question » */
+.lp #orb { opacity: 0; transition: opacity 0.5s ease; }
+
+/* Exemple de fiche dans l'accueil */
+.lp .fd { display: grid; gap: 12px; width: 100%; max-width: 520px; justify-self: center; }
+.lp .fd-tag { font-size: 14px; color: var(--muted); }
+.lp .fd-card { background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: clamp(18px, 3vw, 28px); display: grid; gap: 18px; box-shadow: var(--shadow); font-size: 16px; line-height: 1.5; }
+.lp .fd-card > * { animation: lpUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.lp .fd-card > :nth-child(2) { animation-delay: 0.15s; } .lp .fd-card > :nth-child(3) { animation-delay: 0.3s; } .lp .fd-card > :nth-child(4) { animation-delay: 0.45s; }
+@keyframes lpUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.lp .fd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.lp .fd-head strong { font: 700 26px/1.1 var(--display); letter-spacing: -0.025em; }
+.lp .fd-head span { font-size: 13px; color: var(--hot); font-weight: 600; }
+.lp .fd-h { font-size: 13px; font-weight: 600; color: var(--hot); margin-bottom: 4px; }
+.lp .fd-card ul { display: grid; gap: 4px; list-style: none; }
+.lp .fd-card li::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--hot); margin-right: 10px; vertical-align: 1px; }
+.lp .fd-row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.lp .fd-mini { background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 14px; font-size: 15px; display: grid; gap: 4px; align-content: start; }
+.lp .fd-a { color: var(--muted); }
+.lp .fd-opt { border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; font-size: 14px; color: var(--muted); }
+.lp .fd-opt.ok { background: var(--hot); color: var(--on-hot); border-color: transparent; font-weight: 600; }
+@media (max-width: 420px) { .lp .fd-row { grid-template-columns: 1fr; } }
+
+.lp .tool.main { border-color: var(--hot); }
+.lp .badge { font-size: 13px; font-weight: 600; color: var(--on-hot); background: var(--hot); border-radius: 999px; padding: 4px 12px; justify-self: start; }
+.lp .notice { display: grid; gap: 16px; justify-items: start; }
+@media (min-width: 900px) { .lp .hero { align-items: center; } }

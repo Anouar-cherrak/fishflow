@@ -51,9 +51,9 @@ const CARDS: [string, string][] = [
 ];
 
 const MENU = [
-  { href: "#apprendre", label: "Apprendre" },
   { href: "#fiche", label: "Générer" },
   { href: "#retenir", label: "Réviser" },
+  { href: "#apprendre", label: "Poser une question" },
   { href: "#tarifs", label: "Tarifs" },
 ];
 
@@ -235,6 +235,7 @@ export function Landing() {
   /* Démo Apprendre : la boule « réfléchit », puis rejette ses images */
   const [demoKey, setDemoKey] = useState<DemoKey | null>(null);
   const [q, setQ] = useState("");
+  const [notice, setNotice] = useState(false);
   const [phase, setPhase] = useState<"idle" | "typing" | "thinking" | "done">("idle");
   const [shown, setShown] = useState(0);
   const timers = useRef<number[]>([]);
@@ -253,6 +254,7 @@ export function Landing() {
     clearTimers();
     const d = DEMO[key];
     const reduce = reduceRef.current;
+    setNotice(false);
     setDemoKey(null);
     setShown(0);
     setPhase("typing");
@@ -316,7 +318,10 @@ export function Landing() {
 
   const onAsk = (e: React.FormEvent) => {
     e.preventDefault();
-    run(/trou|noir/.test(q.toLowerCase()) ? "hole" : "sky");
+    const text = q.toLowerCase();
+    if (/trou|noir/.test(text)) run("hole");
+    else if (/ciel|bleu/.test(text)) run("sky");
+    else setNotice(true);
   };
 
   /* Flashcards */
@@ -432,7 +437,7 @@ export function Landing() {
           <div className="copy">
             <h1 className="h-xl">Le savoir est une force.</h1>
             <p className="lead">
-              FishFlow t&apos;aide à comprendre, puis à retenir. Colle un cours : il devient une fiche, des cartes et un quiz. Pose une question : tu reçois une réponse avec ses sources.
+              Colle ton cours, envoie un PDF ou prends-le en photo. FishFlow en fait une fiche de révision, des flashcards et un quiz, en quelques secondes.
             </p>
             <div className="cta-row">
               <TrackedLink href="/generer" event="cta_click_hero" className="btn">
@@ -444,24 +449,55 @@ export function Landing() {
             </div>
             <p className="note">3 fiches gratuites par mois, sans carte bancaire.</p>
           </div>
-          <div className="slot-hero" data-slot="hero" aria-hidden="true" />
+          <div className="fd">
+            <p className="fd-tag">Exemple généré à partir d&apos;un cours sur la photosynthèse</p>
+            <article className="fd-card" aria-label="Exemple de fiche générée">
+              <div className="fd-head"><strong>Photosynthèse</strong><span>Fiche de révision</span></div>
+              <div>
+                <p className="fd-h">Résumé</p>
+                <p>La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie chimique, en produisant du glucose et de l&apos;oxygène.</p>
+              </div>
+              <div>
+                <p className="fd-h">Points clés</p>
+                <ul>
+                  <li>Se déroule dans les chloroplastes</li>
+                  <li>Demande de la lumière, de l&apos;eau et du CO₂</li>
+                  <li>Produit du glucose et libère de l&apos;oxygène</li>
+                </ul>
+              </div>
+              <div className="fd-row">
+                <div className="fd-mini">
+                  <p className="fd-h">Flashcard</p>
+                  <p><strong>Où se fait la photosynthèse ?</strong></p>
+                  <p className="fd-a">Dans les chloroplastes.</p>
+                </div>
+                <div className="fd-mini">
+                  <p className="fd-h">Quiz</p>
+                  <p><strong>Que libère la plante ?</strong></p>
+                  <p className="fd-opt">Du CO₂</p>
+                  <p className="fd-opt ok">De l&apos;oxygène</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         {/* C'est quoi */}
         <section id="quoi" aria-labelledby="t-q">
           <div className="wrap">
-            <h2 id="t-q">FishFlow, c&apos;est quoi ?</h2>
-            <p className="sub">Un site qui t&apos;aide à comprendre quelque chose, puis à ne plus l&apos;oublier. Trois outils, un seul compte.</p>
+            <h2 id="t-q">Ce que FishFlow fait pour toi.</h2>
+            <p className="sub">Un site qui t&apos;aide à comprendre, puis à ne plus oublier. Le plus important : tes fiches de révision.</p>
             <div className="tools">
-              <article className="tool">
-                <h3>Générer</h3>
+              <article className="tool main">
+                <p className="badge">L&apos;outil principal</p>
+                <h3>Générer des fiches</h3>
                 <dl>
                   <div><dt>Tu donnes</dt><dd>Un cours collé, un PDF ou une photo.</dd></div>
                   <div><dt>Tu reçois</dt><dd>Un résumé, une fiche claire, des flashcards et un quiz.</dd></div>
                 </dl>
               </article>
               <article className="tool">
-                <h3>Apprendre</h3>
+                <h3>Poser une question</h3>
                 <dl>
                   <div><dt>Tu donnes</dt><dd>Une question, sur n&apos;importe quel sujet.</dd></div>
                   <div><dt>Tu reçois</dt><dd>Une réponse courte, des images libres de droits et les sources pour vérifier.</dd></div>
@@ -524,65 +560,6 @@ export function Landing() {
           </div>
         </section>
 
-        {/* Apprendre */}
-        <section id="apprendre" aria-labelledby="t-app">
-          <div className="wrap">
-            <h2 id="t-app">Pose une question, reçois la réponse.</h2>
-            <p className="sub">Une réponse courte, des images libres de droits et les sources pour vérifier. Essaie avec un exemple.</p>
-            <div className="demo">
-              <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
-                <div className="slot-demo" data-slot="demo" aria-hidden="true" />
-                <div className="chips" role="group" aria-label="Questions d'exemple">
-                  <button type="button" className="chip" onClick={() => run("sky")}>Pourquoi le ciel est bleu</button>
-                  <button type="button" className="chip" onClick={() => run("hole")}>Comment fonctionne un trou noir</button>
-                </div>
-                <form className="ask" onSubmit={onAsk} autoComplete="off">
-                  <label htmlFor="lp-q" hidden>Ta question</label>
-                  <input
-                    id="lp-q"
-                    type="text"
-                    placeholder="Que veux-tu savoir ?"
-                    enterKeyHint="send"
-                    maxLength={120}
-                    value={q}
-                    readOnly={phase === "typing" || phase === "thinking"}
-                    onChange={(e) => { setQ(e.target.value); setPhase("idle"); setDemoKey(null); }}
-                  />
-                  <button className="btn" type="submit"><span>Envoyer</span></button>
-                </form>
-                <p className="demo-note">Démo : dans FishFlow, les images viennent de Wikipédia avec leur auteur et leur licence.</p>
-              </div>
-              <div className="demo-panel" aria-live="polite">
-                {!answer && (
-                  <p className="note">
-                    {phase === "thinking" ? "FishFlow cherche des sources…" : "La réponse apparaît ici, avec ses images et ses sources."}
-                  </p>
-                )}
-                {answer && (
-                  <div className="answer show">
-                    <div className="pics">
-                      {answer.pics.map((p, n) => (
-                        <figure key={`${demoKey}-${p}`} className="pic" ref={(el) => { picRefs.current[n] = el; }}>
-                          <Art k={p} />
-                          <figcaption>{CAPTIONS[p]}</figcaption>
-                        </figure>
-                      ))}
-                    </div>
-                    <h3>{answer.title}</h3>
-                    <p className="sr-only">{answer.text}</p>
-                    <p aria-hidden="true" className={shown < answer.text.length ? "typed" : undefined}>{answer.text.slice(0, shown)}</p>
-                    <div className="src">
-                      {answer.src.map((s, n) => (
-                        <a key={s.url} href={s.url} target="_blank" rel="noopener noreferrer">[{n + 1}] {s.label}</a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Réviser */}
         <section id="retenir" aria-labelledby="t-r">
           <div className="wrap">
@@ -627,11 +604,76 @@ export function Landing() {
           </div>
         </section>
 
+        {/* Apprendre */}
+        <section id="apprendre" aria-labelledby="t-app">
+          <div className="wrap">
+            <h2 id="t-app">Et si tu as une question ?</h2>
+            <p className="sub">FishFlow répond aussi à n&apos;importe quelle question, avec des images libres de droits et ses sources. Essaie avec un exemple.</p>
+            <div className="demo">
+              <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
+                <div className="slot-demo" data-slot="demo" aria-hidden="true" />
+                <div className="chips" role="group" aria-label="Questions d'exemple">
+                  <button type="button" className="chip" onClick={() => run("sky")}>Pourquoi le ciel est bleu</button>
+                  <button type="button" className="chip" onClick={() => run("hole")}>Comment fonctionne un trou noir</button>
+                </div>
+                <form className="ask" onSubmit={onAsk} autoComplete="off">
+                  <label htmlFor="lp-q" hidden>Ta question</label>
+                  <input
+                    id="lp-q"
+                    type="text"
+                    placeholder="Que veux-tu savoir ?"
+                    enterKeyHint="send"
+                    maxLength={120}
+                    value={q}
+                    readOnly={phase === "typing" || phase === "thinking"}
+                    onChange={(e) => { setQ(e.target.value); setPhase("idle"); setDemoKey(null); setNotice(false); }}
+                  />
+                  <button className="btn" type="submit"><span>Envoyer</span></button>
+                </form>
+                <p className="demo-note">Démo avec deux exemples. Dans FishFlow, tu poses ta propre question et les images viennent de Wikipédia, avec leur auteur et leur licence.</p>
+              </div>
+              <div className="demo-panel" aria-live="polite">
+                {!answer && !notice && (
+                  <p className="note">
+                    {phase === "thinking" ? "FishFlow cherche des sources…" : "La réponse apparaît ici, avec ses images et ses sources."}
+                  </p>
+                )}
+                {!answer && notice && (
+                  <div className="notice">
+                    <p>Cette démo ne connaît que deux exemples. Dans FishFlow, tu peux poser ta vraie question.</p>
+                    <TrackedLink href="/signup" event="cta_click_demo_signup" className="btn"><span>Créer un compte</span></TrackedLink>
+                  </div>
+                )}
+                {answer && (
+                  <div className="answer show">
+                    <div className="pics">
+                      {answer.pics.map((p, n) => (
+                        <figure key={`${demoKey}-${p}`} className="pic" ref={(el) => { picRefs.current[n] = el; }}>
+                          <Art k={p} />
+                          <figcaption>{CAPTIONS[p]}</figcaption>
+                        </figure>
+                      ))}
+                    </div>
+                    <h3>{answer.title}</h3>
+                    <p className="sr-only">{answer.text}</p>
+                    <p aria-hidden="true" className={shown < answer.text.length ? "typed" : undefined}>{answer.text.slice(0, shown)}</p>
+                    <div className="src">
+                      {answer.src.map((s, n) => (
+                        <a key={s.url} href={s.url} target="_blank" rel="noopener noreferrer">[{n + 1}] {s.label}</a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Confiance */}
         <section aria-labelledby="t-c">
           <div className="wrap">
             <h2 id="t-c">Des réponses que tu peux vérifier.</h2>
-            <p className="sub">Dans Apprendre, FishFlow ne devine pas. Il lit des sources, puis te les montre.</p>
+            <p className="sub">Quand tu poses une question, FishFlow ne devine pas. Il lit des sources, puis te les montre.</p>
             <ul className="trust">
               <li><strong>Des sources connues</strong>Wikipédia et une liste de sites reconnus, comme Le Monde, le CNRS ou la NASA.</li>
               <li><strong>Chaque idée a sa source</strong>Tu cliques sur le numéro et tu ouvres l&apos;article d&apos;origine.</li>

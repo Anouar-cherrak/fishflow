@@ -154,6 +154,9 @@ export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement
 
   function draw() {
     const r = pick();
+    const visible = !!r && r.bottom > -120 && r.top < H + 120;
+    canvas.style.opacity = visible ? "1" : "0";
+    if (!visible) return;
     if (r) {
       tgt.x = r.left + r.width / 2; tgt.y = r.top + r.height / 2; tgt.r = Math.min(r.width, r.height) / 2;
       if (!inited) { pos.x = tgt.x; pos.y = tgt.y; pos.r = tgt.r; inited = true; }
