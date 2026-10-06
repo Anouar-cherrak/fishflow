@@ -8,16 +8,22 @@
 
 :root {
   --font-body: 'Inter', sans-serif;
-  --font-display: 'Poppins', sans-serif;
+  --font-display: var(--font-body);
   --ff-bg: #ffffff;
-  --ff-fg: #111111;
-  --ff-surface: #F4F4F5;
+  --ff-fg: #0a0a0a;
+  --ff-surface: #f4f4f5;
+  --ff-back: #e9e9ec;
+  --ff-line: rgba(10, 10, 10, 0.14);
+  --ff-accent: #22c55e;
+  --ff-on-accent: #04130a;
 }
 
 :root.dark {
   --ff-bg: #0a0a0a;
-  --ff-fg: #f2f2f2;
-  --ff-surface: #1c1c1f;
+  --ff-fg: #f5f5f5;
+  --ff-surface: #151515;
+  --ff-back: #000000;
+  --ff-line: rgba(245, 245, 245, 0.14);
   color-scheme: dark;
 }
 
@@ -43,7 +49,8 @@
 
 body {
   font-family: var(--font-body), sans-serif;
-  background: var(--ff-bg);
+  background: var(--ff-back);
+  color: var(--ff-fg);
   transition: background-color 0.2s ease;
 }
 
@@ -86,8 +93,8 @@ body {
 }
 .ff-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.1);
-  border-color: rgba(0,0,0,0.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+  border-color: color-mix(in srgb, var(--ff-fg) 28%, transparent);
 }
 
 .ff-btn {
@@ -261,3 +268,227 @@ body {
     animation-duration: 0.01ms;
   }
 }
+
+
+/* ===== Cadre commun des pages de l'application =====
+   Sur téléphone la page prend tout l'écran. Sur ordinateur, le contenu est un grand panneau
+   posé sur un fond plus sombre (ou plus gris en thème clair) : on voit tout de suite où il commence. */
+.ff-frame {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--ff-bg);
+  color: var(--ff-fg);
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .ff-frame {
+    max-width: 1280px;
+    margin: 20px auto;
+    min-height: calc(100dvh - 40px);
+    border: 1px solid var(--ff-line);
+    border-radius: 32px;
+    box-shadow: 0 40px 100px -40px rgba(0, 0, 0, 0.55);
+  }
+}
+.ff-main {
+  width: 100%;
+  flex: 1;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+@media (min-width: 768px) { .ff-main { padding: 36px 32px 80px; } }
+@media (min-width: 1024px) { .ff-main { padding: 48px 56px 96px; } }
+.ff-main[data-size="form"] { max-width: 760px; }
+.ff-main[data-size="normal"] { max-width: 1000px; }
+.ff-main[data-size="wide"] { max-width: 1200px; }
+
+.ff-title {
+  font-family: var(--font-body), sans-serif;
+  font-weight: 800;
+  font-size: clamp(30px, 4.4vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.ff-lead {
+  color: color-mix(in srgb, var(--ff-fg) 62%, transparent);
+  font-size: clamp(16px, 1.6vw, 19px);
+  max-width: 56ch;
+}
+
+/* Barre du haut et menu plein écran (même style que la page d'accueil) */
+.ff-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--ff-bg) 78%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ff-line);
+}
+@media (min-width: 768px) { .ff-bar { padding: 14px 32px; } }
+@media (min-width: 1024px) { .ff-bar { padding: 16px 40px; border-radius: 32px 32px 0 0; } }
+.ff-round {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--ff-line);
+  background: var(--ff-surface);
+  color: var(--ff-fg);
+  display: grid;
+  place-items: center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ff-round:hover { transform: scale(1.08) rotate(-6deg); }
+.ff-round:active { transform: scale(0.9); }
+
+.ff-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--ff-fg);
+  color: var(--ff-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px max(24px, env(safe-area-inset-bottom));
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+  transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s 0.7s;
+}
+.ff-menu[data-open="true"] {
+  clip-path: inset(0 0 0 0);
+  visibility: visible;
+  transition-delay: 0s;
+}
+.ff-menu-link {
+  display: block;
+  overflow: hidden;
+  padding: 4px 0;
+  font-weight: 800;
+  font-size: clamp(34px, 8vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+.ff-menu-link > span {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ff-menu[data-open="true"] .ff-menu-link > span { transform: none; }
+.ff-menu-link:hover > span { transform: translateX(14px); }
+.ff-menu-link[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 8px; text-decoration-color: var(--ff-accent); }
+.ff-menu-link small { display: block; font-size: 15px; font-weight: 500; letter-spacing: 0; opacity: 0.6; }
+
+/* Boutons de l'application, comme sur la page d'accueil : pilule verte, texte sombre */
+.ff-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--ff-accent);
+  color: var(--ff-on-accent);
+  font-weight: 600;
+}
+.ff-primary:hover:not(:disabled) { background: #4ade80; }
+.ff-primary:disabled { opacity: 0.35; }
+.ff-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid var(--ff-line);
+  font-weight: 600;
+}
+.ff-secondary:hover:not(:disabled) { background: var(--ff-surface); }
+
+/* Vignettes animées (explications en mouvement) */
+@keyframes ffBeam { from { top: -30%; } to { top: 110%; } }
+@keyframes ffPop { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+
+/* Animation du chargement : un cours est lu (le faisceau passe), puis la fiche se remplit. */
+.ff-doc-anim {
+  position: relative;
+  width: 168px;
+  height: 208px;
+  border: 1px solid var(--ff-line);
+  border-radius: 20px;
+  background: var(--ff-surface);
+  padding: 22px 18px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  overflow: hidden;
+}
+.ff-doc-anim span {
+  display: block;
+  height: 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ff-fg) 14%, transparent);
+  animation: ffFill 2.4s ease-in-out infinite;
+}
+.ff-doc-anim span:nth-child(2) { width: 82%; animation-delay: 0.25s; }
+.ff-doc-anim span:nth-child(3) { width: 94%; animation-delay: 0.5s; }
+.ff-doc-anim span:nth-child(4) { width: 60%; animation-delay: 0.75s; }
+.ff-doc-anim span:nth-child(5) { width: 76%; animation-delay: 1s; }
+.ff-doc-anim i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 56px;
+  top: -30%;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ff-accent) 40%, transparent), transparent);
+  animation: ffBeam 2.4s ease-in-out infinite;
+}
+@keyframes ffFill {
+  0%, 20% { background: color-mix(in srgb, var(--ff-fg) 14%, transparent); }
+  45%, 100% { background: var(--ff-accent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ff-doc-anim span, .ff-doc-anim i { animation: none; }
+  .ff-doc-anim span { background: var(--ff-accent); }
+}
+
+/* Le PDF est toujours exporté en clair */
+.ff-force-light {
+  --color-white: #ffffff;
+  --color-black: #111111;
+  --color-surface: #f4f4f5;
+  color: #111111;
+}
+
+/* Les cinq cases de révision : une carte monte de case en case */
+.ff-boxes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-items: end; height: 150px; list-style: none; padding: 0; margin: 0; }
+.ff-boxes li { display: grid; gap: 8px; justify-items: center; align-content: end; height: 100%; }
+.ff-box-card {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--ff-line);
+  background: var(--ff-surface);
+  height: calc(28px + var(--i) * 18px);
+  position: relative;
+  overflow: hidden;
+}
+.ff-box-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 6px 6px 6px;
+  height: 10px;
+  border-radius: 4px;
+  background: var(--ff-accent);
+  opacity: 0;
+  animation: ffClimb 7.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 1.2s);
+}
+@keyframes ffClimb { 0% { opacity: 0; transform: translateY(14px); } 6%, 14% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ff-box-card::after { animation: none; opacity: 1; } }

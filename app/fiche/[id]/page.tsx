@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { AppShell } from "@/components/AppShell";
 import { FicheView, type FishFlowResult } from "@/components/FicheView";
 
 export default function FichePage() {
@@ -43,25 +44,24 @@ export default function FichePage() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-black/40 text-sm">Chargement...</p>
-      </main>
+      <AppShell size="form">
+        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement...</p>
+      </AppShell>
     );
   }
 
   if (status === "missing" || !data) {
     return (
-      <main className="min-h-screen bg-white text-black flex flex-col items-center justify-center px-4 text-center gap-4">
-        <p className="text-black/60">Cette fiche est introuvable, ou elle appartient à un autre compte.</p>
-        <div className="flex items-center gap-3">
-          <Link href="/mes-fiches" className="text-sm font-medium px-4 py-2 rounded-lg border border-black/15 hover:bg-surface transition">
-            Mes fiches
-          </Link>
-          <Link href="/login" className="text-sm font-medium px-4 py-2 rounded-lg bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
-            Me connecter
-          </Link>
+      <AppShell size="form">
+        <div className="py-20 text-center grid gap-5 justify-items-center">
+          <h1 className="ff-title">Fiche introuvable.</h1>
+          <p className="ff-lead">Cette fiche n&apos;existe pas, ou elle appartient à un autre compte.</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/mes-fiches" className="ff-secondary text-sm">Mes fiches</Link>
+            <Link href="/login" className="ff-primary text-sm ff-btn">Me connecter</Link>
+          </div>
         </div>
-      </main>
+      </AppShell>
     );
   }
 

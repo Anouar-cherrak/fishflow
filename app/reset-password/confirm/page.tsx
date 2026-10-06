@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Logo, Wordmark } from "@/components/Logo";
+import { AuthLayout } from "@/components/AuthLayout";
 
 function ConfirmContent() {
   const [ready, setReady] = useState(false);
@@ -53,46 +53,38 @@ function ConfirmContent() {
 
   if (done) {
     return (
-      <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-        <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
-          <h1 className="text-xl font-semibold mb-2">Mot de passe mis à jour</h1>
-          <p className="text-black/50 text-sm">Redirection...</p>
-        </div>
-      </main>
+      <AuthLayout>
+        <h1 className="text-2xl font-bold tracking-tight mb-2">Mot de passe mis à jour</h1>
+        <p className="text-black/60" role="status">Redirection...</p>
+      </AuthLayout>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card">
-        <div className="flex items-center gap-2 mb-6">
-          <Logo size={24} />
-          <Wordmark />
-        </div>
+    <AuthLayout>
+        <h1 className="text-2xl font-bold tracking-tight mb-1">Nouveau mot de passe</h1>
+        <p className="text-black/60 mb-6">Choisis un nouveau mot de passe pour ton compte.</p>
 
-        <h1 className="text-xl font-semibold mb-1">Nouveau mot de passe</h1>
-        <p className="text-black/50 text-sm mb-6">Choisis un nouveau mot de passe pour ton compte.</p>
-
-        <label className="text-xs font-semibold text-black/40 uppercase tracking-wide block mb-1">Nouveau mot de passe</label>
-        <input
+        <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Nouveau mot de passe</label>
+        <input id="field-1"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
           placeholder="Au moins 6 caractères"
         />
 
-        <label className="text-xs font-semibold text-black/40 uppercase tracking-wide block mb-1">Confirme le mot de passe</label>
-        <input
+        <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Confirme le mot de passe</label>
+        <input id="field-2"
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
           placeholder="Retape le mot de passe"
         />
 
         {error && (
-          <p className="text-sm text-black bg-black/5 border border-black/20 rounded-lg p-3 mb-4 font-medium ff-fade">
+          <p className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
             {error}
           </p>
         )}
@@ -100,12 +92,11 @@ function ConfirmContent() {
         <button
           onClick={handleSubmit}
           disabled={loading || !ready || !password || !confirmPassword}
-          className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+          className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
         </button>
-      </div>
-    </main>
+    </AuthLayout>
   );
 }
 

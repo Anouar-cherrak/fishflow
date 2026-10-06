@@ -3,8 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Logo, Wordmark } from "@/components/Logo";
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/AppShell";
 import { InstallPWA } from "@/components/InstallPWA";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { trackEvent } from "@/lib/tracking";
@@ -195,19 +194,31 @@ function GenererContent() {
 
   const isMultiPdfPro = mode === "pdf" && usage?.isPro;
 
+  const canGenerate =
+    !loading &&
+    (mode === "text" ? !!text : mode === "pdf" && isMultiPdfPro ? files.length > 0 : !!file) &&
+    outputs.length > 0 &&
+    !(!!user && !!usage && !usage.isPro && usage.remaining === 0);
+
+  const dropClass =
+    "w-full min-h-[220px] lg:min-h-[320px] p-8 border border-dashed border-black/25 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#22C55E] hover:bg-surface transition";
+
   return (
-    <main className="min-h-screen bg-white text-black">
+    <AppShell size="wide">
       {loading && (
-        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-50 px-6">
-          <div className="w-10 h-10 border-4 border-black/10 border-t-[#22C55E] rounded-full animate-spin mb-4" />
-          <p className="text-black font-medium mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
+        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[70] px-6 text-center">
+          <div className="ff-doc-anim mb-8" aria-hidden="true">
+            <span /><span /><span /><span /><span />
+            <i />
+          </div>
+          <p className="text-black font-semibold text-lg mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
           <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
             <div
               className="h-full ff-progress-shimmer transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-black/40 text-sm mt-3">Ça peut prendre jusqu'à 30-40 secondes.</p>
+          <p className="text-black/50 text-sm mt-3">Ça peut prendre jusqu&apos;à 30-40 secondes.</p>
         </div>
       )}
 
@@ -223,220 +234,197 @@ function GenererContent() {
         />
       )}
 
-      <AppNav />
-      <div className="w-full flex flex-col items-center px-4 py-6">
-        <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
-          <div className="flex items-center gap-3 mb-4 ff-fade-up" style={{ animationDelay: "0.05s" }}>
-            <div className="w-11 h-11 bg-white border border-black/10 rounded-xl flex items-center justify-center shrink-0">
-              <Logo size={22} />
-            </div>
-            <div>
-              <Wordmark className="text-xl" />
-              <p className="text-black/50 text-sm">Transforme ton cours en fiche de révision.</p>
-            </div>
+      <div className="mb-8 ff-fade-up">
+        <h1 className="ff-title mb-3">Génère ta fiche de révision.</h1>
+        <p className="ff-lead">Colle ton cours, envoie un PDF ou prends-le en photo. Tu reçois un résumé, une fiche, des flashcards et un quiz.</p>
+      </div>
+
+      <div className="ff-fade-up" style={{ animationDelay: "0.05s" }}>
+        <InstallPWA />
+      </div>
+
+      {!user && !checkingAuth && (
+        <div className="mb-6 px-4 py-3 rounded-xl text-sm bg-surface text-black/70 ff-fade-up">
+          Connecte-toi pour générer des fiches (3 gratuites par mois).
+        </div>
+      )}
+
+      <div className="grid gap-6 lg:gap-10 lg:grid-cols-[1.3fr_1fr] items-start">
+        {/* Colonne de gauche : le cours */}
+        <section aria-label="Ton cours" className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-7 ff-fade-up" style={{ animationDelay: "0.1s" }}>
+          <div className="flex gap-1 mb-5 bg-white border border-black/10 rounded-full p-1" role="group" aria-label="Type de document">
+            {(["text", "pdf", "photo"] as Mode[]).map((m) => (
+              <button
+                key={m}
+                type="button"
+                aria-pressed={mode === m}
+                onClick={() => { setMode(m); setFile(null); setFiles([]); }}
+                className={`flex-1 min-h-[44px] px-3 rounded-full font-semibold text-sm transition ${
+                  mode === m ? "bg-black text-white" : "text-black/55 hover:text-black"
+                }`}
+              >
+                {m === "text" ? "Texte" : m === "pdf" ? "PDF" : "Photo"}
+              </button>
+            ))}
           </div>
 
-          <div className="ff-fade-up" style={{ animationDelay: "0.1s" }}>
-            <InstallPWA />
-          </div>
-
-          {user && usage && !usage.isPro && (
-            <div className="mb-4 bg-white border border-black/10 rounded-2xl overflow-hidden ff-fade-up ff-card" style={{ animationDelay: "0.15s" }}>
-              <div className={`px-5 py-3 text-sm font-medium ${usage.remaining === 0 ? "bg-black/5 text-black" : "bg-surface text-black/70"}`}>
-                {usage.remaining === 0
-                  ? "Tu as atteint ta limite gratuite de ce mois-ci."
-                  : `${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} restante${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
-              </div>
-
-              <div className="p-5">
-                <div className="grid grid-cols-2 gap-4 mb-3">
-                  <div>
-                    <p className="text-xs font-semibold text-black/30 uppercase tracking-wide mb-2">Gratuit</p>
-                    <p className="text-sm text-black/60">3 fiches / mois</p>
-                    <p className="text-sm text-black/60">Documents courts et moyens</p>
-                    <p className="text-sm text-black/60">Historique limité à 5 fiches</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-black uppercase tracking-wide mb-2">Pro</p>
-                    <p className="text-sm text-black font-medium">Fiches illimitées</p>
-                    <p className="text-sm text-black font-medium">Documents volumineux</p>
-                    <p className="text-sm text-black font-medium">Plusieurs PDF à la fois</p>
-                    <p className="text-sm text-black font-medium">Quiz de 12 questions + audio</p>
-                    <p className="text-sm text-black font-medium">Historique illimité</p>
-                  </div>
-                </div>
-                <p className="text-xs text-black/30 pt-2 border-t border-black/10">
-                  Inclus dans les deux : texte, PDF, photo, export PDF
-                </p>
-              </div>
-
-              <div className="px-5 pb-5">
-                <button onClick={() => router.push("/pricing")} className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
-                  Passer Pro — 4,99 €/mois
-                </button>
-              </div>
-            </div>
-          )}
-
-          {!user && !checkingAuth && (
-            <div className="mb-4 px-4 py-2.5 rounded-lg text-sm bg-surface text-black/60 ff-fade-up" style={{ animationDelay: "0.15s" }}>
-              Connecte-toi pour générer des fiches (3 gratuites par mois).
-            </div>
-          )}
-
-          <div className="bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card" style={{ animationDelay: "0.2s" }}>
-            <div className="flex gap-1 mb-6 bg-surface rounded-lg p-1">
-              {(["text", "pdf", "photo"] as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => { setMode(m); setFile(null); setFiles([]); }}
-                  className={`flex-1 px-3 py-2 rounded-md font-medium text-sm transition ${
-                    mode === m ? "bg-[#111111] text-[#ffffff]" : "text-black/50 hover:text-black/80"
-                  }`}
-                >
-                  {m === "text" ? "Texte" : m === "pdf" ? "PDF" : "Photo"}
-                </button>
-              ))}
-            </div>
-
-            {mode === "text" && (
+          {mode === "text" && (
+            <>
+              <label htmlFor="cours" className="sr-only">Ton cours</label>
               <textarea
+                id="cours"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Colle ton texte ici..."
-                className="w-full h-40 p-4 border border-black/15 rounded-xl mb-5 text-black placeholder-black/30 bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm ff-input"
+                placeholder="Colle ton cours ici..."
+                className="w-full h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent text-base ff-input resize-y"
               />
-            )}
+            </>
+          )}
 
-            {mode === "pdf" && isMultiPdfPro && (
-              <div className="mb-5">
-                <label className="w-full p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-surface transition">
-                  <span className="text-black font-medium text-sm mb-1">
-                    {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
-                  </span>
-                  <span className="text-black/40 text-xs">Fonctionnalité Pro : combine plusieurs PDF en une seule fiche</span>
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    multiple
-                    onChange={(e) => setFiles(e.target.files ? Array.from(e.target.files) : [])}
-                    className="hidden"
-                  />
-                </label>
-                {files.length > 0 && (
-                  <ul className="mt-2 space-y-1">
-                    {files.map((f, i) => (
-                      <li key={i} className="text-xs text-black/50 flex items-center justify-between px-1">
-                        <span className="truncate">{f.name}</span>
-                        <button onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="text-black/30 hover:text-black shrink-0 ml-2">✕</button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-
-            {mode === "pdf" && !isMultiPdfPro && (
-              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-surface transition">
-                <span className="text-black font-medium text-sm mb-1">
-                  {file ? file.name : "Choisir un PDF"}
+          {mode === "pdf" && isMultiPdfPro && (
+            <div>
+              <label className={dropClass}>
+                <span className="text-black font-semibold mb-1">
+                  {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
                 </span>
-                <span className="text-black/40 text-xs">
-                  {file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}
-                </span>
+                <span className="text-black/50 text-sm">Avec Pro, plusieurs PDF sont fusionnés en une seule fiche</span>
                 <input
                   type="file"
                   accept="application/pdf"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  className="hidden"
+                  multiple
+                  onChange={(e) => setFiles(e.target.files ? Array.from(e.target.files) : [])}
+                  className="sr-only"
                 />
               </label>
-            )}
+              {files.length > 0 && (
+                <ul className="mt-3 space-y-1">
+                  {files.map((f, i) => (
+                    <li key={i} className="text-sm text-black/60 flex items-center justify-between px-1">
+                      <span className="truncate">{f.name}</span>
+                      <button type="button" aria-label={`Retirer ${f.name}`} onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="text-black/40 hover:text-black shrink-0 ml-2 w-8 h-8">✕</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
-            {mode === "photo" && (
-              <label className="w-full mb-5 p-8 bg-white border border-dashed border-black/25 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-black/50 hover:bg-surface transition">
-                <span className="text-black font-medium text-sm mb-1">
-                  {file ? file.name : "Choisir une photo"}
-                </span>
-                <span className="text-black/40 text-xs">
-                  {file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  className="hidden"
-                />
-              </label>
-            )}
+          {mode === "pdf" && !isMultiPdfPro && (
+            <label className={dropClass}>
+              <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir un PDF"}</span>
+              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}</span>
+              <input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sr-only" />
+            </label>
+          )}
 
-            <div className="mb-5">
-              <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-2">Sorties</p>
+          {mode === "photo" && (
+            <label className={dropClass}>
+              <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir une photo"}</span>
+              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}</span>
+              <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sr-only" />
+            </label>
+          )}
+        </section>
+
+        {/* Colonne de droite : ce que tu veux recevoir */}
+        <div className="grid gap-6 ff-fade-up" style={{ animationDelay: "0.15s" }}>
+          <section aria-label="Options" className="grid gap-6">
+            <fieldset>
+              <legend className="text-sm font-semibold text-black/60 mb-3">Ce que tu veux recevoir</legend>
               <div className="grid grid-cols-2 gap-2">
                 {OUTPUT_OPTIONS.map((opt) => (
                   <label
                     key={opt.key}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer text-sm transition ${
-                      outputs.includes(opt.key) ? "bg-surface border-black/40 text-black" : "bg-white border-black/10 text-black/50"
+                    className={`flex items-center gap-2 min-h-[48px] px-4 rounded-2xl border cursor-pointer text-sm font-medium transition ${
+                      outputs.includes(opt.key) ? "bg-surface border-[#22C55E] text-black" : "bg-white border-black/15 text-black/55 hover:border-black/40"
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={outputs.includes(opt.key)}
                       onChange={() => toggleOutput(opt.key)}
-                      className="accent-[#22C55E]"
+                      className="accent-[#22C55E] w-4 h-4"
                     />
                     {opt.label}
                   </label>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
-            <div className="mb-7 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-black/40 uppercase tracking-wide block mb-1">Niveau</label>
+                <label htmlFor="niveau" className="text-sm font-semibold text-black/60 block mb-2">Niveau</label>
                 <select
+                  id="niveau"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                  className="w-full p-2.5 border border-black/15 rounded-lg bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
                 >
                   <option value="facile">Facile</option>
                   <option value="moyen">Moyen</option>
                   <option value="difficile">Difficile</option>
                 </select>
-                <p className="text-xs text-black/30 mt-1.5">Complexité du vocabulaire.</p>
+                <p className="text-xs text-black/50 mt-1.5">Complexité du vocabulaire.</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-black/40 uppercase tracking-wide block mb-1">Longueur</label>
+                <label htmlFor="longueur" className="text-sm font-semibold text-black/60 block mb-2">Longueur</label>
                 <select
+                  id="longueur"
                   value={length}
                   onChange={(e) => setLength(e.target.value as Length)}
-                  className="w-full p-2.5 border border-black/15 rounded-lg bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
                 >
                   <option value="court">Court</option>
                   <option value="moyen">Moyen</option>
                   <option value="detaille">Détaillé</option>
                 </select>
-                <p className="text-xs text-black/30 mt-1.5">Quantité de contenu généré.</p>
+                <p className="text-xs text-black/50 mt-1.5">Quantité de contenu généré.</p>
               </div>
             </div>
+          </section>
 
-            <button
-              onClick={handleGenerate}
-              disabled={
-                loading ||
-                (mode === "text" ? !text : mode === "pdf" && isMultiPdfPro ? files.length === 0 : !file) ||
-                outputs.length === 0 ||
-                (!!user && !!usage && !usage.isPro && usage.remaining === 0)
-              }
-              className="w-full py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
-            >
-              {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer"}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={!canGenerate}
+            className="ff-primary w-full text-base ff-btn"
+          >
+            {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer ma fiche"}
+          </button>
+
+          {user && usage && !usage.isPro && (
+            <section aria-label="Ton offre" className="bg-surface border border-black/10 rounded-3xl overflow-hidden">
+              <p className={`px-5 py-3 text-sm font-semibold ${usage.remaining === 0 ? "text-[#22C55E]" : "text-black/80"}`}>
+                {usage.remaining === 0
+                  ? "Tu as atteint ta limite gratuite de ce mois-ci."
+                  : `${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} restante${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
+              </p>
+              <div className="px-5 pb-5 grid grid-cols-2 gap-4 border-t border-black/10 pt-4">
+                <div>
+                  <p className="text-xs font-semibold text-black/50 mb-2">Gratuit</p>
+                  <p className="text-sm text-black/65">3 fiches par mois</p>
+                  <p className="text-sm text-black/65">Documents courts et moyens</p>
+                  <p className="text-sm text-black/65">Historique de 5 fiches</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#22C55E] mb-2">Pro</p>
+                  <p className="text-sm font-medium">Fiches illimitées</p>
+                  <p className="text-sm font-medium">Documents volumineux</p>
+                  <p className="text-sm font-medium">Plusieurs PDF à la fois</p>
+                  <p className="text-sm font-medium">Quiz jouable + audio</p>
+                  <p className="text-sm font-medium">Historique illimité</p>
+                </div>
+              </div>
+              <div className="px-5 pb-5">
+                <button type="button" onClick={() => router.push("/pricing")} className="ff-secondary w-full text-sm">
+                  Voir Pro, 4,99 € par mois
+                </button>
+              </div>
+            </section>
+          )}
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }
 

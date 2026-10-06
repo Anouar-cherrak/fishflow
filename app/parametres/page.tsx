@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Logo, Wordmark } from "@/components/Logo";
+import { AppShell } from "@/components/AppShell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { User } from "@supabase/supabase-js";
 
@@ -116,44 +115,35 @@ export default function Parametres() {
 
   if (checking) {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-black/40 text-sm">Chargement...</p>
-      </main>
+      <AppShell size="normal">
+        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement...</p>
+      </AppShell>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
-      <div className="w-full flex flex-col items-center px-4 py-6">
-        <div className="w-full max-w-lg flex items-center justify-between mb-6 ff-fade">
-          <Link
-            href="/generer"
-            className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
-          >
-            ← FishFlow
-          </Link>
-          <div className="flex items-center gap-2">
-            <Logo size={20} />
-            <Wordmark className="text-base" />
+    <AppShell size="normal">
+      <div>
+        <div>
+          <div className="mb-8 ff-fade-up">
+            <h1 className="ff-title mb-3">Paramètres.</h1>
+            <p className="ff-lead">Ton compte, ton abonnement et tes données.</p>
           </div>
-        </div>
+          <div className="grid gap-5 md:grid-cols-2 items-start">
 
-        <div className="w-full max-w-lg">
-          <h1 className="text-2xl font-semibold mb-6 ff-fade-up">Paramètres</h1>
-
-          <div className="bg-white border border-black/10 rounded-2xl p-6 mb-4 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">Compte</p>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-black/55 mb-3">Compte</p>
             <p className="text-sm text-black/70 mb-1">{user?.email}</p>
             <p className="text-sm text-black/50">{isPro ? "FishFlow Pro actif" : "Compte gratuit"}</p>
           </div>
 
-          <div className="bg-white border border-black/10 rounded-2xl p-6 mb-4 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">Apparence</p>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-black/55 mb-3">Apparence</p>
             <ThemeToggle />
           </div>
 
-          <div className="bg-white border border-black/10 rounded-2xl p-6 mb-4 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">Notifications</p>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-black/55 mb-3">Notifications</p>
             <button
               onClick={handleToggleEmailOptOut}
               disabled={prefsLoading}
@@ -180,8 +170,8 @@ export default function Parametres() {
             </button>
           </div>
 
-          <div className="bg-white border border-black/10 rounded-2xl p-6 mb-4 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">Mes données</p>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-black/55 mb-3">Mes données</p>
             <a
               href="/api/account/export"
               download
@@ -191,8 +181,8 @@ export default function Parametres() {
             </a>
           </div>
 
-          <div className="bg-white border border-black/10 rounded-2xl p-6 mb-4 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">Abonnement</p>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-black/55 mb-3">Abonnement</p>
             {isPro ? (
               <button
                 onClick={handleManageSubscription}
@@ -204,15 +194,15 @@ export default function Parametres() {
             ) : (
               <button
                 onClick={() => router.push("/pricing")}
-                className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
+                className="w-full py-2.5 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn"
               >
                 Passer Pro — 4,99 €/mois
               </button>
             )}
           </div>
 
-          <div className="bg-white border border-black/10 rounded-2xl p-6 mb-4 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">Mot de passe</p>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-black/55 mb-3">Mot de passe</p>
             <input
               type="password"
               value={newPassword}
@@ -230,8 +220,8 @@ export default function Parametres() {
             </button>
           </div>
 
-          <div className="bg-white border border-red-200 rounded-2xl p-6 ff-card ff-fade-up">
-            <p className="text-xs font-semibold text-red-500 uppercase tracking-wide mb-3">Zone dangereuse</p>
+          <div className="bg-surface border border-red-500/40 rounded-3xl p-6 sm:p-7 md:col-span-2 ff-card ff-fade-up">
+            <p className="text-sm font-semibold text-red-500 mb-3">Zone dangereuse</p>
             {!showDeleteConfirm ? (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
@@ -273,8 +263,9 @@ export default function Parametres() {
               </div>
             )}
           </div>
+          </div>
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }

@@ -54,7 +54,7 @@ export function InstallPWA() {
 
       <button
         onClick={handleClick}
-        className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition shrink-0 ff-btn"
+        className="text-xs font-semibold px-4 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition shrink-0 ff-btn"
       >
         Télécharger l'application
       </button>

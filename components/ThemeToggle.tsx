@@ -10,11 +10,16 @@ export function ThemeToggle() {
     setIsDark(document.documentElement.classList.contains("dark"));
     setMounted(true);
 
-    // Si l'utilisateur est connecté, on récupère sa préférence sauvegardée sur son compte
+    // Le choix fait sur cet appareil gagne ; sans choix local, le thème sombre reste le défaut.
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("ff-theme");
+    } catch {}
+    if (stored) return;
     fetch("/api/preferences")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data && typeof data.darkMode === "boolean") {
+        if (data && data.darkMode === true) {
           setIsDark(data.darkMode);
           document.documentElement.classList.toggle("dark", data.darkMode);
           try {

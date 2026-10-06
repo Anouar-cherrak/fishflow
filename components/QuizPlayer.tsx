@@ -73,7 +73,7 @@ export function QuizPlayer({
         {saving && <p className="text-xs text-black/30 mb-3">Sauvegarde du score...</p>}
         <button
           onClick={restart}
-          className="text-sm px-5 py-2.5 rounded-lg bg-[#22C55E] text-[#ffffff] font-medium hover:bg-[#16A34A] transition ff-btn"
+          className="text-sm px-5 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] font-semibold hover:bg-[#16A34A] transition ff-btn"
         >
           Refaire le quiz
         </button>
@@ -129,7 +129,7 @@ export function QuizPlayer({
       {selected !== null && (
         <button
           onClick={handleNext}
-          className="w-full py-2.5 rounded-lg bg-[#22C55E] text-[#ffffff] font-medium hover:bg-[#16A34A] transition ff-btn"
+          className="w-full py-2.5 rounded-full bg-[#22C55E] text-[#04130A] font-semibold hover:bg-[#16A34A] transition ff-btn"
         >
           {current + 1 < quiz.length ? "Question suivante" : "Voir mon score"}
         </button>

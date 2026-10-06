@@ -158,7 +158,7 @@ export function FlashcardStudy({
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 py-2.5 rounded-lg bg-[#22C55E] text-[#ffffff] text-sm font-medium hover:bg-[#16A34A] transition ff-btn"
+                className="flex-1 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition ff-btn"
               >
                 Fermer
               </button>
@@ -191,7 +191,7 @@ export function FlashcardStudy({
               <button
                 onClick={() => answer(true)}
                 disabled={!flipped}
-                className="py-3 rounded-lg bg-[#22C55E] text-[#ffffff] text-sm font-medium hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+                className="py-3 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
               >
                 Je savais
               </button>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/AppShell";
 import { countDueCards } from "@/lib/reviews";
 
 type FicheRow = {
@@ -154,9 +154,9 @@ export default function MesFiches() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-black/40 text-sm">Chargement...</p>
-      </main>
+      <AppShell size="wide">
+        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement...</p>
+      </AppShell>
     );
   }
 
@@ -174,70 +174,62 @@ export default function MesFiches() {
 
   const noneCount = fiches.filter((f) => !f.folder_id).length;
 
+  const tabClass = (active: boolean) =>
+    `shrink-0 flex items-center gap-2 min-h-[44px] px-4 rounded-full text-sm font-semibold transition whitespace-nowrap lg:w-full lg:rounded-2xl lg:justify-start ${
+      active ? "bg-black text-white" : "bg-surface text-black/65 hover:text-black border border-black/10"
+    }`;
+
   return (
-    <>
-    <AppNav />
-    <main className="min-h-screen bg-white text-black px-4 py-10">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-4 mt-4 ff-fade-up">
-          <h1 className="text-xl font-semibold">Mes fiches</h1>
-          <button onClick={() => router.push("/generer")} className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
-            Nouvelle fiche
+    <AppShell size="wide">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-8 ff-fade-up">
+        <div>
+          <h1 className="ff-title mb-2">Mes fiches.</h1>
+          <p className="ff-lead">
+            {fiches.length === 0
+              ? "Tes fiches apparaîtront ici."
+              : `${fiches.length} fiche${fiches.length > 1 ? "s" : ""} au total, dont ${thisMonthCount} ce mois-ci.`}
+          </p>
+        </div>
+        <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
+          Nouvelle fiche
+        </button>
+      </div>
+
+      {dueCount > 0 && (
+        <div className="mb-8 bg-surface border border-[#22C55E]/50 rounded-3xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 ff-fade-up">
+          <p className="text-black">
+            <span className="font-extrabold text-xl mr-1">{dueCount}</span> carte{dueCount > 1 ? "s" : ""} à réviser aujourd&apos;hui
+          </p>
+          <button type="button" onClick={() => router.push("/reviser")} className="ff-primary text-sm ff-btn shrink-0">
+            Réviser
           </button>
         </div>
+      )}
 
-        {dueCount > 0 && (
-          <div className="mb-4 bg-surface border border-black/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3 ff-fade-up">
-            <p className="text-sm text-black">
-              <span className="font-semibold">{dueCount}</span> carte{dueCount > 1 ? "s" : ""} à réviser aujourd'hui
-            </p>
-            <button
-              onClick={() => router.push("/reviser")}
-              className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn shrink-0"
-            >
-              Réviser
-            </button>
-          </div>
-        )}
-
-        {fiches.length > 0 && (
-          <div className="flex gap-3 mb-6 ff-fade-up" style={{ animationDelay: "0.05s" }}>
-            <div className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-center ff-card">
-              <p className="text-2xl font-semibold text-black">{thisMonthCount}</p>
-              <p className="text-xs text-black/40 mt-0.5">fiche{thisMonthCount > 1 ? "s" : ""} ce mois-ci</p>
-            </div>
-            <div className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-center ff-card">
-              <p className="text-2xl font-semibold text-black">{fiches.length}</p>
-              <p className="text-xs text-black/40 mt-0.5">au total</p>
-            </div>
-          </div>
-        )}
-
-        <div className="mb-5 ff-fade-up" style={{ animationDelay: "0.08s" }}>
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setActiveFolder("all")}
-              className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
-                activeFolder === "all" ? "bg-[#111111] text-[#ffffff]" : "bg-surface text-black/60 hover:bg-black/10"
-              }`}
-            >
+      <div className="grid gap-6 lg:gap-10 lg:grid-cols-[230px_minmax(0,1fr)] items-start">
+        {/* Dossiers */}
+        <div className="ff-fade-up">
+          <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0" role="group" aria-label="Dossiers">
+            <button type="button" aria-pressed={activeFolder === "all"} onClick={() => setActiveFolder("all")} className={tabClass(activeFolder === "all")}>
               Toutes ({fiches.length})
             </button>
 
             {folders.map((folder) => (
-              <div key={folder.id} className="relative group">
+              <div key={folder.id} className="relative shrink-0 lg:w-full">
                 <button
+                  type="button"
+                  aria-pressed={activeFolder === folder.id}
                   onClick={() => setActiveFolder(folder.id)}
-                  className={`text-sm pl-3 pr-7 py-1.5 rounded-full font-medium transition flex items-center gap-2 ${
-                    activeFolder === folder.id ? "ring-2 ring-black/40" : ""
-                  }`}
-                  style={{ backgroundColor: folder.color, color: "#1a1a1a" }}
+                  className={`${tabClass(activeFolder === folder.id)} pr-11`}
                 >
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: folder.color }} aria-hidden="true" />
                   {folder.name} ({fiches.filter((f) => f.folder_id === folder.id).length})
                 </button>
                 <button
+                  type="button"
                   onClick={() => deleteFolder(folder.id)}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-black/50 hover:text-black text-sm font-bold transition"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-current opacity-60 hover:opacity-100 text-sm"
+                  aria-label={`Supprimer le dossier ${folder.name}`}
                   title="Supprimer le dossier"
                 >
                   ✕
@@ -245,59 +237,58 @@ export default function MesFiches() {
               </div>
             ))}
 
-            {noneCount > 0 && (
-              <button
-                onClick={() => setActiveFolder("none")}
-                className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${
-                  activeFolder === "none" ? "bg-[#111111] text-[#ffffff]" : "bg-surface text-black/60 hover:bg-black/10"
-                }`}
-              >
+            {noneCount > 0 && folders.length > 0 && (
+              <button type="button" aria-pressed={activeFolder === "none"} onClick={() => setActiveFolder("none")} className={tabClass(activeFolder === "none")}>
                 Sans dossier ({noneCount})
               </button>
             )}
 
             <button
+              type="button"
               onClick={() => setShowNewFolder(!showNewFolder)}
-              className="text-sm px-3 py-1.5 rounded-full font-medium border border-dashed border-black/25 text-black/50 hover:border-black/40 hover:text-black transition"
+              aria-expanded={showNewFolder}
+              className="shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold border border-dashed border-black/30 text-black/60 hover:border-[#22C55E] hover:text-black transition whitespace-nowrap lg:w-full lg:rounded-2xl"
             >
               + Nouveau dossier
             </button>
           </div>
 
           {showNewFolder && (
-            <div className="mt-3 bg-white border border-black/10 rounded-xl p-4 ff-fade">
+            <div className="mt-3 bg-surface border border-black/10 rounded-2xl p-4 ff-fade">
+              <label htmlFor="folder-name" className="sr-only">Nom du dossier</label>
               <input
+                id="folder-name"
                 type="text"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                placeholder="Nom de la matière (ex: Anglais, Droit...)"
-                className="w-full p-2.5 border border-black/15 rounded-lg mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                placeholder="Matière (ex : Anglais, Droit...)"
+                className="w-full min-h-[44px] px-3 border border-black/15 rounded-xl mb-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]"
                 autoFocus
               />
-              <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <div className="flex items-center gap-2 mb-3 flex-wrap" role="group" aria-label="Couleur du dossier">
                 {PASTEL_COLORS.map((c) => (
                   <button
+                    type="button"
                     key={c.value}
                     onClick={() => setNewFolderColor(c.value)}
-                    className={`w-7 h-7 rounded-full transition ${
-                      newFolderColor === c.value ? "ring-2 ring-offset-2 ring-black" : ""
+                    aria-pressed={newFolderColor === c.value}
+                    className={`w-8 h-8 rounded-full transition ${
+                      newFolderColor === c.value ? "ring-2 ring-offset-2 ring-offset-[var(--ff-surface)] ring-[#22C55E]" : ""
                     }`}
                     style={{ backgroundColor: c.value }}
                     title={c.name}
+                    aria-label={c.name}
                   />
                 ))}
               </div>
               <div className="flex gap-2">
-                <button
-                  onClick={createFolder}
-                  disabled={!newFolderName.trim()}
-                  className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-[#ffffff] font-medium hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
-                >
+                <button type="button" onClick={createFolder} disabled={!newFolderName.trim()} className="ff-primary text-sm min-h-[44px] ff-btn">
                   Créer
                 </button>
                 <button
+                  type="button"
                   onClick={() => { setShowNewFolder(false); setNewFolderName(""); }}
-                  className="text-sm px-4 py-2 rounded-lg text-black/50 hover:text-black transition"
+                  className="text-sm px-4 rounded-full text-black/60 hover:text-black transition min-h-[44px]"
                 >
                   Annuler
                 </button>
@@ -306,139 +297,135 @@ export default function MesFiches() {
           )}
         </div>
 
-        {filteredFiches.length === 0 ? (
-          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
-            <p className="text-black/50 mb-4">
-              {fiches.length === 0 ? "Tu n'as pas encore de fiche sauvegardée." : "Aucune fiche dans cette section."}
-            </p>
-            {fiches.length === 0 && (
-              <button onClick={() => router.push("/generer")} className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
-                Créer ma première fiche
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredFiches.map((fiche, i) => {
-              const ficheFolder = folders.find((f) => f.id === fiche.folder_id);
-              return (
-                <div
-                  key={fiche.id}
-                  className="bg-white border border-black/10 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 ff-fade-up ff-card"
-                  style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
-                >
-                  <div className="min-w-0 flex-1">
-                    {editingId === fiche.id ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") saveTitle(fiche.id);
-                            if (e.key === "Escape") cancelEditing();
-                          }}
-                          autoFocus
-                          className="w-full px-2 py-1 border border-black/30 rounded-md text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
-                        />
-                        <button onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-xs font-semibold text-[#22C55E] shrink-0 disabled:opacity-50">
-                          OK
-                        </button>
-                        <button onClick={cancelEditing} className="text-xs text-black/40 shrink-0">
-                          Annuler
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {ficheFolder && (
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: ficheFolder.color }}
+        {/* Fiches */}
+        <div>
+          {filteredFiches.length === 0 ? (
+            <div className="bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
+              <p className="text-black/60">
+                {fiches.length === 0 ? "Tu n'as pas encore de fiche sauvegardée." : "Aucune fiche dans cette section."}
+              </p>
+              {fiches.length === 0 && (
+                <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
+                  Créer ma première fiche
+                </button>
+              )}
+            </div>
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {filteredFiches.map((fiche, i) => {
+                const ficheFolder = folders.find((f) => f.id === fiche.folder_id);
+                return (
+                  <li
+                    key={fiche.id}
+                    className="bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-4 ff-fade-up ff-card"
+                    style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
+                  >
+                    <div className="min-w-0 flex-1">
+                      {editingId === fiche.id ? (
+                        <div className="flex items-center gap-2">
+                          <label htmlFor={`rename-${fiche.id}`} className="sr-only">Nouveau titre</label>
+                          <input
+                            id={`rename-${fiche.id}`}
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveTitle(fiche.id);
+                              if (e.key === "Escape") cancelEditing();
+                            }}
+                            autoFocus
+                            className="w-full min-h-[44px] px-3 border border-black/30 rounded-xl text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]"
                           />
-                        )}
-                        <p className="font-medium text-black truncate">{fiche.title}</p>
-                        {fiche.best_score !== null && (
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
-                              fiche.best_score >= 80
-                                ? "bg-[#DCFCE7] text-[#16A34A]"
-                                : "bg-surface text-black/50"
-                            }`}
-                          >
-                            {fiche.best_score}%
-                          </span>
-                        )}
-                        <button onClick={() => startEditing(fiche)} className="text-black/30 hover:text-black transition text-xs shrink-0" title="Renommer">
-                          Renommer
-                        </button>
-                      </div>
-                    )}
-                    <p className="text-xs text-black/30 mt-0.5">
-                      {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0 -mx-2 sm:mx-0">
-                    <button
-                      onClick={() => setMovingFicheId(fiche.id)}
-                      className="text-sm text-black/40 hover:text-black transition px-2 py-1.5 rounded-lg hover:bg-surface"
-                      title="Déplacer vers un dossier"
-                    >
-                      Dossier
-                    </button>
-                    <button onClick={() => handleView(fiche)} className="text-sm text-[#22C55E] font-medium hover:underline transition ff-link-underline px-2 py-1.5 rounded-lg hover:bg-surface">
-                      Voir
-                    </button>
-                    <button onClick={() => handleDelete(fiche.id)} className="text-sm text-black/30 hover:text-black transition px-2 py-1.5 rounded-lg hover:bg-surface">
-                      Supprimer
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                          <button type="button" onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-sm font-semibold text-[#22C55E] shrink-0 disabled:opacity-50 min-h-[44px] px-1">
+                            OK
+                          </button>
+                          <button type="button" onClick={cancelEditing} className="text-sm text-black/50 shrink-0 min-h-[44px] px-1">
+                            Annuler
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            {ficheFolder && (
+                              <span className="inline-flex items-center gap-1.5 text-xs text-black/60">
+                                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: ficheFolder.color }} aria-hidden="true" />
+                                {ficheFolder.name}
+                              </span>
+                            )}
+                            {fiche.best_score !== null && (
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full font-semibold shrink-0 ${
+                                  fiche.best_score >= 80 ? "bg-[#22C55E] text-[#04130A]" : "bg-white border border-black/15 text-black/60"
+                                }`}
+                              >
+                                Quiz {fiche.best_score}%
+                              </span>
+                            )}
+                          </div>
+                          <h2 className="font-bold text-lg leading-snug text-black line-clamp-3 break-words">{fiche.title}</h2>
+                        </>
+                      )}
+                      <p className="text-sm text-black/50 mt-2">
+                        {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-wrap gap-1 -mx-2">
+                      <button type="button" onClick={() => handleView(fiche)} className="ff-primary text-sm min-h-[40px] px-5 mx-2 ff-btn">
+                        Ouvrir
+                      </button>
+                      <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[40px] rounded-full hover:bg-white">
+                        Renommer
+                      </button>
+                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[40px] rounded-full hover:bg-white" title="Déplacer vers un dossier">
+                        Dossier
+                      </button>
+                      <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-red-500 transition px-2.5 min-h-[40px] rounded-full hover:bg-white">
+                        Supprimer
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       </div>
 
       {movingFicheId && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-sm flex items-center justify-center px-4"
+          className="fixed inset-0 z-[70] bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center px-4"
           onClick={() => setMovingFicheId(null)}
         >
           <div
-            className="bg-surface border border-black/10 rounded-2xl shadow-xl p-4 w-full max-w-xs"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Déplacer la fiche"
+            className="bg-surface border border-black/10 rounded-3xl shadow-xl p-4 w-full max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-sm font-medium text-black mb-3 px-1">Déplacer vers</p>
-            <button
-              onClick={() => moveFicheToFolder(movingFicheId, null)}
-              className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-surface transition"
-            >
+            <p className="text-sm font-semibold text-black mb-3 px-1">Déplacer vers</p>
+            <button type="button" onClick={() => moveFicheToFolder(movingFicheId, null)} className="w-full text-left text-sm px-3 min-h-[44px] rounded-xl hover:bg-white transition">
               Sans dossier
             </button>
             {folders.map((folder) => (
               <button
+                type="button"
                 key={folder.id}
                 onClick={() => moveFicheToFolder(movingFicheId, folder.id)}
-                className="w-full text-left text-sm px-3 py-2.5 rounded-lg hover:bg-surface transition flex items-center gap-2"
+                className="w-full text-left text-sm px-3 min-h-[44px] rounded-xl hover:bg-white transition flex items-center gap-2"
               >
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: folder.color }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: folder.color }} aria-hidden="true" />
                 {folder.name}
               </button>
             ))}
-            {folders.length === 0 && (
-              <p className="text-xs text-black/30 px-3 py-2">Crée d'abord un dossier plus haut.</p>
-            )}
-            <button
-              onClick={() => setMovingFicheId(null)}
-              className="w-full mt-2 text-center text-sm px-3 py-2.5 rounded-lg bg-surface text-black/60 hover:text-black transition"
-            >
+            {folders.length === 0 && <p className="text-xs text-black/50 px-3 py-2">Crée d&apos;abord un dossier.</p>}
+            <button type="button" onClick={() => setMovingFicheId(null)} className="ff-secondary w-full mt-2 text-sm">
               Annuler
             </button>
           </div>
         </div>,
         document.body
       )}
-    </main>
-    </>
+    </AppShell>
   );
 }

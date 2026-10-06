@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AppShell } from "@/components/AppShell";
 import { FicheView, type FishFlowResult } from "@/components/FicheView";
 
 // Page de secours : une fiche qui n'a pas pu être enregistrée en base reste lisible ici
@@ -30,8 +32,12 @@ export default function Result() {
   if (!checked) return null;
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-white text-black px-4">
-      <p className="text-black/50">Aucun résultat trouvé. Retourne à l'accueil pour en générer un.</p>
-    </main>
+    <AppShell size="form">
+      <div className="py-20 text-center grid gap-5 justify-items-center">
+        <h1 className="ff-title">Aucun résultat.</h1>
+        <p className="ff-lead">Génère une fiche pour la voir ici.</p>
+        <Link href="/generer" className="ff-primary text-sm ff-btn">Générer une fiche</Link>
+      </div>
+    </AppShell>
   );
 }

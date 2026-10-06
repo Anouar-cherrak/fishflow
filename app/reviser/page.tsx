@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/AppShell";
 import { FlashcardStudy } from "@/components/FlashcardStudy";
 import { recordReviewResults, getProgress, type Progress } from "@/lib/reviews";
 import { trackEvent } from "@/lib/tracking";
@@ -99,90 +98,108 @@ export default function Reviser() {
     setTimeout(() => getProgress().then(setProgress), 800);
   };
 
+  const stats = progress && progress.tracked > 0
+    ? [
+        { label: "jours d'affilée", value: progress.streak },
+        { label: "cartes maîtrisées", value: progress.mastered },
+        { label: "cartes suivies", value: progress.tracked },
+      ]
+    : null;
+
   return (
-    <>
-    <AppNav />
-    <main className="min-h-screen bg-white text-black px-4 py-10">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6 mt-4 ff-fade-up">
-          <h1 className="text-xl font-semibold">Réviser</h1>
-          <Link href="/mes-fiches" className="text-sm text-black/60 hover:text-black transition ff-link-underline">
-            ← Mes fiches
-          </Link>
-        </div>
+    <AppShell size="normal">
+      <div className="mb-8 ff-fade-up">
+        <h1 className="ff-title mb-3">Réviser.</h1>
+        <p className="ff-lead">Tes cartes reviennent au bon moment : vite si tu les rates, plus tard si tu les sais.</p>
+      </div>
 
-        {progress && progress.tracked > 0 && (
-          <div className="grid grid-cols-3 gap-3 mb-6 ff-fade-up">
-            {[
-              { label: "jours d'affilée", value: progress.streak },
-              { label: "cartes maîtrisées", value: progress.mastered },
-              { label: "cartes suivies", value: progress.tracked },
-            ].map((s) => (
-              <div key={s.label} className="bg-white border border-black/10 rounded-xl p-3 text-center ff-card">
-                <p className="text-2xl font-bold text-black">{s.value}</p>
-                <p className="text-xs text-black/50">{s.label}</p>
+      {stats && (
+        <ul className="grid grid-cols-3 gap-3 sm:gap-5 mb-8 ff-fade-up" aria-label="Ta progression">
+          {stats.map((st) => (
+            <li key={st.label} className="bg-surface border border-black/10 rounded-3xl p-4 sm:p-6 ff-card">
+              <p className="text-3xl sm:text-5xl font-extrabold tracking-tight text-black">{st.value}</p>
+              <p className="text-xs sm:text-sm text-black/60 mt-1">{st.label}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] items-stretch">
+        <section aria-live="polite" className="bg-surface border border-black/10 rounded-3xl p-7 sm:p-10 flex flex-col justify-center ff-fade-up">
+          {status === "loading" && <p className="text-black/50">Chargement...</p>}
+
+          {status === "empty" && !finished && (
+            <>
+              <h2 className="text-2xl font-bold tracking-tight mb-2">Rien à réviser pour l&apos;instant.</h2>
+              <p className="text-black/60 mb-6 max-w-[48ch]">
+                Étudie les flashcards d&apos;une fiche : les cartes reviendront ici au bon moment, pour que tu les retiennes.
+              </p>
+              <div>
+                <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-primary ff-btn">
+                  Voir mes fiches
+                </button>
               </div>
+            </>
+          )}
+
+          {status === "ready" && !finished && (
+            <>
+              <p className="text-6xl sm:text-7xl font-extrabold tracking-tight text-black">{dueTotal}</p>
+              <p className="text-black/70 text-lg mt-1 mb-2">carte{dueTotal > 1 ? "s" : ""} à réviser aujourd&apos;hui</p>
+              {dueTotal > cards.length ? (
+                <p className="text-sm text-black/50 mb-6">On commence par les {cards.length} plus urgentes.</p>
+              ) : (
+                <div className="mb-6" />
+              )}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent("revision_commencee", { cartes: cards.length });
+                    setStudying(true);
+                  }}
+                  className="ff-primary ff-btn"
+                >
+                  Commencer
+                </button>
+              </div>
+            </>
+          )}
+
+          {finished && (
+            <>
+              <h2 className="text-2xl font-bold tracking-tight mb-2">Séance terminée.</h2>
+              <p className="text-black/60 mb-6 max-w-[48ch]">
+                Les cartes que tu connais reviendront plus tard, celles à revoir demain. Reviens quand il y en a de nouvelles.
+              </p>
+              <div>
+                <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-primary ff-btn">
+                  Retour à mes fiches
+                </button>
+              </div>
+            </>
+          )}
+        </section>
+
+        <section aria-label="Comment ça marche" className="border border-black/10 rounded-3xl p-7 sm:p-10 ff-fade-up" style={{ animationDelay: "0.1s" }}>
+          <h2 className="text-xl font-bold tracking-tight mb-2">Comment ça marche</h2>
+          <p className="text-black/60 mb-6 text-sm sm:text-base">
+            Chaque carte monte d&apos;une case quand tu la sais, et redescend quand tu la rates. Plus la case est haute, plus elle revient tard.
+          </p>
+          <ol className="ff-boxes" aria-label="Les cinq cases et leur délai">
+            {["1 jour", "3 jours", "7 jours", "14 jours", "30 jours"].map((d, i) => (
+              <li key={d} style={{ ["--i" as string]: i }}>
+                <span className="ff-box-card" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-semibold">{d}</span>
+              </li>
             ))}
-          </div>
-        )}
-
-        {status === "loading" && <p className="text-black/40 text-sm">Chargement...</p>}
-
-        {status === "empty" && !finished && (
-          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
-            <p className="text-black font-medium mb-2">Rien à réviser pour l'instant.</p>
-            <p className="text-black/50 text-sm mb-5">
-              Étudie les flashcards d'une fiche : les cartes reviendront ici au bon moment, pour que tu les retiennes.
-            </p>
-            <button
-              onClick={() => router.push("/mes-fiches")}
-              className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
-            >
-              Voir mes fiches
-            </button>
-          </div>
-        )}
-
-        {status === "ready" && !finished && (
-          <div className="bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
-            <p className="text-4xl font-bold text-black mb-1">{dueTotal}</p>
-            <p className="text-black/60 mb-1">carte{dueTotal > 1 ? "s" : ""} à réviser</p>
-            {dueTotal > cards.length && (
-              <p className="text-xs text-black/40 mb-5">On commence par les {cards.length} plus urgentes.</p>
-            )}
-            {dueTotal <= cards.length && <div className="mb-5" />}
-            <button
-              onClick={() => {
-                trackEvent("revision_commencee", { cartes: cards.length });
-                setStudying(true);
-              }}
-              className="px-6 py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
-            >
-              Commencer
-            </button>
-          </div>
-        )}
-
-        {finished && (
-          <div className="bg-white border border-black/10 rounded-2xl p-10 text-center ff-fade-up ff-card">
-            <p className="text-black font-medium mb-2">Séance terminée.</p>
-            <p className="text-black/50 text-sm mb-5">
-              Les cartes que tu connais reviendront plus tard, celles à revoir demain. Reviens quand il y en a de nouvelles.
-            </p>
-            <button
-              onClick={() => router.push("/mes-fiches")}
-              className="px-4 py-2 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn"
-            >
-              Retour à mes fiches
-            </button>
-          </div>
-        )}
+          </ol>
+        </section>
       </div>
 
       {studying && cards.length > 0 && (
         <FlashcardStudy cards={cards} onClose={() => setStudying(false)} onComplete={handleComplete} />
       )}
-    </main>
-    </>
+    </AppShell>
   );
 }

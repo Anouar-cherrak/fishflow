@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/AppShell";
 import { Orb } from "@/components/Orb";
 import { trackEvent } from "@/lib/tracking";
 
@@ -114,10 +114,9 @@ export default function Apprendre() {
   const orbState = status === "loading" ? "thinking" : status === "idle" ? "idle" : "done";
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-white text-black">
-      <AppNav />
-
-      <main className="flex-1 w-full max-w-2xl mx-auto px-4 pt-8 pb-44 flex flex-col items-center">
+    <>
+      <AppShell size="normal">
+      <div className="w-full max-w-2xl mx-auto pt-4 pb-44 flex flex-col items-center">
         <div className={showResult ? "mb-6" : "mt-6 mb-8"}>
           <Orb state={orbState} compact={showResult} shift={shift} />
         </div>
@@ -174,7 +173,7 @@ export default function Apprendre() {
               <p className="text-sm text-black/60 mb-4">Tu as eu un essai gratuit. Avec Pro, tu apprends sans limite.</p>
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-[#22C55E] text-[#ffffff] text-sm font-medium hover:bg-[#16A34A] transition ff-btn"
+                className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition ff-btn"
               >
                 Voir Pro
               </Link>
@@ -273,11 +272,12 @@ export default function Apprendre() {
             </article>
           )}
         </div>
-      </main>
+      </div>
+      </AppShell>
 
       <form
         onSubmit={onSubmit}
-        className="fixed bottom-0 inset-x-0 z-10 bg-white/90 backdrop-blur border-t border-black/10 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 inset-x-0 z-10 bg-white/90 backdrop-blur border-t border-black/10 lg:px-8 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       >
         <div className="max-w-2xl mx-auto flex items-center gap-2">
           <label htmlFor="question" className="sr-only">
@@ -297,12 +297,12 @@ export default function Apprendre() {
           <button
             type="submit"
             disabled={status === "loading" || question.trim().length < 3}
-            className="min-h-[48px] px-5 rounded-full bg-[#22C55E] text-[#ffffff] text-sm font-medium hover:bg-[#16A34A] transition disabled:opacity-40 ff-btn shrink-0"
+            className="min-h-[48px] px-5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition disabled:opacity-40 ff-btn shrink-0"
           >
             {status === "loading" ? "…" : "Envoyer"}
           </button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

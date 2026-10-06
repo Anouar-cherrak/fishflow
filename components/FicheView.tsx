@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Logo, Wordmark } from "@/components/Logo";
+import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
 import { QuizPlayer } from "@/components/QuizPlayer";
 import { createClient } from "@/lib/supabase/client";
@@ -41,7 +41,7 @@ function RegenButton({
     <button
       onClick={() => onRegenerate(sectionKey)}
       disabled={!hasSource || regenerating}
-      className="flex items-center gap-1.5 text-xs text-black font-medium hover:underline disabled:opacity-50 disabled:no-underline"
+      className="flex items-center gap-1.5 text-sm text-black/70 font-medium hover:text-black hover:underline disabled:opacity-50 disabled:no-underline min-h-[44px]"
     >
       {regenerating ? (
         <>
@@ -59,6 +59,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const [data, setData] = useState<FishFlowResult>(initialData);
   const [settings, setSettings] = useState<Settings>({ difficulty: "moyen", length: "moyen" });
   const [downloading, setDownloading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [regeneratingKey, setRegeneratingKey] = useState<string | null>(null);
   const [isPro, setIsPro] = useState(false);
   const [bestScore, setBestScore] = useState<number | null>(initialData.best_score ?? null);
@@ -156,6 +157,9 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
 
   const handleDownloadPDF = async () => {
     setDownloading(true);
+    // Le PDF est toujours en clair, même si l'écran est en thème sombre.
+    setExporting(true);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     try {
       // Les outils de PDF sont lourds : on ne les charge qu'au moment du clic.
       const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
@@ -205,6 +209,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       console.error(err);
       alert("Erreur pendant la génération du PDF. Réessaie.");
     } finally {
+      setExporting(false);
       setDownloading(false);
     }
   };
@@ -237,182 +242,185 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const sectionOpacity = (key: string) =>
     regeneratingKey === key ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity";
 
+  const actionClass = "ff-secondary w-full text-sm";
+
   return (
-    <main className="min-h-screen bg-white text-black py-10 px-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-          <button onClick={handleClear} className="text-sm text-black/30 hover:text-black transition ff-link-underline">
-            Effacer cette fiche
-          </button>
-          <button onClick={() => router.push("/generer")} className="text-sm text-black/60 hover:text-black font-medium transition ff-link-underline">
-            ← Nouveau document
-          </button>
-        </div>
-
-        <div ref={logoRef} className="bg-white rounded-t-2xl border border-black/10 border-b-0 px-6 pt-6 pb-4">
-          <div className="flex items-center gap-2">
-            <Logo size={22} />
-            <Wordmark className="text-lg" />
-          </div>
-          <p className="text-black/50 text-sm mt-1">Ta fiche de révision générée</p>
-        </div>
-
-        <div className="h-1 bg-white border-x border-black/10" />
-        <div className="h-4" />
-
-        {data.summary !== undefined && (
-          <div ref={summaryRef} className={`pb-6 ${sectionOpacity("summary")}`}>
-            <section className="bg-white rounded-xl shadow-sm border border-black/10 p-6">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-black">Résumé</h2>
-                <div className="flex items-center gap-3">
-                  {isPro && (
-                    <button
-                      onClick={toggleSpeak}
-                      className="text-xs text-[#22C55E] font-medium hover:underline"
-                    >
-                      {isSpeaking ? "Arrêter" : "Écouter"}
-                    </button>
-                  )}
-                  <RegenButton {...regenProps("summary")} />
-                </div>
-              </div>
-              <p className="text-black/70 leading-relaxed">{data.summary}</p>
-            </section>
-          </div>
-        )}
-
-        {data.sheet !== undefined && (
-          <div className={`pb-6 ${sectionOpacity("sheet")}`}>
-            <div ref={sheetHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-black">Fiche de révision</h2>
-                <RegenButton {...regenProps("sheet")} />
-              </div>
-            </div>
-            <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2 space-y-2">
-              {data.sheet.map((point, i) => (
-                <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className="bg-surface rounded-lg border border-black/10 p-3 flex gap-2">
-                  <span className="text-black font-bold">•</span>
-                  <span className="text-black/70">{point}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {data.flashcards !== undefined && (
-          <div className={`pb-6 ${sectionOpacity("flashcards")}`}>
-            <div ref={flashcardsHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-black">Flashcards</h2>
-                <RegenButton {...regenProps("flashcards")} />
-              </div>
-            </div>
-            <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2 grid gap-3">
-              {data.flashcards.length > 0 && (
+    <AppShell size="wide">
+      <div className={exporting ? "ff-force-light" : ""}>
+        <div className="grid gap-8 lg:gap-12 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
+          <aside className="lg:order-2 lg:sticky lg:top-28 grid gap-3" aria-label="Actions sur la fiche">
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                disabled={downloading}
+                className="ff-primary w-full text-sm ff-btn"
+              >
+                {downloading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                    PDF en cours...
+                  </>
+                ) : (
+                  "Télécharger en PDF"
+                )}
+              </button>
+              <button type="button" onClick={() => router.push("/generer")} className={actionClass}>
+                Nouvelle fiche
+              </button>
+              {data.flashcards !== undefined && data.flashcards.length > 0 && (
                 <button
+                  type="button"
                   onClick={() => {
                     trackEvent("flashcards_etude_ouverte");
                     setStudying(true);
                   }}
-                  className="w-full py-2.5 rounded-lg bg-[#22C55E] text-[#ffffff] text-sm font-medium hover:bg-[#16A34A] transition ff-btn"
+                  className={actionClass}
                 >
                   Étudier les flashcards
                 </button>
               )}
-              {data.flashcards.map((card, i) => (
-                <div key={i} ref={(el) => { flashcardItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-surface">
-                  <p className="font-medium text-black mb-1">{i + 1}. {card.question}</p>
-                  <p className="text-black/60 text-sm">{card.answer}</p>
-                </div>
-              ))}
+              <button type="button" onClick={() => router.push("/mes-fiches")} className={actionClass}>
+                Mes fiches
+              </button>
             </div>
-          </div>
-        )}
+            <button type="button" onClick={handleClear} className="text-sm text-black/50 hover:text-black transition ff-link-underline justify-self-start mt-1 min-h-[44px]">
+              Effacer cette fiche
+            </button>
+          </aside>
 
-        {data.quiz !== undefined && (
-          <div className={`pb-6 ${sectionOpacity("quiz")}`}>
-            <div ref={quizHeaderRef} className="bg-white rounded-t-xl border border-b-0 border-black/10 px-6 pt-4 pb-2">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg font-semibold text-black">Quiz</h2>
-                <RegenButton {...regenProps("quiz")} />
-              </div>
-              {isPro && bestScore !== null && (
-                <div className="mb-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-black/50">
-                      {bestScore >= 80 ? "Fiche maîtrisée" : "Meilleur score"}
-                    </span>
-                    <span className="text-xs font-semibold text-black">{bestScore}%</span>
+          <div className="lg:order-1 min-w-0">
+            <div ref={logoRef} className="mb-6">
+              <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision</p>
+              <h1 className="ff-title">Ta fiche est prête.</h1>
+              <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
+            </div>
+
+            {data.summary !== undefined && (
+              <div ref={summaryRef} className={`pb-6 ${sectionOpacity("summary")}`}>
+                <section className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-3 gap-3">
+                    <h2 className="text-xl font-bold tracking-tight text-black">Résumé</h2>
+                    <div className="flex items-center gap-4">
+                      {isPro && (
+                        <button type="button" onClick={toggleSpeak} className="text-sm text-[#22C55E] font-semibold hover:underline min-h-[44px]">
+                          {isSpeaking ? "Arrêter" : "Écouter"}
+                        </button>
+                      )}
+                      <RegenButton {...regenProps("summary")} />
+                    </div>
                   </div>
-                  <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${bestScore >= 80 ? "bg-[#22C55E]" : "bg-black/40"}`}
-                      style={{ width: `${bestScore}%` }}
-                    />
+                  <p className="text-black/80 leading-relaxed text-base sm:text-lg max-w-[68ch]">{data.summary}</p>
+                </section>
+              </div>
+            )}
+
+            {data.sheet !== undefined && (
+              <div className={`pb-6 ${sectionOpacity("sheet")}`}>
+                <div ref={sheetHeaderRef} className="px-1 pt-2 pb-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold tracking-tight text-black">Fiche de révision</h2>
+                    <RegenButton {...regenProps("sheet")} />
                   </div>
                 </div>
-              )}
-            </div>
-            <div className="bg-white border-x border-b border-black/10 rounded-b-xl p-6 pt-2">
-              {isPro ? (
-                <QuizPlayer
-                  quiz={data.quiz}
-                  ficheId={ficheId}
-                  currentBestScore={bestScore}
-                  onScoreUpdate={setBestScore}
-                />
-              ) : (
-                <div className="space-y-3">
-                  {data.quiz.map((q, i) => (
-                    <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-lg p-4 bg-surface">
-                      <p className="font-medium text-black mb-3">{i + 1}. {q.question}</p>
-                      <ul className="space-y-2">
-                        {q.options.map((opt, j) => (
-                          <li
-                            key={j}
-                            className={`px-3 py-2 rounded-md text-sm ${
-                              j === q.correctIndex
-                                ? "bg-[#111111] text-[#ffffff] font-semibold"
-                                : "bg-white text-black/70 border border-black/10"
-                            }`}
-                          >
-                            {opt}
-                          </li>
-                        ))}
-                      </ul>
+                <div className="grid gap-2.5 md:grid-cols-2">
+                  {data.sheet.map((point, i) => (
+                    <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className="bg-surface rounded-2xl border border-black/10 p-4 flex gap-3">
+                      <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />
+                      <span className="text-black/80">{point}</span>
                     </div>
                   ))}
-                  <div className="text-center pt-2">
-                    <p className="text-xs text-black/40 mb-2">Passe Pro pour jouer le quiz et suivre ta progression</p>
-                    <button
-                      onClick={() => router.push("/pricing")}
-                      className="text-sm px-4 py-2 rounded-lg bg-[#22C55E] text-[#ffffff] font-medium hover:bg-[#16A34A] transition ff-btn"
-                    >
-                      Découvrir FishFlow Pro
-                    </button>
+                </div>
+              </div>
+            )}
+
+            {data.flashcards !== undefined && (
+              <div className={`pb-6 ${sectionOpacity("flashcards")}`}>
+                <div ref={flashcardsHeaderRef} className="px-1 pt-2 pb-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold tracking-tight text-black">Flashcards</h2>
+                    <RegenButton {...regenProps("flashcards")} />
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        )}
+                <div className="grid gap-3 md:grid-cols-2">
+                  {data.flashcards.map((card, i) => (
+                    <div key={i} ref={(el) => { flashcardItemRefs.current[i] = el; }} className="border border-black/10 rounded-2xl p-5 bg-surface">
+                      <p className="font-semibold text-black mb-1.5">{i + 1}. {card.question}</p>
+                      <p className="text-black/65 text-sm">{card.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        <button
-          onClick={handleDownloadPDF}
-          disabled={downloading}
-          className="mt-2 px-6 py-3 rounded-xl font-display font-semibold bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition w-full disabled:opacity-50 flex items-center justify-center gap-2 ff-btn"
-        >
-          {downloading ? (
-            <>
-              <span className="w-4 h-4 border-2 border-[#ffffff]/30 border-t-[#ffffff] rounded-full animate-spin" />
-              Génération du PDF...
-            </>
-          ) : (
-            "Télécharger en PDF"
-          )}
-        </button>
+            {data.quiz !== undefined && (
+              <div className={`pb-6 ${sectionOpacity("quiz")}`}>
+                <div ref={quizHeaderRef} className="px-1 pt-2 pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-xl font-bold tracking-tight text-black">Quiz</h2>
+                    <RegenButton {...regenProps("quiz")} />
+                  </div>
+                  {isPro && bestScore !== null && (
+                    <div className="mb-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-black/60">
+                          {bestScore >= 80 ? "Fiche maîtrisée" : "Meilleur score"}
+                        </span>
+                        <span className="text-xs font-semibold text-black">{bestScore}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${bestScore >= 80 ? "bg-[#22C55E]" : "bg-black/40"}`}
+                          style={{ width: `${bestScore}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  {isPro ? (
+                    <QuizPlayer
+                      quiz={data.quiz}
+                      ficheId={ficheId}
+                      currentBestScore={bestScore}
+                      onScoreUpdate={setBestScore}
+                    />
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {data.quiz.map((q, i) => (
+                          <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-2xl p-5 bg-surface">
+                            <p className="font-semibold text-black mb-3">{i + 1}. {q.question}</p>
+                            <ul className="space-y-2">
+                              {q.options.map((opt, j) => (
+                                <li
+                                  key={j}
+                                  className={`px-3 py-2 rounded-xl text-sm ${
+                                    j === q.correctIndex
+                                      ? "bg-black text-white font-semibold"
+                                      : "bg-white text-black/70 border border-black/10"
+                                  }`}
+                                >
+                                  {opt}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="bg-surface border border-black/10 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-sm text-black/70">Avec Pro, tu joues le quiz et tu suis ta progression.</p>
+                        <button type="button" onClick={() => router.push("/pricing")} className="ff-primary text-sm ff-btn">
+                          Découvrir Pro
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {studying && data.flashcards && data.flashcards.length > 0 && (
@@ -425,6 +433,6 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
           }}
         />
       )}
-    </main>
+    </AppShell>
   );
 }

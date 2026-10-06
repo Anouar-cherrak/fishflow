@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
 
 export default function Pricing() {
@@ -52,29 +53,29 @@ export default function Pricing() {
 
   if (checkingStatus) {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-black/40 text-sm">Chargement...</p>
-      </main>
+      <AppShell size="form">
+        <p className="text-black/40 text-sm text-center py-20" role="status">Chargement...</p>
+      </AppShell>
     );
   }
 
   if (isPro) {
     return (
-      <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-        <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
+      <AppShell size="form">
+        <div className="w-full max-w-sm mx-auto bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
           <p className="text-black/50 text-sm mb-6">Génération illimitée déjà active sur ton compte.</p>
-          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn">
+          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn">
             Retour à l'outil
           </button>
         </div>
-      </main>
+      </AppShell>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
+    <AppShell size="form">
+      <div className="w-full max-w-sm mx-auto bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
         <div className="flex items-center justify-center gap-2 mb-6">
           <Logo size={24} />
           <Wordmark />
@@ -99,7 +100,7 @@ export default function Pricing() {
         <button
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
+          className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
         >
           {loading ? "Redirection..." : "Passer Pro"}
         </button>
@@ -108,6 +109,6 @@ export default function Pricing() {
           Retour
         </button>
       </div>
-    </main>
+    </AppShell>
   );
 }

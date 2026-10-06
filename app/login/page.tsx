@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Logo, Wordmark } from "@/components/Logo";
+import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
 
 export default function Login() {
@@ -32,31 +32,25 @@ export default function Login() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-black flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white border border-black/10 rounded-2xl p-8 ff-fade-up ff-card">
-        <div className="flex items-center gap-2 mb-6">
-          <Logo size={24} />
-          <Wordmark />
-        </div>
+    <AuthLayout>
+        <h1 className="text-2xl font-bold tracking-tight mb-1">Connexion</h1>
+        <p className="text-black/60 mb-6">Accède à ton compte</p>
 
-        <h1 className="text-xl font-semibold mb-1">Connexion</h1>
-        <p className="text-black/50 text-sm mb-6">Accède à ton compte</p>
-
-        <label className="text-xs font-semibold text-black/40 uppercase tracking-wide block mb-1">Email</label>
-        <input
+        <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
+        <input id="field-1"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
           placeholder="toi@exemple.com"
         />
 
-        <label className="text-xs font-semibold text-black/40 uppercase tracking-wide block mb-1">Mot de passe</label>
-        <input
+        <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Mot de passe</label>
+        <input id="field-2"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2.5 border border-black/15 rounded-lg mb-2 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-2 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
           placeholder="Ton mot de passe"
         />
 
@@ -67,7 +61,7 @@ export default function Login() {
         </p>
 
         {error && (
-          <p className="text-sm text-black bg-black/5 border border-black/20 rounded-lg p-3 mb-4 font-medium ff-fade">
+          <p className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
             {error}
           </p>
         )}
@@ -75,7 +69,7 @@ export default function Login() {
         <button
           onClick={handleLogin}
           disabled={loading || !email || !password}
-          className="w-full py-2.5 rounded-lg font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+          className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>
@@ -86,7 +80,6 @@ export default function Login() {
             Créer un compte
           </button>
         </p>
-      </div>
-    </main>
+    </AuthLayout>
   );
 }

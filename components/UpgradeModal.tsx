@@ -17,11 +17,14 @@ export function UpgradeModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 ff-fade"
+      className="fixed inset-0 bg-[#000000]/60 backdrop-blur-sm flex items-center justify-center z-50 px-4 ff-fade"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm bg-surface rounded-2xl p-6 ff-card ff-fade-up max-h-[85vh] overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="w-full max-w-sm bg-surface border border-black/10 rounded-2xl p-6 ff-card ff-fade-up max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-3">
@@ -47,7 +50,7 @@ export function UpgradeModal({
 
         <button
           onClick={onUpgrade}
-          className="w-full py-3 rounded-xl font-medium bg-[#22C55E] text-[#ffffff] hover:bg-[#16A34A] transition ff-btn mb-2"
+          className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn mb-2"
         >
           Voir les tarifs Pro — 4,99 €/mois
         </button>

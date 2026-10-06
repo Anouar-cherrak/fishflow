@@ -9,10 +9,16 @@ import { useEffect } from "react";
  */
 export function ThemeSync() {
   useEffect(() => {
+    // Le choix fait sur cet appareil gagne. Sans choix local, le thème sombre est le thème par défaut.
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("ff-theme");
+    } catch {}
+    if (stored) return;
     fetch("/api/preferences")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data && typeof data.darkMode === "boolean") {
+        if (data && data.darkMode === true) {
           document.documentElement.classList.toggle("dark", data.darkMode);
           try {
             localStorage.setItem("ff-theme", data.darkMode ? "dark" : "light");

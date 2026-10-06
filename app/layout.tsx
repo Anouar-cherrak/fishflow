@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
@@ -9,12 +9,6 @@ import { ThemeSync } from "@/components/ThemeSync";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-body",
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111111",
+  themeColor: "#0a0a0a",
 };
 
 const GA4_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
@@ -44,11 +38,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <Script id="theme-init" strategy="beforeInteractive">
           {`
             try {
-              if (localStorage.getItem('ff-theme') === 'dark') {
+              if (localStorage.getItem('ff-theme') !== 'light') {
                 document.documentElement.classList.add('dark');
               }
             } catch (e) {}
