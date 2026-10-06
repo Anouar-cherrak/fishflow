@@ -281,15 +281,11 @@ body {
   display: flex;
   flex-direction: column;
 }
-@media (min-width: 1024px) {
-  .ff-frame {
-    max-width: 1280px;
-    margin: 20px auto;
-    min-height: calc(100dvh - 40px);
-    border: 1px solid var(--ff-line);
-    border-radius: 32px;
-    box-shadow: 0 40px 100px -40px rgba(0, 0, 0, 0.55);
-  }
+.ff-frame {
+  position: relative;
+  background:
+    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, #22c55e 9%, transparent), transparent 70%),
+    var(--ff-bg);
 }
 .ff-main {
   width: 100%;
@@ -299,9 +295,9 @@ body {
 }
 @media (min-width: 768px) { .ff-main { padding: 36px 32px 80px; } }
 @media (min-width: 1024px) { .ff-main { padding: 48px 56px 96px; } }
-.ff-main[data-size="form"] { max-width: 760px; }
-.ff-main[data-size="normal"] { max-width: 1000px; }
-.ff-main[data-size="wide"] { max-width: 1200px; }
+.ff-main[data-size="form"] { max-width: 820px; }
+.ff-main[data-size="normal"] { max-width: 1120px; }
+.ff-main[data-size="wide"] { max-width: 1280px; }
 
 .ff-title {
   font-family: var(--font-body), sans-serif;
@@ -332,7 +328,7 @@ body {
   border-bottom: 1px solid var(--ff-line);
 }
 @media (min-width: 768px) { .ff-bar { padding: 14px 32px; } }
-@media (min-width: 1024px) { .ff-bar { padding: 16px 40px; border-radius: 32px 32px 0 0; } }
+@media (min-width: 1024px) { .ff-bar { padding: 16px max(40px, calc((100% - 1280px) / 2 + 56px)); } }
 .ff-round {
   width: 46px;
   height: 46px;
@@ -492,3 +488,9 @@ body {
 }
 @keyframes ffClimb { 0% { opacity: 0; transform: translateY(14px); } 6%, 14% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .ff-box-card::after { animation: none; opacity: 1; } }
+
+/* Boule argent (Apprendre) */
+.ff-silver-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.ff-silver-slot { width: min(68vw, 300px); aspect-ratio: 1; margin-inline: auto; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.ff-silver-slot[data-compact="true"] { width: 112px; }
+@media (min-width: 1024px) { .ff-silver-slot { width: 340px; } .ff-silver-slot[data-compact="true"] { width: 128px; } }

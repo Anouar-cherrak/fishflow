@@ -125,11 +125,12 @@ function Art({ k }: { k: ArtKey }) {
 }
 
 function BrandMark() {
+  // Même logo que dans l'application (components/Logo.tsx)
   return (
     <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path d="M4 20c0 0 4-8 12-8s12 8 12 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      <path d="M4 25c0 0 4-8 12-8s12 8 12 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity=".4" />
-      <circle cx="16" cy="7" r="3" fill="var(--hot)" />
+      <path d="M4 20C4 20 8 12 16 12C24 12 28 20 28 20" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <path d="M4 24C4 24 8 16 16 16C24 16 28 24 28 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity=".4" />
+      <circle cx="16" cy="8" r="3" fill="#22C55E" />
     </svg>
   );
 }
@@ -379,7 +380,7 @@ export function Landing() {
       <header className="bar">
         <Link className="brand" href="/" aria-label="FishFlow, accueil">
           <BrandMark />
-          FishFlow
+          <span>Fish<em>Flow</em></span>
         </Link>
         <div className="bar-actions">
           <Link className="bar-link" href="/login">Connexion</Link>

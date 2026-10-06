@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
-import { Orb } from "@/components/Orb";
+import { SilverOrb } from "@/components/SilverOrb";
 import { trackEvent } from "@/lib/tracking";
 
 type Source = { id: number; title: string; url: string; site: string };
@@ -111,14 +111,13 @@ export default function Apprendre() {
   };
 
   const showResult = status !== "idle";
-  const orbState = status === "loading" ? "thinking" : status === "idle" ? "idle" : "done";
 
   return (
     <>
       <AppShell size="normal">
-      <div className="w-full max-w-2xl mx-auto pt-4 pb-44 flex flex-col items-center">
+      <div className="relative z-[1] w-full max-w-2xl mx-auto pt-2 pb-44 flex flex-col items-center">
         <div className={showResult ? "mb-6" : "mt-6 mb-8"}>
-          <Orb state={orbState} compact={showResult} shift={shift} />
+          <SilverOrb thinking={status === "loading"} done={status === "done"} compact={showResult} shift={shift} />
         </div>
 
         {!showResult && (

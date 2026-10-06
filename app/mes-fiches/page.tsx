@@ -206,9 +206,9 @@ export default function MesFiches() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:gap-10 lg:grid-cols-[230px_minmax(0,1fr)] items-start">
+      <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[230px_minmax(0,1fr)] items-start">
         {/* Dossiers */}
-        <div className="ff-fade-up">
+        <div className="ff-fade-up min-w-0">
           <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0" role="group" aria-label="Dossiers">
             <button type="button" aria-pressed={activeFolder === "all"} onClick={() => setActiveFolder("all")} className={tabClass(activeFolder === "all")}>
               Toutes ({fiches.length})
@@ -298,7 +298,7 @@ export default function MesFiches() {
         </div>
 
         {/* Fiches */}
-        <div>
+        <div className="min-w-0">
           {filteredFiches.length === 0 ? (
             <div className="bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
               <p className="text-black/60">
@@ -311,13 +311,13 @@ export default function MesFiches() {
               )}
             </div>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
               {filteredFiches.map((fiche, i) => {
                 const ficheFolder = folders.find((f) => f.id === fiche.folder_id);
                 return (
                   <li
                     key={fiche.id}
-                    className="bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-4 ff-fade-up ff-card"
+                    className="min-w-0 bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-4 ff-fade-up ff-card"
                     style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
                   >
                     <div className="min-w-0 flex-1">
@@ -334,7 +334,7 @@ export default function MesFiches() {
                               if (e.key === "Escape") cancelEditing();
                             }}
                             autoFocus
-                            className="w-full min-h-[44px] px-3 border border-black/30 rounded-xl text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]"
+                            className="flex-1 min-w-0 min-h-[44px] px-3 border border-black/30 rounded-xl text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]"
                           />
                           <button type="button" onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-sm font-semibold text-[#22C55E] shrink-0 disabled:opacity-50 min-h-[44px] px-1">
                             OK

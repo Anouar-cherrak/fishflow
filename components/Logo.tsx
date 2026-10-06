@@ -23,7 +23,7 @@ export function Logo({ size = 28, className = "" }: { size?: number; className?:
         fill="none"
         opacity="0.4"
       />
-      <circle cx="16" cy="8" r="3" fill="currentColor" />
+      <circle cx="16" cy="8" r="3" fill="#22C55E" />
     </svg>
   );
 }
