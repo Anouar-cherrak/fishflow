@@ -2,9 +2,9 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { AppNav } from "@/components/AppNav";
 import { InstallPWA } from "@/components/InstallPWA";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { trackEvent } from "@/lib/tracking";
@@ -104,13 +104,6 @@ function GenererContent() {
       }
       return [...prev, key];
     });
-  };
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setUser(null);
-    router.refresh();
   };
 
   const handleGenerate = async () => {
@@ -230,56 +223,8 @@ function GenererContent() {
         />
       )}
 
+      <AppNav />
       <div className="w-full flex flex-col items-center px-4 py-6">
-        <div className="w-full max-w-lg flex flex-wrap justify-between items-center gap-3 mb-6 ff-fade">
-          <Link href="/" className="text-sm text-black/50 hover:text-black transition ff-link-underline">← FishFlow</Link>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            {!checkingAuth && (
-              user ? (
-                <>
-                  <button
-                    onClick={() => router.push("/apprendre")}
-                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
-                  >
-                    Apprendre
-                  </button>
-                  <button
-                    onClick={() => router.push("/mes-fiches")}
-                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
-                  >
-                    Mes fiches
-                  </button>
-                  <button
-                    onClick={() => router.push("/parametres")}
-                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
-                  >
-                    Paramètres
-                  </button>
-                  <span className="hidden sm:inline text-sm text-black/40">{user.email}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
-                  >
-                    Déconnexion
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => router.push("/login")}
-                    className="text-sm text-black/70 hover:text-black px-3 py-1.5 rounded-full border border-black/15 hover:bg-surface transition font-medium"
-                  >
-                    Connexion
-                  </button>
-                  <button onClick={() => router.push("/signup")} className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
-                    Créer un compte
-                  </button>
-                </>
-              )
-            )}
-          </div>
-        </div>
-
         <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
           <div className="flex items-center gap-3 mb-4 ff-fade-up" style={{ animationDelay: "0.05s" }}>
             <div className="w-11 h-11 bg-white border border-black/10 rounded-xl flex items-center justify-center shrink-0">

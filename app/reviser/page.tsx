@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Logo, Wordmark } from "@/components/Logo";
+import { AppNav } from "@/components/AppNav";
 import { FlashcardStudy } from "@/components/FlashcardStudy";
 import { recordReviewResults, getProgress, type Progress } from "@/lib/reviews";
 import { trackEvent } from "@/lib/tracking";
@@ -100,13 +100,10 @@ export default function Reviser() {
   };
 
   return (
+    <>
+    <AppNav />
     <main className="min-h-screen bg-white text-black px-4 py-10">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 mb-2 ff-fade">
-          <Logo size={22} />
-          <Wordmark className="text-sm" />
-        </div>
-
         <div className="flex items-center justify-between mb-6 mt-4 ff-fade-up">
           <h1 className="text-xl font-semibold">Réviser</h1>
           <Link href="/mes-fiches" className="text-sm text-black/60 hover:text-black transition ff-link-underline">
@@ -186,5 +183,6 @@ export default function Reviser() {
         <FlashcardStudy cards={cards} onClose={() => setStudying(false)} onComplete={handleComplete} />
       )}
     </main>
+    </>
   );
 }

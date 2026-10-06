@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Logo, Wordmark } from "@/components/Logo";
+import { AppNav } from "@/components/AppNav";
 import { countDueCards } from "@/lib/reviews";
 
 type FicheRow = {
@@ -176,16 +175,10 @@ export default function MesFiches() {
   const noneCount = fiches.filter((f) => !f.folder_id).length;
 
   return (
+    <>
+    <AppNav />
     <main className="min-h-screen bg-white text-black px-4 py-10">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 mb-2 ff-fade">
-          <Logo size={22} />
-          <Wordmark className="text-sm" />
-          <Link href="/apprendre" className="ml-auto text-sm text-black/60 hover:text-black transition ff-link-underline">
-            Apprendre
-          </Link>
-        </div>
-
         <div className="flex items-center justify-between mb-4 mt-4 ff-fade-up">
           <h1 className="text-xl font-semibold">Mes fiches</h1>
           <button onClick={() => router.push("/generer")} className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn">
@@ -446,5 +439,6 @@ export default function MesFiches() {
         document.body
       )}
     </main>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isProUser } from "@/lib/usage";
 import { bumpApprendreUsage, getApprendreQuota } from "@/lib/apprendre-quota";
 import { searchArticles, type WikiArticle } from "@/lib/wikipedia";
+import { searchTrustedWeb } from "@/lib/websearch";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -55,7 +56,7 @@ async function buildQueries(openai: OpenAI, question: string): Promise<string[]>
 // Étape 2 : l'IA résume UNIQUEMENT à partir des extraits fournis, avec leurs numéros.
 function buildAnswerPrompt(articles: WikiArticle[]) {
   const sources = articles
-    .map((a, i) => `<source id="${i + 1}" titre="${a.title.replace(/"/g, "'")}">\n${a.text}\n</source>`)
+    .map((a, i) => `<source id="${i + 1}" site="${a.site}" titre="${a.title.replace(/"/g, "'")}">\n${a.text}\n</source>`)
     .join("\n\n");
 
   return `Tu es un assistant de culture scientifique pour des gens curieux. Tu réponds en français simple et précis.
@@ -136,7 +137,12 @@ export async function POST(req: Request) {
   let articles: WikiArticle[];
   try {
     const queries = await buildQueries(openai, question);
-    articles = await searchArticles(queries);
+    // Wikipédia + une liste de sites fiables, en même temps. Si le web échoue, Wikipédia suffit.
+    const [wiki, web] = await Promise.all([
+      searchArticles(queries, 3),
+      searchTrustedWeb(queries[0]).catch(() => [] as WikiArticle[]),
+    ]);
+    articles = [...wiki, ...web];
   } catch {
     return fail("Impossible de joindre les sources pour le moment. Réessaie.", 502);
   }
@@ -179,7 +185,7 @@ export async function POST(req: Request) {
 
   const sources = cited.map((oldId) => {
     const a = articles[oldId - 1];
-    return { id: renumber.get(oldId)!, title: a.title, url: a.url };
+    return { id: renumber.get(oldId)!, title: a.title, url: a.url, site: a.site };
   });
 
   const images = cited
@@ -191,6 +197,7 @@ export async function POST(req: Request) {
       width: article.image!.width,
       height: article.image!.height,
       alt: article.title,
+      site: article.site,
       sourceId: id,
     }));
 

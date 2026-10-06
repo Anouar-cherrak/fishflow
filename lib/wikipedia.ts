@@ -8,6 +8,7 @@ const MAX_CHARS = 3000;
 
 export type WikiArticle = {
   pageId: number;
+  site: string;
   title: string;
   url: string;
   text: string;
@@ -66,6 +67,7 @@ async function searchOnce(query: string, limit: number): Promise<WikiArticle[]> 
       return [
         {
           pageId: page.pageid,
+          site: "Wikipédia",
           title: page.title,
           url: page.fullurl,
           text,

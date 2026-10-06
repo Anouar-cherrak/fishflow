@@ -7,8 +7,8 @@ import { AppNav } from "@/components/AppNav";
 import { Orb } from "@/components/Orb";
 import { trackEvent } from "@/lib/tracking";
 
-type Source = { id: number; title: string; url: string };
-type ImageItem = { src: string; width: number; height: number; alt: string; sourceId: number };
+type Source = { id: number; title: string; url: string; site: string };
+type ImageItem = { src: string; width: number; height: number; alt: string; site: string; sourceId: number };
 type Answer = {
   title: string;
   summary: string;
@@ -208,7 +208,7 @@ export default function Apprendre() {
                           className="w-full h-40 min-[480px]:h-28 object-cover"
                         />
                         <figcaption className="px-2 py-1.5 text-xs text-black/50">
-                          {image.alt} · Wikipédia [{image.sourceId}]
+                          {image.alt} · {image.site} [{image.sourceId}]
                         </figcaption>
                       </figure>
                     </li>
@@ -252,7 +252,7 @@ export default function Apprendre() {
                       rel="noopener noreferrer"
                       className="text-black underline underline-offset-2 hover:text-[#16A34A]"
                     >
-                      {source.title} — Wikipédia
+                      {source.title} — {source.site}
                     </a>
                   </li>
                 ))}
