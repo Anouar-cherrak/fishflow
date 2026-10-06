@@ -192,7 +192,7 @@ export default function Apprendre() {
               </p>
 
               {answer.images.length > 0 && (
-                <ul className="grid grid-cols-2 min-[640px]:grid-cols-4 gap-3 mb-8">
+                <ul className="grid grid-cols-2 min-[640px]:grid-cols-3 gap-3 mb-8">
                   {answer.images.map((image, i) => (
                     <li
                       key={image.src}

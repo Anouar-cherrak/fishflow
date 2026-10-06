@@ -5,7 +5,7 @@ import { isProUser } from "@/lib/usage";
 import { bumpApprendreUsage, getApprendreQuota } from "@/lib/apprendre-quota";
 import { searchArticles, type WikiArticle } from "@/lib/wikipedia";
 import { searchTrustedWeb } from "@/lib/websearch";
-import { searchCommonsImages, type CommonsImage } from "@/lib/commons";
+import { imagesFromArticle, type CommonsImage } from "@/lib/commons";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -143,17 +143,14 @@ export async function POST(req: Request) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let articles: WikiArticle[];
-  let commonsImages: CommonsImage[] = [];
   try {
     const queries = await buildQueries(openai, question);
     // Wikipédia + une liste de sites fiables, en même temps. Si le web échoue, Wikipédia suffit.
-    const [wiki, web, pictures] = await Promise.all([
+    const [wiki, web] = await Promise.all([
       searchArticles(queries, 3),
       searchTrustedWeb(queries[0]).catch(() => [] as WikiArticle[]),
-      searchCommonsImages(queries[0], 4).catch(() => [] as CommonsImage[]),
     ]);
     articles = [...wiki, ...web];
-    commonsImages = pictures;
   } catch {
     return fail("Impossible de joindre les sources pour le moment. Réessaie.", 502);
   }
@@ -203,24 +200,31 @@ export async function POST(req: Request) {
     return { id: renumber.get(oldId)!, title: a.title, url: a.url, site: a.site };
   });
 
-  // Images libres : d'abord celles de Wikimedia Commons (avec auteur et licence),
-  // sinon l'image principale des articles Wikipédia cités.
-  const images: { src: string; width: number; height: number; alt: string; credit: string; license: string; pageUrl: string }[] =
-    commonsImages.map((img) => ({ ...img }));
-  if (images.length < 2) {
-    for (const oldId of cited) {
-      const a = articles[oldId - 1];
-      if (a.image && a.site === "Wikipédia" && !images.some((i) => i.src === a.image!.src)) {
-        images.push({
-          src: a.image.src,
-          width: a.image.width,
-          height: a.image.height,
-          alt: a.title,
-          credit: "Wikipédia",
-          license: "Licence libre",
-          pageUrl: a.url,
-        });
-      }
+  // Images libres : uniquement celles des articles Wikipédia réellement cités, choisies par leurs auteurs.
+  // On n'en met pas « pour en mettre » : s'il n'y en a pas de bonne, on n'en affiche aucune.
+  const citedWiki = cited.map((oldId) => articles[oldId - 1]).filter((a) => a.site === "Wikipédia").slice(0, 2);
+  const images: CommonsImage[] = [];
+
+  // L'image principale de l'article d'abord (la plus représentative)...
+  for (const a of citedWiki) {
+    if (a.image && !images.some((i) => i.src === a.image!.src)) {
+      images.push({
+        src: a.image.src,
+        width: a.image.width,
+        height: a.image.height,
+        alt: a.title,
+        credit: "Wikipédia",
+        license: "Licence libre",
+        pageUrl: a.url,
+      });
+    }
+  }
+  // ... puis des images de l'article avec auteur et licence, s'il en reste de la place.
+  if (images.length < 3 && citedWiki[0]) {
+    const extra = await imagesFromArticle(citedWiki[0].title, 3).catch(() => [] as CommonsImage[]);
+    for (const img of extra) {
+      if (images.length >= 3) break;
+      if (!images.some((i) => i.src === img.src)) images.push(img);
     }
   }
 
@@ -230,6 +234,6 @@ export async function POST(req: Request) {
     summary: answer.summary,
     points: answer.points.map((p) => ({ text: p.text, sources: p.sources.map((s) => renumber.get(s)!) })),
     sources,
-    images: images.slice(0, 4),
+    images: images.slice(0, 3),
   });
 }
