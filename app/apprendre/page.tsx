@@ -35,6 +35,7 @@ export default function Apprendre() {
   const [asked, setAsked] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "empty" | "error" | "pro">("idle");
   const [message, setMessage] = useState("");
+  const [reason, setReason] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [shift, setShift] = useState(0);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -89,6 +90,7 @@ export default function Apprendre() {
         return;
       }
       if (!data.found) {
+        setReason(typeof data.reason === "string" ? data.reason : "");
         setStatus("empty");
         return;
       }
@@ -156,6 +158,7 @@ export default function Apprendre() {
               <p className="text-sm text-black/60">
                 Plutôt que d&apos;inventer, je préfère ne rien dire. Essaie avec d&apos;autres mots ou une question plus précise.
               </p>
+              {reason && <p className="text-xs text-black/30 mt-3">code : {reason}</p>}
             </div>
           )}
 

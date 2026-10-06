@@ -99,8 +99,10 @@ function normalizeAnswer(raw: unknown, sourceCount: number): Answer | null {
   for (const item of Array.isArray(obj.points) ? obj.points : []) {
     const point = (item ?? {}) as Record<string, unknown>;
     const text = asText(point.text);
+    // L'IA renvoie parfois "1" ou "[1]" au lieu de 1 : on accepte ces formes.
     const ids = (Array.isArray(point.sources) ? point.sources : [])
-      .filter((n): n is number => Number.isInteger(n) && n >= 1 && n <= sourceCount);
+      .map((n) => (typeof n === "number" ? n : parseInt(String(n).replace(/\D/g, ""), 10)))
+      .filter((n) => Number.isInteger(n) && n >= 1 && n <= sourceCount);
     // Un point sans source valide n'est pas affiché : on ne montre rien d'invérifiable.
     if (text && ids.length > 0) points.push({ text, sources: Array.from(new Set(ids)) });
   }
@@ -148,7 +150,8 @@ export async function POST(req: Request) {
   }
 
   if (articles.length === 0) {
-    return NextResponse.json({ found: false });
+    console.warn("[apprendre] aucune source trouvée pour :", question);
+    return NextResponse.json({ found: false, reason: "no_articles" });
   }
 
   let answer: Answer | null = null;
@@ -174,7 +177,10 @@ export async function POST(req: Request) {
     return fail("L'IA n'a pas répondu. Réessaie.", 502);
   }
 
-  if (!answer) return NextResponse.json({ found: false });
+  if (!answer) {
+    console.warn("[apprendre] réponse IA inutilisable ou « non répondable » pour :", question, `(${articles.length} sources)`);
+    return NextResponse.json({ found: false, reason: "no_answer" });
+  }
 
   // On ne facture l'usage qu'à une réponse réussie.
   await bumpApprendreUsage(user.id, quota.key);
