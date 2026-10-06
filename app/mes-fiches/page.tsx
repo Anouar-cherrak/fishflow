@@ -5,11 +5,11 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { countDueCards } from "@/lib/reviews";
 
 type FicheRow = {
   id: string;
   title: string;
-  data: any;
   created_at: string;
   folder_id: string | null;
   best_score: number | null;
@@ -44,7 +44,12 @@ export default function MesFiches() {
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderColor, setNewFolderColor] = useState(PASTEL_COLORS[0].value);
   const [movingFicheId, setMovingFicheId] = useState<string | null>(null);
+  const [dueCount, setDueCount] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    countDueCards().then(setDueCount);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -56,7 +61,11 @@ export default function MesFiches() {
       }
 
       const [fichesRes, foldersRes] = await Promise.all([
-        supabase.from("fiches").select("*").order("created_at", { ascending: false }),
+        // On ne charge que l'en-tête de chaque fiche ; le contenu complet est chargé à l'ouverture.
+        supabase
+          .from("fiches")
+          .select("id, title, created_at, folder_id, best_score")
+          .order("created_at", { ascending: false }),
         supabase.from("folders").select("*").order("created_at", { ascending: true }),
       ]);
 
@@ -68,11 +77,7 @@ export default function MesFiches() {
   }, [router]);
 
   const handleView = (fiche: FicheRow) => {
-    localStorage.setItem(
-      "fishflow_result",
-      JSON.stringify({ ...fiche.data, id: fiche.id, best_score: fiche.best_score })
-    );
-    router.push("/result");
+    router.push(`/fiche/${fiche.id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -183,6 +188,20 @@ export default function MesFiches() {
             Nouvelle fiche
           </button>
         </div>
+
+        {dueCount > 0 && (
+          <div className="mb-4 bg-surface border border-black/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3 ff-fade-up">
+            <p className="text-sm text-black">
+              <span className="font-semibold">{dueCount}</span> carte{dueCount > 1 ? "s" : ""} à réviser aujourd'hui
+            </p>
+            <button
+              onClick={() => router.push("/reviser")}
+              className="text-sm bg-[#22C55E] text-[#ffffff] px-3 py-1.5 rounded-full font-medium hover:bg-[#16A34A] transition ff-btn shrink-0"
+            >
+              Réviser
+            </button>
+          </div>
+        )}
 
         {fiches.length > 0 && (
           <div className="flex gap-3 mb-6 ff-fade-up" style={{ animationDelay: "0.05s" }}>

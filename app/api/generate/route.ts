@@ -33,11 +33,90 @@ const OUTPUT_SCHEMAS: Record<string, string> = {
   quiz: `"quiz": array d'objets {question, options (array de 4 strings), correctIndex (index numérique 0 à 3 de la bonne réponse dans options)}`,
 };
 
-function buildSystemPrompt(outputs: string[], difficulty: string, length: string, pro: boolean) {
+type Flashcard = { question: string; answer: string };
+type QuizQuestion = { question: string; options: string[]; correctIndex: number };
+
+function asText(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function asArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+// Vérifie et nettoie la réponse de l'IA avant de l'envoyer au navigateur.
+// Renvoie null si une sortie demandée est vide ou inutilisable.
+function normalizeResult(raw: Record<string, unknown> | null, outputs: string[]) {
+  if (!raw || typeof raw !== "object") return null;
+  const out: Record<string, unknown> = {};
+
+  if (outputs.includes("summary")) {
+    const summary = Array.isArray(raw.summary)
+      ? asArray(raw.summary).map(asText).filter(Boolean).join(" ")
+      : asText(raw.summary);
+    if (!summary) return null;
+    out.summary = summary;
+  }
+
+  if (outputs.includes("sheet")) {
+    const sheet = asArray(raw.sheet).map(asText).filter(Boolean);
+    if (sheet.length === 0) return null;
+    out.sheet = sheet;
+  }
+
+  if (outputs.includes("flashcards")) {
+    const flashcards: Flashcard[] = [];
+    for (const item of asArray(raw.flashcards)) {
+      const card = (item ?? {}) as Record<string, unknown>;
+      const question = asText(card.question);
+      const answer = asText(card.answer);
+      if (question && answer) flashcards.push({ question, answer });
+    }
+    if (flashcards.length === 0) return null;
+    out.flashcards = flashcards;
+  }
+
+  if (outputs.includes("quiz")) {
+    const quiz: QuizQuestion[] = [];
+    for (const item of asArray(raw.quiz)) {
+      const entry = (item ?? {}) as Record<string, unknown>;
+      const question = asText(entry.question);
+      const options = asArray(entry.options).map(asText).filter(Boolean);
+      const correctIndex = Number(entry.correctIndex);
+      if (
+        question &&
+        options.length >= 2 &&
+        Number.isInteger(correctIndex) &&
+        correctIndex >= 0 &&
+        correctIndex < options.length
+      ) {
+        quiz.push({ question, options, correctIndex });
+      }
+    }
+    if (quiz.length === 0) return null;
+    out.quiz = quiz;
+  }
+
+  return out;
+}
+
+function buildSystemPrompt(
+  outputs: string[],
+  difficulty: string,
+  length: string,
+  pro: boolean,
+  transcribe: boolean
+) {
   const schemaLines = outputs
     .filter((o) => OUTPUT_SCHEMAS[o])
     .map((o) => OUTPUT_SCHEMAS[o])
     .join(", ");
+
+  // Pour un texte ou un PDF, c'est le serveur qui garde le texte du cours.
+  // On ne demande à l'IA de le recopier que pour une photo (il faut le lire sur l'image).
+  const keysLine = transcribe
+    ? `"sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}`
+    : schemaLines;
 
   const quizBoost =
     pro && outputs.includes("quiz")
@@ -51,7 +130,7 @@ Le contenu que tu reçois peut provenir de sources variées : texte brut, PDF de
 Ta mission : identifie les concepts réellement importants — pas juste ce qui est écrit en gros, mais ce qui structure le cours (définitions, mécanismes, exemples clés, relations de cause à effet, chiffres et dates importants). Ignore le bruit (numéros de page, en-têtes/pieds de page répétitifs, mentions de copyright, éléments purement décoratifs). Si le document est long ou combine plusieurs sources, synthétise l'ensemble plutôt que de te concentrer uniquement sur le début.
 
 À partir de ce contenu, génère un JSON avec exactement ces clés :
-"sourceText": string (le texte original que tu as lu ou transcrit, tel quel, sans le reformuler), ${schemaLines}.
+${keysLine}.
 
 Règles strictes de qualité :
 - N'invente jamais un fait, un chiffre ou une définition qui n'apparaît pas dans le contenu fourni.
@@ -131,10 +210,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length, pro);
+  const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length, pro, mode === "photo");
 
   let messages: any[];
   let wasTruncated = false;
+  let sourceText: string | undefined;
 
   try {
     if (mode === "text") {
@@ -147,6 +227,7 @@ export async function POST(req: Request) {
       }
       wasTruncated = text.length > MAX_CHARS;
       const limitedText = text.slice(0, MAX_CHARS);
+      sourceText = limitedText;
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: `Contenu du cours :\n"""\n${limitedText}\n"""` },
@@ -203,6 +284,7 @@ export async function POST(req: Request) {
         );
       }
 
+      sourceText = limitedText;
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: `Contenu du cours (extrait d'un ou plusieurs PDF) :\n"""\n${limitedText}\n"""` },
@@ -256,17 +338,38 @@ export async function POST(req: Request) {
       TIMEOUT_MS
     );
 
-    const rawContent = completion.choices[0].message.content || "{}";
+    const choice = completion.choices[0];
 
-    let result;
+    if (choice.finish_reason === "length") {
+      return NextResponse.json(
+        { error: "La réponse de l'IA a été coupée car le contenu est trop riche. Choisis une longueur plus courte ou moins de sorties, puis réessaie." },
+        { status: 502 }
+      );
+    }
+
+    const rawContent = choice.message.content || "{}";
+
+    let parsed: Record<string, unknown> | null = null;
     try {
-      result = JSON.parse(rawContent);
+      parsed = JSON.parse(rawContent);
     } catch {
       return NextResponse.json(
         { error: "L'IA a renvoyé une réponse invalide. Réessaie." },
         { status: 502 }
       );
     }
+
+    const result = normalizeResult(parsed, outputs);
+    if (!result) {
+      return NextResponse.json(
+        { error: "L'IA a renvoyé une réponse incomplète. Réessaie." },
+        { status: 502 }
+      );
+    }
+
+    // Le texte du cours vient du serveur (texte/PDF) ou de la transcription de la photo.
+    const finalSourceText = sourceText ?? asText(parsed?.sourceText);
+    if (finalSourceText) result.sourceText = finalSourceText;
 
     if (!pro) {
       await incrementUsage(user.id);
