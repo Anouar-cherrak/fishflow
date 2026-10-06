@@ -7,6 +7,18 @@ import { Logo, Wordmark } from "@/components/Logo";
 import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
 
+// Même contenu que le tableau de la page d'accueil : ce qui est gratuit, ce qui est Pro.
+const ROWS: { label: string; free: string; pro: string }[] = [
+  { label: "Fiches générées", free: "3 par mois", pro: "Illimitées" },
+  { label: "Résumé, fiche, flashcards", free: "Oui", pro: "Oui" },
+  { label: "Quiz", free: "À lire, avec les bonnes réponses", pro: "À jouer, 12 questions, meilleur score" },
+  { label: "Réviser avec rappels", free: "Oui", pro: "Oui" },
+  { label: "Apprendre (questions avec sources)", free: "1 essai", pro: "20 questions par jour" },
+  { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },
+  { label: "Résumé lu à voix haute", free: "Non", pro: "Oui" },
+  { label: "Historique de fiches", free: "5 fiches", pro: "Illimité" },
+];
+
 export default function Pricing() {
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -74,40 +86,61 @@ export default function Pricing() {
   }
 
   return (
-    <AppShell size="form">
-      <div className="w-full max-w-sm mx-auto bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <Logo size={24} />
-          <Wordmark />
+    <AppShell size="wide">
+      <div className="mb-8 ff-fade-up">
+        <h1 className="ff-title mb-2">Gratuit ou Pro.</h1>
+        <p className="ff-lead">Ce que tu as vraiment dans chaque formule. Tu peux arrêter Pro quand tu veux.</p>
+      </div>
+
+      <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[380px_minmax(0,1fr)] items-start">
+        <div className="bg-white border border-[#22C55E]/60 rounded-3xl p-8 text-center ff-fade-up ff-card lg:sticky lg:top-24">
+          <div className="flex items-center justify-center gap-2 mb-5">
+            <Logo size={24} />
+            <Wordmark />
+          </div>
+
+          <h2 className="text-xl font-semibold mb-1">FishFlow Pro</h2>
+          <p className="text-black/60 text-sm mb-5">Génération illimitée de fiches de révision.</p>
+
+          <div className="text-4xl font-extrabold mb-1">4,99 €</div>
+          <p className="text-black/55 text-sm mb-6">par mois, résiliable à tout moment</p>
+
+          <button
+            onClick={handleUpgrade}
+            disabled={loading}
+            className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
+          >
+            {loading ? "Redirection..." : "Passer Pro"}
+          </button>
+
+          <button onClick={() => router.push("/generer")} className="w-full mt-3 text-sm text-black/55 hover:text-black hover:underline transition ff-link-underline min-h-[44px]">
+            Retour
+          </button>
         </div>
 
-        <h1 className="text-xl font-semibold mb-1">FishFlow Pro</h1>
-        <p className="text-black/50 text-sm mb-6">Génération illimitée de fiches de révision.</p>
-
-        <div className="text-3xl font-bold mb-1">4,99 €</div>
-        <p className="text-black/40 text-sm mb-6">par mois, résiliable à tout moment</p>
-
-        <ul className="text-left text-sm text-black/70 space-y-2 mb-6">
-          <li>✓ Fiches illimitées</li>
-          <li>✓ Documents volumineux</li>
-          <li>✓ Plusieurs PDF fusionnés en une fiche</li>
-          <li>✓ Quiz interactif, 12 questions</li>
-          <li>✓ Suivi de progression par fiche</li>
-          <li>✓ Résumé lu à voix haute</li>
-          <li>✓ Historique illimité</li>
-        </ul>
-
-        <button
-          onClick={handleUpgrade}
-          disabled={loading}
-          className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
-        >
-          {loading ? "Redirection..." : "Passer Pro"}
-        </button>
-
-        <button onClick={() => router.push("/generer")} className="w-full mt-3 text-sm text-black/40 hover:text-black hover:underline transition ff-link-underline">
-          Retour
-        </button>
+        <div className="ff-fade-up min-w-0">
+          <div className="overflow-x-auto rounded-3xl border border-black/10 bg-surface" tabIndex={0} role="region" aria-label="Comparaison Gratuit et Pro">
+            <table className="w-full text-sm text-left min-w-[560px]">
+              <thead>
+                <tr className="border-b border-black/10">
+                  <th scope="col" className="p-4"><span className="sr-only">Fonctionnalité</span></th>
+                  <th scope="col" className="p-4 font-semibold">Gratuit</th>
+                  <th scope="col" className="p-4 font-semibold"><span className="border-b-2 border-[#22C55E] pb-0.5">Pro</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {ROWS.map((row) => (
+                  <tr key={row.label} className="border-b border-black/10 last:border-0 align-top">
+                    <th scope="row" className="p-4 font-medium">{row.label}</th>
+                    <td className="p-4 text-black/65">{row.free}</td>
+                    <td className="p-4">{row.pro}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-black/50 mt-4">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
+        </div>
       </div>
     </AppShell>
   );

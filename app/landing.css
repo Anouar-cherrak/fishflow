@@ -10,8 +10,8 @@
   position: relative; isolation: isolate; min-height: 100vh;
 }
 .lp[data-theme="light"] {
-  --bg: #FFFFFF; --paper: #F4F4F5; --ink: #0A0A0A; --muted: #525252;
-  --line: rgba(10, 10, 10, 0.16); --hot: #15803D; --on-hot: #FFFFFF;
+  --bg: #ECEAE5; --paper: #F8F7F4; --ink: #0A0A0A; --muted: #4A4A47;
+  --line: rgba(10, 10, 10, 0.18); --hot: #15803D; --on-hot: #FFFFFF;
   --shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.25);
   color-scheme: light;
 }

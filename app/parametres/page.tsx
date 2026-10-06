@@ -140,6 +140,13 @@ export default function Parametres() {
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
             <p className="text-sm font-semibold text-black/55 mb-3">Apparence</p>
             <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("ff-open-tuto"))}
+              className="mt-4 text-sm font-semibold underline underline-offset-4 min-h-[44px]"
+            >
+              Revoir le tutoriel
+            </button>
           </div>
 
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">

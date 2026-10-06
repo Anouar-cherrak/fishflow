@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { SilverOrb } from "@/components/SilverOrb";
@@ -19,8 +19,6 @@ type Answer = {
 
 const MAX_QUESTION = 300;
 const EXAMPLES = ["Comment fonctionne un trou noir", "Pourquoi le ciel est bleu", "Histoire du café"];
-// Les images « sortent » de la boule vers la gauche, le centre, puis la droite.
-const FLY_FROM = ["-60px", "-20px", "20px", "60px"];
 
 // Une couleur différente par question : même question = même couleur.
 function hueFromText(text: string): number {
@@ -40,6 +38,25 @@ export default function Apprendre() {
   const [shift, setShift] = useState(0);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Les images partent du centre de la boule et volent jusqu'à leur place.
+  const imagesRef = useRef<HTMLUListElement>(null);
+  useLayoutEffect(() => {
+    const list = imagesRef.current;
+    if (!list || status !== "done") return;
+    const slot = document.querySelector<HTMLElement>(".ff-silver-slot, .ff-orb");
+    const from = slot?.getBoundingClientRect();
+    list.querySelectorAll<HTMLElement>("li.ff-fly").forEach((li, i) => {
+      if (from) {
+        const to = li.getBoundingClientRect();
+        li.style.setProperty("--fx", `${from.left + from.width / 2 - (to.left + to.width / 2)}px`);
+        li.style.setProperty("--fy", `${from.top + from.height / 2 - (to.top + to.height / 2)}px`);
+      }
+      li.style.setProperty("--fr", `${(i - 1) * 14}deg`);
+      li.style.animationDelay = `${0.2 + i * 0.18}s`;
+      li.classList.add("ff-fly-go");
+    });
+  }, [status, answer]);
 
   // On annule la requête en cours si on quitte la page.
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -190,12 +207,11 @@ export default function Apprendre() {
               </p>
 
               {answer.images.length > 0 && (
-                <ul className="grid grid-cols-2 min-[640px]:grid-cols-3 gap-3 mb-8">
-                  {answer.images.map((image, i) => (
+                <ul ref={imagesRef} className="grid grid-cols-2 min-[640px]:grid-cols-3 gap-3 mb-8">
+                  {answer.images.map((image) => (
                     <li
                       key={image.src}
                       className="ff-fly"
-                      style={{ "--fx": FLY_FROM[i % FLY_FROM.length], animationDelay: `${0.15 + i * 0.15}s` } as React.CSSProperties}
                     >
                       <figure className="rounded-xl overflow-hidden border border-black/10 bg-surface h-full">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -222,6 +238,12 @@ export default function Apprendre() {
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {answer.images.length === 0 && (
+                <p className="text-sm text-black/50 mb-8 border border-dashed border-black/15 rounded-xl px-4 py-3">
+                  Pas d&apos;image libre de droits pour ce sujet. Les sources ci-dessous restent à ta disposition.
+                </p>
               )}
 
               <h2 className="text-sm font-semibold uppercase tracking-wide text-black/40 mb-3">À retenir</h2>

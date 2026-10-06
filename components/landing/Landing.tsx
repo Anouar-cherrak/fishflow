@@ -151,8 +151,8 @@ export function Landing() {
   /* Thème : sombre par défaut, le choix est retenu sur cet appareil. */
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("ff-lp-theme");
-      if (saved === "light" || saved === "dark") queueMicrotask(() => setTheme(saved));
+      // Même choix que sur tout le site : « light » seulement si la personne l'a demandé.
+      if (localStorage.getItem("ff-theme") === "light") queueMicrotask(() => setTheme("light"));
     } catch {}
   }, []);
   useEffect(() => {
@@ -162,7 +162,8 @@ export function Landing() {
     const next: Theme = theme === "dark" ? "light" : "dark";
     setTheme(next);
     try {
-      localStorage.setItem("ff-lp-theme", next);
+      localStorage.setItem("ff-theme", next);
+      document.documentElement.classList.toggle("dark", next === "dark");
     } catch {}
   };
 

@@ -9,11 +9,11 @@
 :root {
   --font-body: 'Inter', sans-serif;
   --font-display: var(--font-body);
-  --ff-bg: #ffffff;
+  --ff-bg: #eceae5;
   --ff-fg: #0a0a0a;
-  --ff-surface: #f4f4f5;
-  --ff-back: #e9e9ec;
-  --ff-line: rgba(10, 10, 10, 0.14);
+  --ff-surface: #f8f7f4;
+  --ff-back: #dfddd7;
+  --ff-line: rgba(10, 10, 10, 0.17);
   --ff-accent: #22c55e;
   --ff-on-accent: #04130a;
 }
@@ -247,12 +247,15 @@ body {
 }
 /* Les images « sortent » de la boule, depuis le haut, vers leur place. */
 @keyframes ffFly {
-  from { opacity: 0; transform: translate3d(var(--fx, 0), -70px, 0) scale(0.45); }
+  from { opacity: 0; transform: translate3d(var(--fx, 0px), var(--fy, -70px), 0) scale(0.2) rotate(var(--fr, 0deg)); }
+  25% { opacity: 1; }
   to { opacity: 1; transform: none; }
 }
-.ff-fly {
-  opacity: 0;
-  animation: ffFly 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.ff-fly { opacity: 0; }
+.ff-fly.ff-fly-go {
+  animation: ffFly 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
+  z-index: 2;
 }
 
 /* Pour les personnes qui demandent moins de mouvement : tout reste lisible, rien ne bouge. */
@@ -494,3 +497,39 @@ body {
 .ff-silver-slot { width: min(68vw, 300px); aspect-ratio: 1; margin-inline: auto; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .ff-silver-slot[data-compact="true"] { width: 112px; }
 @media (min-width: 1024px) { .ff-silver-slot { width: 340px; } .ff-silver-slot[data-compact="true"] { width: 128px; } }
+
+/* Tutoriel de bienvenue */
+.ff-tuto-back { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; }
+.ff-tuto { width: 100%; max-width: 460px; max-height: calc(100dvh - 32px); overflow-y: auto; background: var(--ff-surface); color: var(--ff-fg); border: 1px solid var(--ff-line); border-radius: 28px; padding: 18px 22px 24px; box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.6); }
+.ff-tuto-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--ff-line); transition: width 0.3s, background 0.3s; }
+.ff-tuto-dot[data-on="true"] { width: 22px; background: var(--ff-accent); }
+.ff-tuto-art { height: 150px; border-radius: 20px; background: var(--ff-bg); border: 1px solid var(--ff-line); margin-bottom: 20px; position: relative; overflow: hidden; display: grid; place-items: center; }
+/* 1. un cours qui se transforme */
+.ff-tuto-doc { grid-template-columns: 1fr; align-content: center; gap: 8px; padding: 0 28px; }
+.ff-tuto-doc span { height: 8px; border-radius: 4px; background: var(--ff-line); transform-origin: left; animation: ffTutoLine 2.8s ease-in-out infinite; }
+.ff-tuto-doc span:nth-child(2) { width: 85%; animation-delay: 0.15s; } .ff-tuto-doc span:nth-child(3) { width: 92%; animation-delay: 0.3s; } .ff-tuto-doc span:nth-child(4) { width: 60%; animation-delay: 0.45s; }
+.ff-tuto-doc i { position: absolute; left: 0; right: 0; height: 3px; background: var(--ff-accent); box-shadow: 0 0 18px var(--ff-accent); animation: ffTutoScan 2.8s ease-in-out infinite; }
+@keyframes ffTutoScan { 0% { top: 12%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { top: 88%; opacity: 0; } }
+@keyframes ffTutoLine { 0%, 30% { background: var(--ff-line); } 60%, 100% { background: var(--ff-accent); } }
+/* 2. quatre outils */
+.ff-tuto-pack { grid-template-columns: 1fr 1fr; gap: 10px; padding: 18px; align-content: center; }
+.ff-tuto-pack b { font-size: 13px; font-weight: 600; text-align: center; padding: 14px 6px; border-radius: 14px; border: 1px solid var(--ff-line); background: var(--ff-surface); animation: ffTutoPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.ff-tuto-pack b:nth-child(2) { animation-delay: 0.12s; } .ff-tuto-pack b:nth-child(3) { animation-delay: 0.24s; } .ff-tuto-pack b:nth-child(4) { animation-delay: 0.36s; }
+@keyframes ffTutoPop { from { opacity: 0; transform: scale(0.6) translateY(10px); } }
+/* 3. cinq boîtes */
+.ff-tuto-boxes { grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 0 20px; align-items: end; }
+.ff-tuto-boxes span { display: grid; place-items: end center; border: 1px solid var(--ff-line); border-radius: 10px; font-size: 12px; padding-bottom: 6px; color: color-mix(in srgb, var(--ff-fg) 55%, transparent); }
+.ff-tuto-boxes span:nth-child(1) { height: 40px; } .ff-tuto-boxes span:nth-child(2) { height: 60px; } .ff-tuto-boxes span:nth-child(3) { height: 80px; } .ff-tuto-boxes span:nth-child(4) { height: 100px; } .ff-tuto-boxes span:nth-child(5) { height: 120px; }
+.ff-tuto-boxes i { position: absolute; width: 26px; height: 18px; border-radius: 5px; background: var(--ff-accent); left: 24px; bottom: 56px; animation: ffTutoHop 3.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+@keyframes ffTutoHop { 0%, 8% { transform: translate(0, 0); } 25% { transform: translate(52px, -20px); } 42% { transform: translate(104px, -40px); } 60% { transform: translate(156px, -60px); } 78%, 100% { transform: translate(208px, -80px); } }
+/* 4. la boule et les images */
+.ff-tuto-orb u { width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fff 0, #cfd3d8 18%, #3a3d42 55%, #0b0c0e 100%); box-shadow: 0 0 40px rgba(34, 197, 94, 0.28); }
+.ff-tuto-orb em { position: absolute; width: 38px; height: 50px; border-radius: 8px; background: linear-gradient(135deg, var(--ff-accent), #0e3b1d); opacity: 0; animation: ffTutoSpit 3s ease-out infinite; }
+.ff-tuto-orb em:nth-of-type(1) { --x: -90px; } .ff-tuto-orb em:nth-of-type(2) { --x: 0px; animation-delay: 0.2s; } .ff-tuto-orb em:nth-of-type(3) { --x: 90px; animation-delay: 0.4s; }
+@keyframes ffTutoSpit { 0%, 10% { opacity: 0; transform: translate(0, 0) scale(0.3); } 40% { opacity: 1; } 70%, 100% { opacity: 1; transform: translate(var(--x), 40px) scale(1) rotate(calc(var(--x) / 12)); } }
+@media (prefers-reduced-motion: reduce) {
+  .ff-tuto-art *, .ff-tuto-art { animation: none !important; }
+  .ff-tuto-orb em { opacity: 1; transform: translate(var(--x), 40px); }
+  .ff-tuto-boxes i { transform: translate(104px, -40px); }
+  .ff-tuto-doc i { display: none; }
+}

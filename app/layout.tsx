@@ -1,3 +1,4 @@
+import { Onboarding } from "@/components/Onboarding";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
@@ -51,6 +52,7 @@ export default function RootLayout({
         <RegisterSW />
         <SplashScreen />
         <ThemeSync />
+        <Onboarding />
         {children}
 
         <Script
