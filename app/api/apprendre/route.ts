@@ -5,6 +5,7 @@ import { isProUser } from "@/lib/usage";
 import { bumpApprendreUsage, getApprendreQuota } from "@/lib/apprendre-quota";
 import { searchArticles, type WikiArticle } from "@/lib/wikipedia";
 import { searchTrustedWeb } from "@/lib/websearch";
+import { searchCommonsImages, type CommonsImage } from "@/lib/commons";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -15,6 +16,11 @@ const AI_TIMEOUT_MS = 20000;
 
 function asText(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
+}
+
+// Les signes comme « ? » gênent la recherche : on les enlève avant de chercher.
+function cleanQuery(text: string): string {
+  return text.replace(/[?!¿¡"«»]/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function fail(error: string, status: number, extra: Record<string, unknown> = {}) {
@@ -43,14 +49,14 @@ async function buildQueries(openai: OpenAI, question: string): Promise<string[]>
     );
     const parsed = JSON.parse(completion.choices[0]?.message?.content ?? "{}") as { queries?: unknown };
     const queries = (Array.isArray(parsed.queries) ? parsed.queries : [])
-      .map(asText)
+      .map((q) => cleanQuery(asText(q)))
       .filter((q) => q.length >= 2 && q.length <= 80)
       .slice(0, 2);
     if (queries.length > 0) return queries;
   } catch {
     // On retombe sur la question brute.
   }
-  return [question];
+  return [cleanQuery(question).slice(0, 80) || question];
 }
 
 // Étape 2 : l'IA résume UNIQUEMENT à partir des extraits fournis, avec leurs numéros.
@@ -137,14 +143,17 @@ export async function POST(req: Request) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let articles: WikiArticle[];
+  let commonsImages: CommonsImage[] = [];
   try {
     const queries = await buildQueries(openai, question);
     // Wikipédia + une liste de sites fiables, en même temps. Si le web échoue, Wikipédia suffit.
-    const [wiki, web] = await Promise.all([
+    const [wiki, web, pictures] = await Promise.all([
       searchArticles(queries, 3),
       searchTrustedWeb(queries[0]).catch(() => [] as WikiArticle[]),
+      searchCommonsImages(queries[0], 4).catch(() => [] as CommonsImage[]),
     ]);
     articles = [...wiki, ...web];
+    commonsImages = pictures;
   } catch {
     return fail("Impossible de joindre les sources pour le moment. Réessaie.", 502);
   }
@@ -194,18 +203,26 @@ export async function POST(req: Request) {
     return { id: renumber.get(oldId)!, title: a.title, url: a.url, site: a.site };
   });
 
-  const images = cited
-    .map((oldId) => ({ article: articles[oldId - 1], id: renumber.get(oldId)! }))
-    .filter(({ article }) => article.image)
-    .slice(0, 3)
-    .map(({ article, id }) => ({
-      src: article.image!.src,
-      width: article.image!.width,
-      height: article.image!.height,
-      alt: article.title,
-      site: article.site,
-      sourceId: id,
-    }));
+  // Images libres : d'abord celles de Wikimedia Commons (avec auteur et licence),
+  // sinon l'image principale des articles Wikipédia cités.
+  const images: { src: string; width: number; height: number; alt: string; credit: string; license: string; pageUrl: string }[] =
+    commonsImages.map((img) => ({ ...img }));
+  if (images.length < 2) {
+    for (const oldId of cited) {
+      const a = articles[oldId - 1];
+      if (a.image && a.site === "Wikipédia" && !images.some((i) => i.src === a.image!.src)) {
+        images.push({
+          src: a.image.src,
+          width: a.image.width,
+          height: a.image.height,
+          alt: a.title,
+          credit: "Wikipédia",
+          license: "Licence libre",
+          pageUrl: a.url,
+        });
+      }
+    }
+  }
 
   return NextResponse.json({
     found: true,
@@ -213,6 +230,6 @@ export async function POST(req: Request) {
     summary: answer.summary,
     points: answer.points.map((p) => ({ text: p.text, sources: p.sources.map((s) => renumber.get(s)!) })),
     sources,
-    images,
+    images: images.slice(0, 4),
   });
 }

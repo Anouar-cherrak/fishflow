@@ -8,7 +8,7 @@ import { Orb } from "@/components/Orb";
 import { trackEvent } from "@/lib/tracking";
 
 type Source = { id: number; title: string; url: string; site: string };
-type ImageItem = { src: string; width: number; height: number; alt: string; site: string; sourceId: number };
+type ImageItem = { src: string; width: number; height: number; alt: string; credit: string; license: string; pageUrl: string };
 type Answer = {
   title: string;
   summary: string;
@@ -18,9 +18,9 @@ type Answer = {
 };
 
 const MAX_QUESTION = 300;
-const EXAMPLES = ["Pourquoi le ciel est bleu ?", "Comment fonctionne un trou noir ?", "D'où vient le café ?"];
+const EXAMPLES = ["Comment fonctionne un trou noir", "Pourquoi le ciel est bleu", "Histoire du café"];
 // Les images « sortent » de la boule vers la gauche, le centre, puis la droite.
-const FLY_FROM = ["-60px", "0px", "60px"];
+const FLY_FROM = ["-60px", "-20px", "20px", "60px"];
 
 // Une couleur différente par question : même question = même couleur.
 function hueFromText(text: string): number {
@@ -192,14 +192,14 @@ export default function Apprendre() {
               </p>
 
               {answer.images.length > 0 && (
-                <ul className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-3 mb-8">
+                <ul className="grid grid-cols-2 min-[640px]:grid-cols-4 gap-3 mb-8">
                   {answer.images.map((image, i) => (
                     <li
                       key={image.src}
                       className="ff-fly"
-                      style={{ "--fx": FLY_FROM[i % FLY_FROM.length], animationDelay: `${0.15 + i * 0.18}s` } as React.CSSProperties}
+                      style={{ "--fx": FLY_FROM[i % FLY_FROM.length], animationDelay: `${0.15 + i * 0.15}s` } as React.CSSProperties}
                     >
-                      <figure className="rounded-xl overflow-hidden border border-black/10 bg-surface">
+                      <figure className="rounded-xl overflow-hidden border border-black/10 bg-surface h-full">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={image.src}
@@ -208,10 +208,17 @@ export default function Apprendre() {
                           height={image.height}
                           loading="lazy"
                           decoding="async"
-                          className="w-full h-40 min-[480px]:h-28 object-cover"
+                          className="w-full h-32 object-cover"
                         />
-                        <figcaption className="px-2 py-1.5 text-xs text-black/50">
-                          {image.alt} · {image.site} [{image.sourceId}]
+                        <figcaption className="px-2 py-1.5 text-[11px] leading-snug text-black/50">
+                          <a
+                            href={image.pageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline underline-offset-2 hover:text-black"
+                          >
+                            {image.credit} · {image.license}
+                          </a>
                         </figcaption>
                       </figure>
                     </li>
