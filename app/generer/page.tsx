@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { InstallPWA } from "@/components/InstallPWA";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { trackEvent } from "@/lib/tracking";
+import { track } from "@/lib/track";
 import type { User } from "@supabase/supabase-js";
 
 type Mode = "text" | "pdf" | "photo";
@@ -178,7 +179,23 @@ function GenererContent() {
       }
 
       const title = data.title || data.summary?.slice(0, 40) || data.sheet?.[0]?.slice(0, 40) || "Fiche sans titre";
-      const { data: inserted } = await supabase.from("fiches").insert({ title, data }).select().single();
+      const { data: inserted, error: insertError } = await supabase.from("fiches").insert({ title, data }).select().single();
+
+      // La base refuse une 6e fiche gratuite : on l'explique au lieu de faire comme si tout allait bien.
+      if (insertError && String(insertError.message).includes("FREE_LIMIT")) {
+        setLoading(false);
+        setUpgradeModal({
+          title: "Ton historique est plein",
+          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour un historique illimité.`,
+        });
+        return;
+      }
+
+      // Première fiche de la personne : on compte l'étape (mesure du parcours).
+      if (inserted?.id) {
+        const { count: mine } = await supabase.from("fiches").select("*", { count: "exact", head: true });
+        if (mine === 1) track("first_fiche");
+      }
 
       const dataWithId = { ...data, id: inserted?.id };
       localStorage.setItem("fishflow_result", JSON.stringify(dataWithId));
@@ -247,7 +264,7 @@ function GenererContent() {
 
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-3">Génère ta fiche de révision.</h1>
-        <p className="ff-lead">Colle ton cours, envoie un PDF ou prends-le en photo. Tu reçois un résumé, une fiche, des flashcards et un quiz.</p>
+        <p className="ff-lead">Colle un cours, un article ou tes notes, envoie un PDF ou prends-les en photo. Tu reçois un résumé, une fiche, des flashcards et un quiz.</p>
       </div>
 
       <div className="ff-fade-up" style={{ animationDelay: "0.05s" }}>
@@ -286,7 +303,7 @@ function GenererContent() {
                 id="cours"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Colle ton cours ici..."
+                placeholder="Colle ici un cours, un article, un chapitre ou tes notes..."
                 className="w-full h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent text-base ff-input resize-y"
               />
             </>

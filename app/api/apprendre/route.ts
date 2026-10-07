@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isProUser } from "@/lib/usage";
-import { bumpApprendreUsage, getApprendreQuota } from "@/lib/apprendre-quota";
+import { isProUser, refundUsage, reserveUsage } from "@/lib/usage";
+import { getApprendreQuota } from "@/lib/apprendre-quota";
 import { searchArticles, type WikiArticle } from "@/lib/wikipedia";
 import { imagesFromArticle, type CommonsImage } from "@/lib/commons";
 
@@ -140,13 +140,21 @@ export async function POST(req: Request) {
 
   const pro = await isProUser(user.id);
   const quota = await getApprendreQuota(user.id, pro);
-  if (!quota.allowed) {
-    return pro
+  const quotaError = () =>
+    pro
       ? fail("Tu as atteint la limite du jour. Reviens demain.", 429)
       : fail("Tu as utilisé ton essai gratuit. Passe Pro pour apprendre sans limite.", 403, { code: "pro_required" });
-  }
+  if (!quota.allowed) return quotaError();
 
   if (!process.env.OPENAI_API_KEY) return fail("Service momentanément indisponible.", 503);
+
+  // On réserve l'utilisation avant d'appeler l'IA (impossible de la dépasser en envoyant plusieurs demandes d'un coup),
+  // et on la rend si la réponse n'a pas pu être donnée.
+  if (!(await reserveUsage(user.id, quota.key, quota.limit))) return quotaError();
+  const giveBack = async () => {
+    await refundUsage(user.id, quota.key);
+  };
+
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let answer: Answer | null = null;
@@ -166,20 +174,25 @@ export async function POST(req: Request) {
       { signal: AbortSignal.timeout(AI_TIMEOUT_MS) }
     );
     if (completion.choices[0]?.finish_reason === "length") {
+      await giveBack();
       return fail("La réponse a été coupée. Réessaie avec une question plus précise.", 502);
     }
     answer = normalizeAnswer(JSON.parse(completion.choices[0]?.message?.content ?? "{}"));
   } catch {
+    await giveBack();
     return fail("L'IA n'a pas répondu. Réessaie.", 502);
   }
 
-  if (!answer) return fail("La réponse n'a pas pu être lue. Réessaie.", 502);
+  if (!answer) {
+    await giveBack();
+    return fail("La réponse n'a pas pu être lue. Réessaie.", 502);
+  }
   if (answer.refusal || answer.points.length === 0) {
+    await giveBack();
     return NextResponse.json({ found: false, reason: "refused", message: answer.refusal });
   }
 
-  // On ne facture l'usage qu'à une réponse réussie.
-  await bumpApprendreUsage(user.id, quota.key);
+  // La réponse est prête : l'utilisation réservée plus haut est bien comptée.
 
   // Wikipédia (gratuit) sert seulement à illustrer et à proposer des liens. Si ça échoue, la réponse reste affichée.
   let articles: WikiArticle[] = [];

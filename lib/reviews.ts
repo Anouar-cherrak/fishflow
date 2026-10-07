@@ -54,6 +54,9 @@ export async function recordReviewResults(results: ReviewResult[]): Promise<void
     });
 
     await supabase.from("card_reviews").upsert(rows, { onConflict: "fiche_id,card_index" });
+
+    // Journal des révisions (pour les statistiques et l'objectif du jour). Silencieux si la table n'existe pas encore.
+    await supabase.from("review_log").insert(results.map((r) => ({ correct: r.correct })));
   } catch {
     // On ignore : la révision espacée est un bonus, elle ne doit jamais bloquer l'étude.
   }
@@ -111,5 +114,71 @@ export async function getProgress(): Promise<Progress> {
     return { tracked: data.length, mastered, streak };
   } catch {
     return empty;
+  }
+}
+
+function startOfDay(daysAgo: number) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - daysAgo);
+  return d;
+}
+
+export type DayCount = { date: Date; total: number; correct: number };
+
+// Nombre de cartes révisées par jour sur les N derniers jours (le plus ancien en premier).
+export async function getDailyCounts(days: number): Promise<{ counts: DayCount[]; ok: boolean }> {
+  const counts: DayCount[] = [];
+  for (let i = days - 1; i >= 0; i--) counts.push({ date: startOfDay(i), total: 0, correct: 0 });
+  try {
+    const { data, error } = await createClient()
+      .from("review_log")
+      .select("reviewed_at, correct")
+      .gte("reviewed_at", startOfDay(days - 1).toISOString())
+      .limit(10000);
+    if (error || !data) return { counts, ok: false };
+    for (const row of data as { reviewed_at: string; correct: boolean }[]) {
+      const when = new Date(row.reviewed_at);
+      const slot = counts.find((c) => c.date.toDateString() === when.toDateString());
+      if (slot) {
+        slot.total++;
+        if (row.correct) slot.correct++;
+      }
+    }
+    return { counts, ok: true };
+  } catch {
+    return { counts, ok: false };
+  }
+}
+
+export type HardCard = { ficheId: string; ficheTitle: string; question: string; answer: string; wrong: number };
+
+// Les cartes que la personne rate le plus souvent.
+export async function getHardCards(limit = 8): Promise<HardCard[]> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("card_reviews")
+      .select("fiche_id, card_index, times_wrong")
+      .gt("times_wrong", 0)
+      .order("times_wrong", { ascending: false })
+      .limit(limit);
+    if (error || !data || data.length === 0) return [];
+
+    const ids = Array.from(new Set(data.map((r) => r.fiche_id as string)));
+    const { data: fiches } = await supabase.from("fiches").select("id, title, data").in("id", ids);
+    const byId = new Map((fiches ?? []).map((f) => [f.id as string, f]));
+
+    const out: HardCard[] = [];
+    for (const row of data as { fiche_id: string; card_index: number; times_wrong: number }[]) {
+      const fiche = byId.get(row.fiche_id);
+      const card = fiche?.data?.flashcards?.[row.card_index];
+      if (fiche && card?.question) {
+        out.push({ ficheId: row.fiche_id, ficheTitle: fiche.title, question: card.question, answer: card.answer, wrong: row.times_wrong });
+      }
+    }
+    return out;
+  } catch {
+    return [];
   }
 }

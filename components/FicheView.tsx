@@ -28,6 +28,15 @@ type Settings = { difficulty: string; length: string };
 
 type SectionKey = "summary" | "sheet" | "flashcards" | "quiz";
 
+// Trois présentations de la même fiche : on lit, on mémorise ou on prend des notes différemment.
+type Template = "classique" | "memo" | "cornell";
+const TEMPLATES: { key: Template; label: string; hint: string }[] = [
+  { key: "classique", label: "Classique", hint: "Cartes aérées, facile à parcourir" },
+  { key: "memo", label: "Mémo", hint: "Compact, pour relire vite ou imprimer" },
+  { key: "cornell", label: "Cornell", hint: "Questions à gauche, notes à droite" },
+];
+const TEMPLATE_KEY = "ff-template";
+
 function RegenButton({
   sectionKey,
   hasSource,
@@ -64,6 +73,9 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const [exporting, setExporting] = useState(false);
   const [regeneratingKey, setRegeneratingKey] = useState<string | null>(null);
   const [isPro, setIsPro] = useState(false);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [nudgeHidden, setNudgeHidden] = useState(false);
+  const [template, setTemplate] = useState<Template>("classique");
   const [bestScore, setBestScore] = useState<number | null>(initialData.best_score ?? null);
   const ficheId = initialData.id ?? "";
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -84,6 +96,9 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
     try {
       const storedSettings = localStorage.getItem("fishflow_settings");
       if (storedSettings) setSettings(JSON.parse(storedSettings));
+      const storedTemplate = localStorage.getItem(TEMPLATE_KEY);
+      if (storedTemplate === "classique" || storedTemplate === "memo" || storedTemplate === "cornell") setTemplate(storedTemplate);
+      if (sessionStorage.getItem("ff-nudge-hidden") === "1") setNudgeHidden(true);
     } catch {}
 
     const checkPro = async () => {
@@ -91,6 +106,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
         const res = await fetch("/api/usage");
         const usageData = await res.json();
         setIsPro(!!usageData.isPro);
+        setRemaining(typeof usageData.remaining === "number" ? usageData.remaining : null);
       } catch {}
     };
     checkPro();
@@ -246,6 +262,45 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
 
   const actionClass = "ff-secondary w-full text-sm";
 
+  const chooseTemplate = (key: Template) => {
+    setTemplate(key);
+    try {
+      localStorage.setItem(TEMPLATE_KEY, key);
+    } catch {}
+    trackEvent("template_choisi", { template: key });
+  };
+
+  const hideNudge = () => {
+    setNudgeHidden(true);
+    try {
+      sessionStorage.setItem("ff-nudge-hidden", "1");
+    } catch {}
+  };
+
+  // Un petit rappel honnête, seulement quand il reste très peu de fiches gratuites.
+  const showNudge = !isPro && !nudgeHidden && remaining !== null && remaining <= 1;
+
+  const sheetWrap = template === "classique" ? "grid gap-2.5 md:grid-cols-2" : "grid gap-0";
+  const sheetItem = (i: number, total: number) => {
+    if (template === "memo") {
+      return `flex gap-3 items-baseline px-4 py-3 bg-surface border border-black/10 -mt-px ${i === 0 ? "rounded-t-2xl mt-0" : ""} ${i === total - 1 ? "rounded-b-2xl" : ""}`;
+    }
+    if (template === "cornell") {
+      return `grid grid-cols-[2.5rem_minmax(0,1fr)] bg-surface border-x border-b border-black/10 ${i === 0 ? "border-t rounded-t-2xl" : ""} ${i === total - 1 ? "rounded-b-2xl" : ""}`;
+    }
+    return "bg-surface rounded-2xl border border-black/10 p-4 flex gap-3";
+  };
+  const cardWrap = template === "classique" ? "grid gap-3 md:grid-cols-2" : "grid gap-0";
+  const cardItem = (i: number, total: number) => {
+    if (template === "memo") {
+      return `px-4 py-3 bg-surface border border-black/10 -mt-px ${i === 0 ? "rounded-t-2xl mt-0" : ""} ${i === total - 1 ? "rounded-b-2xl" : ""}`;
+    }
+    if (template === "cornell") {
+      return `grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] bg-surface border-x border-b border-black/10 ${i === 0 ? "border-t rounded-t-2xl" : ""} ${i === total - 1 ? "rounded-b-2xl" : ""}`;
+    }
+    return "border border-black/10 rounded-2xl p-5 bg-surface";
+  };
+
   return (
     <AppShell size="wide">
       <div className={exporting ? "ff-force-light" : ""}>
@@ -299,6 +354,45 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
             </div>
 
+            {showNudge && (
+              <aside className="mb-6 bg-surface border border-black/10 rounded-2xl p-5" aria-label="À propos de Pro">
+                <p className="font-semibold mb-1">
+                  {remaining === 0 ? "Tu as utilisé tes 3 fiches gratuites ce mois-ci." : "Il te reste 1 fiche gratuite ce mois-ci."}
+                </p>
+                <p className="text-sm text-black/65 mb-4 max-w-[60ch]">
+                  Avec Pro : fiches illimitées, quiz à jouer avec ton meilleur score, 20 questions par jour dans Apprendre, tes
+                  cartes difficiles et ta progression sur 30 jours.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <button type="button" onClick={() => { trackEvent("pro_nudge_clic"); router.push("/pricing"); }} className="ff-primary text-sm ff-btn">
+                    Voir Pro
+                  </button>
+                  <button type="button" onClick={hideNudge} className="ff-secondary text-sm">
+                    Plus tard
+                  </button>
+                </div>
+              </aside>
+            )}
+
+            <div className="mb-6" role="group" aria-label="Présentation de la fiche">
+              <div className="flex flex-wrap gap-2">
+                {TEMPLATES.map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => chooseTemplate(t.key)}
+                    aria-pressed={template === t.key}
+                    className={`min-h-[44px] px-4 rounded-full border text-sm font-semibold transition ${
+                      template === t.key ? "bg-black text-white border-black" : "border-black/15 text-black/65 hover:border-black/40"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-black/50 mt-2">{TEMPLATES.find((t) => t.key === template)?.hint}</p>
+            </div>
+
             {data.summary !== undefined && (
               <div ref={summaryRef} className={`pb-6 ${sectionOpacity("summary")}`}>
                 <section className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
@@ -326,11 +420,15 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                     <RegenButton {...regenProps("sheet")} />
                   </div>
                 </div>
-                <div className="grid gap-2.5 md:grid-cols-2">
+                <div className={sheetWrap}>
                   {data.sheet.map((point, i) => (
-                    <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className="bg-surface rounded-2xl border border-black/10 p-4 flex gap-3">
-                      <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />
-                      <span className="text-black/80">{point}</span>
+                    <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className={sheetItem(i, data.sheet!.length)}>
+                      {template === "classique" && <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />}
+                      {template === "memo" && <span className="text-[#22C55E] font-bold tabular-nums shrink-0 w-6" aria-hidden="true">{i + 1}.</span>}
+                      {template === "cornell" && (
+                        <span className="border-r border-black/10 grid place-items-start justify-items-center pt-3.5 text-[#22C55E] font-bold tabular-nums" aria-hidden="true">{i + 1}</span>
+                      )}
+                      <span className={`text-black/80 ${template === "cornell" ? "px-4 py-3" : ""}`}>{point}</span>
                     </div>
                   ))}
                 </div>
@@ -345,11 +443,20 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                     <RegenButton {...regenProps("flashcards")} />
                   </div>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className={cardWrap}>
                   {data.flashcards.map((card, i) => (
-                    <div key={i} ref={(el) => { flashcardItemRefs.current[i] = el; }} className="border border-black/10 rounded-2xl p-5 bg-surface">
-                      <p className="font-semibold text-black mb-1.5">{i + 1}. {card.question}</p>
-                      <p className="text-black/65 text-sm">{card.answer}</p>
+                    <div key={i} ref={(el) => { flashcardItemRefs.current[i] = el; }} className={cardItem(i, data.flashcards!.length)}>
+                      {template === "cornell" ? (
+                        <>
+                          <p className="font-semibold text-black px-4 py-3 md:border-r border-black/10">{i + 1}. {card.question}</p>
+                          <p className="text-black/70 text-sm px-4 pb-3 md:py-3.5">{card.answer}</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className={`font-semibold text-black ${template === "memo" ? "mb-0.5" : "mb-1.5"}`}>{i + 1}. {card.question}</p>
+                          <p className="text-black/65 text-sm">{card.answer}</p>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>

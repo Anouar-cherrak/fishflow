@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
+import { TrackView } from "@/components/TrackView";
 
 // Même contenu que le tableau de la page d'accueil : ce qui est gratuit, ce qui est Pro.
 const ROWS: { label: string; free: string; pro: string }[] = [
@@ -15,6 +16,9 @@ const ROWS: { label: string; free: string; pro: string }[] = [
   { label: "Réviser avec rappels", free: "Oui", pro: "Oui" },
   { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
   { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },
+  { label: "Objectif du jour et série", free: "Oui", pro: "Oui" },
+  { label: "Présentations (Classique, Mémo, Cornell)", free: "Oui", pro: "Oui" },
+  { label: "Progression", free: "7 derniers jours", pro: "30 jours, taux de réussite, cartes difficiles" },
   { label: "Résumé lu à voix haute", free: "Non", pro: "Oui" },
   { label: "Historique de fiches", free: "5 fiches", pro: "Illimité" },
 ];
@@ -87,6 +91,7 @@ export default function Pricing() {
 
   return (
     <AppShell size="wide">
+      <TrackView name="pricing_view" />
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-2">Gratuit ou Pro.</h1>
         <p className="ff-lead">Ce que tu as vraiment dans chaque formule. Tu peux arrêter Pro quand tu veux.</p>

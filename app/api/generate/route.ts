@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { extractText, getDocumentProxy } from "unpdf";
 import { createClient } from "@/lib/supabase/server";
-import { getUsage, incrementUsage, isProUser } from "@/lib/usage";
+import { FREE_MONTHLY_LIMIT, getUsage, isProUser, monthKey, refundUsage, reserveUsage } from "@/lib/usage";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -38,6 +38,15 @@ type QuizQuestion = { question: string; options: string[]; correctIndex: number 
 
 function asText(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
 function asArray(value: unknown): unknown[] {
@@ -97,15 +106,13 @@ function normalizeResult(raw: Record<string, unknown> | null, outputs: string[])
     for (const item of asArray(raw.quiz)) {
       const entry = (item ?? {}) as Record<string, unknown>;
       const question = asText(entry.question);
-      const options = asArray(entry.options).map(asText).filter(Boolean);
-      const correctIndex = Number(entry.correctIndex);
-      if (
-        question &&
-        options.length >= 2 &&
-        Number.isInteger(correctIndex) &&
-        correctIndex >= 0 &&
-        correctIndex < options.length
-      ) {
+      const rawOptions = asArray(entry.options).map(asText);
+      const rawIndex = Number(entry.correctIndex);
+      const right = Number.isInteger(rawIndex) ? rawOptions[rawIndex] : "";
+      // On retire les réponses vides ou en double, puis on les mélange : l'IA met trop souvent la bonne réponse au même endroit.
+      const options = shuffle(Array.from(new Set(rawOptions.filter(Boolean))));
+      const correctIndex = right ? options.indexOf(right) : -1;
+      if (question && options.length >= 2 && correctIndex >= 0) {
         quiz.push({ question, options, correctIndex });
       }
     }
@@ -243,6 +250,15 @@ export async function POST(req: Request) {
         );
       }
       wasTruncated = text.length > MAX_CHARS;
+      if (wasTruncated && !pro) {
+        return NextResponse.json(
+          {
+            error: `Ce texte est trop long pour un compte gratuit (${MAX_CHARS_FREE.toLocaleString("fr-FR")} caractères maximum). Raccourcis-le, ou passe à FishFlow Pro pour des documents plus volumineux.`,
+            requiresPro: true,
+          },
+          { status: 403 }
+        );
+      }
       const limitedText = text.slice(0, MAX_CHARS);
       sourceText = limitedText;
       messages = [
@@ -344,12 +360,31 @@ export async function POST(req: Request) {
     );
   }
 
+  // On réserve la génération gratuite avant d'appeler l'IA (plusieurs demandes en même temps ne passent plus),
+  // et on la rend si la génération échoue.
+  const usageKey = monthKey();
+  if (!pro) {
+    const ok = await reserveUsage(user.id, usageKey, FREE_MONTHLY_LIMIT);
+    if (!ok) {
+      return NextResponse.json(
+        {
+          error: `Tu as atteint ta limite de ${FREE_MONTHLY_LIMIT} fiches gratuites ce mois-ci. Passe à FishFlow Pro pour continuer.`,
+          quotaExceeded: true,
+        },
+        { status: 403 }
+      );
+    }
+  }
+  const giveBack = async () => {
+    if (!pro) await refundUsage(user.id, usageKey);
+  };
+
   try {
     const completion = await withTimeout(
       openai.chat.completions.create({
         model: "gpt-4o-mini",
         response_format: { type: "json_object" },
-        max_tokens: pro ? 3000 : 2000,
+        max_tokens: pro ? 4500 : 3000,
         messages,
       }),
       TIMEOUT_MS
@@ -358,6 +393,7 @@ export async function POST(req: Request) {
     const choice = completion.choices[0];
 
     if (choice.finish_reason === "length") {
+      await giveBack();
       return NextResponse.json(
         { error: "La réponse de l'IA a été coupée car le contenu est trop riche. Choisis une longueur plus courte ou moins de sorties, puis réessaie." },
         { status: 502 }
@@ -370,6 +406,7 @@ export async function POST(req: Request) {
     try {
       parsed = JSON.parse(rawContent);
     } catch {
+      await giveBack();
       return NextResponse.json(
         { error: "L'IA a renvoyé une réponse invalide. Réessaie." },
         { status: 502 }
@@ -378,6 +415,7 @@ export async function POST(req: Request) {
 
     const result = normalizeResult(parsed, outputs);
     if (!result) {
+      await giveBack();
       return NextResponse.json(
         { error: "L'IA a renvoyé une réponse incomplète. Réessaie." },
         { status: 502 }
@@ -388,13 +426,10 @@ export async function POST(req: Request) {
     const finalSourceText = sourceText ?? asText(parsed?.sourceText);
     if (finalSourceText) result.sourceText = finalSourceText;
 
-    if (!pro) {
-      await incrementUsage(user.id);
-    }
-
     return NextResponse.json(result);
   } catch (err: any) {
     console.error("Erreur appel OpenAI:", err?.message || err);
+    await giveBack();
 
     if (err?.message === "TIMEOUT") {
       return NextResponse.json(

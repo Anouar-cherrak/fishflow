@@ -26,19 +26,3 @@ export async function getApprendreQuota(userId: string, pro: boolean) {
   const used = data?.count ?? 0;
   return { key, limit, used, allowed: used < limit };
 }
-
-export async function bumpApprendreUsage(userId: string, key: string) {
-  const supabase = createAdminClient();
-  const { data } = await supabase
-    .from("usage")
-    .select("count")
-    .eq("user_id", userId)
-    .eq("month", key)
-    .maybeSingle();
-
-  if (data) {
-    await supabase.from("usage").update({ count: data.count + 1 }).eq("user_id", userId).eq("month", key);
-  } else {
-    await supabase.from("usage").insert({ user_id: userId, month: key, count: 1 });
-  }
-}

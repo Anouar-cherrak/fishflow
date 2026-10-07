@@ -72,6 +72,11 @@ export default function Confidentialite() {
               Analytics / Google Ads) ne sont déposés que si tu cliques sur « Accepter » dans le
               bandeau. Si tu refuses, rien n'est chargé. Ton choix est gardé sur ton appareil.
             </p>
+            <p className="mt-3">
+              FishFlow compte aussi, sans cookie, les grandes étapes du parcours (visite, inscription,
+              première fiche) et l'origine du lien (par exemple « tiktok »). Ces comptages n'enregistrent ni
+              ton adresse e-mail ni ton adresse IP, et servent uniquement à améliorer le site.
+            </p>
           </section>
 
           <section>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
+import { track } from "@/lib/track";
 
 declare global {
   interface Window {
@@ -64,6 +65,7 @@ export default function Signup() {
       window.gtag("event", "conversion", { send_to: "AW-18394032288/P97kCIqRtegcEKDR-sJE" });
     }
     trackEvent("sign_up", { method: "email" });
+    track("signup");
 
     router.push("/generer");
     router.refresh();

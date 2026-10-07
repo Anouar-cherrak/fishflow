@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 
 const LINKS = [
+  { href: "/aujourdhui", label: "Aujourd'hui", hint: "Ton objectif, tes cartes, ta progression" },
   { href: "/generer", label: "Générer", hint: "Crée une fiche à partir d'un cours" },
   { href: "/mes-fiches", label: "Mes fiches", hint: "Retrouve toutes tes fiches" },
   { href: "/reviser", label: "Réviser", hint: "Tes cartes du jour" },

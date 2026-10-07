@@ -27,7 +27,7 @@ export default function Login() {
     }
 
     trackEvent("login", { method: "email" });
-    router.push("/generer");
+    router.push("/aujourdhui");
     router.refresh();
   };
 

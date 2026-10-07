@@ -58,6 +58,12 @@ export default function Apprendre() {
     });
   }, [status, answer]);
 
+  // Un lien comme /apprendre?q=... remplit le champ (sans envoyer : c'est la personne qui décide).
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setQuestion(q.slice(0, 300));
+  }, []);
+
   // On annule la requête en cours si on quitte la page.
   useEffect(() => () => abortRef.current?.abort(), []);
 

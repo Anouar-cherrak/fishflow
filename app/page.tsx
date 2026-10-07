@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TrackView } from "@/components/TrackView";
 import { Landing as LandingView } from "@/components/landing/Landing";
 import "./landing.css";
 
@@ -31,6 +32,7 @@ export default function Landing() {
           }),
         }}
       />
+      <TrackView name="visit" />
       <LandingView />
     </>
   );

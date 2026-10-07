@@ -702,6 +702,9 @@ export function Landing() {
                   <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
                   <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 essai</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
                   <tr><th scope="row">Documents</th><td data-label="Gratuit">Courts et moyens</td><td data-label="Pro" className="pro">Volumineux, plusieurs PDF fusionnés en une fiche</td></tr>
+                  <tr><th scope="row">Objectif du jour et série</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                  <tr><th scope="row">Présentations (Classique, Mémo, Cornell)</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                  <tr><th scope="row">Progression</th><td data-label="Gratuit">7 derniers jours</td><td data-label="Pro" className="pro">30 jours, réussite, cartes difficiles</td></tr>
                   <tr><th scope="row">Résumé lu à voix haute</th><td data-label="Gratuit">Non</td><td data-label="Pro" className="pro">Oui</td></tr>
                   <tr><th scope="row">Historique de fiches</th><td data-label="Gratuit">5 fiches</td><td data-label="Pro" className="pro">Illimité</td></tr>
                 </tbody>
