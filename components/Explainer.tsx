@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export type Scene = { caption: string; art: ReactNode };
 
-const SCENE_MS = 3600;
+const SCENE_MS = 4200;
 
 // Une petite animation de ~15 secondes (4 étapes) qui montre comment utiliser une fonction.
 // Elle défile toute seule quand elle est visible. On peut la mettre en pause ou choisir une étape.
@@ -28,6 +28,19 @@ export function Explainer({
   const [paused, setPaused] = useState(false);
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.6);
+
+  // L'écran est dessiné sur 1000 px de large, puis réduit pour tenir dans la place disponible.
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const set = () => setScale(el.clientWidth / 1000);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = ref.current;
@@ -50,8 +63,8 @@ export function Explainer({
     <article ref={ref} id={id} className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-7 scroll-mt-28">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-10 items-center">
         <div className="min-w-0 lg:order-2">
-          <div className="ex-stage" aria-hidden="true">
-            <div key={scene} className="ex-scene">
+          <div className="sx-wrap" ref={wrapRef} aria-hidden="true">
+            <div key={scene} className="sx" style={{ transform: `scale(${scale})` }}>
               {scenes[scene].art}
             </div>
           </div>

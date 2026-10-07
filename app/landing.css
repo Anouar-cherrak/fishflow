@@ -33,22 +33,7 @@
 .lp .round { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; padding: 0; position: relative; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .lp .round:hover { transform: scale(1.1) rotate(-6deg); }
 .lp .round:active { transform: scale(0.88); }
-.lp .burger i { position: absolute; left: 14px; right: 14px; height: 2px; background: currentColor; border-radius: 2px; transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1), top 0.45s cubic-bezier(0.7, 0, 0.2, 1); }
-.lp .burger i:nth-child(1) { top: 18px; }
-.lp .burger i:nth-child(2) { top: 26px; }
-.lp .burger[aria-expanded="true"] i:nth-child(1) { top: 22px; transform: rotate(45deg); }
-.lp .burger[aria-expanded="true"] i:nth-child(2) { top: 22px; transform: rotate(-45deg); }
 .lp .theme svg { width: 20px; height: 20px; }
-.lp .menu { position: fixed; inset: 0; z-index: 20; background: var(--ink); color: var(--bg); clip-path: inset(0 0 100% 0); transition: clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s 0.8s; visibility: hidden; display: flex; flex-direction: column; justify-content: center; padding: 90px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))) 40px; }
-.lp .menu.open { clip-path: inset(0 0 0 0); visibility: visible; transition-delay: 0s; }
-.lp .menu a { font: 700 clamp(38px, 11vw, 100px)/1 var(--display); letter-spacing: -0.025em; text-decoration: none; display: block; overflow: hidden; padding: 4px 0; }
-.lp .menu a span { display: block; transform: translateY(110%) skewY(6deg); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
-.lp .menu.open a span { transform: none; }
-.lp .menu.open a:nth-child(1) span { transition-delay: 0.3s; }
-.lp .menu.open a:nth-child(2) span { transition-delay: 0.37s; }
-.lp .menu.open a:nth-child(3) span { transition-delay: 0.44s; }
-.lp .menu.open a:nth-child(4) span { transition-delay: 0.51s; }
-.lp .menu a:hover span { transform: translateX(16px) skewX(-6deg); }
 .lp .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 0 30px; border-radius: 999px; border: 0; background: var(--hot); color: var(--on-hot); font: 600 17px/1 var(--body); text-decoration: none; position: relative; overflow: hidden; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .lp .btn::before { content: ""; position: absolute; inset: 0; background: var(--ink); transform: translateY(101%); transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1); border-radius: inherit; }
 .lp .btn span { position: relative; z-index: 1; transition: color 0.3s 0.05s; }
@@ -197,7 +182,6 @@
 .lp .bar-link:hover { color: var(--ink); }
 .lp .bar-cta { min-height: 46px; padding: 0 20px; font-size: 15px; }
 @media (max-width: 599px) { .lp .bar-link, .lp .bar-cta { display: none; } }
-.lp .menu a.menu-small { font-size: clamp(22px, 5vw, 30px); letter-spacing: -0.02em; margin-top: 8px; }
 .lp .cmp-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 24px; background: var(--paper); }
 .lp .cmp { width: 100%; border-collapse: collapse; min-width: 520px; font-size: 16px; }
 .lp .cmp th, .lp .cmp td { padding: 14px 18px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
@@ -264,9 +248,6 @@
 
 /* Menu ouvert : la barre du haut prend les couleurs du menu (plus de bandeau gris), et les liens en double disparaissent. */
 .lp header.bar { transition: background 0.4s ease, color 0.4s ease; }
-.lp header.bar.on-menu { background: transparent; backdrop-filter: none; color: var(--bg); }
-.lp header.bar.on-menu .bar-link, .lp header.bar.on-menu .bar-cta { opacity: 0; pointer-events: none; visibility: hidden; }
-.lp header.bar.on-menu .round { background: transparent; border-color: color-mix(in srgb, var(--bg) 40%, transparent); color: var(--bg); }
 .lp .bar-link, .lp .bar-cta { transition: opacity 0.3s ease; }
 
 /* « Comment une fiche est fabriquée » : les étapes défilent seules, avec un bouton Pause */

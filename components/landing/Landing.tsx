@@ -50,12 +50,6 @@ const CARDS: [string, string][] = [
   ["Où se fait la photosynthèse ?", "Dans les chloroplastes des cellules des feuilles."],
 ];
 
-const MENU = [
-  { href: "#fiche", label: "Générer" },
-  { href: "#retenir", label: "Réviser" },
-  { href: "#apprendre", label: "Poser une question" },
-  { href: "#tarifs", label: "Tarifs" },
-];
 
 function Art({ k }: { k: ArtKey }) {
   const inner: Record<ArtKey, React.ReactNode> = {
@@ -144,7 +138,6 @@ export function Landing() {
   const reduceRef = useRef(false);
 
   const [theme, setTheme] = useState<Theme>("dark");
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const kick = useCallback((a: number) => orbRef.current?.kick(a), []);
 
@@ -193,18 +186,6 @@ export function Landing() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Menu : Échap ferme, la page ne défile plus derrière */
-  useEffect(() => {
-    if (!menuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [menuOpen]);
 
   /* La fiche, étape par étape */
   const stageRef = useRef<HTMLDivElement>(null);
@@ -329,6 +310,26 @@ export function Landing() {
     else setNotice(true);
   };
 
+
+  /* Les deux démos tournent toutes seules quand elles sont à l'écran. Un geste de la personne les arrête. */
+  const [cardsInView, setCardsInView] = useState(false);
+  const [askInView, setAskInView] = useState(false);
+  const [cardsManual, setCardsManual] = useState(false);
+  const [askManual, setAskManual] = useState(false);
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const watch = (id: string, set: (v: boolean) => void) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      const io = new IntersectionObserver((es) => set(es[0].isIntersecting), { threshold: 0.35 });
+      io.observe(el);
+      return io;
+    };
+    const a = watch("retenir", setCardsInView);
+    const b = watch("apprendre", setAskInView);
+    return () => { a?.disconnect(); b?.disconnect(); };
+  }, []);
+
   /* Flashcards */
   const [cardIdx, setCardIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -373,15 +374,44 @@ export function Landing() {
     }, 520);
   };
 
+  /* Cartes : la carte se retourne, puis elle est notée, puis la suivante arrive */
+  useEffect(() => {
+    if (!cardsInView || cardsManual || leaving) return;
+    const id = window.setTimeout(
+      () => {
+        if (!flipped) setFlipped(true);
+        else answerCard(cardIdx % 3 !== 1);
+      },
+      flipped ? 2200 : 2000
+    );
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardsInView, cardsManual, flipped, leaving, cardIdx]);
+
+  /* Question : les deux exemples s'enchaînent */
+  const autoKey = useRef(0);
+  useEffect(() => {
+    if (!askInView || askManual || phase === "typing" || phase === "thinking") return;
+    const id = window.setTimeout(
+      () => {
+        const k: DemoKey = autoKey.current % 2 === 0 ? "sky" : "hole";
+        autoKey.current += 1;
+        run(k);
+      },
+      phase === "done" ? 7000 : 900
+    );
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [askInView, askManual, phase]);
+
   const answer = demoKey ? DEMO[demoKey] : null;
-  const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="lp" data-theme={theme} ref={rootRef}>
       <a className="skip" href="#top">Aller au contenu</a>
       <canvas id="orb" ref={canvasRef} aria-hidden="true" />
 
-      <header className={`bar${menuOpen ? " on-menu" : ""}`}>
+      <header className="bar">
         <Link className="brand" href="/" aria-label="FishFlow, accueil">
           <BrandMark />
           <span>Fish<em>Flow</em></span>
@@ -408,33 +438,8 @@ export function Landing() {
               )}
             </svg>
           </button>
-          <button
-            type="button"
-            className="round burger"
-            aria-expanded={menuOpen}
-            aria-controls="lp-menu"
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            <i />
-            <i />
-          </button>
         </div>
       </header>
-
-      <nav className={`menu${menuOpen ? " open" : ""}`} id="lp-menu" aria-label="Menu principal">
-        {MENU.map((m) => (
-          <a key={m.href} href={m.href} onClick={closeMenu}>
-            <span>{m.label}</span>
-          </a>
-        ))}
-        <Link className="menu-small" href="/login" onClick={closeMenu}>
-          <span>Connexion</span>
-        </Link>
-        <Link className="menu-small" href="/signup" onClick={closeMenu}>
-          <span>Créer un compte</span>
-        </Link>
-      </nav>
 
       <main id="top">
         {/* Accueil */}
@@ -574,7 +579,7 @@ export function Landing() {
         <section id="retenir" aria-labelledby="t-r">
           <div className="wrap">
             <h2 id="t-r">Retiens-le pour de bon.</h2>
-            <p className="sub">Touche la carte pour la retourner. Une carte que tu savais revient plus tard, une carte ratée revient plus vite.</p>
+            <p className="sub">Les cartes se retournent toutes seules, tu peux aussi les toucher. Une carte que tu savais revient plus tard, une carte ratée revient plus vite.</p>
             <div className="gestures">
               <article className="card">
                 <div className="deck">
@@ -584,7 +589,7 @@ export function Landing() {
                     className={`fc${leaving ? ` gone-${leaving}` : ""}`}
                     aria-label={flipped ? "Revoir la question" : "Retourner la carte"}
                     style={{ transform: `rotateX(${rx}deg) rotateY(${ry}deg) rotateY(${flipped ? 180 : 0}deg)` }}
-                    onClick={() => { setFlipped((f) => !f); kick(0.25); }}
+                    onClick={() => { setCardsManual(true); setFlipped((f) => !f); kick(0.25); }}
                     onPointerMove={(e) => {
                       if (reduceRef.current || e.pointerType !== "mouse") return;
                       const r = e.currentTarget.getBoundingClientRect();
@@ -598,8 +603,8 @@ export function Landing() {
                   </button>
                 </div>
                 <div className="fc-actions">
-                  <button type="button" className="btn ghost" onClick={() => answerCard(false)}><span>À revoir</span></button>
-                  <button type="button" className="btn" ref={knownBtn} onClick={() => answerCard(true)}><span>Je savais</span></button>
+                  <button type="button" className="btn ghost" onClick={() => { setCardsManual(true); answerCard(false); }}><span>À revoir</span></button>
+                  <button type="button" className="btn" ref={knownBtn} onClick={() => { setCardsManual(true); answerCard(true); }}><span>Je savais</span></button>
                 </div>
               </article>
               <article className="card">
@@ -618,13 +623,13 @@ export function Landing() {
         <section id="apprendre" aria-labelledby="t-app">
           <div className="wrap">
             <h2 id="t-app">Et si tu as une question ?</h2>
-            <p className="sub">FishFlow répond aussi à n&apos;importe quelle question, avec des images libres de droits et des liens Wikipédia pour aller plus loin. Essaie avec un exemple.</p>
+            <p className="sub">FishFlow répond aussi à n&apos;importe quelle question, avec des images libres de droits et des liens Wikipédia pour aller plus loin. Les exemples défilent tout seuls, tu peux aussi écrire ta question.</p>
             <div className="demo">
               <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
                 <div className="slot-demo" data-slot="demo" aria-hidden="true" />
                 <div className="chips" role="group" aria-label="Questions d'exemple">
-                  <button type="button" className="chip" onClick={() => run("sky")}>Pourquoi le ciel est bleu</button>
-                  <button type="button" className="chip" onClick={() => run("hole")}>Comment fonctionne un trou noir</button>
+                  <button type="button" className="chip" onClick={() => { setAskManual(true); run("sky"); }}>Pourquoi le ciel est bleu</button>
+                  <button type="button" className="chip" onClick={() => { setAskManual(true); run("hole"); }}>Comment fonctionne un trou noir</button>
                 </div>
                 <form className="ask" onSubmit={onAsk} autoComplete="off">
                   <label htmlFor="lp-q" hidden>Ta question</label>
@@ -636,7 +641,7 @@ export function Landing() {
                     maxLength={120}
                     value={q}
                     readOnly={phase === "typing" || phase === "thinking"}
-                    onChange={(e) => { setQ(e.target.value); setPhase("idle"); setDemoKey(null); setNotice(false); }}
+                    onChange={(e) => { setAskManual(true); setQ(e.target.value); setPhase("idle"); setDemoKey(null); setNotice(false); }}
                   />
                   <button className="btn" type="submit"><span>Envoyer</span></button>
                 </form>
