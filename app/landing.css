@@ -39,7 +39,7 @@
 .lp .burger[aria-expanded="true"] i:nth-child(1) { top: 22px; transform: rotate(45deg); }
 .lp .burger[aria-expanded="true"] i:nth-child(2) { top: 22px; transform: rotate(-45deg); }
 .lp .theme svg { width: 20px; height: 20px; }
-.lp .menu { position: fixed; inset: 0; z-index: 20; background: var(--ink); color: var(--bg); clip-path: inset(0 0 100% 0); transition: clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s 0.8s; visibility: hidden; display: flex; flex-direction: column; justify-content: center; padding: 90px var(--gutter) 40px; }
+.lp .menu { position: fixed; inset: 0; z-index: 20; background: var(--ink); color: var(--bg); clip-path: inset(0 0 100% 0); transition: clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s 0.8s; visibility: hidden; display: flex; flex-direction: column; justify-content: center; padding: 90px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))) 40px; }
 .lp .menu.open { clip-path: inset(0 0 0 0); visibility: visible; transition-delay: 0s; }
 .lp .menu a { font: 700 clamp(38px, 11vw, 100px)/1 var(--display); letter-spacing: -0.025em; text-decoration: none; display: block; overflow: hidden; padding: 4px 0; }
 .lp .menu a span { display: block; transform: translateY(110%) skewY(6deg); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -261,3 +261,17 @@
 .lp .badge { font-size: 13px; font-weight: 600; color: var(--on-hot); background: var(--hot); border-radius: 999px; padding: 4px 12px; justify-self: start; }
 .lp .notice { display: grid; gap: 16px; justify-items: start; }
 @media (min-width: 900px) { .lp .hero { align-items: center; } }
+
+/* Menu ouvert : la barre du haut prend les couleurs du menu (plus de bandeau gris), et les liens en double disparaissent. */
+.lp header.bar { transition: background 0.4s ease, color 0.4s ease; }
+.lp header.bar.on-menu { background: transparent; backdrop-filter: none; color: var(--bg); }
+.lp header.bar.on-menu .bar-link, .lp header.bar.on-menu .bar-cta { opacity: 0; pointer-events: none; visibility: hidden; }
+.lp header.bar.on-menu .round { background: transparent; border-color: color-mix(in srgb, var(--bg) 40%, transparent); color: var(--bg); }
+.lp .bar-link, .lp .bar-cta { transition: opacity 0.3s ease; }
+
+/* « Comment une fiche est fabriquée » : les étapes défilent seules, avec un bouton Pause */
+.lp .cap-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lp .cap-row .cap { flex: 1 1 320px; }
+.lp .pause { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-weight: 600; font-size: 15px; }
+.lp .pause:hover { background: var(--paper); }
+.lp .step.halt[aria-current="true"]::after { transition: none; }

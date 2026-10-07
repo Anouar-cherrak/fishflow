@@ -354,11 +354,14 @@ body {
   color: var(--ff-bg);
   display: flex;
   flex-direction: column;
-  padding: 16px 20px max(24px, env(safe-area-inset-bottom));
+  padding: 10px 16px max(24px, env(safe-area-inset-bottom));
   clip-path: inset(0 0 100% 0);
   visibility: hidden;
   transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s 0.7s;
 }
+/* Même marge que la barre du haut : le logo et les liens sont alignés à gauche, à tous les formats. */
+@media (min-width: 768px) { .ff-menu { padding-inline: 32px; } }
+@media (min-width: 1024px) { .ff-menu { padding-inline: max(40px, calc((100% - 1280px) / 2 + 56px)); } }
 .ff-menu[data-open="true"] {
   clip-path: inset(0 0 0 0);
   visibility: visible;
@@ -366,10 +369,11 @@ body {
 }
 .ff-menu-link {
   display: block;
+  flex-shrink: 0; /* sans ça, avec beaucoup de liens, ils se font écraser et le sous-titre est coupé */
   overflow: hidden;
-  padding: 4px 0;
+  padding: 3px 0 8px;
   font-weight: 800;
-  font-size: clamp(34px, 8vw, 72px);
+  font-size: clamp(26px, min(8vw, 4vh), 60px);
   line-height: 1.05;
   letter-spacing: -0.035em;
 }
@@ -380,8 +384,9 @@ body {
 }
 .ff-menu[data-open="true"] .ff-menu-link > span { transform: none; }
 .ff-menu-link:hover > span { transform: translateX(14px); }
-.ff-menu-link[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 8px; text-decoration-color: var(--ff-accent); }
-.ff-menu-link small { display: block; font-size: 15px; font-weight: 500; letter-spacing: 0; opacity: 0.6; }
+.ff-menu-title { font-weight: inherit; }
+.ff-menu-link[aria-current="page"] .ff-menu-title { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 8px; text-decoration-color: var(--ff-accent); }
+.ff-menu-link small { display: block; font-size: 15px; font-weight: 500; letter-spacing: 0; line-height: 1.5; margin-top: 4px; padding-bottom: 2px; opacity: 0.6; }
 
 /* Boutons de l'application, comme sur la page d'accueil : pilule verte, texte sombre */
 .ff-primary {
@@ -532,4 +537,86 @@ body {
   .ff-tuto-orb em { opacity: 1; transform: translate(var(--x), 40px); }
   .ff-tuto-boxes i { transform: translate(104px, -40px); }
   .ff-tuto-doc i { display: none; }
+}
+
+/* ===== Aide : petites animations explicatives (~15 s) ===== */
+.ex-stage { position: relative; aspect-ratio: 16 / 10; min-height: 220px; border-radius: 22px; background: var(--ff-bg); border: 1px solid var(--ff-line); overflow: hidden; display: grid; place-items: center; padding: 18px; }
+.ex-scene { width: 100%; display: grid; place-items: center; animation: exIn 0.5s ease both; }
+.ex-win { width: min(100%, 360px); background: var(--ff-surface); border: 1px solid var(--ff-line); border-radius: 18px; padding: 16px; position: relative; }
+.ex-line { display: block; height: 8px; border-radius: 4px; background: var(--ff-line); }
+.ex-h { font-weight: 700; margin: 0; }
+.ex-tabs { display: flex; gap: 6px; font-size: 12px; }
+.ex-tabs b, .ex-tabs span { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--ff-line); font-weight: 600; }
+.ex-tabs b { background: var(--ff-fg); color: var(--ff-bg); border-color: transparent; }
+.ex-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--ff-line); font-size: 13px; font-weight: 600; opacity: 0.7; }
+.ex-chip.on { background: var(--ff-fg); color: var(--ff-bg); border-color: transparent; opacity: 1; }
+.ex-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 18px; border-radius: 999px; background: var(--ff-accent); color: var(--ff-on-accent); font-weight: 700; font-size: 13px; text-align: center; }
+.ex-btn.ghost { background: transparent; color: var(--ff-fg); border: 1px solid var(--ff-line); }
+.ex-track { display: block; width: 70%; height: 8px; border-radius: 4px; background: var(--ff-line); overflow: hidden; }
+.ex-fill { display: block; height: 100%; width: 100%; background: var(--ff-accent); transform-origin: left; animation: exFill 2.6s 0.4s ease-out both; }
+.ex-fill.half { animation-name: exFillHalf; }
+.ex-cursor { position: absolute; color: var(--ff-fg); right: 22%; bottom: 14%; animation: exMove 1.6s 0.2s ease-out both; }
+.ex-stack { position: relative; width: 150px; height: 96px; }
+.ex-stack i { position: absolute; inset: 0; border-radius: 14px; background: var(--ff-surface); border: 1px solid var(--ff-line); }
+.ex-stack i:nth-child(1) { transform: translate(-8px, 8px) rotate(-4deg); } .ex-stack i:nth-child(2) { transform: translate(8px, 4px) rotate(3deg); }
+.ex-stack b { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 14px; background: var(--ff-surface); border: 1px solid var(--ff-line); font-size: 18px; }
+.ex-flip { perspective: 800px; width: 220px; height: 130px; }
+.ex-flip-in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: exFlip 3s 0.5s ease-in-out both; }
+.ex-face { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 14px; border-radius: 16px; background: var(--ff-surface); border: 1px solid var(--ff-line); font-weight: 700; backface-visibility: hidden; }
+.ex-face.back { transform: rotateY(180deg); background: var(--ff-accent); color: var(--ff-on-accent); border-color: transparent; }
+.ex-boxes { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding-bottom: 28px; }
+.ex-boxes > span { height: 52px; border-radius: 12px; border: 1px solid var(--ff-line); display: grid; place-items: center; font-weight: 700; }
+.ex-dot { position: absolute; bottom: 4px; left: 8%; width: 14px; height: 14px; border-radius: 50%; }
+.ex-dot.ok { background: var(--ff-accent); animation: exDotOk 3s 0.3s ease-in-out both; }
+.ex-dot.ko { background: #EF4444; animation: exDotKo 3s 0.3s ease-in-out both; }
+.ex-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 12px; }
+.ex-cal span { padding: 6px 0; border-radius: 8px; opacity: 0.7; }
+.ex-cal span.on { background: var(--ff-accent); color: var(--ff-on-accent); font-weight: 800; opacity: 1; animation: exPopIn 0.5s 0.6s ease both; }
+.ex-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--ff-line); }
+.ex-row i { width: 16px; height: 16px; border-radius: 5px; border: 2px solid var(--ff-line); flex-shrink: 0; }
+.ex-row i.on { background: var(--ff-accent); border-color: var(--ff-accent); }
+.ex-bars { display: flex; align-items: flex-end; gap: 8px; height: 110px; }
+.ex-bars.small { height: 80px; flex: 1; }
+.ex-bars span { flex: 1; height: var(--h); border-radius: 8px 8px 3px 3px; background: var(--ff-accent); transform-origin: bottom; animation: exGrowY 0.8s ease-out both; }
+.ex-days { display: flex; gap: 8px; margin-top: 6px; font-size: 11px; opacity: 0.6; } .ex-days span { flex: 1; text-align: center; }
+.ex-input { border: 1px solid var(--ff-line); border-radius: 999px; padding: 12px 16px; background: var(--ff-bg); font-size: 14px; }
+.ex-type { display: inline-block; white-space: nowrap; overflow: hidden; border-right: 2px solid var(--ff-fg); animation: exType 2.4s 0.3s steps(26, end) both; max-width: 100%; }
+.ex-orb { display: block; width: 84px; height: 84px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #9aa 40%, #333 100%); box-shadow: 0 0 40px rgba(34, 197, 94, 0.35); animation: exPulse 1.4s ease-in-out infinite; }
+.ex-dots { display: flex; gap: 6px; } .ex-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ff-fg); opacity: 0.3; animation: exDot 1.2s ease-in-out infinite; } .ex-dots i:nth-child(2) { animation-delay: 0.2s; } .ex-dots i:nth-child(3) { animation-delay: 0.4s; }
+.ex-img { display: block; aspect-ratio: 4 / 3; border-radius: 10px; background: linear-gradient(135deg, var(--ff-line), transparent), var(--ff-bg); border: 1px solid var(--ff-line); }
+.ex-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--ff-line); border-radius: 12px; padding: 10px 12px; font-size: 13px; background: var(--ff-bg); }
+.ex-link b { color: #22C55E; font-size: 12px; } .ex-link.off span { text-decoration: line-through; opacity: 0.5; } .ex-link.off b { color: #EF4444; }
+.ex-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--ff-fg); color: var(--ff-bg); margin: 0; }
+.ex-toggle { width: 46px; height: 26px; border-radius: 999px; background: var(--ff-accent); position: relative; animation: exToggle 0.5s 1s ease both; }
+.ex-toggle i { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; animation: exKnob 0.5s 1s ease both; }
+.ex-streak { padding: 8px 14px; border-radius: 999px; background: var(--ff-accent); color: var(--ff-on-accent); font-weight: 800; font-size: 13px; }
+.ex-ring { stroke-dasharray: 327; stroke-dashoffset: 327; animation: exRing 2.4s 0.3s ease-out both; }
+.ex-seg { position: relative; flex: 1; min-height: 44px; background: none; border: 0; padding: 0; }
+.ex-seg::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--ff-line); }
+.ex-seg::after { content: ""; position: absolute; left: 0; top: 50%; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--ff-accent); width: 0; }
+.ex-seg[data-state="done"]::after { width: 100%; }
+.ex-seg[data-state="now"]::after { width: 100%; animation: exSeg var(--ms, 3.6s) linear both; }
+.ex-seg[data-state="now"][data-paused="true"]::after { animation-play-state: paused; }
+.ex-up { animation: exUp 0.6s ease both; } .ex-pop { animation: exPopIn 0.5s ease both; } .ex-grow { transform-origin: left; animation: exGrowX 0.7s ease-out both; } .ex-press { animation: exPress 0.5s 1.2s ease both; }
+@keyframes exIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes exUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes exPopIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes exGrowX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes exGrowY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes exFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes exFillHalf { from { transform: scaleX(0); } to { transform: scaleX(0.45); } }
+@keyframes exPress { 0%, 100% { transform: scale(1); } 40% { transform: scale(0.92); } }
+@keyframes exMove { from { transform: translate(60px, 50px); opacity: 0; } 25% { opacity: 1; } to { transform: translate(var(--cx, 0), var(--cy, 0)); opacity: 1; } }
+@keyframes exFlip { 0%, 25% { transform: rotateY(0); } 55%, 100% { transform: rotateY(180deg); } }
+@keyframes exType { from { width: 0; } to { width: 26ch; } }
+@keyframes exPulse { 0%, 100% { transform: scale(0.94); } 50% { transform: scale(1.06); } }
+@keyframes exDot { 0%, 100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+@keyframes exRing { from { stroke-dashoffset: 327; } to { stroke-dashoffset: 0; } }
+@keyframes exSeg { from { width: 0; } to { width: 100%; } }
+@keyframes exDotOk { 0% { left: 8%; } 60%, 100% { left: 46%; } }
+@keyframes exDotKo { 0% { left: 46%; } 60%, 100% { left: 8%; } }
+@keyframes exToggle { to { background: var(--ff-line); } }
+@keyframes exKnob { to { right: 23px; } }
+@media (prefers-reduced-motion: reduce) {
+  .ex-scene, .ex-up, .ex-pop, .ex-grow, .ex-press, .ex-fill, .ex-cursor, .ex-flip-in, .ex-type, .ex-orb, .ex-dots i, .ex-ring, .ex-dot, .ex-toggle, .ex-toggle i, .ex-bars span { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }

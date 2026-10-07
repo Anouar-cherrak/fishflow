@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/reviser", label: "Réviser", hint: "Tes cartes du jour" },
   { href: "/examens", label: "Examens", hint: "Prépare une date d'examen" },
   { href: "/apprendre", label: "Apprendre", hint: "Pose une question, comprends vite" },
+  { href: "/aide", label: "Aide", hint: "De petites animations pour tout comprendre" },
   { href: "/pricing", label: "Pro", hint: "Les avantages et le prix" },
   { href: "/parametres", label: "Paramètres", hint: "Compte et apparence" },
 ];
@@ -172,13 +173,13 @@ export function AppNav() {
         </button>
       </div>
 
-      <nav aria-label="Navigation principale" className="flex-1 flex flex-col justify-center overflow-y-auto py-6 max-w-5xl w-full mx-auto">
+      <nav aria-label="Navigation principale" className="flex-1 flex flex-col justify-center overflow-y-auto py-4 w-full">
         {LINKS.map((link) => {
           const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
           return (
             <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined} className="ff-menu-link">
               <span>
-                {link.label}
+                <b className="ff-menu-title">{link.label}</b>
                 <small>{link.hint}</small>
               </span>
             </Link>
@@ -186,7 +187,7 @@ export function AppNav() {
         })}
       </nav>
 
-      <div className="max-w-5xl w-full mx-auto">
+      <div className="w-full pt-2">
         {authReady && email && (
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm opacity-60 truncate">{email}</p>

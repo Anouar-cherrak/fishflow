@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const KEY = "ff-tuto-v1";
-const NEW_ACCOUNT_DAYS = 7;
+const LATER_KEY = "ff-tuto-later";
 // Pages où le tutoriel ne doit jamais s'ouvrir tout seul
 const QUIET = ["/", "/login", "/signup", "/reset-password", "/cgu", "/mentions-legales", "/confidentialite", "/p"];
 
@@ -25,7 +25,7 @@ const STEPS: Step[] = [
   },
   {
     title: "Révise un peu chaque jour",
-    text: "Dans « Réviser », FishFlow te montre les cartes à revoir aujourd'hui. Les cartes que tu connais reviennent moins souvent.",
+    text: "Dans « Aujourd'hui », tu vois ton objectif et les cartes à revoir. Celles que tu connais reviennent moins souvent.",
     art: "boxes",
   },
   {
@@ -69,7 +69,8 @@ function Art({ kind }: { kind: Step["art"] }) {
   );
 }
 
-// Petit tutoriel affiché une seule fois aux comptes récents. On peut le passer, et le revoir dans Paramètres.
+// Petit tutoriel affiché à la première connexion sur cet appareil. On peut le passer pour de bon,
+// le remettre à plus tard (il revient à la prochaine visite) et le revoir à tout moment dans « Aide ».
 export function Onboarding() {
   const router = useRouter();
   const pathname = usePathname();
@@ -93,27 +94,33 @@ export function Onboarding() {
     setOpen(true);
   }, []);
 
-  // Première visite d'un compte récent
+  // Première visite sur cet appareil (sauf si la personne l'a passé, ou remis à plus tard pendant cette visite)
   useEffect(() => {
     if (quiet) return;
     let cancelled = false;
-    let seen = false;
     try {
-      seen = localStorage.getItem(KEY) === "1";
+      if (localStorage.getItem(KEY) === "1") return;
+      if (sessionStorage.getItem(LATER_KEY) === "1") return;
     } catch {}
-    if (seen) return;
     createClient()
       .auth.getUser()
       .then(({ data }) => {
-        if (cancelled || !data.user?.created_at) return;
-        const age = Date.now() - new Date(data.user.created_at).getTime();
-        if (age < NEW_ACCOUNT_DAYS * 86400000) start();
+        if (cancelled || !data.user) return;
+        start();
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [start, quiet]);
+
+  const later = useCallback(() => {
+    try {
+      sessionStorage.setItem(LATER_KEY, "1");
+    } catch {}
+    setOpen(false);
+    returnFocus.current?.focus();
+  }, []);
 
   // « Revoir le tutoriel » dans Paramètres
   useEffect(() => {
@@ -161,9 +168,14 @@ export function Onboarding() {
           <p className="text-sm text-black/55" aria-live="polite">
             Étape {step + 1} sur {STEPS.length}
           </p>
-          <button type="button" onClick={close} className="text-sm text-black/60 hover:text-black min-h-[44px] px-2">
-            Passer
-          </button>
+          <div className="flex items-center gap-1">
+            <button type="button" onClick={later} className="text-sm text-black/60 hover:text-black min-h-[44px] px-3">
+              Plus tard
+            </button>
+            <button type="button" onClick={close} className="text-sm text-black/60 hover:text-black min-h-[44px] px-3">
+              Passer le tuto
+            </button>
+          </div>
         </div>
 
         <Art key={current.art} kind={current.art} />
@@ -172,6 +184,22 @@ export function Onboarding() {
           {current.title}
         </h2>
         <p className="text-black/65 mb-6">{current.text}</p>
+        {last && (
+          <p className="text-sm text-black/60 mb-5">
+            Tu retrouveras de petites animations pour chaque fonction dans{" "}
+            <button
+              type="button"
+              onClick={() => {
+                close();
+                router.push("/aide");
+              }}
+              className="underline text-black font-semibold"
+            >
+              Aide
+            </button>
+            .
+          </p>
+        )}
 
         <div className="flex items-center justify-between gap-4">
           <div className="flex gap-1.5" aria-hidden="true">

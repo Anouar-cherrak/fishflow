@@ -210,6 +210,7 @@ export function Landing() {
   const stageRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
   const [stageInView, setStageInView] = useState(false);
+  const [paused, setPaused] = useState(false);
   const DUR = 3200;
   useEffect(() => {
     const el = stageRef.current;
@@ -222,17 +223,19 @@ export function Landing() {
         setStageInView(es[0].isIntersecting);
         if (es[0].isIntersecting) setStep(0);
       },
-      { threshold: 0.35 }
+      { threshold: 0.2 }
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
   useEffect(() => {
     kick(0.45);
-    if (!stageInView || reduceRef.current) return;
+    // Les étapes défilent toutes seules, même si l'animation du système est réduite (c'est un changement de texte, pas un mouvement).
+    // Un bouton Pause permet de s'arrêter.
+    if (!stageInView || paused) return;
     const id = setTimeout(() => setStep((s) => (s + 1) % 4), DUR);
     return () => clearTimeout(id);
-  }, [step, stageInView, kick]);
+  }, [step, stageInView, paused, kick]);
 
   /* Démo Apprendre : la boule « réfléchit », puis rejette ses images */
   const [demoKey, setDemoKey] = useState<DemoKey | null>(null);
@@ -378,7 +381,7 @@ export function Landing() {
       <a className="skip" href="#top">Aller au contenu</a>
       <canvas id="orb" ref={canvasRef} aria-hidden="true" />
 
-      <header className="bar">
+      <header className={`bar${menuOpen ? " on-menu" : ""}`}>
         <Link className="brand" href="/" aria-label="FishFlow, accueil">
           <BrandMark />
           <span>Fish<em>Flow</em></span>
@@ -520,14 +523,14 @@ export function Landing() {
         <section id="fiche" aria-labelledby="t-f">
           <div className="wrap">
             <h2 id="t-f">Comment une fiche est fabriquée.</h2>
-            <p className="sub">Quatre étapes. Clique sur une étape pour la voir.</p>
+            <p className="sub">Quatre étapes qui défilent toutes seules. Tu peux cliquer sur une étape, ou mettre en pause.</p>
             <div className="fab">
               <div className="steps" role="group" aria-label="Étapes">
                 {STEPS.map((s, n) => (
                   <button
                     key={s.label}
                     type="button"
-                    className={`step${n < step ? " done" : ""}`}
+                    className={`step${n < step ? " done" : ""}${paused ? " halt" : ""}`}
                     aria-current={n === step ? "true" : "false"}
                     style={{ ["--dur" as string]: `${DUR}ms` }}
                     onClick={() => setStep(n)}
@@ -557,7 +560,12 @@ export function Landing() {
                   </div>
                 </div>
               </div>
-              <p className="cap" aria-live="polite">{STEPS[step].caption}</p>
+              <div className="cap-row">
+                <p className="cap" aria-live="polite">{STEPS[step].caption}</p>
+                <button type="button" className="pause" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
+                  {paused ? "Reprendre" : "Pause"}
+                </button>
+              </div>
             </div>
           </div>
         </section>
