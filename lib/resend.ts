@@ -2,6 +2,24 @@ import { Resend } from "resend";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
+// Version texte du mail : les boîtes mail se méfient des messages qui n'ont que du HTML.
+export function htmlToText(html: string) {
+  return html
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g, "$2 : $1")
+    .replace(/<\/(p|div|h[1-6])>/g, "\n\n")
+    .replace(/<br\s*\/?>/g, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+type Mail = { from: string; to: string | string[]; subject: string; html: string; headers?: Record<string, string> };
+export function sendMail(mail: Mail) {
+  return resend.emails.send({ ...mail, text: htmlToText(mail.html) });
+}
+
 export function emailLayout(
   content: string,
   ctaLabel: string = "Ouvrir FishFlow",

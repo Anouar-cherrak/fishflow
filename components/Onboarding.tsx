@@ -4,70 +4,39 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { SceneStage, type Scene } from "@/components/Explainer";
+import { APPRENDRE, GENERER, REVISER } from "@/components/tutorials";
 
 const KEY = "ff-tuto-v1";
 const LATER_KEY = "ff-tuto-later";
 // Pages où le tutoriel ne doit jamais s'ouvrir tout seul
 const QUIET = ["/", "/login", "/signup", "/reset-password", "/cgu", "/mentions-legales", "/confidentialite", "/p"];
 
-type Step = { title: string; text: string; art: "doc" | "pack" | "boxes" | "orb" };
+type Step = { title: string; text: string; scene: Scene };
 
+// Les écrans animés sont les mêmes que dans la page « Aide » : on voit la vraie interface.
 const STEPS: Step[] = [
   {
     title: "Colle ton cours, FishFlow fait le reste",
     text: "Un texte, un PDF ou une photo de tes notes. En quelques secondes, ton cours devient clair.",
-    art: "doc",
+    scene: GENERER[0],
   },
   {
     title: "Tu reçois quatre outils d'un coup",
     text: "Un résumé, une fiche de révision, des flashcards et un quiz. Tu as 3 fiches gratuites par mois.",
-    art: "pack",
+    scene: GENERER[3],
   },
   {
     title: "Révise un peu chaque jour",
-    text: "Dans « Aujourd'hui », tu vois ton objectif et les cartes à revoir. Celles que tu connais reviennent moins souvent.",
-    art: "boxes",
+    text: "Dans « Réviser » et « Aujourd'hui », tu vois les cartes à revoir. Celles que tu connais reviennent moins souvent.",
+    scene: REVISER[2],
   },
   {
     title: "Pose une question, comprends vite",
     text: "Dans « Apprendre », tu reçois une réponse bien expliquée, des images libres de droits et des liens pour aller plus loin. Tu as un essai gratuit.",
-    art: "orb",
+    scene: APPRENDRE[2],
   },
 ];
-
-function Art({ kind }: { kind: Step["art"] }) {
-  if (kind === "doc") {
-    return (
-      <div className="ff-tuto-art ff-tuto-doc" aria-hidden="true">
-        <span /><span /><span /><span />
-        <i />
-      </div>
-    );
-  }
-  if (kind === "pack") {
-    return (
-      <div className="ff-tuto-art ff-tuto-pack" aria-hidden="true">
-        <b>Résumé</b><b>Fiche</b><b>Flashcards</b><b>Quiz</b>
-      </div>
-    );
-  }
-  if (kind === "boxes") {
-    return (
-      <div className="ff-tuto-art ff-tuto-boxes" aria-hidden="true">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <span key={n}>{n}</span>
-        ))}
-        <i />
-      </div>
-    );
-  }
-  return (
-    <div className="ff-tuto-art ff-tuto-orb" aria-hidden="true">
-      <u />
-      <em /><em /><em />
-    </div>
-  );
-}
 
 // Petit tutoriel affiché à la première connexion sur cet appareil. On peut le passer pour de bon,
 // le remettre à plus tard (il revient à la prochaine visite) et le revoir à tout moment dans « Aide ».
@@ -178,7 +147,7 @@ export function Onboarding() {
           </div>
         </div>
 
-        <Art key={current.art} kind={current.art} />
+        <div className="mb-5"><SceneStage scene={current.scene} sceneKey={step} /></div>
 
         <h2 id="tuto-title" className="text-2xl font-extrabold tracking-tight leading-tight mb-2">
           {current.title}
@@ -223,7 +192,7 @@ export function Onboarding() {
                 }}
                 className="ff-primary ff-btn"
               >
-                Créer ma première fiche
+                Ma première fiche
               </button>
             ) : (
               <button ref={nextRef} type="button" onClick={() => setStep(step + 1)} className="ff-primary ff-btn">

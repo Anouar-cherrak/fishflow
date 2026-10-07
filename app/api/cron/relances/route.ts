@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { resend, emailLayout, unsubscribeHeaders } from "@/lib/resend";
+import { sendMail, emailLayout, unsubscribeHeaders } from "@/lib/resend";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 
     if (!dejaMensuel?.length) {
       try {
-        const result = await resend.emails.send({
+        const result = await sendMail({
           from: "FishFlow <noreply@fishflow.fr>",
           to: user.email,
           subject: "Tes fiches gratuites sont renouvelées ce mois-ci",
@@ -85,7 +85,7 @@ export async function GET(req: Request) {
       if (!dejaInactivite?.length) {
         await new Promise((resolve) => setTimeout(resolve, 150));
         try {
-          const result = await resend.emails.send({
+          const result = await sendMail({
             from: "FishFlow <noreply@fishflow.fr>",
             to: user.email,
             subject: "Ça fait un moment... reviens réviser avec FishFlow",
