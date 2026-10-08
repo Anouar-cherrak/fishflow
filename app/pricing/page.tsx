@@ -125,20 +125,20 @@ export default function Pricing() {
 
         <div className="ff-fade-up min-w-0">
           <div className="overflow-x-auto rounded-3xl border border-black/10 bg-surface" tabIndex={0} role="region" aria-label="Comparaison Gratuit et Pro">
-            <table className="w-full text-sm text-left min-w-[560px]">
+            <table className="w-full text-[13px] sm:text-sm text-left sm:min-w-[560px]">
               <thead>
                 <tr className="border-b border-black/10">
-                  <th scope="col" className="p-4"><span className="sr-only">Fonctionnalité</span></th>
-                  <th scope="col" className="p-4 font-semibold">Gratuit</th>
-                  <th scope="col" className="p-4 font-semibold"><span className="border-b-2 border-[#22C55E] pb-0.5">Pro</span></th>
+                  <th scope="col" className="p-3 sm:p-4 w-[34%] sm:w-auto"><span className="sr-only">Fonctionnalité</span></th>
+                  <th scope="col" className="p-3 sm:p-4 font-semibold">Gratuit</th>
+                  <th scope="col" className="p-3 sm:p-4 font-semibold"><span className="border-b-2 border-[#22C55E] pb-0.5">Pro</span></th>
                 </tr>
               </thead>
               <tbody>
                 {ROWS.map((row) => (
                   <tr key={row.label} className="border-b border-black/10 last:border-0 align-top">
-                    <th scope="row" className="p-4 font-medium">{row.label}</th>
-                    <td className="p-4 text-black/65">{row.free}</td>
-                    <td className="p-4">{row.pro}</td>
+                    <th scope="row" className="p-3 sm:p-4 font-medium">{row.label}</th>
+                    <td className="p-3 sm:p-4 text-black/65">{row.free}</td>
+                    <td className="p-3 sm:p-4">{row.pro}</td>
                   </tr>
                 ))}
               </tbody>

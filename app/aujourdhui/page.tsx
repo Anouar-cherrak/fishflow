@@ -130,13 +130,13 @@ export default function Aujourdhui() {
 
   return (
     <AppShell size="wide">
-      <div className="mb-8 ff-fade-up">
+      <div className="mb-6 sm:mb-8 ff-fade-up">
         <h1 className="ff-title mb-2">Aujourd&apos;hui.</h1>
         <p className="ff-lead first-letter:uppercase">{todayLabel}</p>
       </div>
 
       {ficheTotal === 0 && (
-        <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8 mb-6 ff-fade-up">
+        <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8 mb-6 ff-fade-up">
           <h2 className="text-xl font-bold tracking-tight mb-2">Commence ici.</h2>
           <p className="text-black/65 mb-5 max-w-[60ch]">
             Colle un cours, un article ou une photo de tes notes : tu obtiens une fiche, des flashcards et un quiz. Ou pose
@@ -151,10 +151,10 @@ export default function Aujourdhui() {
 
       <div className="grid gap-6 lg:gap-8 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start">
         <div className="grid gap-6 min-w-0">
-          <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8" aria-labelledby="goal-title">
-            <div className="flex items-center gap-6">
-              <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
-                <svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
+          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="goal-title">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="relative shrink-0 w-[92px] h-[92px] sm:w-[120px] sm:h-[120px]">
+                <svg viewBox="0 0 120 120" className="w-full h-full" aria-hidden="true">
                   <circle cx="60" cy="60" r={R} fill="none" stroke="currentColor" strokeOpacity="0.12" strokeWidth="10" />
                   <circle
                     cx="60"
@@ -172,13 +172,13 @@ export default function Aujourdhui() {
                 </svg>
                 <div className="absolute inset-0 grid place-items-center text-center">
                   <div>
-                    <p className="text-2xl font-extrabold leading-none tabular-nums">{doneToday}</p>
+                    <p className="text-xl sm:text-2xl font-extrabold leading-none tabular-nums">{doneToday}</p>
                     <p className="text-xs text-black/55 mt-1">sur {goal}</p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <h2 id="goal-title" className="text-xl font-bold tracking-tight mb-1">
+                <h2 id="goal-title" className="text-lg sm:text-xl font-bold tracking-tight mb-1">
                   {reached ? "Objectif atteint." : "Ton objectif du jour"}
                 </h2>
                 <p className="text-black/65 text-sm">
@@ -189,18 +189,20 @@ export default function Aujourdhui() {
               </div>
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Choisir ton objectif quotidien">
+            <p className="mt-5 mb-2 text-xs text-black/55">Cartes à réviser par jour</p>
+            <div className="grid grid-cols-4 gap-2 sm:flex sm:flex-wrap sm:items-center" role="group" aria-label="Choisir ton objectif quotidien">
               {GOALS.map((n) => (
                 <button
                   key={n}
                   type="button"
                   onClick={() => chooseGoal(n)}
                   aria-pressed={goal === n}
-                  className={`min-h-[44px] px-4 rounded-full border text-sm font-semibold transition ${
+                  aria-label={`${n} cartes par jour`}
+                  className={`min-h-[44px] sm:px-4 rounded-full border text-sm font-semibold transition ${
                     goal === n ? "bg-black text-white border-black" : "border-black/15 text-black/65 hover:border-black/40"
                   }`}
                 >
-                  {n} cartes
+                  {n}<span className="hidden sm:inline">&nbsp;cartes</span>
                 </button>
               ))}
             </div>
@@ -219,21 +221,21 @@ export default function Aujourdhui() {
             </div>
           </section>
 
-          <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8" aria-labelledby="curio-title">
+          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="curio-title">
             <h2 id="curio-title" className="text-xl font-bold tracking-tight mb-3">Une question pour aujourd&apos;hui</h2>
             <p className="text-lg text-black/85 mb-5 max-w-[48ch]">{question}</p>
             <div className="flex flex-wrap gap-3">
-              <Link href={`/apprendre?q=${encodeURIComponent(question)}`} className="ff-primary ff-btn">
+              <Link href={`/apprendre?q=${encodeURIComponent(question)}`} className="ff-primary ff-btn w-full sm:w-auto">
                 Poser cette question
               </Link>
-              <button type="button" onClick={() => setOffset((o) => o + 1)} className="ff-secondary">
+              <button type="button" onClick={() => setOffset((o) => o + 1)} className="ff-secondary w-full sm:w-auto">
                 Une autre
               </button>
             </div>
           </section>
 
           {recent.length > 0 && (
-            <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8" aria-labelledby="recent-title">
+            <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="recent-title">
               <h2 id="recent-title" className="text-xl font-bold tracking-tight mb-3">Reprendre</h2>
               <ul className="grid gap-1">
                 {recent.map((f) => (
@@ -253,7 +255,7 @@ export default function Aujourdhui() {
         </div>
 
         <div className="grid gap-6 min-w-0">
-          <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8" aria-labelledby="prog-title">
+          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="prog-title">
             <h2 id="prog-title" className="text-xl font-bold tracking-tight mb-4">Ta progression</h2>
             <dl className="grid grid-cols-3 gap-3 mb-6">
               <div>
@@ -281,7 +283,7 @@ export default function Aujourdhui() {
           </section>
 
           {isPro ? (
-            <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8" aria-labelledby="hard-title">
+            <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="hard-title">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <h2 id="hard-title" className="text-xl font-bold tracking-tight">Tes cartes difficiles</h2>
                 {successRate !== null && (
@@ -305,7 +307,7 @@ export default function Aujourdhui() {
               )}
             </section>
           ) : (
-            <section className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8" aria-labelledby="hard-title">
+            <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="hard-title">
               <h2 id="hard-title" className="text-xl font-bold tracking-tight mb-2">Tes cartes difficiles</h2>
               <p className="text-sm text-black/65 mb-4 max-w-[52ch]">
                 Avec Pro, FishFlow te montre les cartes que tu rates le plus, ton taux de réussite et ta progression sur

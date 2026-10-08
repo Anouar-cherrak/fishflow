@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 export type Scene = { caption: string; art: ReactNode };
 
@@ -9,6 +10,7 @@ export type Scene = { caption: string; art: ReactNode };
 export function SceneStage({ scene, sceneKey }: { scene: Scene; sceneKey: string | number }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.6);
+  const [zoom, setZoom] = useState(false);
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -18,12 +20,65 @@ export function SceneStage({ scene, sceneKey }: { scene: Scene; sceneKey: string
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+  // Sur téléphone l'écran est petit : on peut le toucher pour l'agrandir en travers.
+  const small = scale < 0.62;
   return (
-    <div className="sx-wrap" ref={wrapRef} aria-hidden="true">
-      <div key={sceneKey} className="sx" style={{ transform: `scale(${scale})` }}>
-        {scene.art}
+    <>
+      <div
+        className="sx-wrap"
+        ref={wrapRef}
+        aria-hidden={small ? undefined : "true"}
+        role={small ? "button" : undefined}
+        tabIndex={small ? 0 : undefined}
+        aria-label={small ? "Agrandir l'animation" : undefined}
+        onClick={small ? () => setZoom(true) : undefined}
+        onKeyDown={small ? (e) => (e.key === "Enter" || e.key === " ") && setZoom(true) : undefined}
+        style={small ? { cursor: "zoom-in" } : undefined}
+      >
+        <div key={sceneKey} className="sx" style={{ transform: `scale(${scale})` }}>
+          {scene.art}
+        </div>
+        {small && <span className="sx-zoom" aria-hidden="true">Toucher pour agrandir</span>}
       </div>
-    </div>
+      {zoom && <ZoomView scene={scene} sceneKey={sceneKey} onClose={() => setZoom(false)} />}
+    </>
+  );
+}
+
+// Plein écran, tourné d'un quart de tour : l'écran de l'animation est large, le téléphone est haut.
+function ZoomView({ scene, sceneKey, onClose }: { scene: Scene; sceneKey: string | number; onClose: () => void }) {
+  const [size, setSize] = useState({ w: 0, h: 0, land: false });
+  useEffect(() => {
+    const set = () => {
+      const land = window.innerWidth > window.innerHeight;
+      setSize(land ? { w: window.innerWidth, h: window.innerHeight, land } : { w: window.innerHeight, h: window.innerWidth, land });
+    };
+    set();
+    window.addEventListener("resize", set);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("resize", set);
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+  if (typeof document === "undefined" || !size.w) return null;
+  const s = Math.min(size.w / 1000, (size.h - 44) / 560);
+  return createPortal(
+    <div className="sx-zoomback" onClick={onClose} role="dialog" aria-modal="true" aria-label="Animation agrandie">
+      <div className="sx-zoomrot" style={size.land ? { width: size.w, height: size.h, left: 0, transform: "none" } : { width: size.w, height: size.h }}>
+        <div style={{ width: 1000 * s, height: 560 * s, position: "relative", overflow: "hidden", borderRadius: 14, border: "1px solid var(--ff-line)" }}>
+          <div key={sceneKey} className="sx" style={{ transform: `scale(${s})` }}>
+            {scene.art}
+          </div>
+        </div>
+        <button type="button" className="sx-zoomclose" onClick={onClose}>Fermer</button>
+      </div>
+    </div>,
+    document.body
   );
 }
 

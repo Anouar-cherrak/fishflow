@@ -369,17 +369,17 @@ export default function MesFiches() {
                         {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                       </p>
                     </div>
-                    <div className="flex items-center flex-wrap gap-1 -mx-2">
-                      <button type="button" onClick={() => handleView(fiche)} className="ff-primary text-sm min-h-[40px] px-5 mx-2 ff-btn">
+                    <div className="grid grid-cols-3 gap-1 sm:flex sm:items-center sm:flex-wrap sm:-mx-2">
+                      <button type="button" onClick={() => handleView(fiche)} className="ff-primary text-sm min-h-[44px] sm:min-h-[40px] px-5 sm:mx-2 ff-btn col-span-3 sm:col-span-1 mb-1 sm:mb-0">
                         Ouvrir
                       </button>
-                      <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[40px] rounded-full hover:bg-white">
+                      <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Renommer
                       </button>
-                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[40px] rounded-full hover:bg-white" title="Déplacer vers un dossier">
+                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Déplacer vers un dossier">
                         Dossier
                       </button>
-                      <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-red-500 transition px-2.5 min-h-[40px] rounded-full hover:bg-white">
+                      <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-red-500 transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Supprimer
                       </button>
                     </div>

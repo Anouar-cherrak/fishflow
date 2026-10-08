@@ -311,7 +311,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                 type="button"
                 onClick={handleDownloadPDF}
                 disabled={downloading}
-                className="ff-primary w-full text-sm ff-btn"
+                className="ff-primary w-full text-sm ff-btn col-span-2 lg:col-span-1"
               >
                 {downloading ? (
                   <>
@@ -322,7 +322,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   "Télécharger en PDF"
                 )}
               </button>
-              <button type="button" onClick={() => router.push("/generer")} className={actionClass}>
+              <button type="button" onClick={() => router.push("/generer")} className={`${actionClass} ff-desk-only`}>
                 Nouvelle fiche
               </button>
               {data.flashcards !== undefined && data.flashcards.length > 0 && (
@@ -337,7 +337,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   Étudier les flashcards
                 </button>
               )}
-              <button type="button" onClick={() => router.push("/mes-fiches")} className={actionClass}>
+              <button type="button" onClick={() => router.push("/mes-fiches")} className={`${actionClass} ff-desk-only`}>
                 Mes fiches
               </button>
               {data.id && <ShareFiche ficheId={data.id} className={actionClass} />}
