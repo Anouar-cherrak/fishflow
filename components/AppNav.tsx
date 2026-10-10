@@ -177,7 +177,7 @@ export function AppNav() {
         </button>
       </div>
 
-      <nav aria-label="Navigation principale" className="flex-1 flex flex-col justify-center overflow-y-auto py-4 w-full">
+      <nav aria-label="Navigation principale" className="flex-1 flex flex-col overflow-y-auto py-4 w-full [&>*:first-child]:mt-auto [&>*:last-child]:mb-auto">
         {LINKS.map((link) => {
           const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
           return (

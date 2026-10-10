@@ -183,7 +183,11 @@
 .lp .bar-link { font-size: 15px; text-decoration: none; padding: 10px 12px; min-height: 44px; display: inline-flex; align-items: center; color: var(--muted); }
 .lp .bar-link:hover { color: var(--ink); }
 .lp .bar-cta { min-height: 46px; padding: 0 20px; font-size: 15px; }
-@media (max-width: 599px) { .lp .bar-link, .lp .bar-cta { display: none; } }
+/* Téléphone : on garde « Connexion » (pour ceux qui ont déjà un compte), le gros bouton vert est déjà dans l'accueil. */
+@media (max-width: 599px) {
+  .lp .bar-cta { display: none; }
+  .lp .bar-link { color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 0 18px; min-height: 46px; font-weight: 600; }
+}
 /* Déjà connecté : « Ouvrir FishFlow » reste visible, aussi sur téléphone. */
 .lp .bar-open { min-height: 44px; padding: 0 16px; font-size: 14px; }
 .lp .cmp-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 24px; background: var(--paper); }

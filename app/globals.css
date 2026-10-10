@@ -823,3 +823,10 @@ body {
   .ff-frame:has(.ff-tabs) .ff-main { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (min-width: 768px) { .ff-tabs { display: none; } }
+
+/* ===== Téléphone : rien ne doit élargir la page =====
+   Dans une grille Tailwind sans colonnes définies, un long titre ou un long bouton gonfle la colonne
+   et toute la page devient plus large que l'écran. Les éléments d'une grille peuvent donc rétrécir. */
+.grid > *, .ff-main > * { min-width: 0; }
+.ff-main { overflow-wrap: break-word; }
+.ff-main :where(button, a, input, select, textarea, svg, img, canvas) { overflow-wrap: normal; }

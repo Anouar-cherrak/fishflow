@@ -770,7 +770,11 @@ export function Landing() {
           <div className="wrap">
             <h2 id="t-end">Commence par une question.</h2>
             <div className="cta-row">
-              <TrackedLink href="/generer" event="cta_click_final" className="btn"><span>Essayer gratuitement</span></TrackedLink>
+              {signedIn ? (
+                <Link href="/aujourdhui" className="btn"><span>Ouvrir FishFlow</span></Link>
+              ) : (
+                <TrackedLink href="/generer" event="cta_click_final" className="btn"><span>Essayer gratuitement</span></TrackedLink>
+              )}
             </div>
           </div>
         </section>
