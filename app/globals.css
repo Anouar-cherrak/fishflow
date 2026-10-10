@@ -725,3 +725,59 @@ body {
 .text-black\/60 {
   color: color-mix(in oklab, var(--color-black) 70%, transparent);
 }
+
+/* ===== Flamme de série ===== */
+.ff-streak {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 46px; padding: 0 14px 0 12px; border-radius: 999px;
+  border: 1px solid var(--ff-line); background: var(--ff-surface);
+  font-weight: 800; font-size: 15px; color: var(--ff-fg); text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
+}
+.ff-streak:hover { transform: scale(1.05); }
+.ff-streak:active { transform: scale(0.94); }
+.ff-streak[data-state="lit"] { border-color: rgba(249, 115, 22, 0.55); }
+.ff-streak[data-state="out"] { color: color-mix(in srgb, var(--ff-fg) 60%, transparent); }
+
+.ff-flame { overflow: visible; }
+.ff-flame-outer, .ff-flame-mid, .ff-flame-core { transform-origin: 16px 38px; }
+.ff-flame[data-state="lit"] { filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.6)); animation: ffFlameGlow 2.2s ease-in-out infinite; }
+.ff-flame[data-state="lit"] .ff-flame-outer { animation: ffFlameDance 1.5s ease-in-out infinite; }
+.ff-flame[data-state="lit"] .ff-flame-mid { animation: ffFlameDance 1.05s ease-in-out infinite reverse; }
+.ff-flame[data-state="lit"] .ff-flame-core { animation: ffFlameCore 0.75s ease-in-out infinite alternate; }
+.ff-flame[data-state="lit"] .ff-flame-sparks circle { animation: ffFlameSpark 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.ff-flame[data-state="lit"] .ff-flame-sparks circle:nth-child(2) { animation-delay: 0.6s; }
+.ff-flame[data-state="lit"] .ff-flame-sparks circle:nth-child(3) { animation-delay: 1.2s; }
+/* Série à entretenir : la flamme est plus petite et plus calme, comme une braise qui attend. */
+.ff-flame[data-state="waiting"] { opacity: 0.8; filter: saturate(0.7); transform: scale(0.86); }
+.ff-flame[data-state="waiting"] .ff-flame-outer, .ff-flame[data-state="waiting"] .ff-flame-mid, .ff-flame[data-state="waiting"] .ff-flame-core { animation: ffFlameDance 2.8s ease-in-out infinite; }
+.ff-flame[data-state="waiting"] .ff-flame-sparks { display: none; }
+.ff-flame-pop { animation: ffFlamePop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
+
+@keyframes ffFlameDance {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  25% { transform: scale(0.96, 1.05) skewX(-3deg); }
+  50% { transform: scale(1.03, 0.96) skewX(2.5deg); }
+  75% { transform: scale(0.98, 1.06) skewX(-1.5deg); }
+}
+@keyframes ffFlameCore {
+  from { transform: scale(0.92, 0.9); opacity: 0.85; }
+  to { transform: scale(1.04, 1.1); opacity: 1; }
+}
+@keyframes ffFlameSpark {
+  0% { transform: translateY(6px) scale(1); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-9px) scale(0.3); opacity: 0; }
+}
+@keyframes ffFlameGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.5)); }
+  50% { filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.85)); }
+}
+@keyframes ffFlamePop {
+  0% { transform: scale(0.4); }
+  60% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ff-flame, .ff-flame * { animation: none !important; }
+}

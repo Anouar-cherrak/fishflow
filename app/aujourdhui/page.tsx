@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { FlameIcon, flameState } from "@/components/StreakFlame";
 import { AppShell } from "@/components/AppShell";
 import { questionOfTheDay } from "@/lib/curiosity";
 import {
@@ -265,7 +266,11 @@ export default function Aujourdhui() {
             <dl className="grid grid-cols-3 gap-3 mb-6">
               <div>
                 <dt className="text-xs text-black/55">Série</dt>
-                <dd className="text-2xl font-extrabold tabular-nums">{progress?.streak ?? 0}<span className="text-sm font-medium text-black/55"> j</span></dd>
+                <dd className="text-2xl font-extrabold tabular-nums flex items-center gap-1.5">
+                  <FlameIcon state={flameState(progress?.streak ?? 0, progress?.activeToday ?? false)} size={20} />
+                  {progress?.streak ?? 0}
+                  <span className="text-sm font-medium text-black/55">j</span>
+                </dd>
               </div>
               <div>
                 <dt className="text-xs text-black/55">Cartes suivies</dt>

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { trackEvent } from "@/lib/tracking";
+import { getStreak, REVIEWED_EVENT } from "@/lib/reviews";
+import { FlameIcon, flameState } from "@/components/StreakFlame";
 
 type Flashcard = { question: string; answer: string };
 
@@ -30,6 +32,7 @@ export function FlashcardStudy({
   const [firstTry, setFirstTry] = useState<Record<number, boolean>>({});
   const [done, setDone] = useState(false);
   const reportedRef = useRef(false);
+  const [streak, setStreak] = useState<{ streak: number; activeToday: boolean } | null>(null);
 
   const close = () => {
     const answered = Object.entries(firstTry).map(([i, correct]) => ({ index: Number(i), correct }));
@@ -85,6 +88,20 @@ export function FlashcardStudy({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
+
+  // Bilan : une fois la séance enregistrée, on relit la série pour allumer la flamme.
+  useEffect(() => {
+    if (!done || !onComplete) return;
+    let cancelled = false;
+    const load = () => getStreak().then((st) => !cancelled && setStreak(st));
+    window.addEventListener(REVIEWED_EVENT, load);
+    const fallback = setTimeout(load, 2500);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(REVIEWED_EVENT, load);
+      clearTimeout(fallback);
+    };
+  }, [done, onComplete]);
 
   // On bloque le défilement de la page derrière la fenêtre.
   useEffect(() => {
@@ -142,7 +159,7 @@ export function FlashcardStudy({
           </p>
           <button
             onClick={close}
-            className="text-black/30 hover:text-black text-xl leading-none"
+            className="w-11 h-11 -mr-2 -my-2 flex items-center justify-center rounded-full text-black/50 hover:text-black text-xl leading-none"
             aria-label="Fermer"
           >
             ✕
@@ -154,14 +171,45 @@ export function FlashcardStudy({
         </div>
 
         {done ? (
-          <div className="text-center py-4">
-            <p className="text-3xl font-bold text-black mb-1">
+          <div className="text-center py-2" role="status">
+            <p className="text-4xl font-extrabold text-black mb-1 tabular-nums">
               {firstTryKnown} / {total}
             </p>
-            <p className="text-sm text-black/60 mb-1">réussies du premier coup</p>
-            <p className="text-xs text-black/40 mb-6">
-              {round > 1 ? `Tu as tout su en ${round} tours.` : "Tu as tout su du premier coup."}
+            <p className="text-sm text-black/60 mb-3">réussies du premier coup</p>
+            <p className="font-semibold text-black mb-4">
+              {firstTryKnown / total >= 0.9
+                ? "Excellent, tu maîtrises ces cartes !"
+                : firstTryKnown / total >= 0.6
+                  ? "Bien joué, encore un petit effort."
+                  : "C'est en revoyant qu'on retient. Tu vas y arriver."}
             </p>
+            <ul className="grid gap-2 text-sm text-left bg-white border border-black/10 rounded-xl p-4 mb-4">
+              <li className="flex justify-between gap-3">
+                <span className="text-black/65">Reviendront demain</span>
+                <strong className="tabular-nums">{total - firstTryKnown}</strong>
+              </li>
+              <li className="flex justify-between gap-3">
+                <span className="text-black/65">Reviendront plus tard</span>
+                <strong className="tabular-nums">{firstTryKnown}</strong>
+              </li>
+              {round > 1 && (
+                <li className="flex justify-between gap-3">
+                  <span className="text-black/65">Tours pour tout savoir</span>
+                  <strong className="tabular-nums">{round}</strong>
+                </li>
+              )}
+            </ul>
+            {streak && streak.streak > 0 && (
+              <div className="flex items-center justify-center gap-3 mb-5 ff-fade">
+                <FlameIcon state={flameState(streak.streak, streak.activeToday)} size={30} pop />
+                <p className="text-left">
+                  <strong className="block text-lg leading-tight">
+                    {streak.streak} jour{streak.streak > 1 ? "s" : ""} d'affilée
+                  </strong>
+                  <span className="text-xs text-black/60">Reviens demain pour garder ta flamme allumée.</span>
+                </p>
+              </div>
+            )}
             <div className="flex gap-2">
               <button
                 onClick={restart}

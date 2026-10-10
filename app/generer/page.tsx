@@ -38,14 +38,15 @@ const LOADING_MESSAGES = [
 
 const FREE_FICHES_LIMIT = 5;
 const MAX_PHOTO_SIDE = 2000;
+const MAX_PHOTOS = 4;
 
 // Les photos de téléphone dépassent souvent 4 Mo : on les réduit avant l'envoi (plus rapide, et plus de refus).
 // Si le navigateur ne sait pas lire l'image, on envoie l'originale.
-async function shrinkPhoto(file: File): Promise<File> {
-  if (file.size < 1.5 * 1024 * 1024 && /^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+async function shrinkPhoto(file: File, maxSide = MAX_PHOTO_SIDE): Promise<File> {
+  if (maxSide === MAX_PHOTO_SIDE && file.size < 1.5 * 1024 * 1024 && /^image\/(jpeg|png|webp)$/.test(file.type)) return file;
   try {
     const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, MAX_PHOTO_SIDE / Math.max(bitmap.width, bitmap.height));
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(bitmap.width * scale);
     canvas.height = Math.round(bitmap.height * scale);
@@ -57,6 +58,18 @@ async function shrinkPhoto(file: File): Promise<File> {
   } catch {
     return file;
   }
+}
+
+// Petit aperçu d'une photo choisie (l'adresse temporaire est libérée quand l'aperçu disparaît).
+function PhotoThumb({ file, alt }: { file: File; alt: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    const u = URL.createObjectURL(file);
+    queueMicrotask(() => setUrl(u));
+    return () => URL.revokeObjectURL(u);
+  }, [file]);
+  // eslint-disable-next-line @next/next/no-img-element
+  return url ? <img src={url} alt={alt} className="w-full h-full object-cover" /> : null;
 }
 
 const isPdf = (f: File) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf");
@@ -176,8 +189,13 @@ function GenererContent() {
       formData.append("text", text);
     } else if (mode === "pdf" && usage?.isPro && files.length > 0) {
       files.forEach((f) => formData.append("files", f));
+    } else if (mode === "photo") {
+      // Plusieurs pages : chaque photo est un peu plus réduite, pour que l'envoi reste léger.
+      const side = files.length > 1 ? 1600 : MAX_PHOTO_SIDE;
+      const ready = await Promise.all(files.map((f) => shrinkPhoto(f, side)));
+      ready.forEach((f) => formData.append("files", f));
     } else if (file) {
-      formData.append("file", mode === "photo" ? await shrinkPhoto(file) : file);
+      formData.append("file", file);
     }
 
     try {
@@ -253,9 +271,21 @@ function GenererContent() {
 
   const canGenerate =
     !loading &&
-    (mode === "text" ? !!text : mode === "pdf" && isMultiPdfPro ? files.length > 0 : !!file) &&
+    (mode === "text" ? !!text : mode === "photo" || isMultiPdfPro ? files.length > 0 : !!file) &&
     outputs.length > 0 &&
     !(!!user && !!usage && !usage.isPro && usage.remaining === 0);
+
+  // Photos ajoutées une par une (appareil photo du téléphone) ou plusieurs d'un coup, 4 au maximum.
+  const addPhotos = (list: File[]) => {
+    const images = list.filter(isImage);
+    if (images.length === 0) return;
+    setError(null);
+    setFiles((prev) => {
+      const next = [...prev, ...images];
+      if (next.length > MAX_PHOTOS) setError(`${MAX_PHOTOS} photos au maximum pour une fiche.`);
+      return next.slice(0, MAX_PHOTOS);
+    });
+  };
 
   // Glisser-déposer un fichier sur la zone (ordinateur).
   const dropProps = (accept: (f: File) => boolean, multiple: boolean) => ({
@@ -270,7 +300,8 @@ function GenererContent() {
       const got = Array.from(e.dataTransfer.files).filter(accept);
       if (got.length === 0) return setError("Ce type de fichier n'est pas accepté ici.");
       setError(null);
-      if (multiple) setFiles(got);
+      if (mode === "photo") addPhotos(got);
+      else if (multiple) setFiles(got);
       else setFile(got[0]);
     },
   });
@@ -396,11 +427,54 @@ function GenererContent() {
           )}
 
           {mode === "photo" && (
-            <label className={dropClass} {...dropProps(isImage, false)}>
-              <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir une photo"}</span>
-              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : <><span className="ff-desk-only">ou glisse-dépose ton fichier ici</span><span className="ff-mobile-only">Touche ici pour choisir</span></>}</span>
-              <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sr-only" />
-            </label>
+            <div>
+              {files.length < MAX_PHOTOS && (
+                <label className={files.length > 0 ? dropClass.replace("min-h-[220px] lg:min-h-[320px]", "min-h-[120px]") : dropClass} {...dropProps(isImage, true)}>
+                  <span className="text-black font-semibold mb-1">
+                    {files.length === 0 ? "Choisir une photo" : "Ajouter une page"}
+                  </span>
+                  <span className="text-black/50 text-sm">
+                    {files.length === 0 ? (
+                      <>
+                        <span className="ff-desk-only">ou glisse-dépose tes photos ici. </span>
+                        <span className="ff-mobile-only">Touche ici pour prendre ou choisir une photo. </span>
+                        Un cours de plusieurs pages ? Ajoute jusqu'à {MAX_PHOTOS} photos.
+                      </>
+                    ) : (
+                      `${files.length} / ${MAX_PHOTOS} photos`
+                    )}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      addPhotos(e.target.files ? Array.from(e.target.files) : []);
+                      e.target.value = "";
+                    }}
+                    className="sr-only"
+                  />
+                </label>
+              )}
+              {files.length > 0 && (
+                <ul className="mt-3 grid grid-cols-4 gap-2" aria-label="Photos choisies">
+                  {files.map((f, i) => (
+                    <li key={`${f.name}-${i}`} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-black/15 bg-white">
+                      <PhotoThumb file={f} alt={`Page ${i + 1}`} />
+                      <span className="absolute left-1 top-1 text-[11px] font-bold px-1.5 rounded-full bg-[#000000]/70 text-[#ffffff]">{i + 1}</span>
+                      <button
+                        type="button"
+                        aria-label={`Retirer la page ${i + 1}`}
+                        onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute right-0 top-0 w-9 h-9 flex items-center justify-center text-[#ffffff] text-sm"
+                      >
+                        <span className="w-6 h-6 rounded-full bg-[#000000]/70 flex items-center justify-center" aria-hidden="true">✕</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
         </section>
 

@@ -61,6 +61,7 @@ export async function recordReviewResults(results: ReviewResult[]): Promise<void
     ]);
     if (cardsRes.error) console.error("Révisions non enregistrées :", cardsRes.error.message);
     if (logRes.error) console.error("Journal des révisions non enregistré :", logRes.error.message);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event(REVIEWED_EVENT));
   } catch {
     // On ignore : la révision espacée est un bonus, elle ne doit jamais bloquer l'étude.
   }
@@ -87,12 +88,37 @@ export async function clearFicheReviews(ficheId: string): Promise<void> {
   } catch {}
 }
 
-export type Progress = { tracked: number; mastered: number; streak: number; reviewedToday: number };
+export type Progress = { tracked: number; mastered: number; streak: number; reviewedToday: number; activeToday: boolean };
 
-// Progression : cartes suivies, cartes « maîtrisées » (boîte 4 ou 5) et série de jours de révision.
-// La série est calculée avec la dernière révision de chaque carte (suffisant pour un premier niveau).
+// Série de jours d'affilée : si on n'a pas encore révisé aujourd'hui, la série d'hier compte encore (elle est « à entretenir »).
+function computeStreak(days: Set<string>): { streak: number; activeToday: boolean } {
+  const cursor = new Date();
+  const activeToday = days.has(cursor.toDateString());
+  if (!activeToday) cursor.setDate(cursor.getDate() - 1);
+  let streak = 0;
+  while (days.has(cursor.toDateString())) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return { streak, activeToday };
+}
+
+// Jours de révision : le journal (chaque séance) complété par la dernière révision de chaque carte.
+async function reviewDays(lastReviewed: (string | null)[]): Promise<Set<string>> {
+  const days = new Set<string>();
+  for (const d of lastReviewed) if (d) days.add(new Date(d).toDateString());
+  const { data } = await createClient()
+    .from("review_log")
+    .select("reviewed_at")
+    .gte("reviewed_at", startOfDay(400).toISOString())
+    .limit(20000);
+  for (const row of (data ?? []) as { reviewed_at: string }[]) days.add(new Date(row.reviewed_at).toDateString());
+  return days;
+}
+
+// Progression : cartes suivies, cartes « maîtrisées » (boîte 4 ou 5), cartes revues aujourd'hui et série de jours.
 export async function getProgress(): Promise<Progress> {
-  const empty = { tracked: 0, mastered: 0, streak: 0, reviewedToday: 0 };
+  const empty = { tracked: 0, mastered: 0, streak: 0, reviewedToday: 0, activeToday: false };
   try {
     const { data, error } = await createClient()
       .from("card_reviews")
@@ -100,32 +126,33 @@ export async function getProgress(): Promise<Progress> {
       .limit(5000);
     if (error || !data) return empty;
 
-    const days = new Set<string>();
-    let mastered = 0;
-    let reviewedToday = 0;
+    const rows = data as { box: number; last_reviewed_at: string | null }[];
     const todayKey = new Date().toDateString();
-    for (const row of data as { box: number; last_reviewed_at: string | null }[]) {
-      if (row.box >= 4) mastered++;
-      if (row.last_reviewed_at) {
-        const day = new Date(row.last_reviewed_at).toDateString();
-        days.add(day);
-        if (day === todayKey) reviewedToday++;
-      }
-    }
-
-    let streak = 0;
-    const cursor = new Date();
-    // Si on n'a pas encore révisé aujourd'hui, la série d'hier compte encore.
-    if (!days.has(cursor.toDateString())) cursor.setDate(cursor.getDate() - 1);
-    while (days.has(cursor.toDateString())) {
-      streak++;
-      cursor.setDate(cursor.getDate() - 1);
-    }
-    return { tracked: data.length, mastered, streak, reviewedToday };
+    const mastered = rows.filter((r) => r.box >= 4).length;
+    const reviewedToday = rows.filter((r) => r.last_reviewed_at && new Date(r.last_reviewed_at).toDateString() === todayKey).length;
+    const { streak, activeToday } = computeStreak(await reviewDays(rows.map((r) => r.last_reviewed_at)));
+    return { tracked: rows.length, mastered, streak, reviewedToday, activeToday };
   } catch {
     return empty;
   }
 }
+
+// Série seule, pour la flamme de la barre du haut (requête légère).
+export async function getStreak(): Promise<{ streak: number; activeToday: boolean }> {
+  try {
+    const { data } = await createClient()
+      .from("card_reviews")
+      .select("last_reviewed_at")
+      .order("last_reviewed_at", { ascending: false, nullsFirst: false })
+      .limit(2000);
+    return computeStreak(await reviewDays(((data ?? []) as { last_reviewed_at: string | null }[]).map((r) => r.last_reviewed_at)));
+  } catch {
+    return { streak: 0, activeToday: false };
+  }
+}
+
+// Prévient la flamme (et les autres écrans) qu'une révision vient d'être enregistrée.
+export const REVIEWED_EVENT = "ff-reviewed";
 
 function startOfDay(daysAgo: number) {
   const d = new Date();

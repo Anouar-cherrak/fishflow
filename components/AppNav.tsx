@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
+import { StreakFlame } from "@/components/StreakFlame";
 
 const LINKS = [
   { href: "/aujourdhui", label: "Aujourd'hui", hint: "Ton objectif, tes cartes, ta progression" },
@@ -122,6 +123,7 @@ export function AppNav() {
       </Link>
 
       <div className="flex items-center gap-2">
+        {authReady && email && <StreakFlame />}
         <button
           type="button"
           onClick={toggleTheme}

@@ -12,6 +12,7 @@ const MAX_CHARS_PRO = 60000;
 const TIMEOUT_MS = 50000;
 const MAX_PHOTO_BYTES = 4 * 1024 * 1024; // 4 Mo — marge de sécurité sous la limite de payload de Vercel (~4.5 Mo)
 const MAX_PDF_FILES = 10;
+const MAX_PHOTOS = 4;
 const PRO_DAILY_FICHES = 50;
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
@@ -249,6 +250,7 @@ export async function POST(req: Request) {
   let messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
   let wasTruncated = false;
   let sourceText: string | undefined;
+  let photoCount = 0;
 
   try {
     if (mode === "text") {
@@ -340,36 +342,50 @@ export async function POST(req: Request) {
         { role: "user", content: `Contenu du cours (extrait d'un ou plusieurs PDF) :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "photo") {
-      const file = formData.get("file");
-      if (!(file instanceof File)) {
+      // Une ou plusieurs photos (les pages d'un même cours, dans l'ordre).
+      const many = formData.getAll("files").filter((f): f is File => f instanceof File);
+      const single = formData.get("file");
+      const photos = many.length > 0 ? many : single instanceof File ? [single] : [];
+      photoCount = photos.length;
+
+      if (photos.length === 0) {
         return NextResponse.json({ error: "Aucune photo reçue." }, { status: 400 });
       }
-
-      if (!PHOTO_TYPES.has(file.type)) {
+      if (photos.length > MAX_PHOTOS) {
+        return NextResponse.json({ error: `${MAX_PHOTOS} photos au maximum pour une fiche.` }, { status: 400 });
+      }
+      if (photos.some((f) => !PHOTO_TYPES.has(f.type))) {
         return NextResponse.json(
           { error: "Ce format de photo n'est pas accepté. Utilise une image JPG, PNG ou WebP." },
           { status: 400 }
         );
       }
-
-      if (file.size > MAX_PHOTO_BYTES) {
+      if (photos.reduce((sum, f) => sum + f.size, 0) > MAX_PHOTO_BYTES) {
         return NextResponse.json(
-          {
-            error: "Cette photo est trop volumineuse (max 4 Mo). Réduis la qualité ou recadre l'image, puis réessaie.",
-          },
+          { error: "Ces photos sont trop lourdes ensemble (4 Mo au total). Envoie-en moins à la fois, ou recadre-les." },
           { status: 400 }
         );
       }
 
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const base64 = buffer.toString("base64");
+      const images = await Promise.all(
+        photos.map(async (f) => ({
+          type: "image_url" as const,
+          image_url: { url: `data:${f.type};base64,${Buffer.from(await f.arrayBuffer()).toString("base64")}` },
+        }))
+      );
       messages = [
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
           content: [
-            { type: "text", text: "Lis le contenu de cette image (le cours) et génère le JSON demandé." },
-            { type: "image_url", image_url: { url: `data:${file.type};base64,${base64}` } },
+            {
+              type: "text",
+              text:
+                photos.length > 1
+                  ? `Voici ${photos.length} photos : ce sont les pages d'un même cours, dans l'ordre. Lis-les toutes et génère UN SEUL JSON qui couvre l'ensemble.`
+                  : "Lis le contenu de cette image (le cours) et génère le JSON demandé.",
+            },
+            ...images,
           ],
         },
       ];
@@ -419,7 +435,8 @@ export async function POST(req: Request) {
       openai.chat.completions.create({
         model: "gpt-4o-mini",
         response_format: { type: "json_object" },
-        max_tokens: pro ? 4500 : 3000,
+        // Plusieurs photos = plus de texte à recopier : on laisse plus de place à la réponse.
+        max_tokens: (pro ? 4500 : 3000) + Math.max(0, photoCount - 1) * 1200,
         messages,
       }),
       TIMEOUT_MS
