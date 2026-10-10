@@ -13,7 +13,7 @@ export function ThemeToggle() {
     // Le choix fait sur cet appareil gagne ; sans choix local, le thème sombre reste le défaut.
     let stored: string | null = null;
     try {
-      stored = localStorage.getItem("ff-theme");
+      stored = localStorage.getItem("ff-theme2");
     } catch {}
     if (stored) return;
     fetch("/api/preferences")
@@ -23,7 +23,7 @@ export function ThemeToggle() {
           setIsDark(data.darkMode);
           document.documentElement.classList.toggle("dark", data.darkMode);
           try {
-            localStorage.setItem("ff-theme", data.darkMode ? "dark" : "light");
+            localStorage.setItem("ff-theme2", data.darkMode ? "dark" : "light");
           } catch {}
         }
       })
@@ -35,7 +35,7 @@ export function ThemeToggle() {
     setIsDark(next);
     document.documentElement.classList.toggle("dark", next);
     try {
-      localStorage.setItem("ff-theme", next ? "dark" : "light");
+      localStorage.setItem("ff-theme2", next ? "dark" : "light");
     } catch {}
     // Sauvegarde sur le compte (silencieux si non connecté)
     fetch("/api/preferences", {

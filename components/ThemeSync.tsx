@@ -12,7 +12,7 @@ export function ThemeSync() {
     // Le choix fait sur cet appareil gagne. Sans choix local, le thème sombre est le thème par défaut.
     let stored: string | null = null;
     try {
-      stored = localStorage.getItem("ff-theme");
+      stored = localStorage.getItem("ff-theme2");
     } catch {}
     if (stored) return;
     fetch("/api/preferences")
@@ -21,7 +21,7 @@ export function ThemeSync() {
         if (data && data.darkMode === true) {
           document.documentElement.classList.toggle("dark", data.darkMode);
           try {
-            localStorage.setItem("ff-theme", data.darkMode ? "dark" : "light");
+            localStorage.setItem("ff-theme2", data.darkMode ? "dark" : "light");
           } catch {}
         }
       })

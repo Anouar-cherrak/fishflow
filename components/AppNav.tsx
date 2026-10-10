@@ -58,7 +58,7 @@ export function AppNav() {
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
     try {
-      localStorage.setItem("ff-theme", next ? "dark" : "light");
+      localStorage.setItem("ff-theme2", next ? "dark" : "light");
     } catch {}
     // Sauvegarde sur le compte (silencieux si non connecté)
     fetch("/api/preferences", {

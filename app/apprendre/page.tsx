@@ -58,12 +58,6 @@ export default function Apprendre() {
     });
   }, [status, answer]);
 
-  // Un lien comme /apprendre?q=... remplit le champ (sans envoyer : c'est la personne qui décide).
-  useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("q");
-    if (q) setQuestion(q.slice(0, 300));
-  }, []);
-
   // On annule la requête en cours si on quitte la page.
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -127,6 +121,25 @@ export default function Apprendre() {
       setMessage("Connexion impossible. Vérifie ta connexion et réessaie.");
     }
   };
+
+  // Un lien comme /apprendre?q=... remplit le champ. Avec &go=1 (bouton « Poser cette question »
+  // de la page Aujourd'hui), la question part tout de suite : la personne a déjà choisi de la poser.
+  const autoAsked = useRef(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    if (!q) return;
+    const text = q.slice(0, MAX_QUESTION);
+    queueMicrotask(() => setQuestion(text));
+    if (params.get("go") === "1" && !autoAsked.current) {
+      autoAsked.current = true;
+      // On retire « go » de l'adresse : recharger la page ne repose pas la question.
+      params.delete("go");
+      window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+      queueMicrotask(() => ask(text));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Le texte de la réponse devient le point de départ d'une fiche (la génération normale s'applique).
   const makeSheet = () => {
@@ -208,7 +221,7 @@ export default function Apprendre() {
           {status === "pro" && (
             <div className="bg-surface border border-black/10 rounded-2xl p-6 text-center ff-fade-up">
               <p className="font-medium mb-1">{message || "Cette fonctionnalité est réservée aux Pro."}</p>
-              <p className="text-sm text-black/60 mb-4">Tu as eu un essai gratuit. Avec Pro, tu apprends sans limite.</p>
+              <p className="text-sm text-black/60 mb-4">Avec Pro, tu peux poser 20 questions par jour.</p>
               <Link
                 href="/pricing"
                 className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition ff-btn"

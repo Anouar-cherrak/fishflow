@@ -46,6 +46,7 @@ export default function Aujourdhui() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [apprendreLeft, setApprendreLeft] = useState(1);
   const [due, setDue] = useState(0);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [counts, setCounts] = useState<DayCount[]>([]);
@@ -84,6 +85,7 @@ export default function Aujourdhui() {
       if (cancelled) return;
 
       setIsPro(pro);
+      setApprendreLeft(typeof usage.apprendreLeft === "number" ? usage.apprendreLeft : 1);
       setDue(dueNow);
       setProgress(prog);
       setCounts(daily.counts);
@@ -93,7 +95,12 @@ export default function Aujourdhui() {
       setFicheTotal(fiches.count ?? (fiches.data ?? []).length);
       setReady(true);
     };
-    load();
+    // Quoi qu'il arrive (réseau coupé, réponse inattendue), la page s'affiche : jamais bloquée sur « Chargement... ».
+    load()
+      .catch((err) => console.error("Aujourd'hui : chargement incomplet", err))
+      .finally(() => {
+        if (!cancelled) setReady(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -227,19 +234,6 @@ export default function Aujourdhui() {
             </div>
           </section>
 
-          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="curio-title">
-            <h2 id="curio-title" className="text-xl font-bold tracking-tight mb-3">Une question pour aujourd&apos;hui</h2>
-            <p className="text-lg text-black/85 mb-5 max-w-[48ch]">{question}</p>
-            <div className="flex flex-wrap gap-3">
-              <Link href={`/apprendre?q=${encodeURIComponent(question)}`} className="ff-primary ff-btn w-full sm:w-auto">
-                Poser cette question
-              </Link>
-              <button type="button" onClick={() => setOffset((o) => o + 1)} className="ff-secondary w-full sm:w-auto">
-                Une autre
-              </button>
-            </div>
-          </section>
-
           {recent.length > 0 && (
             <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="recent-title">
               <h2 id="recent-title" className="text-xl font-bold tracking-tight mb-3">Reprendre</h2>
@@ -326,6 +320,34 @@ export default function Aujourdhui() {
               <Link href="/pricing" className="ff-secondary text-sm">Voir ce que contient Pro</Link>
             </section>
           )}
+
+          {/* En dernier : la question du jour (Apprendre) est un bonus, la révision passe avant. */}
+          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="curio-title">
+            <h2 id="curio-title" className="text-xl font-bold tracking-tight mb-3">Une question pour aujourd&apos;hui</h2>
+            <p className="text-lg text-black/85 mb-5 max-w-[48ch]">{question}</p>
+            {/* Plus de question possible (essai gratuit utilisé, ou limite du jour) : on le dit au lieu d'envoyer vers un mur. */}
+            {apprendreLeft === 0 && (
+              <p className="text-sm text-black/65 mb-4 max-w-[48ch]">
+                {isPro
+                  ? "Tu as posé toutes tes questions du jour. Reviens demain !"
+                  : "Tu as utilisé ta question gratuite. Avec Pro, tu peux en poser 20 par jour."}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-3">
+              {apprendreLeft > 0 ? (
+                <Link href={`/apprendre?q=${encodeURIComponent(question)}&go=1`} className="ff-primary ff-btn w-full sm:w-auto">
+                  {isPro ? "Poser cette question" : "Poser cette question (essai gratuit)"}
+                </Link>
+              ) : !isPro ? (
+                <Link href="/pricing" className="ff-primary ff-btn w-full sm:w-auto">
+                  Voir Pro
+                </Link>
+              ) : null}
+              <button type="button" onClick={() => setOffset((o) => o + 1)} className="ff-secondary w-full sm:w-auto">
+                Une autre
+              </button>
+            </div>
+          </section>
         </div>
       </div>
     </AppShell>

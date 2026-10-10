@@ -145,7 +145,7 @@ export function Landing() {
   useEffect(() => {
     try {
       // Même choix que sur tout le site : « light » seulement si la personne l'a demandé.
-      if (localStorage.getItem("ff-theme") === "light") queueMicrotask(() => setTheme("light"));
+      if (localStorage.getItem("ff-theme2") === "light") queueMicrotask(() => setTheme("light"));
     } catch {}
   }, []);
   useEffect(() => {
@@ -155,7 +155,7 @@ export function Landing() {
     const next: Theme = theme === "dark" ? "light" : "dark";
     setTheme(next);
     try {
-      localStorage.setItem("ff-theme", next);
+      localStorage.setItem("ff-theme2", next);
       document.documentElement.classList.toggle("dark", next === "dark");
     } catch {}
   };

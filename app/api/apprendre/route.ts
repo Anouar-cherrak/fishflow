@@ -143,7 +143,7 @@ export async function POST(req: Request) {
   const quotaError = () =>
     pro
       ? fail("Tu as atteint la limite du jour. Reviens demain.", 429)
-      : fail("Tu as utilisé ton essai gratuit. Passe Pro pour apprendre sans limite.", 403, { code: "pro_required" });
+      : fail("Tu as utilisé ta question gratuite. Passe Pro pour en poser 20 par jour.", 403, { code: "pro_required" });
   if (!quota.allowed) return quotaError();
 
   if (!process.env.OPENAI_API_KEY) return fail("Service momentanément indisponible.", 503);

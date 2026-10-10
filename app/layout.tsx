@@ -45,7 +45,8 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`
             try {
-              if (localStorage.getItem('ff-theme') !== 'light') {
+              // Clé « ff-theme2 » : en octobre 2026, le thème sombre a été remis par défaut pour tout le monde.
+              if (localStorage.getItem('ff-theme2') !== 'light') {
                 document.documentElement.classList.add('dark');
               }
             } catch (e) {}
