@@ -114,7 +114,8 @@ export default function Aujourdhui() {
   }
 
   const today = counts[counts.length - 1];
-  const doneToday = today?.total ?? 0;
+  // Secours : si le journal des révisions est vide ou absent, on compte les cartes révisées aujourd'hui.
+  const doneToday = Math.max(today?.total ?? 0, progress?.reviewedToday ?? 0);
   const ratio = Math.min(1, doneToday / goal);
   const reached = doneToday >= goal;
   const question = questionOfTheDay(offset);
@@ -211,6 +212,10 @@ export default function Aujourdhui() {
               {due > 0 ? (
                 <Link href="/reviser" className="ff-primary ff-btn w-full sm:w-auto">
                   Réviser {Math.min(due, 20)} carte{Math.min(due, 20) > 1 ? "s" : ""} maintenant
+                </Link>
+              ) : ficheTotal > 0 && !reached ? (
+                <Link href="/reviser" className="ff-primary ff-btn w-full sm:w-auto">
+                  Découvrir de nouvelles cartes
                 </Link>
               ) : (
                 <p className="text-sm text-black/60">

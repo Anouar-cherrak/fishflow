@@ -84,7 +84,7 @@ export function ShareFiche({ ficheId, className }: { ficheId: string; className:
         </button>
       </div>
       <p className="text-xs text-black/50">Toute personne qui a ce lien peut lire ta fiche. Ton cours d&apos;origine n&apos;est pas partagé.</p>
-      {error && <p className="text-xs text-red-500" role="alert">{error}</p>}
+      {error && <p className="text-xs text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
     </div>
   );
 }

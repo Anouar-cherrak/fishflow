@@ -22,7 +22,11 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setError("Email ou mot de passe incorrect.");
+      setError(
+        error.message.toLowerCase().includes("not confirmed")
+          ? "Ton email n'est pas encore confirmé. Refais l'inscription avec le même email pour recevoir un nouveau code (pense aux spams)."
+          : "Email ou mot de passe incorrect."
+      );
       setLoading(false);
       return;
     }
@@ -34,6 +38,14 @@ export default function Login() {
 
   return (
     <AuthLayout>
+      <form
+        noValidate
+        onSubmit={(e) => {
+          // La touche « OK » du clavier du téléphone valide le formulaire.
+          e.preventDefault();
+          if (!loading && email && password) handleLogin();
+        }}
+      >
         <h1 className="text-2xl font-bold tracking-tight mb-1">Connexion</h1>
         <p className="text-black/60 mb-6">Accède à ton compte</p>
 
@@ -59,28 +71,29 @@ export default function Login() {
         />
 
         <p className="text-right mb-4">
-          <Link href="/reset-password" className="text-xs text-black/40 hover:text-black hover:underline transition">
+          <Link href="/reset-password" className="inline-flex items-center min-h-[44px] text-sm text-black/60 hover:text-black hover:underline transition">
             Mot de passe oublié ?
           </Link>
         </p>
 
         {error && (
-          <p className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
+          <p role="alert" className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
             {error}
           </p>
         )}
 
         <button
-          onClick={handleLogin}
+          type="submit"
           disabled={loading || !email || !password}
           className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>
+      </form>
 
         <p className="text-sm text-black/50 text-center mt-4">
           Pas encore de compte ?{" "}
-          <button onClick={() => router.push("/signup")} className="text-black hover:underline font-medium ff-link-underline">
+          <button type="button" onClick={() => router.push("/signup")} className="text-black hover:underline font-medium ff-link-underline">
             Créer un compte
           </button>
         </p>

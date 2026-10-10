@@ -126,6 +126,14 @@ export function QuizPlayer({
         })}
       </div>
 
+      <p role="status" aria-live="polite" className={`text-sm font-medium ${selected !== null ? "mb-4" : "sr-only"}`}>
+        {selected === null
+          ? ""
+          : selected === q.correctIndex
+            ? "Bonne réponse !"
+            : `Pas tout à fait : la bonne réponse est « ${q.options[q.correctIndex]} ».`}
+      </p>
+
       {selected !== null && (
         <button
           onClick={handleNext}

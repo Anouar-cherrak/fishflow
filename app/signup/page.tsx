@@ -14,6 +14,17 @@ declare global {
   }
 }
 
+// Messages de Supabase traduits en français simple.
+function frenchAuthError(msg: string): string {
+  const m = msg.toLowerCase();
+  if (m.includes("already registered") || m.includes("already exists")) return "Un compte existe déjà avec cet email. Connecte-toi plutôt.";
+  if (m.includes("weak") || m.includes("pwned") || m.includes("leaked")) return "Ce mot de passe est trop facile à deviner. Choisis-en un autre.";
+  if (m.includes("password")) return "Ton mot de passe doit faire au moins 6 caractères.";
+  if (m.includes("email") && (m.includes("invalid") || m.includes("valid"))) return "Cette adresse email n'est pas valide. Vérifie-la.";
+  if (m.includes("rate") || m.includes("too many") || m.includes("seconds")) return "Trop d'essais d'un coup. Attends une minute puis réessaie.";
+  return "Une erreur est survenue. Vérifie ton email et réessaie.";
+}
+
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +48,7 @@ export default function Signup() {
     });
 
     if (error) {
-      setMessage(error.message);
+      setMessage(frenchAuthError(error.message));
       setLoading(false);
       return;
     }
@@ -92,6 +103,16 @@ export default function Signup() {
 
   return (
     <AuthLayout>
+      <form
+        noValidate
+        onSubmit={(e) => {
+          // La touche « OK » du clavier du téléphone valide le formulaire.
+          e.preventDefault();
+          if (loading) return;
+          if (step === "form" && email && password) handleSignup();
+          if (step === "code" && code.length >= 6) handleVerify();
+        }}
+      >
         {step === "form" ? (
           <>
             <h1 className="text-2xl font-bold tracking-tight mb-1">Crée ton compte gratuit</h1>
@@ -134,7 +155,7 @@ export default function Signup() {
             </p>
 
             <button
-              onClick={handleSignup}
+              type="submit"
               disabled={loading || !email || !password}
               className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
@@ -153,7 +174,9 @@ export default function Signup() {
               <strong>Pense aux spams.</strong> Le mail avec ton code arrive souvent dans le courrier indésirable. Il vient de FishFlow.
             </p>
 
+            <label htmlFor="signup-code" className="sr-only">Code reçu par email</label>
             <input
+              id="signup-code"
               type="text"
               inputMode="numeric"
               maxLength={10}
@@ -166,13 +189,13 @@ export default function Signup() {
             />
 
             {message && (
-              <p className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mb-4 ff-fade">
+              <p role="alert" className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mb-4 ff-fade">
                 {message}
               </p>
             )}
 
             <button
-              onClick={handleVerify}
+              type="submit"
               disabled={loading || code.length < 6}
               className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
@@ -189,17 +212,23 @@ export default function Signup() {
             </button>
 
             <button
-              onClick={() => { setStep("form"); setMessage(null); }}
-              className="w-full mt-3 text-sm text-black/40 hover:text-black transition"
+              type="button"
+              onClick={() => { setStep("form"); setMessage(null); setCode(""); }}
+              className="w-full mt-3 text-sm text-black/60 hover:text-black transition min-h-[44px]"
             >
               ← Modifier l'email
             </button>
+            <p className="text-xs text-black/60 text-center mt-2">
+              Tu avais déjà un compte avec cet email ? Dans ce cas, aucun code n&apos;est envoyé :{" "}
+              <button type="button" onClick={() => router.push("/login")} className="underline">connecte-toi</button>.
+            </p>
           </>
         )}
+      </form>
 
         <p className="text-sm text-black/50 text-center mt-4">
           Déjà un compte ?{" "}
-          <button onClick={() => router.push("/login")} className="text-black hover:underline font-medium ff-link-underline">
+          <button type="button" onClick={() => router.push("/login")} className="text-black hover:underline font-medium ff-link-underline">
             Se connecter
           </button>
         </p>

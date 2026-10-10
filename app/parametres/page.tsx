@@ -228,11 +228,11 @@ export default function Parametres() {
           </div>
 
           <div className="bg-surface border border-red-500/40 rounded-3xl p-6 sm:p-7 md:col-span-2 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-red-500 mb-3">Zone dangereuse</p>
+            <p className="text-sm font-semibold text-[var(--quiz-wrong-text)] mb-3">Zone dangereuse</p>
             {!showDeleteConfirm ? (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="w-full py-2.5 rounded-lg font-medium border border-red-300 text-red-600 hover:bg-red-50 transition ff-btn"
+                className="w-full py-2.5 rounded-lg font-medium border border-[var(--quiz-wrong-text)] text-[var(--quiz-wrong-text)] hover:bg-[var(--quiz-wrong-bg)] transition ff-btn"
               >
                 Supprimer mon compte
               </button>

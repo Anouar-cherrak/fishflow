@@ -53,10 +53,14 @@ export async function recordReviewResults(results: ReviewResult[]): Promise<void
       };
     });
 
-    await supabase.from("card_reviews").upsert(rows, { onConflict: "fiche_id,card_index" });
-
-    // Journal des révisions (pour les statistiques et l'objectif du jour). Silencieux si la table n'existe pas encore.
-    await supabase.from("review_log").insert(results.map((r) => ({ correct: r.correct })));
+    // Les deux envois partent ensemble : si la personne change de page tout de suite, le journal
+    // (objectif du jour, graphique) n'est plus perdu derrière l'enregistrement des cartes.
+    const [cardsRes, logRes] = await Promise.all([
+      supabase.from("card_reviews").upsert(rows, { onConflict: "fiche_id,card_index" }),
+      supabase.from("review_log").insert(results.map((r) => ({ correct: r.correct }))),
+    ]);
+    if (cardsRes.error) console.error("Révisions non enregistrées :", cardsRes.error.message);
+    if (logRes.error) console.error("Journal des révisions non enregistré :", logRes.error.message);
   } catch {
     // On ignore : la révision espacée est un bonus, elle ne doit jamais bloquer l'étude.
   }
@@ -83,12 +87,12 @@ export async function clearFicheReviews(ficheId: string): Promise<void> {
   } catch {}
 }
 
-export type Progress = { tracked: number; mastered: number; streak: number };
+export type Progress = { tracked: number; mastered: number; streak: number; reviewedToday: number };
 
 // Progression : cartes suivies, cartes « maîtrisées » (boîte 4 ou 5) et série de jours de révision.
 // La série est calculée avec la dernière révision de chaque carte (suffisant pour un premier niveau).
 export async function getProgress(): Promise<Progress> {
-  const empty = { tracked: 0, mastered: 0, streak: 0 };
+  const empty = { tracked: 0, mastered: 0, streak: 0, reviewedToday: 0 };
   try {
     const { data, error } = await createClient()
       .from("card_reviews")
@@ -98,9 +102,15 @@ export async function getProgress(): Promise<Progress> {
 
     const days = new Set<string>();
     let mastered = 0;
+    let reviewedToday = 0;
+    const todayKey = new Date().toDateString();
     for (const row of data as { box: number; last_reviewed_at: string | null }[]) {
       if (row.box >= 4) mastered++;
-      if (row.last_reviewed_at) days.add(new Date(row.last_reviewed_at).toDateString());
+      if (row.last_reviewed_at) {
+        const day = new Date(row.last_reviewed_at).toDateString();
+        days.add(day);
+        if (day === todayKey) reviewedToday++;
+      }
     }
 
     let streak = 0;
@@ -111,7 +121,7 @@ export async function getProgress(): Promise<Progress> {
       streak++;
       cursor.setDate(cursor.getDate() - 1);
     }
-    return { tracked: data.length, mastered, streak };
+    return { tracked: data.length, mastered, streak, reviewedToday };
   } catch {
     return empty;
   }

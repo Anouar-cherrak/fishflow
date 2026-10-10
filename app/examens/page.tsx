@@ -118,7 +118,9 @@ export default function Examens() {
   };
 
   const remove = async (id: string) => {
-    await createClient().from("exams").delete().eq("id", id);
+    if (!confirm("Supprimer cet examen ? Tes fiches et tes cartes ne sont pas supprimées.")) return;
+    const { error: err } = await createClient().from("exams").delete().eq("id", id);
+    if (err) return alert("Impossible de supprimer cet examen pour l'instant. Réessaie.");
     setExams((cur) => cur.filter((x) => x.id !== id));
   };
 
@@ -129,7 +131,7 @@ export default function Examens() {
           <h1 className="ff-title mb-2">Mes examens.</h1>
           <p className="ff-lead">Tu as un examen bientôt ? Donne la date et choisis tes fiches. FishFlow te dit combien de cartes revoir chaque jour.</p>
         </div>
-        {status === "ready" && !creating && (
+        {status === "ready" && !creating && exams.length > 0 && (
           <button type="button" onClick={() => setCreating(true)} className="ff-primary ff-btn">
             Ajouter un examen
           </button>
@@ -161,7 +163,7 @@ export default function Examens() {
             </div>
             <div className="grid gap-1.5">
               <label htmlFor="exam-date" className="text-sm font-semibold text-black/70">2. La date</label>
-              <input id="exam-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="min-h-[48px] px-4 rounded-xl border border-black/15 bg-white" />
+              <input id="exam-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={date} onChange={(e) => setDate(e.target.value)} className="min-h-[48px] px-4 rounded-xl border border-black/15 bg-white" />
             </div>
           </div>
 
@@ -207,7 +209,7 @@ export default function Examens() {
             )}
           </fieldset>
 
-          {error && <p className="text-sm text-red-500" role="alert">{error}</p>}
+          {error && <p className="text-sm text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
           <div className="flex flex-wrap gap-3">
             <button type="submit" disabled={saving} className="ff-primary ff-btn">{saving ? "Enregistrement..." : "Enregistrer"}</button>
             <button type="button" onClick={() => { setCreating(false); setError(""); }} className="ff-secondary">Annuler</button>
@@ -244,8 +246,8 @@ export default function Examens() {
                     <p className="text-sm text-black/60 capitalize">{formatDate(exam.exam_date)}</p>
                   </div>
                   <p className="text-right shrink-0">
-                    <span className="block text-3xl font-extrabold leading-none">{past ? "—" : left}</span>
-                    <span className="text-xs text-black/60">{past ? "terminé" : left === 1 ? "jour" : "jours"}</span>
+                    <span className="block text-3xl font-extrabold leading-none">{past ? "—" : left === 0 ? "J" : left}</span>
+                    <span className="text-xs text-black/60">{past ? "terminé" : left === 0 ? "aujourd'hui" : left === 1 ? "jour" : "jours"}</span>
                   </p>
                 </div>
 

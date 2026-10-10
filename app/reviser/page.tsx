@@ -17,11 +17,14 @@ type DueCard = {
 
 // Une séance = au maximum 20 cartes, pour que ça reste court et facile à faire chaque jour.
 const SESSION_SIZE = 20;
+// Rien à revoir : on propose au plus 10 cartes jamais étudiées, prises dans les fiches les plus récentes.
+const NEW_CARDS = 10;
 
 export default function Reviser() {
   const [status, setStatus] = useState<"loading" | "ready" | "empty">("loading");
   const [cards, setCards] = useState<DueCard[]>([]);
   const [dueTotal, setDueTotal] = useState(0);
+  const [onlyNew, setOnlyNew] = useState(false);
   const [studying, setStudying] = useState(false);
   const [finished, setFinished] = useState(false);
   const [progress, setProgress] = useState<Progress | null>(null);
@@ -70,7 +73,27 @@ export default function Reviser() {
         ficheSource = [...ficheSource, ...newRows.map((r) => r.fiche_id)];
       }
 
+      // Aucune carte à revoir : on fait découvrir les nouvelles cartes des fiches récentes,
+      // pour que Réviser ne soit jamais vide quand il y a des fiches.
+      if (only.length === 0 && dueRows.length === 0) {
+        const { data: recentFiches } = await supabase.from("fiches").select("id, data").order("created_at", { ascending: false }).limit(10);
+        const ids = (recentFiches ?? []).map((f) => f.id as string);
+        if (ids.length > 0) {
+          const { data: tracked } = await supabase.from("card_reviews").select("fiche_id, card_index").in("fiche_id", ids);
+          const seen = new Set((tracked ?? []).map((r) => `${r.fiche_id}:${r.card_index}`));
+          for (const f of recentFiches ?? []) {
+            const total = Array.isArray(f.data?.flashcards) ? f.data.flashcards.length : 0;
+            for (let i = 0; i < total && newRows.length < NEW_CARDS; i++) {
+              if (!seen.has(`${f.id}:${i}`)) newRows.push({ fiche_id: f.id as string, card_index: i });
+            }
+          }
+          ficheSource = newRows.map((r) => r.fiche_id);
+          setOnlyNew(newRows.length > 0);
+        }
+      }
+
       const allRows = [...dueRows, ...newRows];
+
       if (allRows.length === 0) {
         setStatus("empty");
         return;
@@ -129,6 +152,12 @@ export default function Reviser() {
     recordReviewResults(
       answered.map(({ index, correct }) => ({ ficheId: cards[index].ficheId, cardIndex: cards[index].cardIndex, correct }))
     );
+    // On retire de la séance les cartes déjà faites : en reprenant, on continue là où on s'était arrêté.
+    const done = new Set(answered.map((a) => a.index));
+    const left = cards.filter((_, i) => !done.has(i));
+    setCards(left);
+    setDueTotal((n) => Math.max(0, n - done.size));
+    if (left.length === 0) setFinished(true);
     setTimeout(() => getProgress().then(setProgress), 800);
   };
 
@@ -166,7 +195,7 @@ export default function Reviser() {
             <>
               <h2 className="text-2xl font-bold tracking-tight mb-2">Rien à réviser pour l&apos;instant.</h2>
               <p className="text-black/60 mb-6 max-w-[48ch]">
-                C&apos;est normal si tu viens d&apos;arriver. Ouvre une fiche et fais ses flashcards une première fois : ensuite, elles reviendront ici toutes seules, au bon moment.
+                Tout est à jour. Tes cartes reviendront ici toutes seules, au bon moment. Pour en avoir de nouvelles, crée une fiche : ses flashcards arriveront ici.
               </p>
               <div>
                 <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-primary ff-btn">
@@ -179,7 +208,11 @@ export default function Reviser() {
           {status === "ready" && !finished && (
             <>
               <p className="text-6xl sm:text-7xl font-extrabold tracking-tight text-black">{dueTotal}</p>
-              <p className="text-black/70 text-lg mt-1 mb-2">carte{dueTotal > 1 ? "s" : ""} à réviser aujourd&apos;hui</p>
+              <p className="text-black/70 text-lg mt-1 mb-2">
+                {onlyNew
+                  ? `nouvelle${dueTotal > 1 ? "s" : ""} carte${dueTotal > 1 ? "s" : ""} à découvrir`
+                  : `carte${dueTotal > 1 ? "s" : ""} à réviser aujourd'hui`}
+              </p>
               {dueTotal > cards.length ? (
                 <p className="text-sm text-black/50 mb-6">On commence par les {cards.length} plus urgentes. Le reste, ce sera pour demain.</p>
               ) : (

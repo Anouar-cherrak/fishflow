@@ -62,12 +62,20 @@ function ConfirmContent() {
 
   return (
     <AuthLayout>
+      <form
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!loading && ready && password && confirmPassword) handleSubmit();
+        }}
+      >
         <h1 className="text-2xl font-bold tracking-tight mb-1">Nouveau mot de passe</h1>
         <p className="text-black/60 mb-6">Choisis un nouveau mot de passe pour ton compte.</p>
 
         <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Nouveau mot de passe</label>
         <input id="field-1"
           type="password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
@@ -77,6 +85,7 @@ function ConfirmContent() {
         <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Confirme le mot de passe</label>
         <input id="field-2"
           type="password"
+          autoComplete="new-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
@@ -84,18 +93,19 @@ function ConfirmContent() {
         />
 
         {error && (
-          <p className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
+          <p role="alert" className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
             {error}
           </p>
         )}
 
         <button
-          onClick={handleSubmit}
+          type="submit"
           disabled={loading || !ready || !password || !confirmPassword}
           className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
         </button>
+      </form>
     </AuthLayout>
   );
 }

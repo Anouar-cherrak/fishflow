@@ -83,7 +83,11 @@ export default function MesFiches() {
   const handleDelete = async (id: string) => {
     if (!confirm("Supprimer cette fiche ? Cette action est irréversible.")) return;
     const supabase = createClient();
-    await supabase.from("fiches").delete().eq("id", id);
+    const { error } = await supabase.from("fiches").delete().eq("id", id);
+    if (error) {
+      alert("Impossible de supprimer cette fiche pour l'instant. Vérifie ta connexion et réessaie.");
+      return;
+    }
     setFiches((prev) => prev.filter((f) => f.id !== id));
   };
 
@@ -379,7 +383,7 @@ export default function MesFiches() {
                       <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Ranger cette fiche dans un dossier (une matière, par exemple)">
                         Classer
                       </button>
-                      <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-red-500 transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
+                      <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-[var(--quiz-wrong-text)] transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Supprimer
                       </button>
                     </div>

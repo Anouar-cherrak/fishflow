@@ -37,6 +37,30 @@ const LOADING_MESSAGES = [
 ];
 
 const FREE_FICHES_LIMIT = 5;
+const MAX_PHOTO_SIDE = 2000;
+
+// Les photos de téléphone dépassent souvent 4 Mo : on les réduit avant l'envoi (plus rapide, et plus de refus).
+// Si le navigateur ne sait pas lire l'image, on envoie l'originale.
+async function shrinkPhoto(file: File): Promise<File> {
+  if (file.size < 1.5 * 1024 * 1024 && /^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_PHOTO_SIDE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch {
+    return file;
+  }
+}
+
+const isPdf = (f: File) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf");
+const isImage = (f: File) => f.type.startsWith("image/");
 
 function GenererContent() {
   const [mode, setMode] = useState<Mode>("text");
@@ -52,6 +76,8 @@ function GenererContent() {
   const [user, setUser] = useState<User | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string; manage?: boolean } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -138,6 +164,7 @@ function GenererContent() {
       }
     }
 
+    setError(null);
     setLoading(true);
     const formData = new FormData();
     formData.append("mode", mode);
@@ -150,7 +177,7 @@ function GenererContent() {
     } else if (mode === "pdf" && usage?.isPro && files.length > 0) {
       files.forEach((f) => formData.append("files", f));
     } else if (file) {
-      formData.append("file", file);
+      formData.append("file", mode === "photo" ? await shrinkPhoto(file) : file);
     }
 
     try {
@@ -173,7 +200,7 @@ function GenererContent() {
           });
         } else {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
-          alert(data.error || "Une erreur est survenue.");
+          setError(data.error || "Une erreur est survenue. Réessaie.");
         }
         fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d));
         return;
@@ -217,7 +244,7 @@ function GenererContent() {
       setTimeout(() => router.push(destination), 150);
     } catch {
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
-      alert("Erreur de connexion. Vérifie ta connexion internet et réessaie.");
+      setError("Erreur de connexion. Vérifie ta connexion internet et réessaie.");
       setLoading(false);
     }
   };
@@ -230,13 +257,32 @@ function GenererContent() {
     outputs.length > 0 &&
     !(!!user && !!usage && !usage.isPro && usage.remaining === 0);
 
+  // Glisser-déposer un fichier sur la zone (ordinateur).
+  const dropProps = (accept: (f: File) => boolean, multiple: boolean) => ({
+    onDragOver: (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(true);
+    },
+    onDragLeave: () => setDragging(false),
+    onDrop: (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      const got = Array.from(e.dataTransfer.files).filter(accept);
+      if (got.length === 0) return setError("Ce type de fichier n'est pas accepté ici.");
+      setError(null);
+      if (multiple) setFiles(got);
+      else setFile(got[0]);
+    },
+  });
+
   const dropClass =
+    (dragging ? "border-[#22C55E] bg-surface " : "") +
     "w-full min-h-[220px] lg:min-h-[320px] p-8 border border-dashed border-black/25 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#22C55E] hover:bg-surface transition";
 
   return (
     <AppShell size="wide">
       {loading && (
-        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[70] px-6 text-center">
+        <div role="status" aria-live="polite" className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[70] px-6 text-center">
           <div className="ff-doc-anim mb-8" aria-hidden="true">
             <span /><span /><span /><span /><span />
             <i />
@@ -290,7 +336,7 @@ function GenererContent() {
                 key={m}
                 type="button"
                 aria-pressed={mode === m}
-                onClick={() => { setMode(m); setFile(null); setFiles([]); }}
+                onClick={() => { setMode(m); setFile(null); setFiles([]); setError(null); }}
                 className={`flex-1 min-h-[44px] px-3 rounded-full font-semibold text-sm transition ${
                   mode === m ? "bg-black text-white" : "text-black/55 hover:text-black"
                 }`}
@@ -315,7 +361,7 @@ function GenererContent() {
 
           {mode === "pdf" && isMultiPdfPro && (
             <div>
-              <label className={dropClass}>
+              <label className={dropClass} {...dropProps(isPdf, true)}>
                 <span className="text-black font-semibold mb-1">
                   {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
                 </span>
@@ -342,17 +388,17 @@ function GenererContent() {
           )}
 
           {mode === "pdf" && !isMultiPdfPro && (
-            <label className={dropClass}>
+            <label className={dropClass} {...dropProps(isPdf, false)}>
               <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir un PDF"}</span>
-              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}</span>
+              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : <><span className="ff-desk-only">ou glisse-dépose ton fichier ici</span><span className="ff-mobile-only">Touche ici pour choisir</span></>}</span>
               <input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sr-only" />
             </label>
           )}
 
           {mode === "photo" && (
-            <label className={dropClass}>
+            <label className={dropClass} {...dropProps(isImage, false)}>
               <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir une photo"}</span>
-              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : "ou glisse-dépose ton fichier ici"}</span>
+              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : <><span className="ff-desk-only">ou glisse-dépose ton fichier ici</span><span className="ff-mobile-only">Touche ici pour choisir</span></>}</span>
               <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sr-only" />
             </label>
           )}
@@ -414,6 +460,12 @@ function GenererContent() {
             </fieldset>
 
           </section>
+
+          {error && (
+            <p role="alert" className="px-4 py-3 rounded-2xl border border-[#EF4444]/40 bg-[#EF4444]/10 text-sm text-black">
+              {error}
+            </p>
+          )}
 
           <button
             type="button"
