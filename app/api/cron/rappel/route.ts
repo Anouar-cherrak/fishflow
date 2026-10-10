@@ -15,6 +15,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
   }
 
+  // Interrupteur : les mails automatiques sont en pause tant que EMAILS_AUTO n'est pas "oui" (variable Vercel).
+  // Raison : trop de relances ignorées ou signalées en spam abîment la réputation du domaine, et les codes d'inscription en souffrent.
+  if (process.env.EMAILS_AUTO !== "oui") {
+    return NextResponse.json({ pause: true, envoyes: 0 });
+  }
+
   const admin = createAdminClient();
   const now = new Date();
   const debutJour = new Date(now);
