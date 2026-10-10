@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
+import { CopyFiche } from "@/components/CopyFiche";
 
 type Shared = {
   title: string;
@@ -48,6 +49,9 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
         <header>
           <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision partagée</p>
           <h1 className="ff-title">{fiche.title || "Fiche de révision"}</h1>
+          <div className="mt-4">
+            <CopyFiche shareId={id} title={fiche.title} data={fiche.data as Record<string, unknown>} className="ff-primary ff-btn" />
+          </div>
         </header>
 
         {summary && (
@@ -92,7 +96,7 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
           <p className="text-black/70 max-w-[52ch]">
             Colle ton cours, envoie un PDF ou prends-le en photo. FishFlow en fait une fiche, des flashcards{quiz && quiz.length > 0 ? " et un quiz" : ""}, en quelques secondes. 3 fiches gratuites par mois.
           </p>
-          <Link href="/signup" className="ff-primary ff-btn">Essayer gratuitement</Link>
+          <Link href="/signup" className="ff-secondary ff-btn">Essayer gratuitement</Link>
         </section>
       </article>
     </AppShell>

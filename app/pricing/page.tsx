@@ -12,7 +12,7 @@ import { TrackView } from "@/components/TrackView";
 const ROWS: { label: string; free: string; pro: string }[] = [
   { label: "Fiches générées", free: "3 par mois", pro: "Illimitées" },
   { label: "Résumé, fiche, flashcards", free: "Oui", pro: "Oui" },
-  { label: "Quiz", free: "À lire, avec les bonnes réponses", pro: "À jouer, 12 questions, meilleur score" },
+  { label: "Quiz", free: "À jouer, avec ton meilleur score", pro: "À jouer, 12 questions par quiz" },
   { label: "Réviser avec rappels", free: "Oui", pro: "Oui" },
   { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
   { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },

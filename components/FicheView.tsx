@@ -88,7 +88,6 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const flashcardsHeaderRef = useRef<HTMLDivElement>(null);
   const flashcardItemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const quizHeaderRef = useRef<HTMLDivElement>(null);
-  const quizItemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const router = useRouter();
 
@@ -200,10 +199,6 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       if (data?.flashcards !== undefined) {
         if (flashcardsHeaderRef.current) blocks.push(flashcardsHeaderRef.current);
         flashcardItemRefs.current.forEach((el) => el && blocks.push(el));
-      }
-      if (data?.quiz !== undefined && !isPro) {
-        if (quizHeaderRef.current) blocks.push(quizHeaderRef.current);
-        quizItemRefs.current.forEach((el) => el && blocks.push(el));
       }
 
       for (const block of blocks) {
@@ -360,7 +355,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   {remaining === 0 ? "Tu as utilisé tes 3 fiches gratuites ce mois-ci." : "Il te reste 1 fiche gratuite ce mois-ci."}
                 </p>
                 <p className="text-sm text-black/65 mb-4 max-w-[60ch]">
-                  Avec Pro : fiches illimitées, quiz à jouer avec ton meilleur score, 20 questions par jour dans Apprendre, tes
+                  Avec Pro : fiches illimitées, historique complet, quiz de 12 questions, 20 questions par jour dans Apprendre, tes
                   cartes difficiles et ta progression sur 30 jours.
                 </p>
                 <div className="flex flex-wrap gap-3">
@@ -470,7 +465,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                     <h2 className="text-xl font-bold tracking-tight text-black">Quiz</h2>
                     <RegenButton {...regenProps("quiz")} />
                   </div>
-                  {isPro && bestScore !== null && (
+                  {bestScore !== null && (
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-black/60">
@@ -488,44 +483,12 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   )}
                 </div>
                 <div>
-                  {isPro ? (
-                    <QuizPlayer
-                      quiz={data.quiz}
-                      ficheId={ficheId}
-                      currentBestScore={bestScore}
-                      onScoreUpdate={setBestScore}
-                    />
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="grid gap-3 md:grid-cols-2">
-                        {data.quiz.map((q, i) => (
-                          <div key={i} ref={(el) => { quizItemRefs.current[i] = el; }} className="border border-black/10 rounded-2xl p-5 bg-surface">
-                            <p className="font-semibold text-black mb-3">{i + 1}. {q.question}</p>
-                            <ul className="space-y-2">
-                              {q.options.map((opt, j) => (
-                                <li
-                                  key={j}
-                                  className={`px-3 py-2 rounded-xl text-sm ${
-                                    j === q.correctIndex
-                                      ? "bg-black text-white font-semibold"
-                                      : "bg-white text-black/70 border border-black/10"
-                                  }`}
-                                >
-                                  {opt}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="bg-surface border border-black/10 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-sm text-black/70">Avec Pro, tu joues le quiz et tu suis ta progression.</p>
-                        <button type="button" onClick={() => router.push("/pricing")} className="ff-primary text-sm ff-btn">
-                          Découvrir Pro
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <QuizPlayer
+                    quiz={data.quiz}
+                    ficheId={ficheId}
+                    currentBestScore={bestScore}
+                    onScoreUpdate={setBestScore}
+                  />
                 </div>
               </div>
             )}

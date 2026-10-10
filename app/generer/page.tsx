@@ -52,7 +52,7 @@ function GenererContent() {
   const [user, setUser] = useState<User | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
-  const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string } | null>(null);
+  const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string; manage?: boolean } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -132,6 +132,7 @@ function GenererContent() {
         setUpgradeModal({
           title: "Ton historique est plein",
           message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour un historique illimité.`,
+          manage: true,
         });
         return;
       }
@@ -187,6 +188,7 @@ function GenererContent() {
         setUpgradeModal({
           title: "Ton historique est plein",
           message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour un historique illimité.`,
+          manage: true,
         });
         return;
       }
@@ -259,6 +261,8 @@ function GenererContent() {
             trackEvent("clic_modal_upgrade");
             router.push("/pricing");
           }}
+          secondaryLabel={upgradeModal.manage ? "Gérer mes fiches" : undefined}
+          onSecondary={upgradeModal.manage ? () => router.push("/mes-fiches") : undefined}
         />
       )}
 
@@ -439,7 +443,7 @@ function GenererContent() {
                   <p className="text-sm font-medium">Fiches illimitées</p>
                   <p className="text-sm font-medium">Documents volumineux</p>
                   <p className="text-sm font-medium">Plusieurs PDF à la fois</p>
-                  <p className="text-sm font-medium">Quiz jouable + audio</p>
+                  <p className="text-sm font-medium">Quiz de 12 questions + audio</p>
                   <p className="text-sm font-medium">Historique illimité</p>
                 </div>
               </div>

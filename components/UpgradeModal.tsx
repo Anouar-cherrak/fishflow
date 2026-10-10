@@ -7,11 +7,15 @@ export function UpgradeModal({
   message,
   onClose,
   onUpgrade,
+  secondaryLabel,
+  onSecondary,
 }: {
   title: string;
   message: string;
   onClose: () => void;
   onUpgrade: () => void;
+  secondaryLabel?: string;
+  onSecondary?: () => void;
 }) {
   if (typeof document === "undefined") return null;
 
@@ -44,7 +48,7 @@ export function UpgradeModal({
           <li>✓ Fiches illimitées</li>
           <li>✓ Documents volumineux</li>
           <li>✓ Plusieurs PDF fusionnés en une fiche</li>
-          <li>✓ Quiz interactif, 12 questions</li>
+          <li>✓ Quiz de 12 questions</li>
           <li>✓ Historique illimité</li>
         </ul>
 
@@ -54,6 +58,14 @@ export function UpgradeModal({
         >
           Voir les tarifs Pro — 4,99 €/mois
         </button>
+        {secondaryLabel && onSecondary && (
+          <button
+            onClick={onSecondary}
+            className="w-full min-h-[44px] mb-1 rounded-full border border-black/15 text-sm font-semibold hover:border-black/40 transition"
+          >
+            {secondaryLabel}
+          </button>
+        )}
         <button
           onClick={onClose}
           className="w-full py-2 text-sm text-black/40 hover:text-black transition"

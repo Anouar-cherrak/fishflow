@@ -1,6 +1,7 @@
 "use client";
+import { pendingCopyPath } from "@/components/CopyFiche";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -19,6 +20,7 @@ export default function Signup() {
   const [step, setStep] = useState<"form" | "code">("form");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
 
@@ -41,7 +43,23 @@ export default function Signup() {
 
     setStep("code");
     setMessage("Un code vient de t'être envoyé par email.");
+    setCooldown(30);
     setLoading(false);
+  };
+
+  // Compte à rebours avant de pouvoir redemander un code
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
+
+  const handleResend = async () => {
+    if (cooldown > 0) return;
+    setMessage(null);
+    setCooldown(30);
+    const { error } = await createClient().auth.resend({ type: "signup", email });
+    setMessage(error ? "Impossible de renvoyer le code pour l'instant. Réessaie dans une minute." : "Nouveau code envoyé. Regarde aussi dans tes spams.");
   };
 
   const handleVerify = async () => {
@@ -67,7 +85,7 @@ export default function Signup() {
     trackEvent("sign_up", { method: "email" });
     track("signup");
 
-    router.push("/generer");
+    router.push(pendingCopyPath() ?? "/generer");
     router.refresh();
   };
 
@@ -117,16 +135,21 @@ export default function Signup() {
         ) : (
           <>
             <h1 className="text-2xl font-bold tracking-tight mb-1">Vérifie ton email</h1>
-            <p className="text-black/60 mb-6">Entre le code reçu à {email}</p>
+            <p className="text-black/60 mb-2">Entre le code reçu à {email}</p>
+            <p className="text-sm text-black/60 mb-6">
+              Rien dans ta boîte ? Regarde dans tes <strong className="text-black">spams</strong> (courrier indésirable). Le mail vient de FishFlow.
+            </p>
 
             <input
               type="text"
               inputMode="numeric"
-              maxLength={8}
+              maxLength={10}
+              autoComplete="one-time-code"
+              autoFocus
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
               className="w-full min-h-[56px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
-              placeholder="00000000"
+              placeholder="000000"
             />
 
             {message && (
@@ -141,6 +164,15 @@ export default function Signup() {
               className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Vérification..." : "Confirmer mon compte"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={cooldown > 0}
+              className="w-full mt-3 text-sm text-black/70 hover:text-black transition disabled:opacity-50 min-h-[44px]"
+            >
+              {cooldown > 0 ? `Renvoyer le code (${cooldown} s)` : "Renvoyer le code"}
             </button>
 
             <button

@@ -447,7 +447,7 @@ export function Landing() {
           <div className="copy">
             <h1 className="h-xl">Le savoir est une force.</h1>
             <p className="lead">
-              Colle ton cours, envoie un PDF ou prends-le en photo. FishFlow en fait une fiche de révision, des flashcards et un quiz, en quelques secondes.
+              Colle un cours, un article ou tes notes, envoie un PDF ou prends une photo. FishFlow en fait une fiche, des flashcards et un quiz, en quelques secondes.
             </p>
             <div className="cta-row">
               <TrackedLink href="/generer" event="cta_click_hero" className="btn">
@@ -711,7 +711,7 @@ export function Landing() {
                   <tr><th scope="row">Prix</th><td data-label="Gratuit">0 €</td><td data-label="Pro" className="pro">4,99 € par mois, résiliable à tout moment</td></tr>
                   <tr><th scope="row">Fiches générées</th><td data-label="Gratuit">3 par mois</td><td data-label="Pro" className="pro">Illimitées</td></tr>
                   <tr><th scope="row">Résumé, fiche, flashcards</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Quiz</th><td data-label="Gratuit">À lire, avec les bonnes réponses</td><td data-label="Pro" className="pro">À jouer, 12 questions, avec ton meilleur score</td></tr>
+                  <tr><th scope="row">Quiz</th><td data-label="Gratuit">À jouer, avec ton meilleur score</td><td data-label="Pro" className="pro">À jouer, 12 questions par quiz</td></tr>
                   <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
                   <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 essai</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
                   <tr><th scope="row">Documents</th><td data-label="Gratuit">Courts et moyens</td><td data-label="Pro" className="pro">Volumineux, plusieurs PDF fusionnés en une fiche</td></tr>
@@ -736,7 +736,7 @@ export function Landing() {
           <div className="wrap">
             <h2 id="t-faq">Questions fréquentes.</h2>
             <div className="faq">
-              <details><summary>C&apos;est pour qui ?</summary><p>Pour tout le monde : élèves, étudiants, ou simples curieux qui veulent comprendre un sujet.</p></details>
+              <details><summary>C&apos;est pour qui ?</summary><p>Pour tout le monde. Un cours à réviser, mais aussi un livre à retenir, des mots d&apos;une langue, le code de la route, un sujet de culture générale ou un dossier de travail. Tout ce que tu veux apprendre ou retenir, toute l&apos;année.</p></details>
               <details><summary>C&apos;est gratuit ?</summary><p>Oui pour commencer : 3 fiches par mois et un essai d&apos;Apprendre, sans carte bancaire. Pro enlève les limites.</p></details>
               <details><summary>Les réponses sont-elles vraies ?</summary><p>Pour les fiches, elles viennent de ton propre cours. Pour les questions d&apos;Apprendre, c&apos;est une IA qui répond : elle peut se tromper, donc pour un détail important, vérifie dans les liens proposés ou dans ton cours.</p></details>
             </div>

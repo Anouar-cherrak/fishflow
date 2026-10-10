@@ -1,4 +1,5 @@
 "use client";
+import { pendingCopyPath } from "@/components/CopyFiche";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -27,7 +28,7 @@ export default function Login() {
     }
 
     trackEvent("login", { method: "email" });
-    router.push("/aujourdhui");
+    router.push(pendingCopyPath() ?? "/aujourdhui");
     router.refresh();
   };
 
