@@ -44,7 +44,7 @@ export default function Signup() {
 
     setStep("code");
     setMessage("Un code vient de t'être envoyé par email.");
-    setCooldown(30);
+    setCooldown(60);
     setLoading(false);
   };
 
@@ -58,7 +58,7 @@ export default function Signup() {
   const handleResend = async () => {
     if (cooldown > 0) return;
     setMessage(null);
-    setCooldown(30);
+    setCooldown(60);
     const { error } = await createClient().auth.resend({ type: "signup", email });
     setMessage(error ? "Impossible de renvoyer le code pour l'instant. Réessaie dans une minute." : "Nouveau code envoyé. Regarde aussi dans tes spams.");
   };
