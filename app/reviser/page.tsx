@@ -126,9 +126,9 @@ export default function Reviser() {
 
   const stats = progress && progress.tracked > 0
     ? [
-        { label: "jours d'affilée", value: progress.streak },
-        { label: "cartes maîtrisées", value: progress.mastered },
-        { label: "cartes suivies", value: progress.tracked },
+        { label: "jours de suite", value: progress.streak },
+        { label: "cartes bien sues", value: progress.mastered },
+        { label: "cartes en cours", value: progress.tracked },
       ]
     : null;
 
@@ -136,7 +136,7 @@ export default function Reviser() {
     <AppShell size="normal">
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-3">Réviser.</h1>
-        <p className="ff-lead">Tes cartes reviennent au bon moment : vite si tu les rates, plus tard si tu les sais.</p>
+        <p className="ff-lead">Chaque jour, tu revois les cartes qu'il faut revoir. Tu réponds, et FishFlow décide quand te les remontrer.</p>
       </div>
 
       {stats && (
@@ -158,7 +158,7 @@ export default function Reviser() {
             <>
               <h2 className="text-2xl font-bold tracking-tight mb-2">Rien à réviser pour l&apos;instant.</h2>
               <p className="text-black/60 mb-6 max-w-[48ch]">
-                Étudie les flashcards d&apos;une fiche : les cartes reviendront ici au bon moment, pour que tu les retiennes.
+                C&apos;est normal si tu viens d&apos;arriver. Ouvre une fiche et fais ses flashcards une première fois : ensuite, elles reviendront ici toutes seules, au bon moment.
               </p>
               <div>
                 <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-primary ff-btn">
@@ -173,7 +173,7 @@ export default function Reviser() {
               <p className="text-6xl sm:text-7xl font-extrabold tracking-tight text-black">{dueTotal}</p>
               <p className="text-black/70 text-lg mt-1 mb-2">carte{dueTotal > 1 ? "s" : ""} à réviser aujourd&apos;hui</p>
               {dueTotal > cards.length ? (
-                <p className="text-sm text-black/50 mb-6">On commence par les {cards.length} plus urgentes.</p>
+                <p className="text-sm text-black/50 mb-6">On commence par les {cards.length} plus urgentes. Le reste, ce sera pour demain.</p>
               ) : (
                 <div className="mb-6" />
               )}
@@ -208,15 +208,19 @@ export default function Reviser() {
         </section>
 
         <section aria-label="Comment ça marche" className="border border-black/10 rounded-3xl p-7 sm:p-10 ff-fade-up" style={{ animationDelay: "0.1s" }}>
-          <h2 className="text-xl font-bold tracking-tight mb-2">Comment ça marche</h2>
-          <p className="text-black/60 mb-6 text-sm sm:text-base">
-            Chaque carte monte d&apos;une case quand tu la sais, et redescend quand tu la rates. Plus la case est haute, plus elle revient tard.
-          </p>
-          <ol className="ff-boxes" aria-label="Les cinq cases et leur délai">
-            {["1 jour", "3 jours", "7 jours", "14 jours", "30 jours"].map((d, i) => (
-              <li key={d} style={{ ["--i" as string]: i }}>
-                <span className="ff-box-card" aria-hidden="true" />
-                <span className="text-xs sm:text-sm font-semibold">{d}</span>
+          <h2 className="text-xl font-bold tracking-tight mb-4">Comment ça marche</h2>
+          <ol className="grid gap-4">
+            {[
+              ["Tu lis la question", "Réponds dans ta tête, sans regarder."],
+              ["Tu retournes la carte", "Puis tu dis si tu savais ou pas."],
+              ["FishFlow s'occupe du reste", "Une carte sue revient plus tard (jusqu'à 30 jours). Une carte ratée revient demain."],
+            ].map(([t, d], i) => (
+              <li key={t} className="flex gap-3">
+                <span className="shrink-0 w-8 h-8 rounded-full border border-black/20 flex items-center justify-center text-sm font-bold" aria-hidden="true">{i + 1}</span>
+                <span>
+                  <strong className="block">{t}</strong>
+                  <span className="text-black/60 text-sm">{d}</span>
+                </span>
               </li>
             ))}
           </ol>

@@ -361,8 +361,38 @@ function GenererContent() {
         {/* Colonne de droite : ce que tu veux recevoir */}
         <div className="grid gap-6 ff-fade-up" style={{ animationDelay: "0.15s" }}>
           <section aria-label="Options" className="grid gap-6">
+            <div className="grid grid-cols-2 gap-4" role="group" aria-label="Réglages de la fiche">
+              <div>
+                <label htmlFor="niveau" className="text-sm font-semibold text-black/60 block mb-2">Niveau</label>
+                <select
+                  id="niveau"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
+                >
+                  <option value="facile">Facile</option>
+                  <option value="moyen">Moyen</option>
+                  <option value="difficile">Difficile</option>
+                </select>
+                <p className="text-xs text-black/50 mt-1.5">Des mots simples ou plus techniques.</p>
+              </div>
+              <div>
+                <label htmlFor="longueur" className="text-sm font-semibold text-black/60 block mb-2">Longueur</label>
+                <select
+                  id="longueur"
+                  value={length}
+                  onChange={(e) => setLength(e.target.value as Length)}
+                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
+                >
+                  <option value="court">Court</option>
+                  <option value="moyen">Moyen</option>
+                  <option value="detaille">Détaillé</option>
+                </select>
+                <p className="text-xs text-black/50 mt-1.5">Court : l'essentiel. Détaillé : plus de cartes.</p>
+              </div>
+            </div>
             <fieldset>
-              <legend className="text-sm font-semibold text-black/60 mb-3">Ce que tu veux recevoir</legend>
+              <legend className="text-sm font-semibold text-black/60 mb-3">Ce que tu veux recevoir (coche au moins un)</legend>
               <div className="grid grid-cols-2 gap-2">
                 {OUTPUT_OPTIONS.map((opt) => (
                   <label
@@ -383,36 +413,6 @@ function GenererContent() {
               </div>
             </fieldset>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="niveau" className="text-sm font-semibold text-black/60 block mb-2">Niveau</label>
-                <select
-                  id="niveau"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
-                >
-                  <option value="facile">Facile</option>
-                  <option value="moyen">Moyen</option>
-                  <option value="difficile">Difficile</option>
-                </select>
-                <p className="text-xs text-black/50 mt-1.5">Complexité du vocabulaire.</p>
-              </div>
-              <div>
-                <label htmlFor="longueur" className="text-sm font-semibold text-black/60 block mb-2">Longueur</label>
-                <select
-                  id="longueur"
-                  value={length}
-                  onChange={(e) => setLength(e.target.value as Length)}
-                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
-                >
-                  <option value="court">Court</option>
-                  <option value="moyen">Moyen</option>
-                  <option value="detaille">Détaillé</option>
-                </select>
-                <p className="text-xs text-black/50 mt-1.5">Quantité de contenu généré.</p>
-              </div>
-            </div>
           </section>
 
           <button

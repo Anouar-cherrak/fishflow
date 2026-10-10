@@ -186,7 +186,7 @@ export default function MesFiches() {
           <h1 className="ff-title mb-2">Mes fiches.</h1>
           <p className="ff-lead">
             {fiches.length === 0
-              ? "Tes fiches apparaîtront ici."
+              ? "Ici, tu retrouves toutes tes fiches. Tu peux les classer par matière."
               : `${fiches.length} fiche${fiches.length > 1 ? "s" : ""} au total, dont ${thisMonthCount} ce mois-ci.`}
           </p>
         </div>
@@ -249,7 +249,7 @@ export default function MesFiches() {
               aria-expanded={showNewFolder}
               className="shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold border border-dashed border-black/30 text-black/60 hover:border-[#22C55E] hover:text-black transition whitespace-nowrap lg:w-full lg:rounded-2xl"
             >
-              + Nouveau dossier
+              + Nouveau dossier (matière)
             </button>
           </div>
 
@@ -302,7 +302,7 @@ export default function MesFiches() {
           {filteredFiches.length === 0 ? (
             <div className="bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
               <p className="text-black/60">
-                {fiches.length === 0 ? "Tu n'as pas encore de fiche sauvegardée." : "Aucune fiche dans cette section."}
+                {fiches.length === 0 ? "Tu n'as pas encore de fiche. Colle un cours, envoie un PDF ou une photo : ta première fiche arrive en quelques secondes." : "Aucune fiche dans cette section."}
               </p>
               {fiches.length === 0 && (
                 <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
@@ -376,8 +376,8 @@ export default function MesFiches() {
                       <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Renommer
                       </button>
-                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Déplacer vers un dossier">
-                        Dossier
+                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Ranger cette fiche dans un dossier (une matière, par exemple)">
+                        Classer
                       </button>
                       <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-red-500 transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Supprimer
@@ -403,7 +403,7 @@ export default function MesFiches() {
             className="bg-surface border border-black/10 rounded-3xl shadow-xl p-4 w-full max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-sm font-semibold text-black mb-3 px-1">Déplacer vers</p>
+            <p className="text-sm font-semibold text-black mb-3 px-1">Ranger cette fiche dans…</p>
             <button type="button" onClick={() => moveFicheToFolder(movingFicheId, null)} className="w-full text-left text-sm px-3 min-h-[44px] rounded-xl hover:bg-white transition">
               Sans dossier
             </button>
@@ -418,7 +418,7 @@ export default function MesFiches() {
                 {folder.name}
               </button>
             ))}
-            {folders.length === 0 && <p className="text-xs text-black/50 px-3 py-2">Crée d&apos;abord un dossier.</p>}
+            {folders.length === 0 && <p className="text-xs text-black/50 px-3 py-2">Crée d&apos;abord un dossier (par exemple une matière) avec « + Nouveau dossier (matière) ».</p>}
             <button type="button" onClick={() => setMovingFicheId(null)} className="ff-secondary w-full mt-2 text-sm">
               Annuler
             </button>

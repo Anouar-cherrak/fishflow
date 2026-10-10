@@ -127,7 +127,7 @@ export default function Examens() {
       <div className="flex flex-wrap items-end justify-between gap-4 mb-8 ff-fade-up">
         <div>
           <h1 className="ff-title mb-2">Mes examens.</h1>
-          <p className="ff-lead">Donne une date. FishFlow te dit combien de cartes revoir chaque jour.</p>
+          <p className="ff-lead">Tu as un examen bientôt ? Donne la date et choisis tes fiches. FishFlow te dit combien de cartes revoir chaque jour.</p>
         </div>
         {status === "ready" && !creating && (
           <button type="button" onClick={() => setCreating(true)} className="ff-primary ff-btn">
@@ -149,7 +149,7 @@ export default function Examens() {
         <form onSubmit={create} className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8 mb-8 grid gap-5 ff-fade-up">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
-              <label htmlFor="exam-title" className="text-sm font-semibold text-black/70">Nom de l&apos;examen</label>
+              <label htmlFor="exam-title" className="text-sm font-semibold text-black/70">1. Le nom de l&apos;examen</label>
               <input
                 id="exam-title"
                 value={title}
@@ -160,13 +160,13 @@ export default function Examens() {
               />
             </div>
             <div className="grid gap-1.5">
-              <label htmlFor="exam-date" className="text-sm font-semibold text-black/70">Date</label>
+              <label htmlFor="exam-date" className="text-sm font-semibold text-black/70">2. La date</label>
               <input id="exam-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="min-h-[48px] px-4 rounded-xl border border-black/15 bg-white" />
             </div>
           </div>
 
           <fieldset className="grid gap-2">
-            <legend className="text-sm font-semibold text-black/70 mb-1">Fiches à réviser</legend>
+            <legend className="text-sm font-semibold text-black/70 mb-1">3. Les fiches à réviser pour cet examen</legend>
             {fiches.length === 0 ? (
               <p className="text-sm text-black/60">
                 Tu n&apos;as pas encore de fiche. <Link href="/generer" className="underline underline-offset-4">Crées-en une</Link> d&apos;abord.
@@ -218,7 +218,7 @@ export default function Examens() {
       {status === "ready" && exams.length === 0 && !creating && (
         <div className="bg-surface border border-black/10 rounded-3xl p-8 sm:p-10 text-center grid gap-4 justify-items-center ff-fade-up">
           <p className="font-semibold text-lg">Aucun examen pour l&apos;instant.</p>
-          <p className="text-black/60 max-w-[46ch]">Ajoute la date de ton prochain examen et choisis tes fiches. Chaque jour, tu sauras exactement quoi réviser.</p>
+          <p className="text-black/60 max-w-[46ch]">Ajoute la date de ton prochain examen et choisis les fiches qui comptent. Ensuite, FishFlow te dit chaque jour combien de cartes revoir, pour être prêt à temps.</p>
           <button type="button" onClick={() => setCreating(true)} className="ff-primary ff-btn">Ajouter mon premier examen</button>
         </div>
       )}
@@ -250,19 +250,19 @@ export default function Examens() {
                 </div>
 
                 <div>
-                  <div className="h-2.5 rounded-full bg-black/10 overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Cartes maîtrisées">
+                  <div className="h-2.5 rounded-full bg-black/10 overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Cartes bien sues">
                     <div className="h-full rounded-full bg-[#22C55E] transition-all" style={{ width: `${percent}%` }} />
                   </div>
-                  <p className="text-sm text-black/65 mt-2">{mastered} cartes maîtrisées sur {total}</p>
+                  <p className="text-sm text-black/65 mt-2">{mastered} cartes bien sues sur {total}</p>
                 </div>
 
                 {!past && total > 0 && (
                   <p className="text-sm">
                     {remaining === 0 ? (
-                      <strong>Tout est maîtrisé. Continue à relire pour garder le rythme.</strong>
+                      <strong>Tout est bien su. Relis de temps en temps pour ne pas oublier.</strong>
                     ) : (
                       <>
-                        <strong>{perDay} carte{perDay > 1 ? "s" : ""} par jour</strong> pour être prêt{left > 0 ? "" : " maintenant"}.
+                        <strong>{perDay} carte{perDay > 1 ? "s" : ""} par jour</strong> pour être prêt le jour J{left > 0 ? "" : " maintenant"}.
                       </>
                     )}
                     {due > 0 && <span className="text-black/60"> {due} à revoir aujourd&apos;hui.</span>}

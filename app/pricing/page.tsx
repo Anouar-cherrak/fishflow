@@ -8,16 +8,12 @@ import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
 import { TrackView } from "@/components/TrackView";
 
-// Même contenu que le tableau de la page d'accueil : ce qui est gratuit, ce qui est Pro.
+// Seulement ce qui change entre Gratuit et Pro. Le reste est identique et résumé en une phrase sous le tableau.
 const ROWS: { label: string; free: string; pro: string }[] = [
   { label: "Fiches générées", free: "3 par mois", pro: "Illimitées" },
-  { label: "Résumé, fiche, flashcards", free: "Oui", pro: "Oui" },
   { label: "Quiz", free: "À jouer, avec ton meilleur score", pro: "À jouer, 12 questions par quiz" },
-  { label: "Réviser avec rappels", free: "Oui", pro: "Oui" },
   { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
   { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },
-  { label: "Objectif du jour et série", free: "Oui", pro: "Oui" },
-  { label: "Présentations (Classique, Mémo, Cornell)", free: "Oui", pro: "Oui" },
   { label: "Progression", free: "7 derniers jours", pro: "30 jours, taux de réussite, cartes difficiles" },
   { label: "Résumé lu à voix haute", free: "Non", pro: "Oui" },
   { label: "Historique de fiches", free: "5 fiches", pro: "Illimité" },
@@ -94,7 +90,7 @@ export default function Pricing() {
       <TrackView name="pricing_view" />
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-2">Gratuit ou Pro.</h1>
-        <p className="ff-lead">Ce que tu as vraiment dans chaque formule. Tu peux arrêter Pro quand tu veux.</p>
+        <p className="ff-lead">Le gratuit suffit pour essayer. Pro enlève toutes les limites. Tu peux arrêter quand tu veux.</p>
       </div>
 
       <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[380px_minmax(0,1fr)] items-start">
@@ -105,17 +101,21 @@ export default function Pricing() {
           </div>
 
           <h2 className="text-xl font-semibold mb-1">FishFlow Pro</h2>
-          <p className="text-black/60 text-sm mb-5">Génération illimitée de fiches de révision.</p>
+          <ul className="text-left text-sm grid gap-2 mb-6" aria-label="Ce que tu gagnes avec Pro">
+            {["Fiches illimitées, sans compter", "Gros documents et plusieurs PDF d'un coup", "Quiz de 12 questions", "20 questions par jour dans Apprendre", "Historique illimité de tes fiches", "Résumé lu à voix haute", "Tes cartes difficiles et ta progression sur 30 jours"].map((b) => (
+              <li key={b} className="flex gap-2"><span className="text-[#22C55E] font-bold" aria-hidden="true">✓</span><span>{b}</span></li>
+            ))}
+          </ul>
 
           <div className="text-4xl font-extrabold mb-1">4,99 €</div>
-          <p className="text-black/55 text-sm mb-6">par mois, résiliable à tout moment</p>
+          <p className="text-black/55 text-sm mb-6">par mois. Sans engagement : tu arrêtes en un clic.</p>
 
           <button
             onClick={handleUpgrade}
             disabled={loading}
             className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
           >
-            {loading ? "Redirection..." : "Passer Pro"}
+            {loading ? "Redirection..." : "Passer Pro, 4,99 €/mois"}
           </button>
 
           <button onClick={() => router.push("/generer")} className="w-full mt-3 text-sm text-black/55 hover:text-black hover:underline transition ff-link-underline min-h-[44px]">
@@ -144,7 +144,8 @@ export default function Pricing() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-black/50 mt-4">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
+          <p className="text-sm text-black/65 mt-4">Dans les deux formules : résumé, fiche, flashcards, quiz, révision avec rappels, objectif du jour et les 3 présentations (Classique, Mémo, Cornell).</p>
+          <p className="text-xs text-black/50 mt-2">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
         </div>
       </div>
     </AppShell>
