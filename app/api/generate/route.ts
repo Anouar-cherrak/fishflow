@@ -7,12 +7,13 @@ import { FREE_MONTHLY_LIMIT, getUsage, isProUser, monthKey, refundUsage, reserve
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 const MAX_CHARS_FREE = 15000;
 const MAX_CHARS_PRO = 60000;
 const TIMEOUT_MS = 50000;
 const MAX_PHOTO_BYTES = 4 * 1024 * 1024; // 4 Mo — marge de sécurité sous la limite de payload de Vercel (~4.5 Mo)
+const MAX_PDF_FILES = 10;
+const PRO_DAILY_FICHES = 50;
+const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 const DIFFICULTY_TEXT: Record<string, string> = {
   facile: "Utilise un langage très simple, accessible à un débutant, évite tout jargon technique.",
@@ -228,7 +229,8 @@ export async function POST(req: Request) {
 
   const mode = formData.get("mode") as string;
   const outputsRaw = (formData.get("outputs") as string) || "summary,sheet,flashcards,quiz";
-  const outputs = outputsRaw.split(",").filter(Boolean);
+  // On ne garde que les sorties connues : une valeur inventée ferait payer une génération vide.
+  const outputs = Array.from(new Set(outputsRaw.split(",").filter((o) => o in OUTPUT_SCHEMAS)));
   const difficulty = (formData.get("difficulty") as string) || "moyen";
   const length = (formData.get("length") as string) || "moyen";
 
@@ -241,7 +243,7 @@ export async function POST(req: Request) {
 
   const SYSTEM_PROMPT = buildSystemPrompt(outputs, difficulty, length, pro, mode === "photo");
 
-  let messages: any[];
+  let messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
   let wasTruncated = false;
   let sourceText: string | undefined;
 
@@ -277,6 +279,13 @@ export async function POST(req: Request) {
 
       if (allFiles.length === 0) {
         return NextResponse.json({ error: "Aucun fichier PDF reçu." }, { status: 400 });
+      }
+
+      if (allFiles.length > MAX_PDF_FILES) {
+        return NextResponse.json({ error: `${MAX_PDF_FILES} PDF au maximum à la fois.` }, { status: 400 });
+      }
+      if (allFiles.some((f) => !(f instanceof File) || (f.type && !/pdf$/i.test(f.type)))) {
+        return NextResponse.json({ error: "Seuls les fichiers PDF sont acceptés ici." }, { status: 400 });
       }
 
       if (allFiles.length > 1 && !pro) {
@@ -328,9 +337,16 @@ export async function POST(req: Request) {
         { role: "user", content: `Contenu du cours (extrait d'un ou plusieurs PDF) :\n"""\n${limitedText}\n"""` },
       ];
     } else if (mode === "photo") {
-      const file = formData.get("file") as File;
-      if (!file) {
+      const file = formData.get("file");
+      if (!(file instanceof File)) {
         return NextResponse.json({ error: "Aucune photo reçue." }, { status: 400 });
+      }
+
+      if (!PHOTO_TYPES.has(file.type)) {
+        return NextResponse.json(
+          { error: "Ce format de photo n'est pas accepté. Utilise une image JPG, PNG ou WebP." },
+          { status: 400 }
+        );
       }
 
       if (file.size > MAX_PHOTO_BYTES) {
@@ -368,6 +384,7 @@ export async function POST(req: Request) {
   // On réserve la génération gratuite avant d'appeler l'IA (plusieurs demandes en même temps ne passent plus),
   // et on la rend si la génération échoue.
   const usageKey = monthKey();
+  const proDailyKey = `fiches-${new Date().toISOString().slice(0, 10)}`;
   if (!pro) {
     const ok = await reserveUsage(user.id, usageKey, FREE_MONTHLY_LIMIT);
     if (!ok) {
@@ -379,12 +396,22 @@ export async function POST(req: Request) {
         { status: 403 }
       );
     }
+  } else {
+    // Pro : limite anti-abus invisible pour un usage normal, qui protège la facture OpenAI.
+    const ok = await reserveUsage(user.id, proDailyKey, PRO_DAILY_FICHES);
+    if (!ok) {
+      return NextResponse.json(
+        { error: `Tu as atteint la limite de ${PRO_DAILY_FICHES} fiches pour aujourd'hui. Reviens demain !` },
+        { status: 429 }
+      );
+    }
   }
   const giveBack = async () => {
-    if (!pro) await refundUsage(user.id, usageKey);
+    await refundUsage(user.id, pro ? proDailyKey : usageKey);
   };
 
   try {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const completion = await withTimeout(
       openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -432,7 +459,8 @@ export async function POST(req: Request) {
     if (finalSourceText) result.sourceText = finalSourceText;
 
     return NextResponse.json(result);
-  } catch (err: any) {
+  } catch (e) {
+    const err = e as { message?: string; status?: number };
     console.error("Erreur appel OpenAI:", err?.message || err);
     await giveBack();
 

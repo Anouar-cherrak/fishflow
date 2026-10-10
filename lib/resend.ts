@@ -1,6 +1,11 @@
 import { Resend } from "resend";
 
-export const resend = new Resend(process.env.RESEND_API_KEY!);
+// Créé seulement au premier envoi : le build n'a pas besoin de la clé.
+let client: Resend | null = null;
+function getResend() {
+  if (!client) client = new Resend(process.env.RESEND_API_KEY!);
+  return client;
+}
 
 // Version texte du mail : les boîtes mail se méfient des messages qui n'ont que du HTML.
 export function htmlToText(html: string) {
@@ -17,7 +22,7 @@ export function htmlToText(html: string) {
 
 type Mail = { from: string; to: string | string[]; subject: string; html: string; headers?: Record<string, string> };
 export function sendMail(mail: Mail) {
-  return resend.emails.send({ ...mail, text: htmlToText(mail.html) });
+  return getResend().emails.send({ ...mail, text: htmlToText(mail.html) });
 }
 
 export function emailLayout(

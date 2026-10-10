@@ -150,7 +150,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       } else {
         localStorage.setItem("fishflow_result", JSON.stringify(updated));
       }
-    } catch (err) {
+    } catch {
       alert("Erreur de connexion pendant la régénération. Réessaie.");
     } finally {
       setRegeneratingKey(null);

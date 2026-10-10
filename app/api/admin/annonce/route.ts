@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendMail, emailLayout, unsubscribeHeaders } from "@/lib/resend";
+import { isCronAuthorized } from "@/lib/cron-auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
   }
 
@@ -50,8 +50,8 @@ export async function POST(req: Request) {
       } else {
         envoyes++;
       }
-    } catch (err: any) {
-      erreurs.push(err?.message || JSON.stringify(err));
+    } catch (err) {
+      erreurs.push(err instanceof Error ? err.message : JSON.stringify(err));
     }
   }
 

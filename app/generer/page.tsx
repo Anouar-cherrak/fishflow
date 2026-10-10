@@ -215,7 +215,7 @@ function GenererContent() {
       // Une fiche enregistrée a sa propre adresse ; sinon on garde la page de secours.
       const destination = inserted?.id ? `/fiche/${inserted.id}` : "/result";
       setTimeout(() => router.push(destination), 150);
-    } catch (err) {
+    } catch {
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
       alert("Erreur de connexion. Vérifie ta connexion internet et réessaie.");
       setLoading(false);

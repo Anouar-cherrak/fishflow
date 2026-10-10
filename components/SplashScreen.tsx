@@ -9,7 +9,7 @@ export function SplashScreen() {
   useEffect(() => {
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true;
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
     const alreadyShown = sessionStorage.getItem("ff_splash_shown") === "1";
 

@@ -32,6 +32,13 @@ export async function POST() {
     }
   }
 
+  // Tout ce qui appartient à la personne part avec le compte (RGPD). Une table absente renvoie juste une erreur ignorée.
+  const { data: ficheRows } = await admin.from("fiches").select("id").eq("user_id", user.id);
+  const ficheIds = (ficheRows ?? []).map((f) => f.id);
+  if (ficheIds.length > 0) await admin.from("card_reviews").delete().in("fiche_id", ficheIds);
+  await admin.from("review_log").delete().eq("user_id", user.id);
+  await admin.from("exams").delete().eq("user_id", user.id);
+  await admin.from("events").delete().eq("user_id", user.id);
   await admin.from("fiches").delete().eq("user_id", user.id);
   await admin.from("folders").delete().eq("user_id", user.id);
   await admin.from("usage").delete().eq("user_id", user.id);

@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+// Événement « installer l'appli » de Chrome (pas encore dans les types du navigateur).
+type InstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<unknown> };
+
 export function InstallPWA() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
@@ -13,15 +16,15 @@ export function InstallPWA() {
   useEffect(() => {
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true;
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
     setIsStandalone(standalone);
 
     const ua = window.navigator.userAgent;
-    setIsIOS(/iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream);
+    setIsIOS(/iPad|iPhone|iPod/.test(ua) && !("MSStream" in window));
 
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as InstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
