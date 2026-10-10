@@ -128,9 +128,16 @@ export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement
   const uTime = U("uTime"), uPulse = U("uPulse"), uScale = U("uScale"), uDir = U("uDir"), uRes = U("uRes"), uCenter = U("uCenter"), uDark = U("uDark"), uHot = U("uHot");
 
   let W = 0, H = 0, dark = 1;
+  // Téléphone : résolution un peu plus basse (la boule reste nette) pour un défilement fluide.
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
+    // Le canevas fait la hauteur de l'écran « barre d'adresse cachée » (100lvh) : quand la barre de Safari
+    // apparaît ou disparaît pendant le défilement, sa taille ne change pas, donc rien n'est recréé (pas de saccade).
+    const w = canvas.clientWidth || window.innerWidth;
+    const h = canvas.clientHeight || window.innerHeight;
+    if (w === W && h === H) return;
+    W = w; H = h;
+    const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2);
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     gl!.viewport(0, 0, canvas.width, canvas.height);
   }

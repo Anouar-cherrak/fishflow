@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TrackedLink } from "@/components/TrackedLink";
+import { createClient } from "@/lib/supabase/client";
 import { createOrb, type OrbHandle } from "./orb-gl";
 
 type Theme = "dark" | "light";
@@ -138,6 +139,14 @@ export function Landing() {
   const reduceRef = useRef(false);
 
   const [theme, setTheme] = useState<Theme>("dark");
+  // Déjà connecté : la barre propose d'ouvrir son espace au lieu de « Connexion / Créer un compte ».
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => {
+    createClient()
+      .auth.getSession()
+      .then(({ data }) => setSignedIn(!!data.session))
+      .catch(() => {});
+  }, []);
 
   const kick = useCallback((a: number) => orbRef.current?.kick(a), []);
 
@@ -417,10 +426,18 @@ export function Landing() {
           <span>Fish<em>Flow</em></span>
         </Link>
         <div className="bar-actions">
-          <Link className="bar-link" href="/login">Connexion</Link>
-          <TrackedLink href="/signup" event="cta_click_header_signup" className="btn bar-cta">
-            <span>Créer un compte</span>
-          </TrackedLink>
+          {signedIn ? (
+            <Link href="/aujourdhui" className="btn bar-open">
+              <span>Ouvrir FishFlow</span>
+            </Link>
+          ) : (
+            <>
+              <Link className="bar-link" href="/login">Connexion</Link>
+              <TrackedLink href="/signup" event="cta_click_header_signup" className="btn bar-cta">
+                <span>Créer un compte</span>
+              </TrackedLink>
+            </>
+          )}
           <button
             type="button"
             className="round theme"
@@ -450,9 +467,15 @@ export function Landing() {
               Colle un cours, un article ou tes notes, envoie un PDF ou prends une photo. FishFlow en fait une fiche, des flashcards et un quiz, en quelques secondes.
             </p>
             <div className="cta-row">
-              <TrackedLink href="/generer" event="cta_click_hero" className="btn">
-                <span>Essayer gratuitement</span>
-              </TrackedLink>
+              {signedIn ? (
+                <Link href="/aujourdhui" className="btn">
+                  <span>Ouvrir FishFlow</span>
+                </Link>
+              ) : (
+                <TrackedLink href="/generer" event="cta_click_hero" className="btn">
+                  <span>Essayer gratuitement</span>
+                </TrackedLink>
+              )}
               <a className="btn ghost" href="#quoi">
                 <span>Comment ça marche</span>
               </a>

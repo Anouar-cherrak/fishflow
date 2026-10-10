@@ -332,6 +332,20 @@ body {
 }
 @media (min-width: 768px) { .ff-bar { padding: 14px 32px; } }
 @media (min-width: 1024px) { .ff-bar { padding: 16px max(40px, calc((100% - 1280px) / 2 + 56px)); } }
+/* Appli installée sur iPhone : la barre descend sous l'heure et l'encoche au lieu d'être cachée dessous. */
+.ff-bar { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 768px) { .ff-bar { padding-top: calc(14px + env(safe-area-inset-top, 0px)); padding-left: 32px; padding-right: 32px; } }
+@media (min-width: 1024px) { .ff-bar { padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-left: max(40px, calc((100% - 1280px) / 2 + 56px)); padding-right: max(40px, calc((100% - 1280px) / 2 + 56px)); } }
+.ff-menu { padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+.ff-tuto-back { padding-top: max(16px, env(safe-area-inset-top, 0px)); padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
+.ff-main { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 768px) { .ff-main { padding-bottom: 80px; } }
+@media (min-width: 1024px) { .ff-main { padding-bottom: 96px; } }
+
+/* Téléphone : un champ écrit en moins de 16 px fait zoomer l'iPhone dès qu'on le touche (la page « saute »). */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select { font-size: 16px !important; }
+}
 .ff-round {
   width: 46px;
   height: 46px;
@@ -498,7 +512,7 @@ body {
 @media (prefers-reduced-motion: reduce) { .ff-box-card::after { animation: none; opacity: 1; } }
 
 /* Boule argent (Apprendre) */
-.ff-silver-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.ff-silver-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; z-index: 0; pointer-events: none; }
 .ff-silver-slot { width: min(68vw, 300px); aspect-ratio: 1; margin-inline: auto; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .ff-silver-slot[data-compact="true"] { width: 112px; }
 @media (min-width: 1024px) { .ff-silver-slot { width: 340px; } .ff-silver-slot[data-compact="true"] { width: 128px; } }
@@ -781,3 +795,31 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ff-flame, .ff-flame * { animation: none !important; }
 }
+
+/* ===== Barre d'onglets du bas (téléphone) ===== */
+.ff-tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right, 0px));
+  background: color-mix(in srgb, var(--ff-bg) 88%, transparent);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--ff-line);
+}
+.ff-tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-height: 52px; border-radius: 14px; text-decoration: none;
+  color: color-mix(in srgb, var(--ff-fg) 62%, transparent);
+  font-size: 12px; font-weight: 600; -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s, transform 0.15s;
+}
+.ff-tab:active { transform: scale(0.92); }
+.ff-tab[aria-current="page"] { color: var(--ff-fg); }
+.ff-tab[aria-current="page"] .ff-tab-icon { background: color-mix(in srgb, var(--ff-accent) 18%, transparent); color: var(--ff-accent); }
+.ff-tab-icon { display: grid; place-items: center; width: 44px; height: 28px; border-radius: 999px; transition: background 0.2s, color 0.2s; }
+.ff-tab[data-main="true"] .ff-tab-icon { background: var(--ff-accent); color: #04130A; }
+.ff-tab[data-main="true"][aria-current="page"] .ff-tab-icon { background: var(--ff-accent); color: #04130A; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ff-accent) 30%, transparent); }
+/* La page laisse la place à la barre pour que rien ne soit caché dessous. */
+@media (max-width: 767px) {
+  .ff-frame:has(.ff-tabs) .ff-main { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (min-width: 768px) { .ff-tabs { display: none; } }

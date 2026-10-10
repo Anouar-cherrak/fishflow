@@ -385,7 +385,7 @@ function GenererContent() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Colle ici un cours, un article, un chapitre ou tes notes..."
-                className="w-full h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent text-base ff-input resize-y"
+                className="w-full h-44 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent text-base ff-input resize-y"
               />
             </>
           )}

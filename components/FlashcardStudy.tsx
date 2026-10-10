@@ -147,7 +147,7 @@ export function FlashcardStudy({
       onClick={close}
     >
       <div
-        className="w-full max-w-md bg-surface rounded-2xl p-5 ff-fade-up max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md bg-surface rounded-2xl p-5 ff-fade-up max-h-[90dvh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

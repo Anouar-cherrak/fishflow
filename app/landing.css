@@ -23,9 +23,10 @@
 .lp a { color: inherit; }
 .lp button { font: inherit; color: inherit; cursor: pointer; }
 .lp :focus-visible { outline: 2px solid var(--hot); outline-offset: 3px; border-radius: 6px; }
-.lp #orb { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.lp #orb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; z-index: 0; pointer-events: none; }
 .lp main, .lp footer { position: relative; z-index: 1; }
-.lp header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(14px); }
+.lp header.bar .brand { min-height: 44px; display: inline-flex; align-items: center; }
+.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(14px); }
 .lp .brand { display: inline-flex; align-items: center; gap: 8px; font: 600 18px/1 var(--display); text-decoration: none; letter-spacing: -0.02em; }
 .lp .brand svg { width: 26px; height: 26px; }
 .lp .brand em { font-style: normal; font-weight: 400; }
@@ -183,6 +184,8 @@
 .lp .bar-link:hover { color: var(--ink); }
 .lp .bar-cta { min-height: 46px; padding: 0 20px; font-size: 15px; }
 @media (max-width: 599px) { .lp .bar-link, .lp .bar-cta { display: none; } }
+/* Déjà connecté : « Ouvrir FishFlow » reste visible, aussi sur téléphone. */
+.lp .bar-open { min-height: 44px; padding: 0 16px; font-size: 14px; }
 .lp .cmp-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 24px; background: var(--paper); }
 .lp .cmp { width: 100%; border-collapse: collapse; min-width: 520px; font-size: 16px; }
 .lp .cmp th, .lp .cmp td { padding: 14px 18px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
@@ -197,7 +200,7 @@
 .lp .demo-note { color: var(--muted); font-size: 14px; }
 .lp .orb-mark { position: relative; }
 .lp footer .links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; }
-.lp footer a { color: var(--muted); }
+.lp footer a { color: var(--muted); display: inline-flex; align-items: center; min-height: 44px; }
 .lp footer a:hover { color: var(--ink); }
 .lp .pic.fly { will-change: transform; }
 .lp .roll-n { display: inline-block; animation: lpPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }

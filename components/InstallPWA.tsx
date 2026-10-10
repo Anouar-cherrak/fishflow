@@ -57,7 +57,7 @@ export function InstallPWA() {
 
       <button
         onClick={handleClick}
-        className="text-xs font-semibold px-4 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition shrink-0 ff-btn"
+        className="text-sm font-semibold px-4 min-h-[44px] rounded-full bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition shrink-0 ff-btn"
       >
         Télécharger l'application
       </button>
@@ -68,7 +68,7 @@ export function InstallPWA() {
           onClick={() => setShowGuide(false)}
         >
           <div
-            className="bg-surface border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl max-h-[85vh] overflow-y-auto"
+            className="bg-surface border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl max-h-[85dvh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">

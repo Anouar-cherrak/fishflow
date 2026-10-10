@@ -50,7 +50,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="w-full flex items-center justify-between py-1"
+      className="w-full flex items-center justify-between min-h-[44px]"
       aria-pressed={isDark}
     >
       <span className="text-sm font-medium text-black">Mode sombre</span>

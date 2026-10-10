@@ -72,16 +72,18 @@ export default function Aujourdhui() {
         return;
       }
 
-      const usage = await fetch("/api/usage").then((r) => r.json()).catch(() => ({ isPro: false }));
-      const pro = !!usage.isPro;
-
-      const [dueNow, prog, daily, fiches, hardCards] = await Promise.all([
+      // Tout part en même temps (plus rapide sur un réseau mobile). Le graphique charge 30 jours,
+      // on n'en montre que 7 aux comptes gratuits.
+      const [usage, dueNow, prog, daily30, fiches] = await Promise.all([
+        fetch("/api/usage").then((r) => r.json()).catch(() => ({ isPro: false })),
         countDueCards(),
         getProgress(),
-        getDailyCounts(pro ? 30 : 7),
+        getDailyCounts(30),
         supabase.from("fiches").select("id, title", { count: "exact" }).order("created_at", { ascending: false }).limit(3),
-        pro ? getHardCards(6) : Promise.resolve([] as HardCard[]),
       ]);
+      const pro = !!usage.isPro;
+      const daily = pro ? daily30 : { ...daily30, counts: daily30.counts.slice(-7) };
+      const hardCards = pro ? await getHardCards(6) : ([] as HardCard[]);
       if (cancelled) return;
 
       setIsPro(pro);

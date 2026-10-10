@@ -28,7 +28,7 @@ export function UpgradeModal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="w-full max-w-sm bg-surface border border-black/10 rounded-2xl p-6 ff-card ff-fade-up max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-sm bg-surface border border-black/10 rounded-2xl p-6 ff-card ff-fade-up max-h-[85dvh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-3">

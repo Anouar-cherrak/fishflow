@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 import { StreakFlame } from "@/components/StreakFlame";
+import { BottomTabs } from "@/components/BottomTabs";
 
 const LINKS = [
   { href: "/aujourdhui", label: "Aujourd'hui", hint: "Ton objectif, tes cartes, ta progression" },
@@ -157,6 +158,7 @@ export function AppNav() {
       </div>
 
     </header>
+    {authReady && email && <BottomTabs />}
     <div id="menu-principal" ref={panelRef} className="ff-menu" data-open={open} role="dialog" aria-modal="true" aria-label="Menu" aria-hidden={!open}>
       <div className="flex items-center justify-between">
         <Link href="/" onClick={close} className="flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">

@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <AppShell size="wide">
-      <div className="grid gap-10 lg:gap-20 lg:grid-cols-2 items-center min-h-[60vh]">
+      <div className="grid gap-10 lg:gap-20 lg:grid-cols-2 items-center lg:min-h-[60vh]">
         <div className="hidden lg:grid gap-8 content-center ff-fade-up">
           <h2 className="ff-title">Le savoir est une force.</h2>
           <p className="ff-lead">Colle un cours, FishFlow en fait une fiche de révision, des flashcards et un quiz. Tu poses aussi n&apos;importe quelle question, avec les sources.</p>
