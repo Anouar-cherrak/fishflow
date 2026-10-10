@@ -124,6 +124,14 @@ export default function Reviser() {
     setTimeout(() => getProgress().then(setProgress), 800);
   };
 
+  // Séance arrêtée avant la fin : les cartes déjà répondues comptent quand même.
+  const handlePartial = (answered: { index: number; correct: boolean }[]) => {
+    recordReviewResults(
+      answered.map(({ index, correct }) => ({ ficheId: cards[index].ficheId, cardIndex: cards[index].cardIndex, correct }))
+    );
+    setTimeout(() => getProgress().then(setProgress), 800);
+  };
+
   const stats = progress && progress.tracked > 0
     ? [
         { label: "jours de suite", value: progress.streak },
@@ -228,7 +236,7 @@ export default function Reviser() {
       </div>
 
       {studying && cards.length > 0 && (
-        <FlashcardStudy cards={cards} onClose={() => setStudying(false)} onComplete={handleComplete} />
+        <FlashcardStudy cards={cards} onClose={() => setStudying(false)} onComplete={handleComplete} onPartial={handlePartial} />
       )}
     </AppShell>
   );

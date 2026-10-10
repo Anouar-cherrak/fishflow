@@ -10,7 +10,7 @@ import { TrackView } from "@/components/TrackView";
 
 // Seulement ce qui change entre Gratuit et Pro. Le reste est identique et résumé en une phrase sous le tableau.
 const ROWS: { label: string; free: string; pro: string }[] = [
-  { label: "Fiches générées", free: "3 par mois", pro: "Illimitées" },
+  { label: "Fiches générées", free: "3 par mois", pro: "Illimitées (usage normal)" },
   { label: "Quiz", free: "À jouer, avec ton meilleur score", pro: "À jouer, 12 questions par quiz" },
   { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
   { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },
@@ -102,7 +102,7 @@ export default function Pricing() {
 
           <h2 className="text-xl font-semibold mb-1">FishFlow Pro</h2>
           <ul className="text-left text-sm grid gap-2 mb-6" aria-label="Ce que tu gagnes avec Pro">
-            {["Fiches illimitées, sans compter", "Gros documents et plusieurs PDF d'un coup", "Quiz de 12 questions", "20 questions par jour dans Apprendre", "Historique illimité de tes fiches", "Résumé lu à voix haute", "Tes cartes difficiles et ta progression sur 30 jours"].map((b) => (
+            {["Fiches illimitées (usage normal)", "Gros documents et plusieurs PDF d'un coup", "Quiz de 12 questions", "20 questions par jour dans Apprendre", "Historique illimité de tes fiches", "Résumé lu à voix haute", "Tes cartes difficiles et ta progression sur 30 jours"].map((b) => (
               <li key={b} className="flex gap-2"><span className="text-[#22C55E] font-bold" aria-hidden="true">✓</span><span>{b}</span></li>
             ))}
           </ul>

@@ -256,6 +256,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
     regeneratingKey === key ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity";
 
   const actionClass = "ff-secondary w-full text-sm";
+  const hasCards = (data.flashcards?.length ?? 0) > 0;
 
   const chooseTemplate = (key: Template) => {
     setTemplate(key);
@@ -299,14 +300,20 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   return (
     <AppShell size="wide">
       <div className={exporting ? "ff-force-light" : ""}>
-        <div className="grid gap-8 lg:gap-12 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
-          <aside className="lg:order-2 lg:sticky lg:top-28 grid gap-3" aria-label="Actions sur la fiche">
+        <div className="grid gap-8 lg:gap-x-12 lg:gap-y-6 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
+          <div ref={logoRef} className="lg:col-start-1 lg:row-start-1">
+            <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision</p>
+            <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
+            <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
+          </div>
+
+          <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-28 grid gap-3" aria-label="Actions sur la fiche">
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
               <button
                 type="button"
                 onClick={handleDownloadPDF}
                 disabled={downloading}
-                className="ff-primary w-full text-sm ff-btn col-span-2 lg:col-span-1"
+                className={hasCards ? actionClass : "ff-primary w-full text-sm ff-btn col-span-2 lg:col-span-1"}
               >
                 {downloading ? (
                   <>
@@ -327,7 +334,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                     trackEvent("flashcards_etude_ouverte");
                     setStudying(true);
                   }}
-                  className={actionClass}
+                  className="ff-primary w-full text-sm ff-btn col-span-2 lg:col-span-1 order-first"
                 >
                   Étudier les flashcards
                 </button>
@@ -342,13 +349,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
             </button>
           </aside>
 
-          <div className="lg:order-1 min-w-0">
-            <div ref={logoRef} className="mb-6">
-              <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision</p>
-              <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
-              <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
-            </div>
-
+          <div className="lg:col-start-1 lg:row-start-2 min-w-0">
             {showNudge && (
               <aside className="mb-6 bg-surface border border-black/10 rounded-2xl p-5" aria-label="À propos de Pro">
                 <p className="font-semibold mb-1">
@@ -503,6 +504,10 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
           onComplete={(firstTry) => {
             if (!ficheId) return;
             recordReviewResults(firstTry.map((correct, cardIndex) => ({ ficheId, cardIndex, correct })));
+          }}
+          onPartial={(answered) => {
+            if (!ficheId) return;
+            recordReviewResults(answered.map(({ index, correct }) => ({ ficheId, cardIndex: index, correct })));
           }}
         />
       )}

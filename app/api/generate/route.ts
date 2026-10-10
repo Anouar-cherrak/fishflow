@@ -162,6 +162,9 @@ Règles strictes de qualité :
 - Priorise la clarté et l'utilité pour la révision plutôt que l'exhaustivité : mieux vaut peu de points clés vraiment importants que beaucoup de détails secondaires.
 - Écris en français, sauf pour les mots ou phrases d'une langue étrangère que la personne apprend : garde-les dans leur langue d'origine, avec leur traduction.
 - Chaque flashcard teste UNE seule idée, avec une question précise qui a une seule bonne réponse, courte (une phrase, rarement deux). Pas de question vague comme « Parle de… » ou « Qu'est-ce que le chapitre 2 ? ».
+- La réponse d'une flashcard répond EXACTEMENT à ce que demande la question : « Qui… ? » → une personne ou un groupe, « Quand… ? » → une date, « Que symbolise X ? » → ce que X représente. Ne retourne jamais le sens d'une relation du cours. Exemple à éviter : « Quel événement est symbolisé par la prise de la Bastille ? → L'arbitraire royal ». Version juste : « Que symbolise la prise de la Bastille ? → L'arbitraire royal ».
+- Une question ne doit pas contenir sa propre réponse, et doit rester vraie et compréhensible sans le cours sous les yeux (précise le sujet : « la Révolution française », pas « elle »).
+- Avant de répondre, relis chaque flashcard et chaque question de quiz : si la réponse ne colle pas parfaitement à la question, reformule-la.
 - Chaque point clé se comprend tout seul, sans avoir lu le reste : pas de « comme vu plus haut » ni de renvoi à une page.
 - Les questions du quiz portent sur des idées différentes, mélangent compréhension et mémoire, et ne contiennent jamais « toutes les réponses » ni « aucune des réponses ». Les 4 options ont une longueur comparable, pour que la bonne ne se devine pas à sa forme.
 - Si le contenu est très court, pauvre ou peu clair, fais moins mais mieux : ne remplis jamais avec du général qui n'est pas dans le contenu.

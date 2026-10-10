@@ -709,7 +709,7 @@ export function Landing() {
                 </thead>
                 <tbody>
                   <tr><th scope="row">Prix</th><td data-label="Gratuit">0 €</td><td data-label="Pro" className="pro">4,99 € par mois, résiliable à tout moment</td></tr>
-                  <tr><th scope="row">Fiches générées</th><td data-label="Gratuit">3 par mois</td><td data-label="Pro" className="pro">Illimitées</td></tr>
+                  <tr><th scope="row">Fiches générées</th><td data-label="Gratuit">3 par mois</td><td data-label="Pro" className="pro">Illimitées (usage normal)</td></tr>
                   <tr><th scope="row">Résumé, fiche, flashcards</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
                   <tr><th scope="row">Quiz</th><td data-label="Gratuit">À jouer, avec ton meilleur score</td><td data-label="Pro" className="pro">À jouer, 12 questions par quiz</td></tr>
                   <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>

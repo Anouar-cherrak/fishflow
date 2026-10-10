@@ -14,10 +14,13 @@ export function FlashcardStudy({
   cards,
   onClose,
   onComplete,
+  onPartial,
 }: {
   cards: Flashcard[];
   onClose: () => void;
   onComplete?: (firstTry: boolean[]) => void;
+  // Fermeture avant la fin : on garde quand même les cartes déjà répondues (index dans `cards`).
+  onPartial?: (answered: { index: number; correct: boolean }[]) => void;
 }) {
   const [deck, setDeck] = useState<number[]>(() => cards.map((_, i) => i));
   const [pos, setPos] = useState(0);
@@ -27,6 +30,15 @@ export function FlashcardStudy({
   const [firstTry, setFirstTry] = useState<Record<number, boolean>>({});
   const [done, setDone] = useState(false);
   const reportedRef = useRef(false);
+
+  const close = () => {
+    const answered = Object.entries(firstTry).map(([i, correct]) => ({ index: Number(i), correct }));
+    if (!reportedRef.current && answered.length > 0) {
+      reportedRef.current = true;
+      onPartial?.(answered);
+    }
+    onClose();
+  };
 
   const total = cards.length;
   const current = cards[deck[pos]];
@@ -87,7 +99,7 @@ export function FlashcardStudy({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        close();
         return;
       }
       const target = e.target as HTMLElement | null;
@@ -115,12 +127,13 @@ export function FlashcardStudy({
   return createPortal(
     <div
       className="fixed inset-0 z-50 bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center px-4 ff-fade"
-      onClick={onClose}
+      onClick={close}
     >
       <div
         className="w-full max-w-md bg-surface rounded-2xl p-5 ff-fade-up max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
+        aria-modal="true"
         aria-label="Étudier les flashcards"
       >
         <div className="flex items-center justify-between mb-3">
@@ -128,7 +141,7 @@ export function FlashcardStudy({
             {done ? "Terminé" : round === 1 ? `Carte ${pos + 1} / ${deck.length}` : `Tour ${round} · carte ${pos + 1} / ${deck.length}`}
           </p>
           <button
-            onClick={onClose}
+            onClick={close}
             className="text-black/30 hover:text-black text-xl leading-none"
             aria-label="Fermer"
           >
@@ -157,7 +170,7 @@ export function FlashcardStudy({
                 Recommencer
               </button>
               <button
-                onClick={onClose}
+                onClick={close}
                 className="flex-1 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition ff-btn"
               >
                 Fermer
