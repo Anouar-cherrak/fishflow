@@ -35,7 +35,7 @@ export function SceneStage({ scene, sceneKey }: { scene: Scene; sceneKey: string
         onKeyDown={small ? (e) => (e.key === "Enter" || e.key === " ") && setZoom(true) : undefined}
         style={small ? { cursor: "zoom-in" } : undefined}
       >
-        <div key={sceneKey} className="sx" style={{ transform: `scale(${scale})` }}>
+        <div key={sceneKey} className="sx" aria-hidden="true" style={{ transform: `scale(${scale})` }}>
           {scene.art}
         </div>
         {small && <span className="sx-zoom" aria-hidden="true">Toucher pour agrandir</span>}

@@ -137,7 +137,7 @@
 .lp .fc .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); }
 .lp .fc .front { background: linear-gradient(145deg, color-mix(in srgb, var(--ink) 14%, var(--bg)), var(--bg) 60%); font: 700 clamp(21px, 3vw, 28px)/1.1 var(--display); letter-spacing: -0.03em; }
 .lp .fc .back { background: var(--hot); color: var(--on-hot); transform: rotateY(180deg); font-size: 18px; }
-.lp .fc small { font: 500 13px var(--body); opacity: 0.6; }
+.lp .fc small { font: 500 13px var(--body); color: var(--muted); }
 .lp .fc.gone-l { transition: transform 0.6s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.6s; transform: translateX(-120%) rotate(-14deg) !important; opacity: 0; }
 .lp .fc.gone-r { transition: transform 0.6s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.6s; transform: translateX(120%) rotate(14deg) !important; opacity: 0; }
 .lp .fc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -231,7 +231,7 @@
 .lp .fd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .lp .fd-head strong { font: 700 26px/1.1 var(--display); letter-spacing: -0.025em; }
 .lp .fd-head span { font-size: 13px; color: var(--hot); font-weight: 600; }
-.lp .fd-h { font-size: 13px; font-weight: 600; color: var(--hot); margin-bottom: 4px; }
+.lp .fd-h { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
 .lp .fd-card ul { display: grid; gap: 4px; list-style: none; }
 .lp .fd-card li::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--hot); margin-right: 10px; vertical-align: 1px; }
 .lp .fd-row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }

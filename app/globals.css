@@ -716,3 +716,11 @@ body {
 .sx-zoomback { position: fixed; inset: 0; z-index: 200; background: var(--ff-bg); overflow: hidden; }
 .sx-zoomrot { position: absolute; top: 0; left: 100%; transform-origin: top left; transform: rotate(90deg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
 .sx-zoomclose { min-height: 34px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--ff-line); background: var(--ff-surface); color: var(--ff-fg); font-weight: 700; font-size: 13px; }
+
+/* Accessibilité : les textes gris très clairs sont remontés pour rester lisibles (contraste suffisant) en mode clair et sombre. */
+.text-black\/30, .text-black\/40, .text-black\/45, .text-black\/50, .text-black\/55 {
+  color: color-mix(in oklab, var(--color-black) 66%, transparent);
+}
+.text-black\/60 {
+  color: color-mix(in oklab, var(--color-black) 70%, transparent);
+}

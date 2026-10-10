@@ -20,6 +20,7 @@ export default function Signup() {
   const [step, setStep] = useState<"form" | "code">("form");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
@@ -93,12 +94,14 @@ export default function Signup() {
     <AuthLayout>
         {step === "form" ? (
           <>
-            <h1 className="text-2xl font-bold tracking-tight mb-1">Créer un compte</h1>
-            <p className="text-black/60 mb-6">Rejoins FishFlow</p>
+            <h1 className="text-2xl font-bold tracking-tight mb-1">Crée ton compte gratuit</h1>
+            <p className="text-black/60 mb-6">Sans carte bancaire. Ta première fiche est prête en moins d&apos;une minute.</p>
 
             <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
             <input id="field-1"
               type="email"
+              autoComplete="email"
+              inputMode="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
@@ -107,18 +110,28 @@ export default function Signup() {
 
             <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Mot de passe</label>
             <input id="field-2"
-              type="password"
+              type={showPwd ? "text" : "password"}
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
               placeholder="6 caractères minimum"
             />
 
+            <label className="flex items-center gap-2 text-sm text-black/70 min-h-[44px] -mt-2 mb-2 cursor-pointer">
+              <input type="checkbox" checked={showPwd} onChange={(e) => setShowPwd(e.target.checked)} className="w-4 h-4 accent-[#22C55E]" />
+              Afficher le mot de passe
+            </label>
+
             {message && (
-              <p className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mb-4 ff-fade">
+              <p role="alert" className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mb-4 ff-fade">
                 {message}
               </p>
             )}
+
+            <p role="note" className="text-sm text-black/80 mb-4">
+              Tu vas recevoir un code par email. <strong>Regarde aussi dans tes spams</strong> (courrier indésirable).
+            </p>
 
             <button
               onClick={handleSignup}
@@ -136,8 +149,8 @@ export default function Signup() {
           <>
             <h1 className="text-2xl font-bold tracking-tight mb-1">Vérifie ton email</h1>
             <p className="text-black/60 mb-2">Entre le code reçu à {email}</p>
-            <p className="text-sm text-black/60 mb-6">
-              Rien dans ta boîte ? Regarde dans tes <strong className="text-black">spams</strong> (courrier indésirable). Le mail vient de FishFlow.
+            <p role="note" className="text-sm text-black bg-white border border-[#22C55E] rounded-2xl p-3 mb-6">
+              <strong>Pense aux spams.</strong> Le mail avec ton code arrive souvent dans le courrier indésirable. Il vient de FishFlow.
             </p>
 
             <input
