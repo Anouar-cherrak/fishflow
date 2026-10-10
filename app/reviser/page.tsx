@@ -127,7 +127,7 @@ export default function Reviser() {
   const stats = progress && progress.tracked > 0
     ? [
         { label: "jours de suite", value: progress.streak },
-        { label: "cartes bien sues", value: progress.mastered },
+        { label: "cartes connues", value: progress.mastered },
         { label: "cartes en cours", value: progress.tracked },
       ]
     : null;
@@ -213,7 +213,7 @@ export default function Reviser() {
             {[
               ["Tu lis la question", "Réponds dans ta tête, sans regarder."],
               ["Tu retournes la carte", "Puis tu dis si tu savais ou pas."],
-              ["FishFlow s'occupe du reste", "Une carte sue revient plus tard (jusqu'à 30 jours). Une carte ratée revient demain."],
+              ["FishFlow s'occupe du reste", "Une carte que tu connais revient plus tard (jusqu'à 30 jours). Une carte ratée revient demain."],
             ].map(([t, d], i) => (
               <li key={t} className="flex gap-3">
                 <span className="shrink-0 w-8 h-8 rounded-full border border-black/20 flex items-center justify-center text-sm font-bold" aria-hidden="true">{i + 1}</span>

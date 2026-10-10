@@ -250,16 +250,16 @@ export default function Examens() {
                 </div>
 
                 <div>
-                  <div className="h-2.5 rounded-full bg-black/10 overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Cartes bien sues">
+                  <div className="h-2.5 rounded-full bg-black/10 overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Cartes connues">
                     <div className="h-full rounded-full bg-[#22C55E] transition-all" style={{ width: `${percent}%` }} />
                   </div>
-                  <p className="text-sm text-black/65 mt-2">{mastered} cartes bien sues sur {total}</p>
+                  <p className="text-sm text-black/65 mt-2">{mastered} cartes connues sur {total}</p>
                 </div>
 
                 {!past && total > 0 && (
                   <p className="text-sm">
                     {remaining === 0 ? (
-                      <strong>Tout est bien su. Relis de temps en temps pour ne pas oublier.</strong>
+                      <strong>Tu connais tout. Relis de temps en temps pour ne pas oublier.</strong>
                     ) : (
                       <>
                         <strong>{perDay} carte{perDay > 1 ? "s" : ""} par jour</strong> pour être prêt le jour J{left > 0 ? "" : " maintenant"}.

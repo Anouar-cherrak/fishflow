@@ -145,7 +145,7 @@ export function FlashcardStudy({
             <p className="text-3xl font-bold text-black mb-1">
               {firstTryKnown} / {total}
             </p>
-            <p className="text-sm text-black/60 mb-1">sues du premier coup</p>
+            <p className="text-sm text-black/60 mb-1">réussies du premier coup</p>
             <p className="text-xs text-black/40 mb-6">
               {round > 1 ? `Tu as tout su en ${round} tours.` : "Tu as tout su du premier coup."}
             </p>
