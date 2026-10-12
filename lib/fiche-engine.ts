@@ -332,6 +332,7 @@ function courseSystem(source: string, difficulty: string) {
 Règles absolues :
 - Tu n'utilises QUE le contenu du cours ci-dessous. Tu n'ajoutes aucun fait, chiffre, date, nom, définition ou exemple qui n'y est pas, même si tu le connais.
 - Tu ne modifies jamais un chiffre, une date, un nom ou une formule du cours.
+- Quand le cours se contente de NOMMER une chose (une liste, un mot, sans explication), tu la nommes aussi, sans ajouter de rôle, de fonction, de cause ou de définition qui n'est pas écrit dans le cours. Un cours court donne une fiche courte.
 - Le cours fait foi : même si une affirmation du cours te semble fausse, dépassée ou différente de ce que tu sais, tu rapportes ce que dit le cours, sans le « corriger ».
 - Tu ignores le bruit : numéros de page, en-têtes et pieds de page répétés, références bibliographiques, liens, mentions de copyright.
 - Pour une langue étrangère étudiée, garde les mots et phrases dans leur langue d'origine avec leur traduction.
@@ -460,7 +461,7 @@ Partie rédigée (JSON) :
 ${JSON.stringify(section.blocks)}
 
 Vérifie, en relisant le cours. Le cours fait foi : tu compares UNIQUEMENT au cours, jamais à tes propres connaissances. Si le cours dit une chose, elle est juste ici, même si tu crois qu'elle est fausse.
-1. Inventions et erreurs : une phrase, un chiffre, une date, un nom, un exemple ou un piège qui n'est PAS dans le cours, ou qui déforme ce que dit le cours. Les phrases de remplissage sans information du cours sont à retirer.
+1. Inventions et erreurs : une phrase, un chiffre, une date, un nom, un exemple ou un piège qui n'est PAS dans le cours, ou qui déforme ce que dit le cours. Attention aux ajouts discrets : un rôle, une fonction, une définition ou une précision ajoutée à une notion que le cours ne fait que nommer est une invention, même si c'est vrai dans la réalité. Les phrases de remplissage sans information du cours sont à retirer.
 2. Oublis : une notion de la liste absente ou seulement nommée sans son contenu.
 3. Mise en valeur : du balisage cassé, ou pas de bloc "retenir" à la fin.
 

@@ -325,7 +325,7 @@ function GenererContent() {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-black/50 text-sm mt-3">Ça peut prendre jusqu&apos;à 30-40 secondes.</p>
+          <p className="text-black/50 text-sm mt-3">Ta fiche complète peut prendre jusqu&apos;à une minute.</p>
         </div>
       )}
 
