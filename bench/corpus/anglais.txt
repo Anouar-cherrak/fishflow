@@ -1,0 +1,40 @@
+Les faux-amis (ou faux amis, sans trait d’union) sont des mots appartenant à deux langues différentes et qui ont entre eux une grande similitude de forme mais dont les significations sont différentes. Lorsqu'ils ont certaines acceptions en commun, ce sont des « faux-amis partiels ». Par exemple, en italien, ricetta signifie « recette (de cuisine) », mais aussi « ordonnance (médicale) » (tout comme Rezept en allemand). Lorsque toutes leurs acceptions sont différentes, ce sont des « faux-amis complets », comme cantina qui signifie uniquement cave à vin et débit de boissons en italien.
+Du point de vue étymologique, il faut distinguer les faux-amis qui sont des mots apparentés (en raison d'un emprunt linguistique) de ceux qui sont des mots non apparentés (c'est-à-dire des homonymes ou des homophones).
+
+== Mots apparentés ==
+Une langue A emprunte un mot à une langue B. Plus tard, le mot change de sens dans la langue B. Ou bien deux langues différentes utilisent un même terme issu d'une autre langue, mais chacun dans un sens différent. Un locuteur de la langue A risque de tomber dans le piège du faux-ami quand il apprendra la langue B et rencontrera le mot en question.
+À l'intérieur de cette catégorie, on distingue les « faux-amis complets » des « faux-amis partiels ».
+
+=== Faux-amis complets ===
+Les faux-amis complets (ou faux-amis absolus, faux-amis stricts) ont un sens différent malgré les apparences. Par exemple, en anglais, opportunity signifie « occasion » (« aubaine », « moment propice à l'action ») et non « opportunité » (caractère de ce qu'il est opportun de faire). De même, la similitude entre Secretary of State (« ministre des Affaires étrangères » aux États-Unis) et « secrétaire d'État » fait oublier la distinction entre la position subalterne d'un secrétaire d'État et la position éminente d'un ministre. Cette force d'induction en erreur est le propre des faux-amis.
+Autres exemples :
+
+actually signifie « en fait », « en réalité », alors que « actuellement » se dit en anglais currently ;
+activism, se traduit par « militantisme » et non par « activisme » ;
+the administration en anglais américain désigne le pouvoir exécutif (the Bush Administration, « le gouvernement Bush »), alors que « l'administration » en français désigne l'ensemble des services publics permettant de faire fonctionner l'État ;
+educator n'a rien à voir avec le métier d'« éducateur », il se traduit par « enseignant » ou plus rarement par « pédagogue » ;
+editor, se traduit par « directeur » de la publication et non par « éditeur » ;
+eventually signifie « finalement », alors que « éventuellement » se dit en anglais, selon le cas, possibly  ou ultimately ;
+gratuity signifie « pourboire », tandis que gratuité sera un composé de free ;
+to support signifie « soutenir » alors que « supporter » (au sens péjoratif) se traduit en anglais par to bear ;
+« sensible » en français qualifie une personne dont les sensations sont exacerbées, qui est sensible à la douleur, ou aux émotions positives ou négatives alors qu'en anglais on traduit cette notion par le mot sensitive ; en revanche le sensible anglais se traduit en français par « raisonnable » (cf. « sensé »).
+En raison de racines communes anciennes, les langues française et anglaise ont évolué différemment et les faux-amis complets sont fréquents.
+
+=== Faux-amis partiels ===
+Les faux-amis partiels ont à la fois des sens équivalents et des sens différents. Ainsi, en anglais, le mot agenda (en latin « les choses destinées à être faites »), peut désigner par métonymie, comme en français, un outil de gestion du temps ou, comme en latin, des objectifs, un programme d'action, un « ordre du jour » (ce qui est inscrit dans l'agenda au sens français du terme).
+
+En français, le mot similarities est abusivement traduit par « similarités » lorsqu'il signifie « similitudes » : les « similitudes » sont des caractéristiques analogues, tandis que la « similarité » est le fait d'être globalement similaire, ce qui explique que ce mot soit rarement employé au pluriel en français, et ce qui permet de subodorer un faux-ami lorsqu'il apparaît au pluriel en anglais.
+En français, le mot « essence » peut se rapporter soit à la nature de l'être soit au carburant. Dans le premier cas la traduction anglaise est tout simplement essence, tandis que dans le deuxième cas il s'agit de petrol (en anglais britannique) ou gas (abréviation de gasoline, en anglais américain). En français, le mot « pétrole » désigne tout simplement la substance de base appelée petroleum oil en anglais.
+En anglais, to fix signifie principalement réparer, régler.
+En anglais, novel signifie « roman » et non « nouvelle », qui se dit short story.
+En anglais, le mot control se rapporte avant tout à la notion de domination, de maîtrise ou de régulation d'un dispositif ou d'une situation, alors qu'en français le mot « contrôle » se rapporte fondamentalement à une opération de vérification de conformité.
+En anglais, parity signifie « parité » au sens étroit d'égalité parfaite, notamment entre deux monnaies, alors qu'en français ce terme peut également désigner un simple rapport entre deux monnaies résultant de leur définition en fonction d'une unité de référence, n'impliquant pas nécessairement une égalité parfaite. Cette double interprétation sema le trouble sur les marchés financiers en juin 2010 à la suite d'une déclaration du Premier ministre français François Fillon lors d'un point de presse avec son homologue canadien Stephen Harper, et fit s'effondrer le taux de change de l’euro par rapport au dollar américain.
+En français, le verbe anglais to realize a depuis 1895 été traduit littéralement par « réaliser » au sens de « se rendre compte », « s'apercevoir », « découvrir », « comprendre », « saisir ». Il est parfois transitif (« réaliser » la gravité de la situation) parfois intransitif (« réaliser que » ou simplement « réaliser »). Aussi cet emploi a-t-il été critiqué.
+
+== Mots faussement apparentés ==
+Dans certains cas, les faux-amis ne sont que des homonymes qui n'ont aucun rapport avec les mots originaux. L'homonymie (ou parfois l'homophonie) n'est qu'une pure coïncidence. Par exemple, l'anglais or « ou », le russe он on « il », l'allemand Rat « conseil » et le néerlandais je « tu », sont des homonymes et des homophones fortuits de mots français sans aucun rapport avec eux. Pour de simples raisons statistiques, ces coïncidences apparaissent plus souvent entre des mots ayant un faible nombre de lettres. Exemples :
+
+Fast signifie « rapide » en anglais et « presque » en allemand.
+Openbaar, en néerlandais, signifie « public » et non open bar (qui signifie « bar ouvert, alcool gratuit »). On trouve ainsi un Openbaar Ministerie (qui ne régule pas les soirées de défonce à l'alcool mais est l'équivalent du ministère de la Justice) et des Openbaar Vervoer (« transports publics »).
+Salire en italien signifie « monter » et non pas « salir », qui se dit en italien sporcare ; de même, salir en espagnol signifie « sortir » et non pas « salir », qui se dit en espagnol ensuciar.
+Gift en allemand signifie « poison », « venin », alors que gift en anglais signifie « don, cadeau ».

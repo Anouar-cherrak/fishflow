@@ -1,0 +1,212 @@
+Le théorème de Pythagore est une proposition de géométrie euclidienne qui met en relation les longueurs des côtés dans un triangle rectangle. Il s'énonce fréquemment sous la forme suivante : 
+
+« Dans un triangle rectangle, le carré de la longueur de l’hypoténuse (ou côté opposé à l'angle droit) est égal à la somme des carrés des longueurs des deux autres côtés. »
+
+Ce théorème permet notamment de calculer l’une des longueurs à partir des deux autres.
+Il doit son nom à Pythagore de Samos, philosophe de la Grèce antique du VIe siècle av. J.-C. ; cependant, le résultat était connu plus de mille ans auparavant en Mésopotamie et a vraisemblablement été découvert indépendamment dans plusieurs autres cultures.
+La plus ancienne démonstration qui nous soit parvenue est due à Euclide, vers 300 av. J.-C. Même si les mathématiciens grecs en connaissaient sûrement une auparavant, rien ne permet de l'attribuer de façon certaine à Pythagore.
+Les premières démonstrations historiques reposent en général sur des méthodes de calcul d’aire par découpage et déplacement de figures géométriques. Inversement, la conception moderne de la géométrie euclidienne est fondée sur une notion de distance qui est définie pour respecter ce théorème.
+Divers autres énoncés généralisent le théorème à des triangles quelconques, à des figures de plus grande dimension telles que les tétraèdres, ou en géométrie non euclidienne comme à la surface d’une sphère.
+Plus généralement, ce théorème a de nombreuses applications dans divers domaines très différents (architecture, ingénierie…), encore aujourd'hui, et a permis nombres d'avancées technologiques à travers l'histoire.
+
+== Énoncés ==
+
+=== Théorème ===
+
+La forme la plus connue du théorème de Pythagore est la suivante :
+
+En particulier, la longueur de l’hypoténuse est donc toujours supérieure à celle de chaque autre côté.
+Le terme « longueur » est parfois omis, chaque côté étant assimilé à sa longueur. Toutefois l’élévation au carré (algébrique), qui n’a de sens que pour une grandeur numérique comme la longueur, correspond à la construction d’un carré (géométrique) sur chaque côté du triangle. Certaines démonstrations du théorème s’appuient d’ailleurs sur une égalité d’aires entre le carré construit sur l’hypoténuse et la réunion des carrés construits sur les deux autres côtés.
+En nommant les sommets du triangle, le théorème peut se reformuler dans l’implication suivante :
+
+Par contraposée :
+
+=== Réciproque ===
+L’implication réciproque est également vraie :
+
+Pour une formulation sans notations des sommets, le terme « hypoténuse » n'est utilisable qu'une fois acquis que le triangle est rectangle :
+
+Par contraposée de la réciproque :
+
+La réciproque se déduit du théorème lui-même et d'un cas d'« égalité » des triangles : si l'on construit un triangle rectangle en C de sommets A, C et B', avec CB' = CB, on a AB = AB' par le théorème de Pythagore, donc un triangle isométrique au triangle initial (les trois côtés sont deux à deux de même longueur). L'angle en C du triangle initial ABC, identique à celui du triangle AB'C, est donc droit.
+
+=== Équivalence ===
+Comme la réciproque est vraie, on dit que l'on a une équivalence : la propriété sur les carrés des longueurs des côtés du triangle est une condition nécessaire et suffisante pour qu'il soit dit rectangle en C :
+
+=== Triplets pythagoriciens ===
+
+Quand trois nombres entiers vérifient la même relation que celle donnée par le théorème de Pythagore pour les côtés d'un triangle rectangle, c'est-à-dire que le carré du plus grand est la somme des carrés des deux autres, on les nomme « triplets pythagoriciens ». Le plus simple et le plus connu est le triplet (3,4,5) : 32 + 42 = 52. D'après la réciproque du théorème de Pythagore, un triangle dont les longueurs des côtés sont 3, 4 et 5 est rectangle.
+
+== Applications ==
+
+=== Arpentage ===
+
+D’après la réciproque du théorème de Pythagore, si un triangle a des côtés de longueurs 3, 4 et 5 (par rapport à une unité quelconque) alors il est rectangle.
+
+Ce cas particulier de triplet pythagoricien justifie l’usage de la corde à treize nœuds, qui aurait permis de mesurer des distances mais aussi d’obtenir un angle droit sans équerre rigide en répartissant les douze intervalles qui séparent les nœuds sur les trois côtés d’un triangle de dimensions 3 – 4 – 5.
+
+=== Nature d'un triangle ===
+Le théorème (ou plutôt sa contraposée) et sa réciproque montrent que la relation donnée entre les longueurs des côtés est une propriété caractéristique des triangles rectangles, ce qui permet de l’utiliser comme test dans la détermination de la nature d’un triangle :
+
+si AB2 = AC2 + BC2 alors le triangle est rectangle en C ;
+si AB2 n’est pas égal à AC2 + BC2 alors le triangle n’est pas rectangle en C.
+En effectuant le test pour le sommet opposé au plus grand côté du triangle (seul sommet susceptible d'abriter l'angle droit), on peut déterminer si le triangle est rectangle ou non à partir des longueurs de ses côtés.
+
+=== Distance euclidienne ===
+
+Dans le plan muni d’un repère orthonormé, la distance entre deux points s’exprime en fonction de leurs coordonnées cartésiennes à l’aide du théorème de Pythagore par :
+
+  
+    
+      
+        A
+        B
+        
+          =
+        
+        
+          
+            (
+            
+              x
+              
+                B
+              
+            
+            −
+            
+              x
+              
+                A
+              
+            
+            
+              )
+              
+                2
+              
+            
+            +
+            (
+            
+              y
+              
+                B
+              
+            
+            −
+            
+              y
+              
+                A
+              
+            
+            
+              )
+              
+                2
+              
+            
+          
+        
+      
+    
+    {\displaystyle AB{=}{\sqrt {(x_{B}-x_{A})^{2}+(y_{B}-y_{A})^{2}}}}
+  
+.
+Cette formule est analogue à celle qui donne la norme d’un vecteur de coordonnées (x ; y) dans une base orthonormée :
+
+  
+    
+      
+        ‖
+        
+          
+            
+              u
+              →
+            
+          
+        
+        ‖
+        =
+        
+          
+            
+              x
+              
+                2
+              
+            
+            +
+            
+              y
+              
+                2
+              
+            
+          
+        
+      
+    
+    {\displaystyle \lVert {\vec {u}}\rVert ={\sqrt {x^{2}+y^{2}}}}
+  
+.
+Ces formules se généralisent en dimension plus grande.
+
+=== Relation trigonométrique ===
+En considérant le cosinus et le sinus d’un angle α comme l'abscisse et l'ordonnée d’un point du cercle trigonométrique repéré par cet angle, et le rayon du cercle trigonométrique de longueur 1 comme l'hypoténuse, le théorème de Pythagore permet d’écrire :
+
+  
+    
+      
+        
+          cos
+          
+            2
+          
+        
+        ⁡
+        α
+        +
+        
+          sin
+          
+            2
+          
+        
+        ⁡
+        α
+        =
+        1
+      
+    
+    {\displaystyle \cos ^{2}\alpha +\sin ^{2}\alpha =1}
+  
+.
+
+== Histoire ==
+
+Pythagore vivait au VIe siècle av. J.-C., mais l'histoire du théorème de Pythagore commence plus d'un millénaire auparavant, comme en témoignent plusieurs tablettes d'argile de la période paléo-babylonienne. Il n'y a aucune preuve archéologique qui permette de remonter plus avant, même si quelques hypothèses existent.
+Ainsi, les travaux d'Alexander Thom, qui imagine une organisation de sites mégalithiques datant du XXVe siècle av. J.-C. en Grande-Bretagne et en France utilisant triangles rectangles et triplets pythagoriciens, sont fortement contestés. L'hypothèse parfois avancée que le théorème aurait été connu de l'Égypte ancienne dès le Moyen Empire paraît elle aussi difficile à établir.
+
+=== Mésopotamie ===
+
+Les historiens des mathématiques et assyriologues ont découvert à la fin des années 1920 que s'était forgée en Mésopotamie (l'ancien Irak), à l'époque paléo-babylonienne, une culture mathématique dont l'objet n'était pas purement utilitariste (numération mésopotamienne finale : sexagésimale positionnelle avec base décimale accessoire).
+Plusieurs des tablettes d'argile qui ont été retrouvées et analysées montrent que la relation entre les longueurs des côtés du rectangle et celle de sa diagonale (soit entre les longueurs des côtés d’un triangle rectangle) était connue et utilisée pour résoudre des problèmes calculatoires.
+Des « tablettes cadastrales » (dont la plus ancienne date de 2340 à 2200 av. J.-C.) établies pour le commerce ou l'administration de parcelles exposent ainsi cette connaissance. La tablette Si427, datant de 1900 à 1600 av. J.-C., a été redécouverte par Daniel Mansfield en 2020 au Istanbul Arkeoloji Müzeleri. Découverte à Sippar (Irak), elle montre ainsi un terrain avec tour, aire de battage et marécage dont une des parcelles a été mise en vente par son propriétaire. Elle présente des découpes de trapèzes et de triangles rectangles ainsi que quelques triplets pythagoriciens.
+La tablette Plimpton 322 (vers 1800 av. J.-C.) donne une liste ordonnée de nombres associés à des triplets pythagoriciens, soit des entiers (a, b, c) satisfaisant la relation a2 + b2 = c2. La tablette ne donne que deux nombres du triplet, mais les associe explicitement au plus petit côté et à la diagonale d'un rectangle.
+Il n'y a pas trace cependant de l'énoncé d'un théorème et les historiens préfèrent souvent utiliser un autre mot : certains parlent par exemple de « règle de la diagonale » ou de « règle de Pythagore ». Ni celle-ci, ni le principe qui la sous-tend ne sont explicitement énoncés non plus, mais les exemples montrent bien qu'une règle générale est connue.
+La datation et l'origine exacte des tablettes d'argile ne sont pas toujours évidentes, beaucoup de celles-ci ont été achetées sur le marché des antiquités comme la tablette Plimpton 322, mais les historiens peuvent s'appuyer sur des éléments linguistiques, et les similarités avec celles dont l'origine est connue, ayant été obtenues par des fouilles archéologiques régulières. Les traces que l'on a des cultures antérieures rendent peu vraisemblable la découverte de la « règle de Pythagore » avant 2300 av. J.-C., celle-ci pourrait apparaître entre 2025 et 1825 av. J.-C..
+
+=== Inde ===
+En Inde, un énoncé du théorème, sous sa forme la plus générale, apparaît dans l'Apastamba (en), l'un des Śulba-Sūtras, ces traités du cordeau qui codifient les règles des constructions destinées aux rituels védiques. Ceux-ci ont été rédigés entre le VIIIe et le IVe siècle avant notre ère (par ailleurs certains triplets pythagoriciens sont mentionnés dans des textes bien antérieurs). Les Sulbasutras parlent du rectangle et de sa diagonale, plutôt que de triangle.
+
+=== Chine ===
+Le théorème apparaît également en Chine dans le Zhoubi Suanjing (le Classique mathématique du Gnomon des Zhou), un des plus anciens ouvrages mathématiques chinois. Ce dernier, écrit probablement durant la dynastie Han (206 à 220 av. J.-C.), regroupe des techniques de calcul datant de la dynastie Zhou (Xe siècle av. J.-C. à 256 av. J.-C.). Le théorème ou procédure s’énonce de la manière suivante :
+
+« En réunissant l’aire (mi) de la base (gou) et l’aire de la hauteur (gu), on engendre l’aire de l’hypoténuse. »
+
+Mais la question se pose de savoir si ce théorème — ou cette procédure — était muni ou non d’une démonstration. Sur ce point, les avis sont partagés. Le théorème, sous le nom de Gougu (à partir des mots « base » et « altitude »), est repris dans le Jiuzhang suanshu (Les Neuf Chapitres sur l'art mathématique, 100 à 50 av. J.-C.), avec une démonstration, utilisant un découpage et une reconstitution, qui ne ressemble pas à celle d’Euclide et qui illustre l'originalité du système démonstratif chinois.
+
+=== Égypte ancienne ===

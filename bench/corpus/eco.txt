@@ -1,0 +1,67 @@
+L'inflation est la perte du pouvoir d'achat de la monnaie qui se traduit par une augmentation générale et durable des prix. Elle correspond à une augmentation générale des prix des biens et services dans tous les secteurs de l’économie (par exemple nationale). Lorsque le niveau général des prix augmente, une quantité spécifique de monnaie permet d'acheter moins de biens et services. Ce phénomène, une fois installé, peut persister.
+La monnaie est l'étalon des valeurs, et elle a elle-même une valeur ; la variation de la valeur de la monnaie n'est pas directement mesurable ; on l'évalue à partir des variations de l'indice des prix à la consommation (IPC) des biens et services, mesurées à quantité et qualité égales. « [L'inflation] doit être distinguée de l'augmentation du coût de la vie » car elle ne prend pas en compte la variation des quantités achetées en réponse à l'évolution des prix.
+En France, le taux d'inflation est évalué au moyen de l'IPC. Cette mesure est établie par l'Institut national de la statistique et des études économiques (Insee) et employée par l'administration française comme indicateur de l'inflation. Dans le cadre européen (en particulier dans le Système européen de banques centrales), l'indice des prix à la consommation harmonisé (IPCH) est employé. C'est le résultat d'un traitement a posteriori des postes de prix des indices nationaux (IPC en France, VPI en Allemagne, etc.) relevés par les instituts statistiques nationaux (Insee en France, Destatis en Allemagne, ISTAT en Italie, etc.), qui rend les indices comparables entre pays membres de la zone euro. Le traitement a posteriori consiste en une modification des pondérations des différents postes qui entrent en compte dans les indices nationaux et dans l'IPCH, mais aussi en l'inclusion ou l'exclusion de certains postes de consommation (par exemple, en France, l'IPC intègre le remboursement des produits de santé, tandis que l'IPCH prend en compte la dépense de santé, remboursements exclus).
+Le concept d'inflation induit de nombreuses controverses entre économistes : les débats portent sur les conséquences (sont-elles positives ? sont-elles négatives ? sont-elles sans incidences sur le reste ?), mais aussi sur les causes. Justifiée par l'incidence concrète qu'a l'inflation sur la population, la controverse se nourrit des interrogations sur les mesures à prendre pour la contenir et sur le niveau d'intervention de l'État pour les mettre en œuvre.
+
+== Définitions ==
+
+=== Inflation ===
+Jusque dans les années 1960, l'inflation se définit comme l'excès de moyens monétaires par rapport à l'offre (phénomène dont la hausse des prix et la perte de pouvoir d'achat de la monnaie résultent). Ainsi, Gaël Fain définit en 1956 l'inflation comme « un excès de la demande solvable sur l'offre, la hausse des prix en étant la conséquence ».
+Aujourd'hui, les définitions les plus couramment rencontrées sont :
+
+de portée plus générale, telle que l'inflation est « la perte du pouvoir d'achat de la monnaie matérialisée par une augmentation générale et durable des prix » ;
+de nature plus systémique comme celle de G. Olive qui se refuse à associer l'inflation à un mécanisme inflationniste particulier. Pour lui, l'inflation est :
+La hausse du niveau général des prix (et non la hausse des prix de quelques produits),
+Un phénomène auto-entretenu de hausse des prix : une hausse en entraîne d'autres (et non un phénomène isolé ou accidentel),
+Une hausse des prix fondée sur des mécanismes macroéconomiques qui mettent en jeu l'interdépendance entre tous les mécanismes et parties de l'économie (production, répartition des richesses, formation des prix, politique de distribution, etc.).
+Assimiler donc l'inflation à la seule hausse de prix des biens de consommation, en excluant la hausse des prix affectant les valeurs patrimoniales (capitaux, actifs financiers, immobilier, etc.), peut être considéré comme un abus de langage, conséquence d'un mode de mesure restrictif choisi par les institutions.
+Cependant, s'il est vrai que le terme d'inflation devrait, sur la base de ces définitions, faire référence à tout phénomène régulier d'augmentation du niveau des prix, la réalité demeure que la totalité des banques centrales ayant un objectif de politique monétaire de ciblage d'inflation vise en fait la seule inflation des prix à la consommation, à l'exclusion notamment de l'inflation des actifs (asset price targeting).
+
+=== Termes connexes ===
+L'inflation rampante décrit un état d'inflation durable, sinon chronique, dont le taux mesuré correspond à des valeurs faibles.
+L'inflation galopante ou hyperinflation correspond à la situation d'une économie affectée par une inflation extrêmement élevée, échappant à tout contrôle.
+
+La stabilité des prix décrit la situation d'une économie où la variation des prix à la consommation est durablement très faible ou nulle.
+La déflation décrit la situation d'une économie où est constatée une baisse générale et durable des prix.
+Une politique de déflation fait référence à l'ancien sens du mot inflation (inflation monétaire), et vise à restreindre le volume de la masse monétaire, dans l'objectif de restaurer ou maintenir la valeur de la monnaie.
+La désinflation décrit la situation d'une économie où est constatée une baisse du taux d'inflation, qui reste cependant positif.
+La désinflation compétitive est une politique menée par le gouvernement d'un pays pour accroître la compétitivité-prix des produits nationaux par rapport aux produits étrangers.
+La stagflation est une situation particulière où l'on constate dans une économie la simultanéité d'un niveau élevé d'inflation et d'une croissance faible, d'un chômage élevé voire d'une récession.
+
+== Mesures de l'inflation ==
+
+=== Mesure de la variation des prix à la consommation ===
+
+Mesurer l'inflation consiste le plus souvent à observer un « panier » pondéré de biens (en fonction de l'importance de chaque bien dans le panier) représentatifs de l'ensemble des biens consommés par les ménages. En effet, ce sont les prix de la consommation finale des ménages qui sont pris en compte dans la mesure d'inflation. Les prix intermédiaires (prix de transferts à l'intérieur d'une chaîne de production, prix de vente du producteur au détaillant, etc.) sont exclus du spectre de prix pris en compte pour l'inflation. Ces biens sont répartis parmi les différents postes de consommation des ménages. Les pondérations de ce panier sont définies par la part de la consommation représentée par chacun de ces biens ou services. Un indice des prix à la consommation mesure les variations enregistrées par le panier observé, traduisant ainsi la variation du coût de la vie pour les consommateurs, et de la valeur de la monnaie dans ses aspects les plus concrets pour les ménages.
+Dans cette conception, les indices d'inflation se rapportent par construction exclusivement à la consommation des ménages, les prix des valeurs (mobilières comme immobilières), faisant l'objet d'un investissement potentiel de la part des ménages mais pas de consommation, sont exclus. Typiquement, les prix du logement sont exclus. Le taux d'inflation est la variation en pourcentage de cet indice sur une période donnée : si le prix moyen du « panier » passe de 100 à 102, l'inflation est de (102-100)/100 = 2/100 = 2 %.
+L'effet Boskin montre que les méthodes de calcul de l'inflation ont tendance à la surestimer.
+
+=== Mesure d'une variation plus large des prix ===
+La mesure du coût de la consommation des ménages ne suffit pas à caractériser totalement le bien-être des ménages :
+
+Le pouvoir d’achat concerne un revenu. À revenu donné, le pouvoir d'achat (la quantité de biens et de services que permet d'acheter un revenu donné) baisse en période d'inflation. Il faut donc distinguer le revenu « nominal » (apparent) du revenu « réel » qui se calcule en « déflatant » le revenu nominal par le taux de variation de l'indice des prix.
+Le niveau de vie concerne un ménage. Il dépend de l'aspect revenu, mais aussi de l'aspect dépense. Ainsi, pour un revenu donné, le fait de devoir payer ou non son logement (selon qu'on est locataire, en train de rembourser un emprunt, ou propriétaire libéré de ces charges) affecte de façon importante le niveau de vie possible. De même, si le prix des biens convoités baisse de façon significative et durable (cas des biens alimentaires par exemple), le niveau de vie s'améliore.
+L'effet de « richesse » signifie qu'un ménage peut se trouver potentiellement enrichi si les prix des actifs qu'il détient (actions, immobilier) augmente.
+Par ailleurs, la politique monétaire des banques centrales vise de plus en plus à la maîtrise de l'inflation à moyen terme pour garantir la crédibilité de la monnaie : depuis les accords de la Jamaïque l'ancrage nominal des monnaies les unes par rapport aux autres, ainsi que l'ancrage des monnaies sur le métal - or ou argent - sont exclus. La crédibilité d'une monnaie est désormais assurée par la seule garantie, par l'action de la banque centrale afin que la valeur de la monnaie ne s'érode pas trop vite. Des débats se font jour pour savoir si le mandat de la banque centrale ne doit pas viser la stabilité des prix des actifs, plutôt que celle des prix à la consommation.
+En effet, l'intermédiation financière produit des effets tels que les surcroîts de monnaie mis en circulation aboutissent non pas à une accélération des prix à la consommation, mais à une concentration d'argent sur des valeurs mobilières : bulles spéculatives sur l'immobilier japonais à la fin des années 1980, bulle des nouvelles technologies à la fin des années 1990, bulle financière des années 2000... D'où l'idée que la crédibilité des monnaies résulte davantage de la stabilité des prix des valeurs (mobilières et immobilières) que de celle des prix à la consommation qui se trouvent évoluer de manière plus modérée du fait du surcroît de concurrence généré par une mondialisation commerciale élargie.
+Ce débat demeure très ouvert. Mais l'absence d'outil défini pour éviter que les liquidités s'accumulent sur certaines classes d'actifs (certains ensembles de valeurs mobilières ou immobilières) fait que bon nombre de banques centrales se réfèrent prioritairement à un objectif d'inflation mesuré par l'évolution des prix à la consommation des ménages.
+
+=== Les effets de l'inflation sur la mesure du PIB ===
+
+La valeur de la production au cours d'une année dans un pays donné est mesurée par le PIB. Le PIB nominal (ou à prix courants ou en valeur) est calculé avec les prix valables au cours de l'année considérée. Cette façon de mesurer fait croitre le PIB avec le déflateur du PIB.Le PIB réel (ou à prix constants ou en volume) est calculé en utilisant les prix qui étaient pratiqués l'année antérieure, ou une année de référence.
+C'est la variation du PIB en volume, et non du PIB en valeur, qui définit la croissance économique. Par définition, on a la relation suivante :(1 + taux nominal de croissance du PIB) = (1 + taux réel de croissance du PIB) * (1 + taux de variation du déflateur du PIB), c'est-à-dire
+(1 + taux réel de croissance du PIB) = (1 + taux nominal de croissance du PIB) / (1 + taux de variation du déflateur du PIB).
+En pratique, on utilise souvent la formule linéarisée, valable pour des taux assez petits (on n'a gardé que les termes d'ordre 1, les termes d'ordre 2 étant négligés) :Taux nominal de croissance du PIB ≈ Taux réel de croissance du PIB + Taux de croissance du déflateur du PIBou de façon équivalente :Taux réel de croissance du PIB ≈ Taux nominal de croissance du PIB - Taux de croissance du déflateur du PIB
+
+== Causes de l'inflation ==
+Selon Raymond Barre, s'il y a fréquemment divergence sur le diagnostic d'une situation d'inflation particulière, c'est qu'en effet plusieurs causes peuvent être pointées, séparément ou de manière combinée :
+
+=== Inflation induite par excès de masse monétaire ===
+L'inflation a d'abord été considérée comme un désordre attribué à l'augmentation de la masse monétaire en circulation. C'est le point de vue théorique avancé par l'école quantitativiste au XIXe siècle, à la suite d'Irving Fisher et, au XXe siècle avec le monétarisme. Pour Milton Friedman, l'une des figures majeures de cette école, l'inflation ne peut avoir qu'une seule source, la monnaie. Dans cette situation, en l'absence de création de richesse réelle, la conséquence directe se manifeste sous la forme d'une augmentation de la demande et par suite des prix. On considère que l'inflation monétaire résulte de l'émission par les autorités monétaires (l'État en général) de monnaie en trop grande quantité :
+
+par rapport à la quantité de biens dans le circuit économique, comme lors de l'hyperinflation de la république de Weimar par sur-émission de mark en 1923,
+ou, dans le cas d'une monnaie assise sur l'or ou l'argent, par un afflux brutal de métal précieux comme ce fut le cas en Espagne à la suite de l'afflux d'or en provenance des Amériques après leur conquête et qui conduira à la révolution des prix des XVIe siècle et XVIIe siècle, partout en Europe de l'Ouest,
+du fait du crédit, si l'activité financée ne conduit pas directement (ou suffisamment) à injecter dans le circuit économique des biens nouveaux à hauteur du montant de monnaie nouvelle.
+Pour l'économiste Claude-Danièle Échaudemaison, « toutefois, il semble que de nos jours, la monnaie soit moins la cause de l'inflation que la condition permissive ».
+
+=== Inflation induite par la demande ===

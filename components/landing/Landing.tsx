@@ -427,7 +427,7 @@ export function Landing() {
         </Link>
         <div className="bar-actions">
           {signedIn ? (
-            <Link href="/aujourdhui" className="btn bar-open">
+            <Link href="/generer" className="btn bar-open">
               <span>Ouvrir FishFlow</span>
             </Link>
           ) : (
@@ -468,7 +468,7 @@ export function Landing() {
             </p>
             <div className="cta-row">
               {signedIn ? (
-                <Link href="/aujourdhui" className="btn">
+                <Link href="/generer" className="btn">
                   <span>Ouvrir FishFlow</span>
                 </Link>
               ) : (
@@ -771,7 +771,7 @@ export function Landing() {
             <h2 id="t-end">Commence par une question.</h2>
             <div className="cta-row">
               {signedIn ? (
-                <Link href="/aujourdhui" className="btn"><span>Ouvrir FishFlow</span></Link>
+                <Link href="/generer" className="btn"><span>Ouvrir FishFlow</span></Link>
               ) : (
                 <TrackedLink href="/generer" event="cta_click_final" className="btn"><span>Essayer gratuitement</span></TrackedLink>
               )}

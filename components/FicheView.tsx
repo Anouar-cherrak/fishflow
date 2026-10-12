@@ -9,6 +9,8 @@ import { QuizPlayer } from "@/components/QuizPlayer";
 import { createClient } from "@/lib/supabase/client";
 import { FlashcardStudy } from "@/components/FlashcardStudy";
 import { clearFicheReviews, recordReviewResults } from "@/lib/reviews";
+import { EssentielList, FicheSectionBody } from "@/components/FicheContent";
+import type { Fiche } from "@/lib/fiche-engine";
 
 type Flashcard = { question: string; answer: string };
 type QuizQuestion = { question: string; options: string[]; correctIndex: number };
@@ -19,6 +21,10 @@ export type FishFlowResult = {
   sourceText?: string;
   summary?: string;
   sheet?: string[];
+  // Nouveau moteur : la fiche structurée et « L'essentiel en 5 lignes ». Les anciennes fiches n'en ont pas.
+  fiche?: Fiche;
+  essentiel?: string[];
+  version?: number;
   flashcards?: Flashcard[];
   quiz?: QuizQuestion[];
   best_score?: number | null;
@@ -84,7 +90,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const logoRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
   const sheetHeaderRef = useRef<HTMLDivElement>(null);
-  const sheetItemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sheetItemRefs = useRef<(HTMLElement | null)[]>([]);
   const flashcardsHeaderRef = useRef<HTMLDivElement>(null);
   const flashcardItemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const quizHeaderRef = useRef<HTMLDivElement>(null);
@@ -127,6 +133,8 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       formData.append("outputs", key);
       formData.append("difficulty", settings.difficulty);
       formData.append("length", settings.length);
+      // Flashcards, quiz et essentiel se refont à partir de la fiche existante (plus rapide, et cohérent avec elle).
+      if (key !== "sheet" && data.fiche) formData.append("fiche", JSON.stringify(data.fiche));
 
       const res = await fetch("/api/generate", { method: "POST", body: formData });
       const newData = await res.json();
@@ -136,7 +144,12 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
         return;
       }
 
-      const updated = { ...data, [key]: newData[key] };
+      const updated: FishFlowResult = { ...data, [key]: newData[key] };
+      if (key === "sheet") {
+        updated.fiche = newData.fiche;
+        updated.version = newData.version;
+      }
+      if (key === "summary") updated.essentiel = newData.essentiel;
       setData(updated);
 
       if (ficheId) {
@@ -189,12 +202,24 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       const margin = 8;
       let cursorY = margin;
 
-      const blocks: HTMLDivElement[] = [];
+      const blocks: HTMLElement[] = [];
       if (logoRef.current) blocks.push(logoRef.current);
-      if (data?.summary !== undefined && summaryRef.current) blocks.push(summaryRef.current);
-      if (data?.sheet !== undefined) {
+      const pushSummary = () => {
+        if (data?.summary !== undefined && summaryRef.current) blocks.push(summaryRef.current);
+      };
+      const pushSheet = () => {
+        if (data?.sheet === undefined && !data?.fiche) return;
         if (sheetHeaderRef.current) blocks.push(sheetHeaderRef.current);
-        sheetItemRefs.current.forEach((el) => el && blocks.push(el));
+        const count = data.fiche ? data.fiche.sections.length : data.sheet?.length ?? 0;
+        sheetItemRefs.current.slice(0, count).forEach((el) => el && blocks.push(el));
+      };
+      // Même ordre qu'à l'écran.
+      if (data?.fiche) {
+        pushSheet();
+        pushSummary();
+      } else {
+        pushSummary();
+        pushSheet();
       }
       if (data?.flashcards !== undefined) {
         if (flashcardsHeaderRef.current) blocks.push(flashcardsHeaderRef.current);
@@ -203,17 +228,38 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
 
       for (const block of blocks) {
         const canvas = await html2canvas(block, { backgroundColor: "#ffffff", scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
         const imgWidth = pageWidth - margin * 2;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const usable = pageHeight - margin * 2;
 
         if (cursorY + imgHeight > pageHeight - margin && cursorY > margin) {
           pdf.addPage();
           cursorY = margin;
         }
 
-        pdf.addImage(imgData, "PNG", margin, cursorY, imgWidth, imgHeight);
-        cursorY += imgHeight + 4;
+        if (imgHeight <= usable) {
+          pdf.addImage(canvas.toDataURL("image/png"), "PNG", margin, cursorY, imgWidth, imgHeight);
+          cursorY += imgHeight + 4;
+          continue;
+        }
+
+        // Une partie plus haute qu'une page (fiche détaillée) : on la découpe en tranches, page après page.
+        const pxPerMm = canvas.width / imgWidth;
+        let offset = 0;
+        while (offset < canvas.height) {
+          const slicePx = Math.min(canvas.height - offset, Math.floor((pageHeight - margin - cursorY) * pxPerMm));
+          const slice = document.createElement("canvas");
+          slice.width = canvas.width;
+          slice.height = slicePx;
+          slice.getContext("2d")?.drawImage(canvas, 0, offset, canvas.width, slicePx, 0, 0, canvas.width, slicePx);
+          pdf.addImage(slice.toDataURL("image/png"), "PNG", margin, cursorY, imgWidth, slicePx / pxPerMm);
+          offset += slicePx;
+          cursorY += slicePx / pxPerMm + 4;
+          if (offset < canvas.height) {
+            pdf.addPage();
+            cursorY = margin;
+          }
+        }
       }
 
       pdf.save("fishflow-fiche.pdf");
@@ -296,6 +342,71 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
     }
     return "border border-black/10 rounded-2xl p-5 bg-surface";
   };
+
+  const hasEssentiel = (data.essentiel?.length ?? 0) > 0;
+
+  // Fiche structurée : une carte par partie, dans les trois présentations existantes.
+  const sectionWrap = template === "classique" ? "grid gap-4" : "grid gap-0";
+  const sectionItem = (i: number, total: number) => {
+    if (template === "memo") {
+      return `px-4 py-4 bg-surface border border-black/10 -mt-px ${i === 0 ? "rounded-t-2xl mt-0" : ""} ${i === total - 1 ? "rounded-b-2xl" : ""}`;
+    }
+    if (template === "cornell") {
+      return `grid md:grid-cols-[minmax(0,2fr)_minmax(0,5fr)] bg-surface border-x border-b border-black/10 ${i === 0 ? "border-t rounded-t-2xl" : ""} ${i === total - 1 ? "rounded-b-2xl" : ""}`;
+    }
+    return "bg-surface rounded-3xl border border-black/10 p-6 sm:p-8";
+  };
+
+  const sheetSection = (data.sheet !== undefined || data.fiche) && (
+    <div className={`pb-6 ${sectionOpacity("sheet")}`}>
+      <div ref={sheetHeaderRef} className="px-1 pt-2 pb-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold tracking-tight text-black">Fiche de révision</h2>
+          <RegenButton {...regenProps("sheet")} />
+        </div>
+      </div>
+      {data.fiche ? (
+        <div className={sectionWrap}>
+          {data.fiche.sections.map((s, i) => (
+            <section key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className={sectionItem(i, data.fiche!.sections.length)}>
+              {template === "cornell" ? (
+                <>
+                  <h3 className="font-bold text-black px-4 pt-4 md:py-4 md:border-r border-black/10">
+                    <span className="text-[#22C55E] tabular-nums mr-2">{i + 1}.</span>
+                    {s.title}
+                  </h3>
+                  <div className="px-4 py-4">
+                    <FicheSectionBody blocks={s.blocks} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className={`font-bold tracking-tight text-black ${template === "memo" ? "mb-2" : "text-lg mb-3"}`}>
+                    <span className="text-[#22C55E] tabular-nums mr-2">{i + 1}.</span>
+                    {s.title}
+                  </h3>
+                  <FicheSectionBody blocks={s.blocks} />
+                </>
+              )}
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div className={sheetWrap}>
+          {(data.sheet ?? []).map((point, i) => (
+            <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className={sheetItem(i, data.sheet!.length)}>
+              {template === "classique" && <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />}
+              {template === "memo" && <span className="text-[#22C55E] font-bold tabular-nums shrink-0 w-6" aria-hidden="true">{i + 1}.</span>}
+              {template === "cornell" && (
+                <span className="border-r border-black/10 grid place-items-start justify-items-center pt-3.5 text-[#22C55E] font-bold tabular-nums" aria-hidden="true">{i + 1}</span>
+              )}
+              <span className={`text-black/80 ${template === "cornell" ? "px-4 py-3" : ""}`}>{point}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <AppShell size="wide">
@@ -389,11 +500,14 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               <p className="text-xs text-black/50 mt-2">{TEMPLATES.find((t) => t.key === template)?.hint}</p>
             </div>
 
+            {/* Nouvelle fiche : la fiche complète d'abord, puis l'essentiel. Ancienne fiche : résumé puis points clés. */}
+            {data.fiche && sheetSection}
+
             {data.summary !== undefined && (
               <div ref={summaryRef} className={`pb-6 ${sectionOpacity("summary")}`}>
                 <section className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-3 gap-3">
-                    <h2 className="text-xl font-bold tracking-tight text-black">Résumé</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-black">{hasEssentiel ? "L'essentiel en 5 lignes" : "Résumé"}</h2>
                     <div className="flex items-center gap-4">
                       {isPro && (
                         <button type="button" onClick={toggleSpeak} className="text-sm text-[#22C55E] font-semibold hover:underline min-h-[44px]">
@@ -403,33 +517,16 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                       <RegenButton {...regenProps("summary")} />
                     </div>
                   </div>
-                  <p className="text-black/80 leading-relaxed text-base sm:text-lg max-w-[68ch]">{data.summary}</p>
+                  {hasEssentiel ? (
+                    <EssentielList lines={data.essentiel!} />
+                  ) : (
+                    <p className="text-black/80 leading-relaxed text-base sm:text-lg max-w-[68ch]">{data.summary}</p>
+                  )}
                 </section>
               </div>
             )}
 
-            {data.sheet !== undefined && (
-              <div className={`pb-6 ${sectionOpacity("sheet")}`}>
-                <div ref={sheetHeaderRef} className="px-1 pt-2 pb-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold tracking-tight text-black">Fiche de révision</h2>
-                    <RegenButton {...regenProps("sheet")} />
-                  </div>
-                </div>
-                <div className={sheetWrap}>
-                  {data.sheet.map((point, i) => (
-                    <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className={sheetItem(i, data.sheet!.length)}>
-                      {template === "classique" && <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />}
-                      {template === "memo" && <span className="text-[#22C55E] font-bold tabular-nums shrink-0 w-6" aria-hidden="true">{i + 1}.</span>}
-                      {template === "cornell" && (
-                        <span className="border-r border-black/10 grid place-items-start justify-items-center pt-3.5 text-[#22C55E] font-bold tabular-nums" aria-hidden="true">{i + 1}</span>
-                      )}
-                      <span className={`text-black/80 ${template === "cornell" ? "px-4 py-3" : ""}`}>{point}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {!data.fiche && sheetSection}
 
             {data.flashcards !== undefined && (
               <div className={`pb-6 ${sectionOpacity("flashcards")}`}>

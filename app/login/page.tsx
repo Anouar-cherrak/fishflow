@@ -32,7 +32,7 @@ export default function Login() {
     }
 
     trackEvent("login", { method: "email" });
-    router.push(pendingCopyPath() ?? "/aujourdhui");
+    router.push(pendingCopyPath() ?? "/generer");
     router.refresh();
   };
 

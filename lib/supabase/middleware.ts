@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
   // Déjà connecté : pas besoin de revoir la connexion ou l'inscription, on va directement à son espace.
   if (user && (pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/aujourdhui";
+    url.pathname = "/generer";
     url.search = "";
     const redirect = NextResponse.redirect(url);
     supabaseResponse.cookies.getAll().forEach((c) => redirect.cookies.set(c));

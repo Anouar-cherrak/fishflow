@@ -1,0 +1,80 @@
+En droit civil français, la classification des contrats  fait partie du droit des obligations (comme la responsabilité civile) et vise à analyser les différentes catégories de contrats.
+Le droit des contrats a été codifié dès 1804 dans le Code civil, selon la théorie des Lumières sous l'emprise philosophique de l'autonomie de la volonté. Dès lors, le droit des contrats en France est soumis à trois grands principes fondamentaux : la liberté contractuelle, le consensualisme et la force obligatoire du contrat. La théorie de l'autonomie de la volonté doit tout de même être relativisée puisqu'elle est active dans les limites de la loi. Le droit des contrats, régi par le Code civil, a fait l'objet d'une refonte par l'effet de l'ordonnance du 10 février 2016 portant réforme du droit des contrats, du régime général et de la preuve des obligations.
+À quelques exceptions près, le droit québécois utilise le même régime de classification des contrats que le droit français.
+
+== Histoire ==
+Le droit des contrats en France est codifié dans le Code civil dès 1804.
+À la suite de débats sur le droit des contrats et de l'ordonnance n°2016-131 du 10 février 2016, il évolue. Ces évolutions intègrent des éléments de jurisprudence ainsi que des éléments nouveaux afin de s'aligner sur le droit continental européen.
+À cette occasion, il se repositionne également par rapport au droit des contrats spéciaux à travers l'article 1105.
+
+== Classification des contrats ==
+Les contrats se classent de différentes manières.
+
+=== Selon leur objet ===
+
+==== Caractère unilatéral et synallagmatique ====
+Pour la prise en considération de ce critère il faut observer la présence d'obligations présentes dans le chef des parties au moment de la formation du contrat.
+
+les contrats unilatéraux, il n'y a qu'un seul des cocontractants qui contracte une obligation.
+Les contrats synallagmatiques imparfaits : au départ, il n'existe d'obligation que pour un cocontractant, mais ensuite, il peut naître une obligation pour l'autre (présence d'obligations éventuelles).
+les contrats synallagmatiques (contrats synallagmatiques parfaits) : dès le départ, chacun des cocontractants est tenu d'au moins une obligation.
+Attention: les contrats synallagmatiques imparfaits sont un classement parmi les contrats unilatéraux et non parmi les synallagmatiques, le critère de distinction de cette classification étant la présence d'obligations au début de la formation du contrat.
+Ce vocabulaire est notamment codifié dans l'article 1106 du code civil de 2016.
+
+==== À titre gratuit ou onéreux ====
+Les contrats peuvent être conclus à titre gratuit ou à titre onéreux.
+
+dans un contrat à titre gratuit, l'une des parties entend procurer un avantage à l'autre sans contrepartie, c'est une intention libérale. (Exemple : la donation ou un service gratuit).
+dans un contrat à titre onéreux, il y a existence de prestations réciproques (contrat synallagmatique), d'où avantage bilatéral. On y distingue les contrats:
+aléatoires, dont l'avantage réciproque dépend d'un aléa (exemples : contrat d'assurance, contrat de jeu, contrat de pari, contrat de vente contre rente viagère et vente à tout risque ou à toute chance).
+commutatifs, dont l'avantage réciproque est connu dès le départ. Chacune des parties recherche au moment de la conclusion du contrat une contrepartie certaine et équivalente (exemple : contrat de vente).
+Cette distinction a un certain intérêt, notamment en raison de la protection à l'égard des contrats à titre gratuit. D'abord, la considération de la personne y est plus importante que dans un contrat à titre onéreux : il est donc plus facile de demander l'annulation de ce contrat pour erreur sur la personne. La protection du consentement est aussi renforcée dans un contrat à titre gratuit. En revanche, la fiscalité est plus importante pour les actes à titre gratuit.
+Ce vocabulaire est notamment codifié dans l'article 1107 et 1108  du code civil de 2016.
+
+==== Exécution unique ou prestations successives ====
+les contrats instantanés, il n'y a qu'une prestation unique ou si les obligations peuvent être exécutés en une seule fois (telle qu'une vente en comptant).
+les contrats successifs, il y a prestations successives. (s'il voit ses effets s'accomplir dans le temps ; ex : le contrat de bail). Il faut différencier:
+contrats à durée déterminée, dont la force obligatoire n'est définie que pour un temps
+contrats à durée indéterminée, dont le terme est incertain.
+
+=== Selon leur mode de formation ===
+Il peut y avoir trois modes de formation différents pour les contrats :
+
+les contrats consensuels, c'est le mode de formation de la majorité des cas.
+les contrats réels, il faut la remise d'une chose par l'un des cocontractants et l'accord des différentes parties. Exemples : contrats de gage, de dépôt, de prêt (lorsqu'il n'est pas consenti par un professionnel du crédit), de don manuel.
+les contrats solennels (formels), il faut une formalité, en général, la passation devant un officier public (notaire, huissier, juge)
+La doctrine a établi ultérieurement une autre classification :
+
+les contrats négociés, dits aussi contrats de gré à gré sont la catégorie classique où le contrat est longuement et librement discuté par les parties, le contenu de ses clauses étant fixé de manière détaillée et personnalisée. Ex: contrat de vente.
+les contrats d'adhésion sont marqués par une pré-rédaction unilatérale du contrat par un professionnel (par lui-même, son conseil ou un organisme professionnel). Ces contrats ne font l'objet d'aucune négociation visant à établir leur contenu définitif, le partenaire du stipulant (le rédacteur) est tenu d'accepter le contrat en bloc ou refuser de contracter. À rapprocher de la catégorie des contrats dits de consommation. Néanmoins, l'utilisation du contrat d'adhésion n'est pas le seul apanage des relations entre professionnels et consommateurs, les professionnels entre eux ont souvent recours aux formulaires pré-rédigées communément appelés conditions générales (d'achat, de vente, ou de prestation de services). La catégorie des contrats d'adhésion est secondaire, elle vise essentiellement à identifier l'instrument par son mode de formation. Derrière le qualificatif de contrat d'adhésion, l'instrument peut être de toute nature, nommé ou innommé. Ex: contrat de transport, de travail, d'assurance en général.
+les contrats forcés sont des contrats rendus obligatoires par la loi dans un souci d'ordre public et d'intérêt général (cas des contrats d'assurance automobile ou pour la chasse).
+Ce vocabulaire est notamment codifié dans l'article 1109 et 1110 du code civil de 2016.
+
+=== Selon la qualité des parties ===
+
+==== Intuitu personæ ou non ====
+les contrats intuitu personæ, il y a prise en compte de la personnalité du cocontractant. Remarque : seule la personne visée par le contrat peut l'exécuter, le contrat peut être annulé s'il y a erreur sur la personne, le contrat s'éteint dans le cas du décès de la personne.
+les contrats non intuitu personæ, il n'y a pas de prise en compte de la personnalité des cocontractants. Le pollicitant n'a pas de motif à exercer une sélection parmi les acceptants de son offre.
+
+==== Consommateur et professionnel ====
+On distingue :
+
+Contrats entre consommateur et professionnel. Ex: achat dans un commerce de détail, contrat entre constructeur et client.
+Contrats entre particuliers. Ex: vente de maison individuelle.
+Contrats entre professionnels. Ex: achat dans un commerce de gros.
+Cette distinction permet au juge de modifier son appréciation des faits en fonction du degré de professionnalisme des parties, le but étant de protéger le consommateur, dit partie faible, contre les vices du consentement et les clauses abusives générant un déséquilibre du contrat, du fait de sa méconnaissance dans le domaine visé par le contrat.
+
+==== Individuel et collectif ====
+le contrat est dit individuel quand il n'engage que les personnes qui l'ont personnellement souscrit.
+le contrat est dit collectif s'il a été conclu par quelques-uns, mais s'impose à tout un groupe, une collectivité qui leur a délégué un pouvoir de représentation (exception à la relativité des contrats). Cas limités: accords collectifs de location, contrats d'intégration agricole, convention collective.
+
+=== Autres distinctions ===
+
+==== Selon leur type ====
+En droit privé, certains contrats sont des contrats nommés : en raison d'une loi ou un code, comme le Code civil français, qui les règlemente et en définit le régime juridique. Ces contrats sont étudiés dans le cadre du droit des contrats spéciaux. Les exemples les plus classiques sont les contrats de vente, de prêt, de bail, de société mais encore le cautionnement et l'hypothèque.
+D'autres contrats issus de la pratique et non définis par un texte sont appelés contrats innommés. Ils ont la même valeur juridique que les contrats nommés. En effet l'autonomie de la volonté permet de créer des contrats non prévus par le législateur. Néanmoins, comme leur régime juridique n'a pas été défini par un texte, ils sont plus difficiles à appliquer par les parties et à interpréter par les juges, en raison de l'absence de volonté du législateur et de leur nature hybride (V. par ex: le crédit-bail, rencontre du contrat de prêt et du contrat de bail). Certains contrats originellement innommés firent l'objet d'une intervention législative visant à fixer leur régime d'origine jurisprudentielle (par exemple la lettre d'intention, qui est issue de la pratique mais codifiée à l'article 2322  du Code civil depuis la réforme du droit des sûretés par l'ordonnance de 23 mars 2006).
+
+==== Selon leur autonomie ====
+les contrats principaux qui sont autonomes et ne se greffent à aucun autre acte juridique.
+les contrats accessoires qui existent par rapport à un autre contrat.
+Si un contrat accessoire valable se greffe à un contrat principal vicié, le contrat accessoire disparait en même temps que le contrat principal en cas d'annulation, résolution ou résiliation.

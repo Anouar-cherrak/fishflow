@@ -1,0 +1,534 @@
+En informatique, le tri rapide ou tri pivot (en anglais quicksort) est un algorithme de tri inventé par C.A.R. Hoare en 1961 et fondé sur la méthode de conception diviser pour régner. C'est un cas particulier de tri par file de priorité en considérant la structure d'arbre binaire de recherche comme file de priorité. Il est généralement utilisé sur des tableaux, mais peut aussi être adapté aux listes. Dans le cas des tableaux, c'est un tri en place mais non stable.
+La complexité moyenne du tri rapide pour n éléments est proportionnelle à n log n, ce qui est optimal pour un tri par comparaison, mais la complexité dans le pire des cas est quadratique. Malgré ce désavantage théorique, c'est en pratique un des tris les plus rapides, et donc un des plus utilisés. Le pire des cas est en effet peu probable lorsque l'algorithme est correctement mis en œuvre et il est possible de s'en prémunir définitivement avec la variante Introsort.
+
+Le tri rapide ne peut cependant pas tirer avantage du fait que l'entrée est déjà presque triée. Dans ce cas particulier, il est plus avantageux d'utiliser le tri par insertion ou l'algorithme smoothsort.
+
+== Histoire ==
+Le tri rapide est créé en 1960 par Tony Hoare, alors étudiant en visite à l'université d'État de Moscou, lors d'une étude sur la traduction automatique pour le National Physical Laboratory. Il a alors besoin de l'algorithme pour trier les mots devant être traduits, afin de les faire correspondre à un dictionnaire russe-anglais déjà existant, stocké sur une bande magnétique.
+
+« J'ai écrit la procédure immodestement appelée QUICKSORT, sur laquelle s'est construite ma carrière d'informaticien. Sans aucun doute, il faut attribuer cela au génie des concepteurs d'Algol 60 qui ont inclus la récursivité dans leur langage et m'ont permis de décrire mon invention si élégamment pour le monde entier.  Je considère que c'est l'un des objectifs primordiaux des langages de programmation que de permettre d'exprimer élégamment des bonnes idées. »
+C. A. R. Hoare, « The emperor's old clothes », Communications of the ACM, vol. 24, no 2,‎ février 1981, p. 5–83 (DOI 10.1145/358549.358561, lire en ligne [PDF])
+
+== Description de l'algorithme ==
+La méthode consiste à placer un élément du tableau (appelé pivot) à sa place définitive, en permutant tous les éléments de telle sorte que tous ceux qui sont inférieurs au pivot soient à sa gauche et que tous ceux qui sont supérieurs au pivot soient à sa droite.
+Cette opération s'appelle le partitionnement. Pour chacun des sous-tableaux, on définit un nouveau pivot et on répète l'opération de partitionnement. Ce processus est répété récursivement, jusqu'à ce que l'ensemble des éléments soit trié.
+Concrètement, pour partitionner un sous-tableau :
+
+le pivot est placé à la fin (arbitrairement), en l'échangeant avec le dernier élément du sous-tableau ;
+tous les éléments inférieurs au pivot sont placés en début du sous-tableau ;
+le pivot est déplacé à la fin des éléments déplacés.
+
+Choisir un pivot aléatoirement dans l'intervalle [premier, dernier] garantit l'efficacité de l'algorithme, mais il existe d'autres possibilités (voir la section « Choix du pivot et complexité »).
+Le partitionnement peut être fait en temps linéaire, en place. La mise en œuvre la plus simple consiste à parcourir le tableau du premier au dernier élément, en formant la partition au fur et à mesure : à la i-ème étape de l'algorithme ci-dessous, les éléments 
+  
+    
+      
+        T
+        [
+        0
+        ]
+        ,
+        ⋯
+        ,
+        T
+        [
+        j
+        −
+        1
+        ]
+      
+    
+    {\displaystyle T[0],\cdots ,T[j-1]}
+  
+ sont inférieurs au pivot, tandis que 
+  
+    
+      
+        T
+        [
+        j
+        ]
+        ,
+        ⋯
+        ,
+        T
+        [
+        i
+        −
+        1
+        ]
+      
+    
+    {\displaystyle T[j],\cdots ,T[i-1]}
+  
+ sont supérieurs au pivot.
+Cet algorithme de partitionnement rend le tri rapide non stable : il ne préserve pas nécessairement l'ordre des éléments possédant une clef de tri identique. On peut résoudre ce problème en ajoutant l'information sur la position de départ à chaque élément et en ajoutant un test sur la position en cas d'égalité sur la clef de tri.
+Le partitionnement peut poser problème si les éléments du tableau ne sont pas distincts. Dans le cas le plus dégénéré, c'est-à-dire un tableau de 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+  
+ éléments égaux, cette version de l'algorithme a une complexité quadratique.
+Plusieurs solutions sont possibles : par exemple se ramener au cas d'éléments distincts en utilisant la méthode décrite pour rendre le tri stable, ou bien utiliser un autre algorithme (voir la section « Algorithme de partitionnement alternatif »).
+
+== Choix du pivot et complexité ==
+
+=== Pivot arbitraire ===
+Une manière simple de choisir le pivot est de prendre toujours le premier élément du sous-tableau courant (ou le dernier).
+Lorsque toutes les permutations possibles des entrées sont équiprobables, la complexité moyenne du tri rapide en sélectionnant le pivot de cette façon est Θ(n log n). Cependant, la complexité dans le pire des cas est Θ(n2), et celle-ci est atteinte lorsque l'entrée est déjà triée ou presque triée.
+Si on prend comme pivot le milieu du tableau, le résultat est identique, bien que les entrées problématiques soient différentes.
+Il est possible d'appliquer une permutation aléatoire au tableau pour éviter que l'algorithme soit systématiquement lent sur certaines entrées. Cependant, cette technique est généralement moins efficace que de choisir le pivot aléatoirement.
+
+=== Pivot aléatoire ===
+Si on utilise la méthode donnée dans la description de l'algorithme, c'est-à-dire choisir le pivot aléatoirement de manière uniforme parmi tous les éléments, alors la complexité moyenne du tri rapide est Θ(n log n) sur n'importe quelle entrée. Dans le pire des cas, la complexité est Θ(n2). Néanmoins, l'écart type de la complexité est seulement Θ(n), ce qui signifie que l'algorithme s'écarte peu du temps d'exécution moyen.
+Dans le cas le meilleur, l'algorithme est en Θ(n log n).
+
+==== Calcul de la complexité ====
+
+On donne une preuve de la complexité temporelle moyenne du tri rapide d'un tableau de taille 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+  
+.
+On note 
+  
+    
+      
+        
+          z
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          z
+          
+            n
+          
+        
+      
+    
+    {\displaystyle z_{1},\dots ,z_{n}}
+  
+ les éléments du tableau donnés par ordre croissant. Pour 
+  
+    
+      
+        i
+        <
+        j
+      
+    
+    {\displaystyle i<j}
+  
+ on note 
+  
+    
+      
+        
+          Z
+          
+            i
+            j
+          
+        
+        =
+        {
+        
+          z
+          
+            i
+          
+        
+        ,
+        
+          z
+          
+            i
+            +
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          z
+          
+            j
+          
+        
+        }
+      
+    
+    {\displaystyle Z_{ij}=\{z_{i},z_{i+1},\dots ,z_{j}\}}
+  
+. Initialement, le tableau à trier est 
+  
+    
+      
+        
+          z
+          
+            σ
+            (
+            1
+            )
+          
+        
+        ,
+        …
+        ,
+        
+          z
+          
+            σ
+            (
+            n
+            )
+          
+        
+      
+    
+    {\displaystyle z_{\sigma (1)},\dots ,z_{\sigma (n)}}
+  
+ où 
+  
+    
+      
+        σ
+      
+    
+    {\displaystyle \sigma }
+  
+ est une permutation des entiers compris entre 1 et 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+  
+.
+Les opérations à effectuer sont les choix de pivot et les comparaisons qui ont lieu lors des partitions autour de chaque pivot. Dès lors qu'un pivot est choisi il n'est plus impliqué dans les partitions qui suivent et donc une exécution de l'algorithme fait intervenir au plus 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+  
+ choix de pivot, et chaque choix se fait en temps constant. De plus tout élément est comparé à un élément au plus une fois, car tout élément n'est comparé qu'à un pivot, et une fois effectuée la partition autour d'un pivot donné, celui-ci n'intervient plus dans l'exécution de l'algorithme une fois la partition finie. En notant 
+  
+    
+      
+        X
+      
+    
+    {\displaystyle X}
+  
+ le nombre total de comparaisons on obtient que la complexité d'une exécution est donc 
+  
+    
+      
+        O
+        (
+        X
+        +
+        n
+        )
+      
+    
+    {\displaystyle O(X+n)}
+  
+. De plus si l'on note 
+  
+    
+      
+        
+          X
+          
+            i
+            j
+          
+        
+      
+    
+    {\displaystyle X_{ij}}
+  
+ la variable aléatoire qui vaut 1 si 
+  
+    
+      
+        
+          z
+          
+            i
+          
+        
+      
+    
+    {\displaystyle z_{i}}
+  
+ est comparé à 
+  
+    
+      
+        
+          z
+          
+            j
+          
+        
+      
+    
+    {\displaystyle z_{j}}
+  
+ et 0 sinon, on déduit que l'on a pour une exécution donnée 
+  
+    
+      
+        X
+        =
+        
+          ∑
+          
+            i
+            =
+            1
+          
+          
+            n
+            −
+            1
+          
+        
+        
+          ∑
+          
+            j
+            =
+            i
+            +
+            1
+          
+          
+            n
+          
+        
+        
+          X
+          
+            i
+            j
+          
+        
+      
+    
+    {\displaystyle X=\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}X_{ij}}
+  
+. On cherche à calculer 
+  
+    
+      
+        
+          
+            E
+          
+        
+        [
+        X
+        ]
+      
+    
+    {\displaystyle {\mathtt {E}}[X]}
+  
+ l'espérance de 
+  
+    
+      
+        X
+      
+    
+    {\displaystyle X}
+  
+. C'est-à-dire 
+  
+    
+      
+        
+          
+            E
+          
+        
+        [
+        X
+        ]
+        =
+        
+          ∑
+          
+            i
+            =
+            1
+          
+          
+            n
+            −
+            1
+          
+        
+        
+          ∑
+          
+            j
+            =
+            i
+            +
+            1
+          
+          
+            n
+          
+        
+        
+          P
+        
+        {
+        
+          L'algorithme compare 
+        
+        
+          z
+          
+            i
+          
+        
+        
+          et 
+        
+        
+          z
+          
+            j
+          
+        
+        }
+      
+    
+    {\displaystyle {\mathtt {E}}[X]=\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}\mathbb {P} \{{\text{L'algorithme compare }}z_{i}{\text{et }}z_{j}\}}
+  
+.
+Or 
+  
+    
+      
+        
+          z
+          
+            i
+          
+        
+      
+    
+    {\displaystyle z_{i}}
+  
+ est comparé à 
+  
+    
+      
+        
+          z
+          
+            j
+          
+        
+      
+    
+    {\displaystyle z_{j}}
+  
+ si et seulement si le premier élément de 
+  
+    
+      
+        
+          Z
+          
+            i
+            j
+          
+        
+      
+    
+    {\displaystyle Z_{ij}}
+  
+ à être choisi comme pivot est soit 
+  
+    
+      
+        
+          z
+          
+            i
+          
+        
+      
+    
+    {\displaystyle z_{i}}
+  
+ soit 
+  
+    
+      
+        
+          z
+          
+            j
+          
+        
+      
+    
+    {\displaystyle z_{j}}
+  
+. En effet si c'est un autre élément qui est choisi en premier comme pivot, alors 
+  
+    
+      
+        
+          z
+          
+            i
+          
+        
+      
+    
+    {\displaystyle z_{i}}
+  
+ et 
+  
+    
+      
+        
+          z
+          
+            j
+          
+        
+      
+    
+    {\displaystyle z_{j}}
+  

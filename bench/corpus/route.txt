@@ -1,0 +1,88 @@
+== Les priorités aux intersections ==
+Les règles relatives aux intersections et aux priorités sont définies dans le Chapitre V : Intersections et priorité de passage du code de la route.
+Il existe sur le réseau routier français cinq régimes de priorité :
+
+La priorité à droite
+Le stop
+Le cédez-le-passage
+La priorité ponctuelle
+Le caractère prioritaire d'une voie
+Le refus de priorité entraîne par défaut la responsabilité totale du conducteur qui n'a pas respecté la priorité.
+Toutefois, la faute du prioritaire peut entraîner un partage de responsabilité ou une responsabilité totale :
+
+Cas de partage de responsabilité :
+vitesse excessive du prioritaire à l’approche d’une intersection (Civ. 12 janv.1977 : D.1977, inf.rap.442 ; CA Rouen, 19 mars 1992 G.P 1994, somm.422) ;
+absence d’éclairage sur le véhicule du prioritaire (Civ. 29 mai 1975 : D.1975, inf.rap.183) ;
+le fait pour le prioritaire, hors le cas des voies à sens unique, de circuler à gauche (Civ. 4 juill.1974 : JCP G 1974, IV, p. 305).
+Dans ces différents cas, la responsabilité du prioritaire est d’environ 1/3.
+
+Cas de responsabilité totale :
+au moment où le non-prioritaire s’engage, il n’a aucun véhicule sur sa droite dans son champ de visibilité (Civ.14 fév.1974 : D.1974, jur.753)
+le carrefour est entièrement dégagé et le prioritaire roule au double de la vitesse autorisée (Crim.6 déc.1983 ; JCP G 1984, IV, p. 54) ;
+Cas d’abandon du droit de priorité : faux arrêt du prioritaire : sa responsabilité pourra être engagée s’il redémarre de façon intempestive (Civ. 15 oct.1975 : D. 1975, inf.rap.263).
+
+=== La priorité à droite ===
+
+À l'approche d'une intersection et en l'absence d'une quelconque signalisation en matière de priorité, c'est la priorité à droite qui prime. Le conducteur doit laisser la priorité à tout véhicule venant d'une route située à sa droite. Le panneau triangulaire contenant une croix noire (panneau appelé "croix de saint-andré" référencé sous le code AB1) ne caractérise pas directement la priorité à droite mais indique "Danger, intersection où la priorité à droite est applicable".
+
+L’article R.415-5 du Code de la route définit plus particulièrement le refus de priorité à droite. Ainsi, lorsque deux conducteurs abordent une intersection par des routes différentes, le conducteur venant de la gauche est tenu de céder le passage à l'autre conducteur. En cas d’accident, le prioritaire est présumé avoir régulièrement usé de sa priorité de passage.
+
+=== Stop ===
+
+Arrivant à un carrefour où figure un panneau octogonal rouge marqué stop avec une large bande blanche continue peinte au sol en travers de la voie, le conducteur doit s'immobiliser au niveau de cette bande blanche, céder le passage à tous les véhicules, avant de pouvoir repartir.
+Le véhicule est considéré comme arrêté (et donc le stop considéré comme "marqué") lorsque les roues de ce dernier ont été bloquées. Il n'y a pas de temps minimum requis pour considérer que le stop a été marqué.
+
+=== Cédez-le-passage ===
+
+Le « cédez-le-passage » est symbolisé par un panneau triangulaire qui pointe vers le bas et éventuellement complété par un panonceau où figure l'intitulé "cédez le passage". Une ligne large discontinue est peinte au sol en travers de la route. Le conducteur doit ralentir à son approche afin d'être prêt à s’arrêter et ne s'insérer que lorsqu'il est sûr de ne pas gêner les conducteurs déjà engagés.
+
+=== La priorité ponctuelle ===
+
+Le panneau de priorité ponctuelle est triangulaire (panneau de danger) ; il avertit le conducteur qu'il va être prioritaire à la prochaine intersection seulement, il pourra donc passer, prudemment toutefois. Deux traits y figurent, l'un vertical et épais, représentant la route où le conducteur circule, l'autre fin et horizontal représentant la route non prioritaire qui va être croisée.
+
+=== Routes prioritaires ===
+Trois panneaux complémentaires signalent si le conducteur se trouve sur une route à caractère prioritaire ou non.
+La route prioritaire a un panneau en losange posant sur la pointe, jaune bordé de blanc, qui est répété environ tous les 5 km. Les routes non prioritaires qu'elle croise, ont un panneau stop ou cédez-le-passage. La perte du caractère prioritaire de la route est marquée par le même panneau en losange barré de noir. On le rencontre par exemple lorsque la route croise une route à plus forte circulation.
+
+== Intersections spéciales ==
+
+=== Les intersections avec feux tricolores ===
+Un carrefour à feux est un carrefour dont le trafic est régulé par des feux de signalisation tricolores. Face à un feu tricolore, le conducteur se conforme à la lumière colorée :
+
+vert : il peut passer, en sachant que, s'il change de direction, il perd la priorité au profit des piétons et des cyclistes traversant la rue attenante.
+orange clignotant en bas ou flèche orange clignotante : le conducteur agit comme à un feu vert mais n'est pas prioritaire (de tels feux sont implantés dans les carrefours complexes).
+jaune (un jaune-orangé, appelé orange par erreur) : il s'arrête, sauf si le conducteur est trop près du feu changeant ou s'il estime que les véhicules circulant derrière lui sont trop près pour pouvoir s'arrêter en sécurité. Le comportement qui consiste à accélérer au feu orange pour être sûr de passer est, en France, hors-la-loi.
+rouge : tous les feux signifient l'arrêt obligatoire du véhicule (voir les passages à niveau ferroviaires).
+Les règles de priorité s'appliquent sur les croisements de véhicules passant au feu vert.
+Un feu tricolore peut être complété par un panneau "cédez-le-passage" ou "route à caractère prioritaire" qui s'applique quand le feu tricolore est hors service ou en clignotant jaune.
+
+=== Rond-point et carrefour giratoire ===
+
+Similaires dans leur forme, ces deux types d'ouvrage sont destinés à sécuriser les changements de direction : le conducteur le contourne dans le sens inverse des aiguilles d'une montre.
+Dans un carrefour à sens giratoire la priorité est aux véhicules qui sont déjà dans l'anneau. Les entrants trouvent donc un panneau cédez-le-passage sur leur voie de circulation, en limite d'ouvrage. La priorité à gauche dans ces anneaux était à l'origine peu connue des conducteurs français qui les ont malicieusement baptisés « rond-point anglais ».
+Dans un rond-point, s'applique la priorité à droite : sont prioritaires les véhicules qui entrent dans le carrefour. L'exemple le plus connu et l'un des plus impressionnants est la place de l'Étoile autour de l'Arc de Triomphe, à Paris.
+
+=== Pistes cyclables ===
+Par ailleurs, les articles Article R415-3 et Article R415-4 indiquent que le conducteur doit céder le passage aux cycles et cyclomoteurs circulant dans les deux sens sur les pistes cyclables qui traversent la chaussée sur laquelle il va s'engager.
+
+=== L'échangeur ===
+
+Pour relier deux routes prévues pour une circulation dense et rapide (voies rapides, autoroutes), des échangeurs sont construits. Les véhicules entrants se retrouvent sur une voie qui va longer sur une certaine distance la route principale (voie d'accélération, destinée à leur permettre d'atteindre la vitesse des véhicules roulants sur la voie qu'ils vont rejoindre), sur laquelle ils pénètrent selon la règle du cédez-le-passage.
+
+=== Voies privées ===
+En outre, l’article R.415-9 du Code de la route oblige tout véhicule débouchant d’un accès non ouvert à la circulation publique (définition voie publique et voie privée selon le code de la route dans la référence suivante. Cette séparation est souvent marquée par un caniveau ou une bordure de trottoir rabaissée (appelée communément "bateau")), d’un chemin de terre ou d’une aire de stationnement de laisser une priorité absolue à tout autre véhicule quelle que soit la route sur laquelle il doit s’engager.
+
+== Les cycles ==
+Les cycles et motocycles sont considérés comme des véhicules et à ce titre ont les mêmes règles de priorité que les autres véhicules.
+
+== Les piétons ==
+
+En tant qu'usager de la route, le piéton est souvent amené à croiser d'autres véhicules. Il ne peut circuler sur la chaussée que hors agglomération quand il n'y a pas d'accotement, et si la voie n'est ni une autoroute ni une voie à accès réglementé. Dans ce cas il doit respecter les mêmes règles de priorités que les autres véhicules. Il faut donc se référer aux chapitres précédents pour les informations concernant ces règles. Le piéton est par contre souvent amené à traverser la chaussée et il doit observer certaines règles de sécurité routière : 
+
+il n'y a pas de feu rouge signalé au piéton ;
+le piéton doit emprunter les passages prévus pour les piétons, s’ils sont situés à moins de 50 mètres ;
+le piéton doit traverser selon un axe rigoureusement perpendiculaire à la chaussée traversée, ceci afin d'optimiser le temps de traversée pour qu'il soit le plus bref possible, le piéton étant particulièrement vulnérable sur la chaussée ;
+le piéton doit s'assurer qu'il n'y aura pas de risque de collision avec d'autres véhicules durant cette traversée, en observant deux règles primordiales :
+la distance des véhicules doit être suffisante par rapport à leur vitesse pour qu'ils puissent s’arrêter en toute sécurité,
+la visibilité des véhicules doit être suffisante, notamment afin d'avoir la capacité d'observer la 1re règle.
+Du fait de sa vulnérabilité, le code de la route considère que le piéton doit être extrêmement bien protégé des autres usagers. L'esprit de la loi est simple et sans exception : pour la traversée d'une chaussée, le piéton dispose de la priorité absolue, dès lors qu'il traverse régulièrement, c'est-à-dire en respectant les règles édictées par le code de la route (feux, passages piétons, etc.) sur les autres véhicules. La 1re phrase de l'article R415-11 du code de la route l'illustre clairement : « Tout conducteur est tenu de céder le passage, au besoin en s'arrêtant, au piéton s'engageant régulièrement dans la traversée d'une chaussée ou manifestant clairement l'intention de le faire. »

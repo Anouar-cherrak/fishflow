@@ -1,0 +1,12 @@
+[
+  { "id": "bio", "file": "bio.txt", "sujet": "Biologie — la photosynthèse", "pro": false },
+  { "id": "histoire", "file": "histoire.txt", "sujet": "Histoire — la Révolution française (cours long, Pro)", "pro": true },
+  { "id": "droit", "file": "droit.txt", "sujet": "Droit — classification des contrats", "pro": false },
+  { "id": "maths", "file": "maths.txt", "sujet": "Maths — théorème de Pythagore", "pro": false },
+  { "id": "info", "file": "info.txt", "sujet": "Informatique — le tri rapide", "pro": false },
+  { "id": "eco", "file": "eco.txt", "sujet": "Économie — l'inflation", "pro": true },
+  { "id": "philo", "file": "philo.txt", "sujet": "Philosophie — l'allégorie de la caverne", "pro": false },
+  { "id": "litt", "file": "litt.txt", "sujet": "Littérature — Le Petit Prince", "pro": false },
+  { "id": "route", "file": "route.txt", "sujet": "Code de la route — règles de priorité", "pro": false },
+  { "id": "anglais", "file": "anglais.txt", "sujet": "Langues — les faux-amis", "pro": false }
+]

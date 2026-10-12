@@ -4,11 +4,13 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { CopyFiche } from "@/components/CopyFiche";
+import { EssentielList, FicheContent } from "@/components/FicheContent";
+import type { Fiche } from "@/lib/fiche-engine";
 
 type Shared = {
   title: string;
   created_at: string;
-  data: { summary?: string; sheet?: string[]; flashcards?: { question: string; answer: string }[]; quiz?: unknown[] };
+  data: { summary?: string; sheet?: string[]; fiche?: Fiche; essentiel?: string[]; flashcards?: { question: string; answer: string }[]; quiz?: unknown[] };
 };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -41,7 +43,19 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
   const fiche = await load(id);
   if (!fiche) notFound();
 
-  const { summary, sheet, flashcards, quiz } = fiche.data;
+  const { summary, sheet, flashcards, quiz, essentiel } = fiche.data;
+  const structured = fiche.data.fiche?.sections?.length ? fiche.data.fiche : null;
+
+  const summaryCard = summary && (
+    <section className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
+      <h2 className="text-xl font-bold tracking-tight mb-3">{essentiel?.length ? "L'essentiel en 5 lignes" : "Résumé"}</h2>
+      {essentiel?.length ? (
+        <EssentielList lines={essentiel} />
+      ) : (
+        <p className="text-black/80 leading-relaxed text-base sm:text-lg max-w-[68ch]">{summary}</p>
+      )}
+    </section>
+  );
 
   return (
     <AppShell size="normal">
@@ -54,14 +68,19 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
           </div>
         </header>
 
-        {summary && (
-          <section className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
-            <h2 className="text-xl font-bold tracking-tight mb-3">Résumé</h2>
-            <p className="text-black/80 leading-relaxed text-base sm:text-lg max-w-[68ch]">{summary}</p>
-          </section>
+        {structured ? (
+          <>
+            <section>
+              <h2 className="text-xl font-bold tracking-tight mb-3 px-1">Fiche de révision</h2>
+              <FicheContent fiche={structured} />
+            </section>
+            {summaryCard}
+          </>
+        ) : (
+          summaryCard
         )}
 
-        {sheet && sheet.length > 0 && (
+        {!structured && sheet && sheet.length > 0 && (
           <section>
             <h2 className="text-xl font-bold tracking-tight mb-3 px-1">À retenir</h2>
             <ul className="grid gap-2.5 md:grid-cols-2">
