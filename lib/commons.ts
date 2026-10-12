@@ -2,7 +2,7 @@
 // Ce sont les images choisies par les rédacteurs de l'article : elles collent au sujet.
 // Chaque image garde son auteur, sa licence et un lien vers sa page, comme la licence l'exige.
 
-const USER_AGENT = "FishFlow/1.0 (application pedagogique)";
+const USER_AGENT = "FishFlow/1.0 (+https://fishflow.fr; application pedagogique)";
 const TIMEOUT_MS = 8000;
 const MIN_WIDTH = 500;
 

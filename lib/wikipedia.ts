@@ -1,7 +1,8 @@
 // Recherche d'articles sur Wikipédia (français d'abord, anglais en renfort) : texte complet, adresse et image principale.
 // Wikipédia est gratuit et chaque réponse de FishFlow renvoie vers l'article d'origine.
 
-const USER_AGENT = "FishFlow/1.0 (application pedagogique)";
+// Wikipédia demande qu'une application s'identifie avec un moyen de la joindre : sans ça, elle est limitée bien plus vite.
+const USER_AGENT = "FishFlow/1.0 (+https://fishflow.fr; application pedagogique)";
 const TIMEOUT_MS = 8000;
 // Assez de texte pour trouver le bon passage, sans charger des livres entiers.
 const MAX_TEXT = 60000;
@@ -20,14 +21,32 @@ export type WikiArticle = {
 
 const apiUrl = (lang: Lang) => `https://${lang}.wikipedia.org/w/api.php`;
 
+// Un refus passager (trop de demandes, serveur occupé) est réessayé deux fois, avec une courte pause.
 async function callApi(lang: Lang, params: Record<string, string>) {
-  const res = await fetch(`${apiUrl(lang)}?${new URLSearchParams({ format: "json", formatversion: "2", ...params })}`, {
-    headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
-    signal: AbortSignal.timeout(TIMEOUT_MS),
-    next: { revalidate: 3600 },
-  });
-  if (!res.ok) throw new Error(`Wikipedia ${res.status}`);
-  return res.json();
+  const url = `${apiUrl(lang)}?${new URLSearchParams({ format: "json", formatversion: "2", maxlag: "5", ...params })}`;
+  let last = "";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { "User-Agent": USER_AGENT, "Api-User-Agent": USER_AGENT, Accept: "application/json" },
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        next: { revalidate: 3600 },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (!json?.error) return json;
+        last = `Wikipedia ${json.error.code}`;
+      } else {
+        last = `Wikipedia ${res.status}`;
+        if (res.status < 429 && res.status !== 408) break;
+      }
+    } catch (e) {
+      last = String((e as Error)?.message || e);
+    }
+    await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+  }
+  console.error("Wikipédia indisponible :", last);
+  throw new Error(last);
 }
 
 // Titres des articles qui correspondent le mieux à une recherche.
@@ -77,14 +96,14 @@ export async function fetchArticle(title: string, lang: Lang): Promise<WikiArtic
   };
 }
 
-// Cherche avec plusieurs requêtes en parallèle, sans doublons, et charge les meilleurs articles.
+// Cherche avec plusieurs requêtes en parallèle (2 au plus), sans doublons, et charge les meilleurs articles.
 export async function searchArticles(queries: string[], lang: Lang, maxArticles = 3): Promise<WikiArticle[]> {
-  const batches = await Promise.all(queries.map((q) => searchTitles(q, lang, 3).catch(() => [] as string[])));
+  const batches = await Promise.all(queries.slice(0, 2).map((q) => searchTitles(q, lang, 3).catch(() => [] as string[])));
   // On alterne les résultats de chaque requête : le meilleur de chacune passe en premier.
   const titles: string[] = [];
   const longest = Math.max(0, ...batches.map((b) => b.length));
   for (let i = 0; i < longest; i++) for (const b of batches) if (b[i] && !titles.includes(b[i])) titles.push(b[i]);
-  const articles = await Promise.all(titles.slice(0, maxArticles + 2).map((t) => fetchArticle(t, lang).catch(() => null)));
+  const articles = await Promise.all(titles.slice(0, maxArticles + 1).map((t) => fetchArticle(t, lang).catch(() => null)));
   const seen = new Set<number>();
   return articles.filter((a): a is WikiArticle => !!a && !seen.has(a.pageId) && !!seen.add(a.pageId)).slice(0, maxArticles);
 }
