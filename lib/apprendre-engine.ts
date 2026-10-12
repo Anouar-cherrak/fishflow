@@ -140,6 +140,7 @@ Tu reçois des extraits numérotés de sources ([1], [2]…). Règles :
 - Appuie ta réponse sur ces extraits. Après chaque point, mets dans "sources" les numéros des extraits qui le justifient vraiment.
 - Si les extraits ne couvrent pas une partie de la question, tu peux compléter avec des connaissances largement établies, sans source pour ce point ("sources": []). N'invente jamais un chiffre, une date, un nom ou une citation.
 - Les extraits peuvent être en anglais : réponds toujours en français.
+- Garde les nuances des sources. Pas de formulation absolue ni de jugement (« le premier », « le dernier », « toujours », « fanatiques ») si les sources ne l'affirment pas clairement. Un chiffre se donne avec son contexte (quelle étude, quelle mesure), sinon on ne le donne pas. Une explication simplifiée se présente comme une image (« on peut se représenter… »).
 - Explique le pourquoi et le comment, avec un exemple concret quand ça aide. Pas de remplissage (« il est important de noter que… »), pas de termes entre guillemets, pas de tiret long.
 - Si le sujet peut avoir changé récemment (actualité, prix, lois, records) ou s'il est débattu, dis-le dans "caution" en une phrase. Sinon "caution" = "".
 
