@@ -307,6 +307,7 @@ function courseSystem(source: string, difficulty: string) {
 Règles absolues :
 - Tu n'utilises QUE le contenu du cours ci-dessous. Tu n'ajoutes aucun fait, chiffre, date, nom, définition ou exemple qui n'y est pas, même si tu le connais.
 - Tu ne modifies jamais un chiffre, une date, un nom ou une formule du cours.
+- Le cours fait foi : même si une affirmation du cours te semble fausse, dépassée ou différente de ce que tu sais, tu rapportes ce que dit le cours, sans le « corriger ».
 - Tu ignores le bruit : numéros de page, en-têtes et pieds de page répétés, références bibliographiques, liens, mentions de copyright.
 - Pour une langue étrangère étudiée, garde les mots et phrases dans leur langue d'origine avec leur traduction.
 - ${DIFFICULTY_TEXT[difficulty] || DIFFICULTY_TEXT.moyen}
@@ -323,7 +324,7 @@ const PLAN_SCHEMA = obj({
 
 type Part = { title: string; notions: string[] };
 
-async function makePlan(ctx: Ctx, system: string, partsTarget: number) {
+async function makePlan(ctx: Ctx, system: string, partsTarget: number, notionsTarget: number) {
   const raw = await callJson(
     ctx,
     "plan",
@@ -337,7 +338,7 @@ async function makePlan(ctx: Ctx, system: string, partsTarget: number) {
 Lis TOUT le cours, du début à la fin, et fais :
 - "title" : le sujet en 2 à 5 mots (par exemple « La photosynthèse »), jamais une phrase ni « Cours de… ».
 - "parts" : environ ${partsTarget} partie${partsTarget > 1 ? "s" : ""} qui suivent l'ordre et la logique du cours (regroupe les petits passages, coupe les très longs). Chaque partie a un titre court et clair.
-- Pour chaque partie, "notions" : la liste COMPLÈTE de ce qu'un élève doit savoir sur ce passage. Une notion par élément, écrite comme un mini-rappel précis avec son contenu : définitions, mécanismes et étapes, causes et conséquences, dates, chiffres, personnes, lieux, formules, règles et leurs exceptions, oppositions, exemples donnés par le cours.
+- Pour chaque partie, "notions" : la liste COMPLÈTE (au moins ${notionsTarget} notions au total pour tout le cours) de ce qu'un élève doit savoir sur ce passage. Une notion par élément, écrite comme un mini-rappel précis avec son contenu : définitions, mécanismes et étapes, causes et conséquences, dates, chiffres, personnes, lieux, formules, règles et leurs exceptions, oppositions, exemples donnés par le cours.
   Bon : « 14 juillet 1789 : prise de la Bastille, symbole de l'arbitraire royal ». Mauvais : « La Bastille ».
 
 Rien d'important ne doit manquer, y compris à la fin du cours. Pas de notion inventée.`,
@@ -364,7 +365,7 @@ const WRITING_RULES = `Format : une liste de "blocks", dans l'ordre de lecture. 
 - "texte" : un paragraphe de 1 à 4 phrases qui explique.
 - "liste" : "text" = phrase d'introduction courte (ou vide), "items" = les éléments (étapes, causes, caractéristiques…).
 - "exemple" : un exemple, un cas ou une application QUI EST DANS LE COURS (sinon, pas de bloc exemple).
-- "piege" : une confusion fréquente, une exception, une nuance ou une erreur à éviter, tirée du cours (par exemple deux notions proches à ne pas confondre). Pas de piège inventé ; aucun si le cours n'en donne pas matière.
+- "piege" : deux notions proches à ne pas confondre, une exception à une règle, une nuance ou une erreur à éviter, tirée du cours. Dès que le cours distingue ou oppose deux choses voisines, ou donne une exception, fais-en un piège. Pas de piège inventé.
 - "retenir" : exactement UN par partie, en dernier : l'idée essentielle de la partie en 1 à 3 phrases, ou en "items" courts.
 
 Mise en valeur (dans "text" et "items") :
@@ -372,7 +373,7 @@ Mise en valeur (dans "text" et "items") :
 - ==phrase== : surligne la ou les 1 à 2 phrases les plus importantes de la partie (définition centrale, règle, formule). Pas plus.
 - Pas d'autre balisage (pas de #, pas de _italique_, pas de HTML). Les formules s'écrivent en texte simple (a² + b² = c²).
 
-Style : phrases claires et complètes, qui se comprennent sans le cours sous les yeux. Pas de « dans cette partie », pas de « le texte dit », pas de renvoi à une page.`;
+Style : phrases claires et complètes, qui se comprennent sans le cours sous les yeux. Chaque phrase apporte une information du cours : pas de phrase de remplissage (« cela souligne l'importance de… », « il est crucial de comprendre… »), pas de « dans cette partie », pas de « le texte dit », pas de renvoi à une page.`;
 
 async function writeSection(ctx: Ctx, system: string, plan: Part[], index: number, length: string) {
   const part = plan[index];
@@ -433,8 +434,8 @@ ${part.notions.map((n) => `- ${n}`).join("\n")}
 Partie rédigée (JSON) :
 ${JSON.stringify(section.blocks)}
 
-Vérifie, en relisant le cours :
-1. Inventions et erreurs : une phrase, un chiffre, une date, un nom, un exemple ou un piège qui n'est PAS dans le cours, ou qui le déforme.
+Vérifie, en relisant le cours. Le cours fait foi : tu compares UNIQUEMENT au cours, jamais à tes propres connaissances. Si le cours dit une chose, elle est juste ici, même si tu crois qu'elle est fausse.
+1. Inventions et erreurs : une phrase, un chiffre, une date, un nom, un exemple ou un piège qui n'est PAS dans le cours, ou qui déforme ce que dit le cours. Les phrases de remplissage sans information du cours sont à retirer.
 2. Oublis : une notion de la liste absente ou seulement nommée sans son contenu.
 3. Mise en valeur : du balisage cassé, ou pas de bloc "retenir" à la fin.
 
@@ -589,7 +590,9 @@ const FINAL_STEPS_MS = 22000;
 export async function buildFiche(ctx: Ctx, source: string, opts: Pick<EngineOptions, "difficulty" | "length">) {
   const system = courseSystem(source, opts.difficulty);
   const { parts: partsTarget } = sizing(source.length, opts.length, false);
-  const plan = await makePlan(ctx, system, partsTarget);
+  // Environ une notion pour 350 caractères de cours : c'est ce qui fait une fiche complète.
+  const notionsTarget = Math.round(Math.min(90, Math.max(8, source.length / 350)));
+  const plan = await makePlan(ctx, system, partsTarget, notionsTarget);
   const report: string[] = [];
 
   const sections = await Promise.all(
