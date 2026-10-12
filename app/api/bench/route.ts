@@ -18,6 +18,19 @@ export async function POST(req: Request) {
   const body = (await req.json()) as { action: string; question: string; answer?: Parameters<typeof judgeApprendre>[1] };
   const t0 = Date.now();
   try {
+    if (body.action === "wiki") {
+      const out: Record<string, unknown> = {};
+      for (const [lang, ua] of [["fr", "FishFlow/1.0 (application pedagogique)"], ["fr", "FishFlow/1.0 (https://fishflow.fr; contact@fishflow.fr)"], ["en", "FishFlow/1.0 (https://fishflow.fr; contact@fishflow.fr)"]]) {
+        const url = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(body.question)}&format=json&srlimit=2`;
+        try {
+          const r = await fetch(url, { headers: { "User-Agent": ua, Accept: "application/json" }, cache: "no-store" });
+          out[lang + " | " + ua] = r.status + " " + (await r.text()).slice(0, 200);
+        } catch (e) {
+          out[lang + " | " + ua] = "ERREUR " + String((e as Error)?.message || e);
+        }
+      }
+      return NextResponse.json(out);
+    }
     if (body.action === "old") return NextResponse.json({ answer: await oldApprendre(body.question), ms: Date.now() - t0 });
     if (body.action === "new") {
       const out = await answerQuestion(body.question);

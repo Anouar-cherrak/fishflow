@@ -8,6 +8,16 @@ import { FlameIcon, flameState } from "@/components/StreakFlame";
 
 type Flashcard = { question: string; answer: string };
 
+// Les cartes arrivent dans un ordre différent à chaque tour : on retient la réponse, pas sa place dans la liste.
+function shuffled(indices: number[]): number[] {
+  const copy = [...indices];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 // Mode étude des flashcards : on retourne la carte, puis on dit si on la savait.
 // Les cartes « à revoir » reviennent dans un nouveau tour, jusqu'à ce que tout soit su.
 // À la fin de la première séance, onComplete reçoit le résultat « du premier coup »
@@ -24,7 +34,7 @@ export function FlashcardStudy({
   // Fermeture avant la fin : on garde quand même les cartes déjà répondues (index dans `cards`).
   onPartial?: (answered: { index: number; correct: boolean }[]) => void;
 }) {
-  const [deck, setDeck] = useState<number[]>(() => cards.map((_, i) => i));
+  const [deck, setDeck] = useState<number[]>(() => shuffled(cards.map((_, i) => i)));
   const [pos, setPos] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [missed, setMissed] = useState<number[]>([]);
@@ -58,7 +68,7 @@ export function FlashcardStudy({
       setMissed(nextMissed);
       setPos(pos + 1);
     } else if (nextMissed.length > 0) {
-      setDeck(nextMissed);
+      setDeck(shuffled(nextMissed));
       setMissed([]);
       setPos(0);
       setRound((r) => r + 1);
@@ -69,7 +79,7 @@ export function FlashcardStudy({
   };
 
   const restart = () => {
-    setDeck(cards.map((_, i) => i));
+    setDeck(shuffled(cards.map((_, i) => i)));
     setPos(0);
     setFlipped(false);
     setMissed([]);
