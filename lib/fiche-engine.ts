@@ -91,6 +91,29 @@ function balanceMarks(s: string): string {
   return out;
 }
 
+// Écriture « manuel scolaire » : un terme court entre guillemets devient du gras, et on retire les tics d'écriture d'IA.
+// Les vraies citations (longues) gardent leurs guillemets.
+const FILLERS = [
+  /\s*(Cela|Ceci) (souligne|montre|illustre|met en (évidence|lumière)) (bien )?l'importance (de|du|des) [^.]*\./gi,
+];
+const asBold = (t: string) => `**${t.replace(/\*\*/g, "")}**`;
+export function tidy(s: string): string {
+  let out = s
+    .replace(/«\s*([^«»]{1,45}?)\s*»/g, (_m, t: string) => (t.split(" ").length <= 6 ? asBold(t) : `« ${t} »`))
+    .replace(/[“"]([^“”"]{1,45}?)[”"]/g, (_m, t: string) => (t.split(" ").length <= 6 ? asBold(t) : `« ${t} »`))
+    .replace(/(^|[\s(])'([^'\n]{2,45}?)'(?=[\s.,;:)!?]|$)/g, (_m, pre: string, t: string) => pre + asBold(t))
+    .replace(/\*{4}(.+?)\*{4}/g, "**$1**")
+    .replace(/\s+—\s+/g, ", ");
+  // « Il est important de noter que la cellule… » → « La cellule… »
+  out = out.replace(
+    /(^|[.!?]\s+)(?:Il est (?:important|essentiel|crucial|à noter) de (?:noter|souligner|comprendre|retenir) que|En (?:résumé|somme|conclusion),)\s+(\S)/gi,
+    (_m, before: string, c: string) => before + c.toUpperCase()
+  );
+  for (const re of FILLERS) out = out.replace(re, (m) => (m.trim().endsWith(".") ? "" : " "));
+  out = out.replace(/\s{2,}/g, " ").replace(/^\s*([a-zà-ÿ])/, (_m, c: string) => c.toUpperCase()).trim();
+  return out;
+}
+
 export function cleanTitle(value: unknown): string {
   let t = asText(value).replace(/^["«“'\s]+|["»”'\s.]+$/g, "");
   t = t.replace(/^(le |la |l'|un |une )?(document|texte|cours|pdf|fichier|extrait)\s+(qui\s+)?(parle|traite|porte|présente|explique|décrit)\s+(de |du |des |d'|sur |à propos (de |du |des |d')?)?/i, "");
@@ -121,8 +144,8 @@ function normalizeBlocks(raw: unknown): FicheBlock[] {
   for (const b of asArray(raw).slice(0, 40)) {
     const block = (b ?? {}) as Record<string, unknown>;
     const type = KINDS.includes(block.type as BlockKind) ? (block.type as BlockKind) : "texte";
-    const text = balanceMarks(asText(block.text)).slice(0, 2000);
-    const items = asArray(block.items).map((i) => balanceMarks(asText(i)).slice(0, 600)).filter(Boolean).slice(0, 20);
+    const text = balanceMarks(tidy(asText(block.text))).slice(0, 2000);
+    const items = asArray(block.items).map((i) => balanceMarks(tidy(asText(i))).slice(0, 600)).filter(Boolean).slice(0, 20);
     if (type === "liste") {
       if (items.length > 0) blocks.push({ type, text, items });
       else if (text) blocks.push({ type: "texte", text });
@@ -163,8 +186,8 @@ function normalizeCards(raw: unknown): Flashcard[] {
   const seen = new Set<string>();
   for (const item of asArray(raw)) {
     const card = (item ?? {}) as Record<string, unknown>;
-    const question = stripMarks(asText(card.question));
-    const answer = stripMarks(asText(card.answer));
+    const question = stripMarks(tidy(asText(card.question)));
+    const answer = stripMarks(tidy(asText(card.answer)));
     const key = question.toLowerCase();
     if (question && answer && !seen.has(key)) {
       seen.add(key);
@@ -178,7 +201,7 @@ function normalizeQuiz(raw: unknown): QuizQuestion[] {
   const quiz: QuizQuestion[] = [];
   for (const item of asArray(raw)) {
     const entry = (item ?? {}) as Record<string, unknown>;
-    const question = stripMarks(asText(entry.question));
+    const question = stripMarks(tidy(asText(entry.question)));
     const rawOptions = asArray(entry.options).map((o) => stripMarks(asText(o)));
     const rawIndex = Number(entry.correctIndex);
     const right = Number.isInteger(rawIndex) ? rawOptions[rawIndex] : "";
@@ -399,7 +422,8 @@ Mise en valeur (dans "text" et "items") :
 - ==phrase== : surligne la ou les 1 à 2 phrases les plus importantes de la partie (définition centrale, règle, formule). Pas plus.
 - Pas d'autre balisage (pas de #, pas de _italique_, pas de HTML). Les formules s'écrivent en texte simple (a² + b² = c²).
 
-Style : phrases claires et complètes, qui se comprennent sans le cours sous les yeux. Chaque phrase apporte une information du cours : pas de phrase de remplissage (« cela souligne l'importance de… », « il est crucial de comprendre… »), pas de « dans cette partie », pas de « le texte dit », pas de renvoi à une page.`;
+Style : phrases claires et complètes, qui se comprennent sans le cours sous les yeux. Chaque phrase apporte une information du cours : pas de phrase de remplissage (« cela souligne l'importance de… », « il est crucial de comprendre… »), pas de « dans cette partie », pas de « le texte dit », pas de renvoi à une page.
+Ton d'un bon manuel scolaire : sobre et précis. Un terme important se met en **gras**, JAMAIS entre guillemets ni entre apostrophes ; les guillemets sont réservés à une vraie citation recopiée du cours. Pas de tiret long (—), pas d'émoji, pas de point d'exclamation, pas de « En résumé ».`;
 
 async function writeSection(ctx: Ctx, system: string, plan: Part[], index: number, length: string) {
   const part = plan[index];
@@ -510,7 +534,7 @@ async function makeEssentiel(ctx: Ctx, system: string) {
     obj({ lignes: S.strArr }),
     800
   );
-  return splitLines(asArray(raw.lignes).map((l) => balanceMarks(asText(l))).filter(Boolean));
+  return splitLines(asArray(raw.lignes).map((l) => balanceMarks(tidy(asText(l)))).filter(Boolean));
 }
 
 const CARD_RULES = `- Chaque carte teste UNE seule idée, avec une question précise qui n'a qu'une bonne réponse, et une réponse courte (une phrase, rarement deux).
