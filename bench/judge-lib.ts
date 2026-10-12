@@ -15,7 +15,7 @@ const obj = (properties: Json) => ({ type: "object", properties, required: Objec
 
 export type JudgeKey = { notions: { notion: string; contenu_attendu: string }[] };
 
-async function ask(client: OpenAI, system: string, user: string, schema: Json, name: string, cost: { usd: number }) {
+async function ask(client: OpenAI, system: string, user: string, schema: Json, name: string, cost: { usd: number }, effort: "low" | "medium" = "medium") {
   let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
@@ -26,7 +26,7 @@ async function ask(client: OpenAI, system: string, user: string, schema: Json, n
             { role: "system", content: system },
             { role: "user", content: user },
           ],
-          reasoning_effort: "medium",
+          reasoning_effort: effort,
           response_format: { type: "json_schema", json_schema: { name, strict: true, schema } },
         },
         { timeout: 100000, maxRetries: 0 }
@@ -71,7 +71,8 @@ export function ficheAsText(result: EngineResult): string {
   return parts.join("\n\n");
 }
 
-export async function judge(client: OpenAI, course: string, key: JudgeKey, result: EngineResult, cost: { usd: number }) {
+// effort "low" pour les très longs cours (sinon le correcteur dépasse 2 minutes) — même réglage pour les deux moteurs.
+export async function judge(client: OpenAI, course: string, key: JudgeKey, result: EngineResult, cost: { usd: number }, effort: "low" | "medium" = "medium") {
   const fiche = ficheAsText(result);
   const system = SYS(course);
   const cards = result.flashcards ?? [];
@@ -95,7 +96,8 @@ Notions :
 ${key.notions.map((n, i) => `${i}. ${n.notion} — attendu : ${n.contenu_attendu}`).join("\n")}`,
       obj({ notes: { type: "array", items: obj({ index: { type: "integer" }, note: { type: "integer" } }) } }),
       "couverture",
-      cost
+      cost,
+      effort
     ),
     ask(
       client,
@@ -119,7 +121,8 @@ ${fiche}
         },
       }),
       "faits",
-      cost
+      cost,
+      effort
     ),
     ask(
       client,
@@ -138,7 +141,8 @@ ${quiz.map((q, i) => `${i}. ${q.question} | options : ${q.options.map((o, j) => 
         quiz: { type: "array", items: obj({ index: { type: "integer" }, verdict: { type: "string", enum: ["ok", "ko"] }, raison: { type: "string" } }) },
       }),
       "cartes",
-      cost
+      cost,
+      effort
     ),
   ]);
 

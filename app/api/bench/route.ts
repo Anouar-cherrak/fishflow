@@ -3,7 +3,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { costUsd, makeContext, runEngine, type EngineResult } from "@/lib/fiche-engine";
+import { costUsd, makeContext, runEngine, transcribeImages, type EngineResult } from "@/lib/fiche-engine";
 import { oldGenerate } from "@/bench/old-engine";
 import { judge, makeKey, type JudgeKey } from "@/bench/judge-lib";
 import corpus from "@/bench/corpus.json";
@@ -11,7 +11,7 @@ import corpus from "@/bench/corpus.json";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-type Case = { id: string; text: string; pro: boolean };
+type Case = { id: string; text: string; pro: boolean; image?: string };
 
 export async function POST(req: Request) {
   if (process.env.VERCEL_ENV === "production") return NextResponse.json({ error: "off" }, { status: 404 });
@@ -44,8 +44,15 @@ export async function POST(req: Request) {
       const out = await runEngine(ctx, c.text, { outputs: ["summary", "sheet", "flashcards", "quiz"], difficulty: "moyen", length, pro: c.pro });
       return NextResponse.json({ result: out.result, report: out.report, usage: out.usage, ms: Date.now() - t0, usd: costUsd(out.usage) });
     }
+    if (body.action === "photo" && c.image) {
+      // Même chemin que /api/generate en mode photo : transcription, puis moteur.
+      const ctx = makeContext({ deadline: Date.now() + 110000 });
+      const source = await transcribeImages(ctx, [c.image]);
+      const out = await runEngine(ctx, source, { outputs: ["summary", "sheet", "flashcards", "quiz"], difficulty: "moyen", length: "moyen", pro: true });
+      return NextResponse.json({ source, result: out.result, report: out.report, ms: Date.now() - t0, usd: costUsd(out.usage) });
+    }
     if (body.action === "judge" && body.key && body.result) {
-      const scores = await judge(client, c.text, body.key, body.result, cost);
+      const scores = await judge(client, c.text, body.key, body.result, cost, c.text.length > 30000 ? "low" : "medium");
       return NextResponse.json({ scores, judgeUsd: cost.usd });
     }
     return NextResponse.json({ error: "action" }, { status: 400 });

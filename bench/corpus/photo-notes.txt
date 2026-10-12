@@ -1,0 +1,22 @@
+SVT - Chapitre 3 : La cellule
+
+I. Définition
+La cellule est l'unité de base du vivant : tout être vivant est formé d'une ou plusieurs cellules.
+- unicellulaire : 1 seule cellule (ex : bactérie, paramécie)
+- pluricellulaire : plusieurs cellules (ex : homme ~ 30 000 milliards de cellules)
+
+II. Organisation
+Toute cellule possède :
+- une membrane plasmique (limite la cellule, contrôle les échanges)
+- un cytoplasme (liquide où ont lieu les réactions)
+- de l'ADN (information génétique)
+Cellule eucaryote : ADN dans un noyau (animaux, végétaux, champignons).
+Cellule procaryote : pas de noyau, ADN libre dans le cytoplasme (bactéries).
+Attention : la cellule végétale a en plus une paroi, des chloroplastes et une grande vacuole.
+
+III. Théorie cellulaire (1838-1839, Schleiden et Schwann)
+1. Tous les êtres vivants sont faits de cellules.
+2. La cellule est l'unité de structure et de fonction.
+3. Toute cellule provient d'une autre cellule (Virchow, 1855).
+
+Taille : 1 à 100 micromètres -> observation au microscope optique.
