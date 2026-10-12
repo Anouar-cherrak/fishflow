@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { answerQuestion, apprendreCostUsd } from "@/lib/apprendre-engine";
 import { oldApprendre } from "@/bench/old-apprendre";
 import { judgeApprendre } from "@/bench/judge-apprendre";
+import { fetchArticle, searchTitles } from "@/lib/wikipedia";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -29,6 +30,16 @@ export async function POST(req: Request) {
           out[lang + " | " + ua] = "ERREUR " + String((e as Error)?.message || e);
         }
       }
+      return NextResponse.json(out);
+    }
+    if (body.action === "wiki2") {
+      const out: Record<string, unknown> = {};
+      try { out.titles = await searchTitles(body.question, "fr", 3); } catch (e) { out.titlesErr = String((e as Error)?.message || e); }
+      try { const a = await fetchArticle(body.question, "fr"); out.article = a ? a.title + " " + a.text.length : null; } catch (e) { out.articleErr = String((e as Error)?.message || e); }
+      try {
+        const r = await fetch(`https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(body.question)}&format=json&formatversion=2&srlimit=2`, { headers: { "User-Agent": "FishFlow/1.0 (application pedagogique)", Accept: "application/json" }, next: { revalidate: 3600 } });
+        out.cached = r.status + " " + (await r.text()).slice(0, 150);
+      } catch (e) { out.cachedErr = String((e as Error)?.message || e); }
       return NextResponse.json(out);
     }
     if (body.action === "old") return NextResponse.json({ answer: await oldApprendre(body.question), ms: Date.now() - t0 });
