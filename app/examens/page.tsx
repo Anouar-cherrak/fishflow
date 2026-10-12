@@ -48,16 +48,20 @@ export default function Examens() {
       return;
     }
 
-    const { data: examRows, error: examError } = await supabase
-      .from("exams")
-      .select("id, title, exam_date, fiche_ids")
-      .order("exam_date", { ascending: true });
+    // Tout part en même temps (plus rapide sur un réseau mobile).
+    const [examRes, ficheRes, folderRes, reviewRes] = await Promise.all([
+      supabase.from("exams").select("id, title, exam_date, fiche_ids").order("exam_date", { ascending: true }),
+      supabase.from("fiches").select("id, title, folder_id, flashcards:data->flashcards").order("created_at", { ascending: false }),
+      supabase.from("folders").select("id, name, color").order("created_at", { ascending: true }),
+      supabase.from("card_reviews").select("fiche_id, box, due_at").limit(5000),
+    ]);
+    const { data: examRows, error: examError } = examRes;
     if (examError) {
       setStatus("unavailable");
       return;
     }
 
-    const { data: ficheRows } = await supabase.from("fiches").select("id, title, folder_id, flashcards:data->flashcards").order("created_at", { ascending: false });
+    const ficheRows = ficheRes.data;
     setFiches(
       (ficheRows ?? []).map((f) => ({
         id: f.id as string,
@@ -67,11 +71,8 @@ export default function Examens() {
       }))
     );
 
-    const { data: folderRows } = await supabase.from("folders").select("id, name, color").order("created_at", { ascending: true });
-    setFolders((folderRows ?? []) as FolderLite[]);
-
-    const { data: reviewRows } = await supabase.from("card_reviews").select("fiche_id, box, due_at").limit(5000);
-    setReviews((reviewRows ?? []) as Review[]);
+    setFolders((folderRes.data ?? []) as FolderLite[]);
+    setReviews((reviewRes.data ?? []) as Review[]);
     setExams((examRows ?? []) as Exam[]);
     setStatus("ready");
   }, [router]);

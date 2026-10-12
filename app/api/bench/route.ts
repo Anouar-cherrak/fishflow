@@ -43,8 +43,8 @@ export async function POST(req: Request) {
       return NextResponse.json(out);
     }
     if (body.action === "old") return NextResponse.json({ answer: await oldApprendre(body.question), ms: Date.now() - t0 });
-    if (body.action === "new") {
-      const out = await answerQuestion(body.question);
+    if (body.action === "new" || body.action === "new41") {
+      const out = await answerQuestion(body.question, { answerModel: body.action === "new41" ? "gpt-4.1" : undefined });
       return NextResponse.json({ answer: out.result, articles: out.articles, ms: Date.now() - t0, usd: apprendreCostUsd(out.usage) });
     }
     if (body.action === "judge" && body.answer) {
