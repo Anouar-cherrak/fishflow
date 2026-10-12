@@ -277,6 +277,8 @@ type Ctx = {
   models: EngineModels;
   usage: EngineUsage[];
   deadline: number;
+  // Régénération : on veut des cartes, un quiz ou un essentiel différents de la fois d'avant.
+  vary: boolean;
 };
 
 type JsonSchema = Record<string, unknown>;
@@ -319,7 +321,7 @@ async function callJson(
     max_completion_tokens: isReasoning(model) ? maxTokens + 4000 : maxTokens,
   };
   if (isReasoning(model)) params.reasoning_effort = "minimal";
-  else params.temperature = 0.2;
+  else params.temperature = !ctx.vary ? 0.2 : ["essentiel", "flashcards", "quiz"].includes(step) ? 0.9 : 0.5;
 
   let completion: OpenAI.Chat.Completions.ChatCompletion;
   try {
@@ -422,6 +424,7 @@ Mise en valeur (dans "text" et "items") :
 - ==phrase== : surligne la ou les 1 à 2 phrases les plus importantes de la partie (définition centrale, règle, formule). Pas plus.
 - Pas d'autre balisage (pas de #, pas de _italique_, pas de HTML). Les formules s'écrivent en texte simple (a² + b² = c²).
 
+Quand le cours donne une suite de petites informations sur un même thème (composants, étapes, caractéristiques), regroupe-les dans un bloc "liste" plutôt qu'en paragraphes d'une seule phrase.
 Style : phrases claires et complètes, qui se comprennent sans le cours sous les yeux. Chaque phrase apporte une information du cours : pas de phrase de remplissage (« cela souligne l'importance de… », « il est crucial de comprendre… »), pas de « dans cette partie », pas de « le texte dit », pas de renvoi à une page.
 Ton d'un bon manuel scolaire : sobre et précis. Un terme important se met en **gras**, JAMAIS entre guillemets ni entre apostrophes ; les guillemets sont réservés à une vraie citation recopiée du cours. Pas de tiret long (—), pas d'émoji, pas de point d'exclamation, pas de « En résumé ».`;
 
@@ -625,11 +628,12 @@ export async function transcribeImages(ctx: Ctx, images: string[]) {
 
 // ---------- Le chef d'orchestre ----------
 
-export function makeContext(opts: { apiKey?: string; models?: Partial<EngineModels>; deadline?: number }): Ctx {
+export function makeContext(opts: { apiKey?: string; models?: Partial<EngineModels>; deadline?: number; vary?: boolean }): Ctx {
   return {
     client: new OpenAI({ apiKey: opts.apiKey ?? process.env.OPENAI_API_KEY }),
     models: { ...DEFAULT_MODELS, ...(opts.models ?? {}) },
     usage: [],
+    vary: !!opts.vary,
     deadline: opts.deadline ?? Date.now() + 10 * 60 * 1000,
   };
 }

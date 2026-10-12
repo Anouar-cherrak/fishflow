@@ -241,7 +241,8 @@ export async function POST(req: Request) {
 
   try {
     const deadline = Date.now() + ENGINE_BUDGET_MS;
-    const ctx = makeContext({ deadline });
+    // Une seule partie demandée = le bouton « Régénérer » : on veut un résultat différent.
+    const ctx = makeContext({ deadline, vary: outputs.length === 1 });
     // Photo : on recopie d'abord le texte du cours, puis on fait comme pour un texte.
     const source = sourceText ?? (await transcribeImages(ctx, images));
     const { result } = await runEngine(ctx, source, {
