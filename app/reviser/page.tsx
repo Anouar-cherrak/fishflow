@@ -64,9 +64,9 @@ export default function Reviser() {
       if (only.length > 0) {
         const { data: tracked } = await supabase.from("card_reviews").select("fiche_id, card_index").in("fiche_id", only);
         const seen = new Set((tracked ?? []).map((r) => `${r.fiche_id}:${r.card_index}`));
-        const { data: examFiches } = await supabase.from("fiches").select("id, data").in("id", only);
+        const { data: examFiches } = await supabase.from("fiches").select("id, flashcards:data->flashcards").in("id", only);
         for (const f of examFiches ?? []) {
-          const total = Array.isArray(f.data?.flashcards) ? f.data.flashcards.length : 0;
+          const total = Array.isArray(f.flashcards) ? f.flashcards.length : 0;
           for (let i = 0; i < total; i++) if (!seen.has(`${f.id}:${i}`)) newRows.push({ fiche_id: f.id as string, card_index: i });
         }
         newRows = newRows.slice(0, Math.max(0, SESSION_SIZE - dueRows.length));
@@ -76,13 +76,13 @@ export default function Reviser() {
       // Aucune carte à revoir : on fait découvrir les nouvelles cartes des fiches récentes,
       // pour que Réviser ne soit jamais vide quand il y a des fiches.
       if (only.length === 0 && dueRows.length === 0) {
-        const { data: recentFiches } = await supabase.from("fiches").select("id, data").order("created_at", { ascending: false }).limit(10);
+        const { data: recentFiches } = await supabase.from("fiches").select("id, flashcards:data->flashcards").order("created_at", { ascending: false }).limit(10);
         const ids = (recentFiches ?? []).map((f) => f.id as string);
         if (ids.length > 0) {
           const { data: tracked } = await supabase.from("card_reviews").select("fiche_id, card_index").in("fiche_id", ids);
           const seen = new Set((tracked ?? []).map((r) => `${r.fiche_id}:${r.card_index}`));
           for (const f of recentFiches ?? []) {
-            const total = Array.isArray(f.data?.flashcards) ? f.data.flashcards.length : 0;
+            const total = Array.isArray(f.flashcards) ? f.flashcards.length : 0;
             for (let i = 0; i < total && newRows.length < NEW_CARDS; i++) {
               if (!seen.has(`${f.id}:${i}`)) newRows.push({ fiche_id: f.id as string, card_index: i });
             }
@@ -100,12 +100,12 @@ export default function Reviser() {
       }
 
       const ficheIds = Array.from(new Set(ficheSource));
-      const { data: fiches } = await supabase.from("fiches").select("id, data").in("id", ficheIds);
+      const { data: fiches } = await supabase.from("fiches").select("id, flashcards:data->flashcards").in("id", ficheIds);
 
       const flashcardsByFiche = new Map<string, { question: string; answer: string }[]>();
       for (const fiche of fiches ?? []) {
-        const list = fiche.data?.flashcards;
-        if (Array.isArray(list)) flashcardsByFiche.set(fiche.id as string, list);
+        const list = fiche.flashcards;
+        if (Array.isArray(list)) flashcardsByFiche.set(fiche.id as string, list as { question: string; answer: string }[]);
       }
 
       const due: DueCard[] = [];

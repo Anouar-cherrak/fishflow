@@ -2,7 +2,6 @@
 // Ce sont les images choisies par les rédacteurs de l'article : elles collent au sujet.
 // Chaque image garde son auteur, sa licence et un lien vers sa page, comme la licence l'exige.
 
-const API_URL = "https://fr.wikipedia.org/w/api.php";
 const USER_AGENT = "FishFlow/1.0 (application pedagogique)";
 const TIMEOUT_MS = 8000;
 const MIN_WIDTH = 500;
@@ -38,7 +37,7 @@ function stripHtml(value: string | undefined): string {
 }
 
 // Images utilisées dans un article Wikipédia (photos et schémas bitmap avec licence claire).
-export async function imagesFromArticle(articleTitle: string, limit = 3): Promise<CommonsImage[]> {
+export async function imagesFromArticle(articleTitle: string, limit = 3, lang: "fr" | "en" = "fr"): Promise<CommonsImage[]> {
   const params = new URLSearchParams({
     action: "query",
     format: "json",
@@ -52,7 +51,7 @@ export async function imagesFromArticle(articleTitle: string, limit = 3): Promis
     redirects: "1",
   });
 
-  const res = await fetch(`${API_URL}?${params.toString()}`, {
+  const res = await fetch(`https://${lang}.wikipedia.org/w/api.php?${params.toString()}`, {
     headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
     signal: AbortSignal.timeout(TIMEOUT_MS),
     next: { revalidate: 3600 },

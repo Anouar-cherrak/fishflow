@@ -203,13 +203,13 @@ export async function getHardCards(limit = 8): Promise<HardCard[]> {
     if (error || !data || data.length === 0) return [];
 
     const ids = Array.from(new Set(data.map((r) => r.fiche_id as string)));
-    const { data: fiches } = await supabase.from("fiches").select("id, title, data").in("id", ids);
+    const { data: fiches } = await supabase.from("fiches").select("id, title, flashcards:data->flashcards").in("id", ids);
     const byId = new Map((fiches ?? []).map((f) => [f.id as string, f]));
 
     const out: HardCard[] = [];
     for (const row of data as { fiche_id: string; card_index: number; times_wrong: number }[]) {
       const fiche = byId.get(row.fiche_id);
-      const card = fiche?.data?.flashcards?.[row.card_index];
+      const card = (fiche?.flashcards as { question: string; answer: string }[] | null | undefined)?.[row.card_index];
       if (fiche && card?.question) {
         out.push({ ficheId: row.fiche_id, ficheTitle: fiche.title, question: card.question, answer: card.answer, wrong: row.times_wrong });
       }

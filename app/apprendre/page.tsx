@@ -337,7 +337,7 @@ export default function Apprendre() {
               </>
               )}
               <p className="text-xs text-black/50">
-                Réponse écrite par l&apos;IA à partir de ses connaissances. Elle peut se tromper : vérifie les infos importantes, par exemple dans les articles ci-dessus.
+                Réponse écrite par l&apos;IA à partir des articles cités. Elle peut se tromper : vérifie les infos importantes dans les sources.
               </p>
             </article>
           )}

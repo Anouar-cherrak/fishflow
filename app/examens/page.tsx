@@ -57,12 +57,12 @@ export default function Examens() {
       return;
     }
 
-    const { data: ficheRows } = await supabase.from("fiches").select("id, title, data, folder_id").order("created_at", { ascending: false });
+    const { data: ficheRows } = await supabase.from("fiches").select("id, title, folder_id, flashcards:data->flashcards").order("created_at", { ascending: false });
     setFiches(
       (ficheRows ?? []).map((f) => ({
         id: f.id as string,
         title: (f.title as string) || "Fiche sans titre",
-        cards: Array.isArray(f.data?.flashcards) ? f.data.flashcards.length : 0,
+        cards: Array.isArray(f.flashcards) ? f.flashcards.length : 0,
         folder_id: (f.folder_id as string | null) ?? null,
       }))
     );
