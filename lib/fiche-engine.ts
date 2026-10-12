@@ -110,7 +110,7 @@ export function normalizeFiche(raw: unknown): Fiche | null {
   for (const s of asArray((raw as { sections?: unknown })?.sections).slice(0, 12)) {
     const sec = (s ?? {}) as Record<string, unknown>;
     const title = stripMarks(asText(sec.title)).slice(0, 120);
-    const blocks = normalizeBlocks(sec.blocks);
+    const blocks = limitHighlights(normalizeBlocks(sec.blocks));
     if (title && blocks.length > 0) sections.push({ title, blocks });
   }
   return sections.length > 0 ? { sections } : null;
@@ -131,6 +131,31 @@ function normalizeBlocks(raw: unknown): FicheBlock[] {
     }
   }
   return blocks;
+}
+
+// Le surlignage ne garde sa force que s'il est rare : 2 passages par partie au plus,
+// et jamais dans l'encadré « À retenir » (il est déjà mis en valeur).
+const unhighlight = (t: string) => t.replace(/==(.+?)==/g, "$1");
+function limitHighlights(blocks: FicheBlock[]): FicheBlock[] {
+  let left = 2;
+  const keep = (t: string) =>
+    t.replace(/==(.+?)==/g, (_m, inner: string) => {
+      if (left > 0) {
+        left--;
+        return `==${inner}==`;
+      }
+      return inner;
+    });
+  return blocks.map((b) => {
+    if (b.type === "retenir") return { ...b, text: unhighlight(b.text), ...(b.items ? { items: b.items.map(unhighlight) } : {}) };
+    return { ...b, text: keep(b.text), ...(b.items ? { items: b.items.map(keep) } : {}) };
+  });
+}
+
+// « L'essentiel en 5 lignes » : une phrase par ligne, même si l'IA les a collées ensemble.
+export function splitLines(lines: string[]): string[] {
+  const out = lines.flatMap((l) => (lines.length < 5 ? l.split(/(?<=[.!?])\s+(?=[A-ZÀ-Ý«*])/) : [l]));
+  return out.map((l) => l.trim()).filter(Boolean).slice(0, 5);
 }
 
 function normalizeCards(raw: unknown): Flashcard[] {
@@ -366,7 +391,7 @@ const WRITING_RULES = `Format : une liste de "blocks", dans l'ordre de lecture. 
 - "liste" : "text" = phrase d'introduction courte (ou vide), "items" = les éléments (étapes, causes, caractéristiques…).
 - "exemple" : un exemple, un cas ou une application QUI EST DANS LE COURS (sinon, pas de bloc exemple).
 - "piege" : deux notions proches à ne pas confondre, une exception à une règle, une nuance ou une erreur à éviter, tirée du cours. Dès que le cours distingue ou oppose deux choses voisines, ou donne une exception, fais-en un piège. Pas de piège inventé.
-- "retenir" : exactement UN par partie, en dernier : l'idée essentielle de la partie en 1 à 3 phrases, ou en "items" courts.
+- "retenir" : exactement UN par partie, en dernier : l'idée essentielle de la partie en 1 ou 2 phrases courtes, ou en 2 à 4 "items" courts. Pas de surlignage dedans.
 
 Mise en valeur (dans "text" et "items") :
 - **mot** : mets en gras chaque mot-clé, nom, date ou chiffre important, à sa première apparition (2 à 4 par paragraphe, pas de phrases entières en gras).
@@ -405,7 +430,7 @@ ${WRITING_RULES}`,
     SECTION_SCHEMA,
     length === "detaille" ? 4500 : 3200
   );
-  const blocks = normalizeBlocks(raw.blocks);
+  const blocks = limitHighlights(normalizeBlocks(raw.blocks));
   if (blocks.length === 0) throw new EngineError("EMPTY", "Partie vide");
   return { title: part.title, blocks } satisfies FicheSection;
 }
@@ -452,7 +477,7 @@ ${WRITING_RULES}`,
   );
   const problems = asArray(raw.problemes).map(asText).filter(Boolean);
   if (raw.corrige === true) {
-    const blocks = normalizeBlocks(raw.blocks);
+    const blocks = limitHighlights(normalizeBlocks(raw.blocks));
     if (blocks.length > 0) return { section: { title: section.title, blocks }, problems };
   }
   return { section, problems };
@@ -477,14 +502,14 @@ async function makeEssentiel(ctx: Ctx, system: string) {
       { role: "system", content: system },
       {
         role: "user",
-        content: `Écris « L'essentiel en 5 lignes » : exactement 5 phrases courtes, une par ligne, qui résument toute la fiche dans l'ordre (de la première à la dernière partie). Chaque phrase se comprend seule. Mets en gras (**mot**) 1 ou 2 mots-clés par phrase.`,
+        content: `Écris « L'essentiel en 5 lignes » : exactement 5 phrases courtes, chacune dans un élément séparé de "lignes", qui résument toute la fiche dans l'ordre (de la première à la dernière partie). Chaque phrase se comprend seule. Mets en gras (**mot**) 1 ou 2 mots-clés par phrase.`,
       },
     ],
     "essentiel",
     obj({ lignes: S.strArr }),
     800
   );
-  return asArray(raw.lignes).map((l) => balanceMarks(asText(l))).filter(Boolean).slice(0, 5);
+  return splitLines(asArray(raw.lignes).map((l) => balanceMarks(asText(l))).filter(Boolean));
 }
 
 const CARD_RULES = `- Chaque carte teste UNE seule idée, avec une question précise qui n'a qu'une bonne réponse, et une réponse courte (une phrase, rarement deux).
