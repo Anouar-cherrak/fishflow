@@ -224,7 +224,7 @@ export default function Apprendre() {
               <p className="text-sm text-black/60 mb-4">Avec Pro, tu peux poser 20 questions par jour.</p>
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition ff-btn"
+                className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition ff-btn"
               >
                 Voir Pro
               </Link>
@@ -295,7 +295,7 @@ export default function Apprendre() {
                         <a
                           key={id}
                           href={`#source-${id}`}
-                          className="inline-block text-xs font-medium text-[#16A34A] px-1 hover:underline"
+                          className="inline-block text-xs font-medium text-accent-strong px-1 hover:underline"
                           aria-label={`Source ${id}`}
                         >
                           [{id}]
@@ -327,7 +327,7 @@ export default function Apprendre() {
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-black underline underline-offset-2 hover:text-[#16A34A]"
+                      className="text-black underline underline-offset-2 hover:text-accent-strong"
                     >
                       {source.title} — {source.site}
                     </a>
@@ -362,12 +362,12 @@ export default function Apprendre() {
             placeholder="Que veux-tu savoir ?"
             autoComplete="off"
             enterKeyHint="send"
-            className="ff-input flex-1 min-w-0 min-h-[48px] rounded-full border border-black/15 bg-surface px-4 text-black placeholder:text-black/40 focus:outline-none focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/30"
+            className="ff-input flex-1 min-w-0 min-h-[48px] rounded-full border border-black/15 bg-surface px-4 text-black placeholder:text-black/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
           />
           <button
             type="submit"
             disabled={status === "loading" || question.trim().length < 3}
-            className="min-h-[48px] px-5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition disabled:opacity-40 ff-btn shrink-0"
+            className="min-h-[48px] px-5 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition disabled:opacity-40 ff-btn shrink-0"
           >
             {status === "loading" ? "…" : "Envoyer"}
           </button>

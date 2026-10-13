@@ -31,7 +31,7 @@ function DaysChart({ counts, label }: { counts: DayCount[]; label: string }) {
         return (
           <div key={i} className="flex-1 min-w-0 h-full flex flex-col justify-end items-center gap-1">
             <div
-              className={`w-full rounded-t-md ${isToday ? "bg-[#22C55E]" : "bg-black/25"}`}
+              className={`w-full rounded-t-md ${isToday ? "bg-accent" : "bg-black/25"}`}
               style={{ height: `${Math.max(c.total > 0 ? 6 : 2, (c.total / max) * 100)}%`, opacity: c.total === 0 ? 0.35 : 1 }}
               title={`${c.date.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} : ${c.total} carte${c.total > 1 ? "s" : ""}`}
             />
@@ -172,7 +172,7 @@ export default function Aujourdhui() {
                     cy="60"
                     r={R}
                     fill="none"
-                    stroke="#22C55E"
+                    stroke="var(--ff-accent)"
                     strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray={C}
@@ -242,7 +242,7 @@ export default function Aujourdhui() {
               <ul className="grid gap-1">
                 {recent.map((f) => (
                   <li key={f.id}>
-                    <Link href={`/fiche/${f.id}`} className="flex items-center justify-between gap-3 min-h-[48px] py-2 border-b border-black/10 last:border-0 hover:text-[#22C55E] transition">
+                    <Link href={`/fiche/${f.id}`} className="flex items-center justify-between gap-3 min-h-[48px] py-2 border-b border-black/10 last:border-0 hover:text-accent transition">
                       <span className="font-medium truncate">{f.title}</span>
                       <span aria-hidden="true">›</span>
                     </Link>

@@ -159,7 +159,7 @@ export function Explainer({
           <ol className="grid gap-2 mb-5">
             {scenes.map((s, i) => (
               <li key={i} className={`flex gap-3 text-sm transition ${i === scene ? "text-black font-semibold" : "text-black/55"}`}>
-                <span className="tabular-nums text-[#22C55E] font-bold w-4 shrink-0">{i + 1}</span>
+                <span className="tabular-nums text-accent font-bold w-4 shrink-0">{i + 1}</span>
                 <span>{s.caption}</span>
               </li>
             ))}

@@ -198,7 +198,7 @@ export default function Examens() {
                 {visibleFiches.map((f) => (
                   <li key={f.id}>
                     <label className="flex items-center gap-3 min-h-[44px] px-3 rounded-xl border border-black/10 bg-white cursor-pointer">
-                      <input type="checkbox" checked={selected.includes(f.id)} onChange={() => toggle(f.id)} className="w-5 h-5 accent-[#22C55E]" />
+                      <input type="checkbox" checked={selected.includes(f.id)} onChange={() => toggle(f.id)} className="w-5 h-5 accent-[var(--ff-accent)]" />
                       <span className="flex-1 min-w-0 truncate">{f.title}</span>
                       <span className="text-xs text-black/50 shrink-0">{f.cards} cartes</span>
                     </label>
@@ -254,7 +254,7 @@ export default function Examens() {
 
                 <div>
                   <div className="h-2.5 rounded-full bg-black/10 overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Cartes connues">
-                    <div className="h-full rounded-full bg-[#22C55E] transition-all" style={{ width: `${percent}%` }} />
+                    <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${percent}%` }} />
                   </div>
                   <p className="text-sm text-black/65 mt-2">{mastered} cartes connues sur {total}</p>
                 </div>

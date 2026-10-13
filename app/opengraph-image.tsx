@@ -1,11 +1,17 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
 export const alt = "FishFlow — Le savoir est une force.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Image affichée quand on partage le lien de FishFlow (réseaux, messageries).
-export default function OpengraphImage() {
+// Image affichée quand on partage le lien de FishFlow (réseaux, messageries) : la raie, le nom et la promesse.
+// Générée une seule fois au moment de la construction du site.
+export default async function OpengraphImage() {
+  const raie = await readFile(path.join(process.cwd(), "public/brand/logo-og.png"));
+  const raieSrc = `data:image/png;base64,${raie.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -13,26 +19,25 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0a0a0a",
+          alignItems: "center",
+          background: "linear-gradient(160deg, #0B1630 0%, #0a2a3a 55%, #07111c 100%)",
           color: "#f5f5f5",
           padding: 72,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 40, fontWeight: 700 }}>
-          <svg width="56" height="56" viewBox="0 0 32 32" fill="none">
-            <path d="M4 20C4 20 8 12 16 12C24 12 28 20 28 20" stroke="#f5f5f5" strokeWidth="3" strokeLinecap="round" />
-            <path d="M4 24C4 24 8 16 16 16C24 16 28 24 28 24" stroke="#f5f5f5" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
-            <circle cx="16" cy="8" r="3" fill="#22C55E" />
-          </svg>
-          FishFlow
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", maxWidth: 640 }}>
+          <div style={{ display: "flex", alignItems: "center", fontSize: 44, fontWeight: 700 }}>
+            Fish<span style={{ fontWeight: 400, color: "#2AA9E8" }}>Flow</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1.02, letterSpacing: -3 }}>Le savoir est une force.</div>
+            <div style={{ fontSize: 34, color: "#a8c4d4" }}>Fiches, flashcards, quiz et révisions qui restent en tête.</div>
+          </div>
+          <div style={{ display: "flex", width: 160, height: 10, borderRadius: 5, background: "#38BDF8" }} />
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ fontSize: 108, fontWeight: 800, lineHeight: 1.02, letterSpacing: -3 }}>Le savoir est une force.</div>
-          <div style={{ fontSize: 38, color: "#a8a8a8" }}>Fiches, flashcards, quiz et révisions qui restent en tête.</div>
-        </div>
-        <div style={{ display: "flex", width: 160, height: 10, borderRadius: 5, background: "#22C55E" }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={raieSrc} width={400} height={328} alt="" />
       </div>
     ),
     size

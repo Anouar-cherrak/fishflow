@@ -175,7 +175,7 @@ export default function Parametres() {
               </span>
               <span
                 className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
-                  !emailOptOut ? "bg-[#22C55E]" : "bg-black/15"
+                  !emailOptOut ? "bg-accent" : "bg-black/15"
                 }`}
               >
                 <span
@@ -211,7 +211,7 @@ export default function Parametres() {
             ) : (
               <button
                 onClick={() => router.push("/pricing")}
-                className="w-full py-2.5 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn"
+                className="w-full py-2.5 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition ff-btn"
               >
                 Passer Pro — 4,99 €/mois
               </button>

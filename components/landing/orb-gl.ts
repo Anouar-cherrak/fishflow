@@ -51,7 +51,7 @@ vec3 env(vec3 r){
   col+=vec3(1.,1.,1.)*pow(max(r.y,0.),5.)*1.7;
   col+=vec3(.95,.97,1.)*exp(-pow((r.x-.62)*5.,2.))*smoothstep(-.3,.5,r.y)*1.5;
   col+=vec3(.9,.95,1.)*exp(-pow((r.x+.7)*7.,2.))*smoothstep(-.1,.6,r.y)*1.1;
-  col+=vec3(.13,.8,.38)*exp(-pow((r.x+.2)*4.,2.))*exp(-pow((r.y+.25)*5.,2.))*(.22+uHot*1.1);
+  col+=vec3(.22,.74,.97)*exp(-pow((r.x+.2)*4.,2.))*exp(-pow((r.y+.25)*5.,2.))*(.22+uHot*1.1);
   col*=.55+.45*smoothstep(-.02,.02,r.y+.03);
   return col; }
 void main(){ vec3 n=normalize(vN); vec3 v=vec3(0.,0.,1.);
@@ -90,7 +90,8 @@ function sphere(rings: number, segs: number) {
 }
 
 /** Crée la boule. Renvoie null si le WebGL n'est pas disponible (la page marche quand même). */
-export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement[], reduce: boolean): OrbHandle | null {
+// onLost : la 3D a été perdue (fréquent sur téléphone quand on change d'appli puis revient) ; la page affiche alors une boule de secours.
+export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement[], reduce: boolean, onGone?: () => void): OrbHandle | null {
   let gl: WebGLRenderingContext | null = null;
   try {
     gl = canvas.getContext("webgl", { alpha: true, antialias: true, premultipliedAlpha: true }) as WebGLRenderingContext | null;
@@ -166,7 +167,9 @@ export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement
     if (!visible) return;
     if (r) {
       tgt.x = r.left + r.width / 2; tgt.y = r.top + r.height / 2; tgt.r = Math.min(r.width, r.height) / 2;
-      if (!inited) { pos.x = tgt.x; pos.y = tgt.y; pos.r = tgt.r; inited = true; }
+      // La boule colle à sa place : sinon, pendant le défilement, elle traîne derrière et passe sur le texte.
+      pos.x = tgt.x; pos.y = tgt.y;
+      if (!inited) { pos.r = tgt.r; inited = true; }
     }
     const g = gl!;
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
@@ -184,7 +187,7 @@ export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement
     const now = performance.now(), dt = Math.min((now - last) / 1000, 0.05); last = now;
     t += dt * (thinking ? 2.4 : 1);
     const k = 1 - Math.pow(0.0009, dt);
-    pos.x += (tgt.x - pos.x) * k * 0.9; pos.y += (tgt.y - pos.y) * k * 0.9; pos.r += (tgt.r - pos.r) * k * 0.9;
+    pos.r += (tgt.r - pos.r) * k * 0.9;
     pulseT += ((thinking ? 0.7 : 0) - pulseT) * (1 - Math.pow(0.2, dt));
     pulse += (pulseT - pulse) * (1 - Math.pow(0.001, dt));
     hot += ((thinking ? 0.5 : 0) - hot) * (1 - Math.pow(0.15, dt));
@@ -197,9 +200,10 @@ export function createOrb(canvas: HTMLCanvasElement, getSlots: () => HTMLElement
 
   const onResize = () => { resize(); if (reduce) draw(); };
   const onMove = (e: PointerEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; hasMouse = true; };
-  const onVis = () => { running = !document.hidden; if (running && !reduce) { last = performance.now(); loop(); } };
+  let lost = false;
+  const onVis = () => { running = !document.hidden && !lost; if (running && !reduce) { last = performance.now(); loop(); } };
   const onScroll = () => draw();
-  const onLost = (e: Event) => { e.preventDefault(); running = false; };
+  const onLost = (e: Event) => { e.preventDefault(); running = false; lost = true; cancelAnimationFrame(raf); onGone?.(); };
 
   resize();
   window.addEventListener("resize", onResize);

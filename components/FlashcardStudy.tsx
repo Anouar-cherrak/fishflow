@@ -177,7 +177,7 @@ export function FlashcardStudy({
         </div>
 
         <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden mb-5">
-          <div className="h-full bg-[#22C55E] transition-all duration-300" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-accent transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
 
         {done ? (
@@ -229,7 +229,7 @@ export function FlashcardStudy({
               </button>
               <button
                 onClick={close}
-                className="flex-1 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition ff-btn"
+                className="flex-1 py-2.5 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition ff-btn"
               >
                 Fermer
               </button>
@@ -262,7 +262,7 @@ export function FlashcardStudy({
               <button
                 onClick={() => answer(true)}
                 disabled={!flipped}
-                className="py-3 rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+                className="py-3 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
               >
                 Je savais
               </button>

@@ -56,7 +56,7 @@ export function ThemeToggle() {
       <span className="text-sm font-medium text-black">Mode sombre</span>
       <span
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
-          isDark ? "bg-[#22C55E]" : "bg-black/15"
+          isDark ? "bg-accent" : "bg-black/15"
         }`}
       >
         <span

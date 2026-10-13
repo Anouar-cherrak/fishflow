@@ -12,7 +12,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           <ul className="grid gap-3 text-black/80">
             {["3 fiches gratuites par mois", "Sans carte bancaire", "Tes fiches restent privées"].map((t) => (
               <li key={t} className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-[#22C55E]" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-accent" aria-hidden="true" />
                 {t}
               </li>
             ))}
@@ -23,7 +23,9 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
         <div className="w-full max-w-md mx-auto lg:mx-0 lg:justify-self-center ff-fade-up">
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-9">{children}</div>
+          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-9">
+            {children}
+          </div>
         </div>
       </div>
     </AppShell>

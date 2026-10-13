@@ -1,7 +1,7 @@
 /* Page d'accueil FishFlow : noir, blanc et un seul vert. Tout est limité à .lp pour ne pas toucher le reste du site. */
 .lp {
   --bg: #0A0A0A; --paper: #141414; --ink: #F5F5F5; --muted: #A8A8A8;
-  --line: rgba(245, 245, 245, 0.16); --hot: #22C55E; --on-hot: #04130A;
+  --line: rgba(245, 245, 245, 0.16); --hot: #38BDF8; --on-hot: #04121C;
   --shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.8);
   --display: var(--font-body), "Inter", "Helvetica Neue", Arial, sans-serif;
   --body: var(--font-body), "Inter", "Helvetica Neue", Arial, sans-serif;
@@ -10,9 +10,9 @@
   position: relative; isolation: isolate; min-height: 100vh;
 }
 .lp[data-theme="light"] {
-  --bg: #ECEAE5; --paper: #F8F7F4; --ink: #0A0A0A; --muted: #4A4A47;
-  --line: rgba(10, 10, 10, 0.18); --hot: #15803D; --on-hot: #FFFFFF;
-  --shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.25);
+  --bg: #EEF6F9; --paper: #FBFDFE; --ink: #0B1A2E; --muted: #47606F;
+  --line: rgba(11, 26, 46, 0.15); --hot: #0284C7; --on-hot: #FFFFFF;
+  --shadow: 0 30px 70px -30px rgba(14, 60, 90, 0.28);
   color-scheme: light;
 }
 .lp h1, .lp h2, .lp h3, .lp p, .lp ul, .lp dl, .lp dd { margin: 0; }
@@ -28,8 +28,8 @@
 .lp header.bar .brand { min-height: 44px; display: inline-flex; align-items: center; }
 .lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(14px); }
 .lp .brand { display: inline-flex; align-items: center; gap: 8px; font: 600 18px/1 var(--display); text-decoration: none; letter-spacing: -0.02em; }
-.lp .brand svg { width: 26px; height: 26px; }
-.lp .brand em { font-style: normal; font-weight: 400; }
+.lp .brand svg, .lp .brand img { width: auto; height: 36px; }
+.lp .brand em { font-style: normal; font-weight: 400; color: var(--ff-logo-blue); }
 .lp .bar-actions { display: flex; gap: 8px; }
 .lp .round { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; padding: 0; position: relative; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .lp .round:hover { transform: scale(1.1) rotate(-6deg); }
@@ -264,3 +264,31 @@
 .lp .pause { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-weight: 600; font-size: 15px; }
 .lp .pause:hover { background: var(--paper); }
 .lp .step.halt[aria-current="true"]::after { transition: none; }
+
+/* Fond d'eau profonde : bleu nuit en haut, qui se fond dans le noir habituel. */
+.lp { background: radial-gradient(1100px 620px at 85% 30%, rgba(14, 116, 144, 0.12), transparent 70%), linear-gradient(180deg, #07111c 0, var(--bg) 760px); }
+/* Thème clair : eau claire, du bleu lumineux en haut vers un bleu très pâle. */
+.lp[data-theme="light"] { background: radial-gradient(1100px 620px at 85% 30%, rgba(56, 189, 248, 0.16), transparent 70%), radial-gradient(900px 500px at 10% 70%, rgba(45, 212, 191, 0.10), transparent 70%), linear-gradient(180deg, #c9e6f3 0, var(--bg) 820px); }
+/* Logo de l'accueil : il plane comme dans l'application. */
+.lp .brand img { animation: ff-logo-glide 7s ease-in-out infinite; transform-origin: 50% 55%; }
+@media (prefers-reduced-motion: reduce) { .lp .brand img { animation: none; } }
+
+/* Fiche d'exemple qui se remplit toute seule (étapes pilotées par la page). */
+.lp .fd-step { opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.lp .fd-step.on { opacity: 1; transform: none; }
+.lp .fd-opt { transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.lp .fd-opt.ok { transform: scale(1.03); }
+
+/* Apparition douce des blocs au défilement. */
+.lp .rv { opacity: 0; transform: translateY(18px); transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1); }
+.lp .rv.rv-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lp .fd-step, .lp .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+/* Boule de secours (sans 3D) : une sphère dessinée en CSS, qui flotte et « réfléchit » pendant la démo. */
+.lp .slot-css { border-radius: 50%; background: radial-gradient(circle at 34% 28%, #ffffff 0, #cfe9f8 18%, #5bb8e8 46%, #1a4f7a 78%, #0b1a2e 100%); box-shadow: 0 30px 60px -20px rgba(14, 116, 144, 0.55), inset -12px -18px 40px rgba(0, 0, 0, 0.35); animation: lpOrbFloat 5s ease-in-out infinite; }
+.lp .slot-css[data-phase="thinking"], .lp .slot-css[data-phase="typing"] { animation: lpOrbThink 1.1s ease-in-out infinite; }
+@keyframes lpOrbFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-8px) scale(1.02); } }
+@keyframes lpOrbThink { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .lp .slot-css { animation: none; } }

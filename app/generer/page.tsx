@@ -10,6 +10,7 @@ import { trackEvent } from "@/lib/tracking";
 import { track } from "@/lib/track";
 import type { User } from "@supabase/supabase-js";
 import { LIMITS } from "@/lib/limits";
+import { FishSchool } from "@/components/Ocean";
 
 type Mode = "text" | "pdf" | "photo";
 type OutputKey = "summary" | "sheet" | "flashcards" | "quiz";
@@ -323,17 +324,15 @@ function GenererContent() {
   });
 
   const dropClass =
-    (dragging ? "border-[#22C55E] bg-surface " : "") +
-    "w-full min-h-[220px] lg:min-h-[320px] p-8 border border-dashed border-black/25 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#22C55E] hover:bg-surface transition";
+    (dragging ? "border-accent bg-surface " : "") +
+    "w-full min-h-[220px] lg:min-h-[320px] p-8 border border-dashed border-black/25 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-accent hover:bg-surface transition";
 
   return (
     <AppShell size="wide">
       {loading && (
         <div role="status" aria-live="polite" className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[70] px-6 text-center">
-          <div className="ff-doc-anim mb-8" aria-hidden="true">
-            <span /><span /><span /><span /><span />
-            <i />
-          </div>
+          {/* Un petit banc de poissons nage pendant que la fiche se prépare. */}
+          <FishSchool />
           <p className="text-black font-semibold text-lg mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
           <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
             <div
@@ -401,7 +400,7 @@ function GenererContent() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Colle ici un cours, un article, un chapitre ou tes notes..."
-                className="w-full h-44 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent text-base ff-input resize-y"
+                className="w-full h-44 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-base ff-input resize-y"
               />
             </>
           )}
@@ -504,7 +503,7 @@ function GenererContent() {
                   id="niveau"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
+                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
                 >
                   <option value="facile">Facile</option>
                   <option value="moyen">Moyen</option>
@@ -518,7 +517,7 @@ function GenererContent() {
                   id="longueur"
                   value={length}
                   onChange={(e) => setLength(e.target.value as Length)}
-                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] ff-input"
+                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
                 >
                   <option value="court">Court</option>
                   <option value="moyen">Moyen</option>
@@ -534,14 +533,14 @@ function GenererContent() {
                   <label
                     key={opt.key}
                     className={`flex items-center gap-2 min-h-[48px] px-4 rounded-2xl border cursor-pointer text-sm font-medium transition ${
-                      outputs.includes(opt.key) ? "bg-surface border-[#22C55E] text-black" : "bg-white border-black/15 text-black/55 hover:border-black/40"
+                      outputs.includes(opt.key) ? "bg-surface border-accent text-black" : "bg-white border-black/15 text-black/55 hover:border-black/40"
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={outputs.includes(opt.key)}
                       onChange={() => toggleOutput(opt.key)}
-                      className="accent-[#22C55E] w-4 h-4"
+                      className="accent-[var(--ff-accent)] w-4 h-4"
                     />
                     {opt.label}
                   </label>
@@ -570,7 +569,7 @@ function GenererContent() {
 
           {user && usage && !usage.isPro && (
             <section aria-label="Ton offre" className="bg-surface border border-black/10 rounded-3xl overflow-hidden">
-              <p className={`px-5 py-3 text-sm font-semibold ${usage.remaining === 0 ? "text-[#22C55E]" : "text-black/80"}`}>
+              <p className={`px-5 py-3 text-sm font-semibold ${usage.remaining === 0 ? "text-accent" : "text-black/80"}`}>
                 {usage.remaining === 0
                   ? `Tu as atteint ta limite gratuite de ce mois-ci. Elle se remet à zéro ${usage.resetMonth ?? "le mois prochain"}.`
                   : `Il te reste ${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
@@ -583,7 +582,7 @@ function GenererContent() {
                   <p className="text-sm text-black/65">Historique de 5 fiches</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-[#22C55E] mb-2">Pro</p>
+                  <p className="text-xs font-semibold text-accent mb-2">Pro</p>
                   <p className="text-sm font-medium">{LIMITS.pro.fichesPerMonth} fiches par mois</p>
                   <p className="text-sm font-medium">Cours jusqu'à 15 pages</p>
                   <p className="text-sm font-medium">Plusieurs PDF à la fois</p>

@@ -200,7 +200,7 @@ export default function MesFiches() {
       </div>
 
       {dueCount > 0 && (
-        <div className="mb-8 bg-surface border border-[#22C55E]/50 rounded-3xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 ff-fade-up">
+        <div className="mb-8 bg-surface border border-accent/50 rounded-3xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 ff-fade-up">
           <p className="text-black">
             <span className="font-extrabold text-xl mr-1">{dueCount}</span> carte{dueCount > 1 ? "s" : ""} à réviser aujourd&apos;hui
           </p>
@@ -251,7 +251,7 @@ export default function MesFiches() {
               type="button"
               onClick={() => setShowNewFolder(!showNewFolder)}
               aria-expanded={showNewFolder}
-              className="shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold border border-dashed border-black/30 text-black/60 hover:border-[#22C55E] hover:text-black transition whitespace-nowrap lg:w-full lg:rounded-2xl"
+              className="shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold border border-dashed border-black/30 text-black/60 hover:border-accent hover:text-black transition whitespace-nowrap lg:w-full lg:rounded-2xl"
             >
               + Nouveau dossier (matière)
             </button>
@@ -266,7 +266,7 @@ export default function MesFiches() {
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 placeholder="Matière (ex : Anglais, Droit...)"
-                className="w-full min-h-[44px] px-3 border border-black/15 rounded-xl mb-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]"
+                className="w-full min-h-[44px] px-3 border border-black/15 rounded-xl mb-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent"
                 autoFocus
               />
               <div className="flex items-center gap-2 mb-3 flex-wrap" role="group" aria-label="Couleur du dossier">
@@ -277,7 +277,7 @@ export default function MesFiches() {
                     onClick={() => setNewFolderColor(c.value)}
                     aria-pressed={newFolderColor === c.value}
                     className={`w-8 h-8 rounded-full transition ${
-                      newFolderColor === c.value ? "ring-2 ring-offset-2 ring-offset-[var(--ff-surface)] ring-[#22C55E]" : ""
+                      newFolderColor === c.value ? "ring-2 ring-offset-2 ring-offset-[var(--ff-surface)] ring-accent" : ""
                     }`}
                     style={{ backgroundColor: c.value }}
                     title={c.name}
@@ -338,9 +338,9 @@ export default function MesFiches() {
                               if (e.key === "Escape") cancelEditing();
                             }}
                             autoFocus
-                            className="flex-1 min-w-0 min-h-[44px] px-3 border border-black/30 rounded-xl text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]"
+                            className="flex-1 min-w-0 min-h-[44px] px-3 border border-black/30 rounded-xl text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-accent"
                           />
-                          <button type="button" onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-sm font-semibold text-[#22C55E] shrink-0 disabled:opacity-50 min-h-[44px] px-1">
+                          <button type="button" onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-sm font-semibold text-accent shrink-0 disabled:opacity-50 min-h-[44px] px-1">
                             OK
                           </button>
                           <button type="button" onClick={cancelEditing} className="text-sm text-black/50 shrink-0 min-h-[44px] px-1">
@@ -359,7 +359,7 @@ export default function MesFiches() {
                             {fiche.best_score !== null && (
                               <span
                                 className={`text-xs px-2 py-0.5 rounded-full font-semibold shrink-0 ${
-                                  fiche.best_score >= 80 ? "bg-[#22C55E] text-[#04130A]" : "bg-white border border-black/15 text-black/60"
+                                  fiche.best_score >= 80 ? "bg-accent text-on-accent" : "bg-white border border-black/15 text-black/60"
                                 }`}
                               >
                                 Quiz {fiche.best_score}%

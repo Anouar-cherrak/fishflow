@@ -24,14 +24,20 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "FishFlow",
   },
+  // Icônes générées depuis la mascotte par scripts/brand.mjs.
   icons: {
-    icon: "/favicon.ico",
-    apple: "/icons/icon-512.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+      { url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180" },
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  // Couleur de la barre du navigateur : le haut du fond « océan » du thème sombre.
+  themeColor: "#07111c",
   // L'appli installée passe sous la barre d'état de l'iPhone : les marges « safe-area » du CSS laissent la place à l'encoche.
   viewportFit: "cover",
 };

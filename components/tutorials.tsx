@@ -16,7 +16,7 @@ function Mark() {
     <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
       <path d="M4 20C4 20 8 12 16 12C24 12 28 20 28 20" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
       <path d="M4 24C4 24 8 16 16 16C24 16 28 24 28 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity=".4" />
-      <circle cx="16" cy="8" r="3" fill="#22C55E" />
+      <circle cx="16" cy="8" r="3" fill="var(--ff-accent)" />
     </svg>
   );
 }

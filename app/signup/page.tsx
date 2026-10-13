@@ -125,7 +125,7 @@ export default function Signup() {
               inputMode="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
+              className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
               placeholder="toi@exemple.com"
             />
 
@@ -135,12 +135,12 @@ export default function Signup() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
+              className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
               placeholder="6 caractères minimum"
             />
 
             <label className="flex items-center gap-2 text-sm text-black/70 min-h-[44px] -mt-2 mb-2 cursor-pointer">
-              <input type="checkbox" checked={showPwd} onChange={(e) => setShowPwd(e.target.checked)} className="w-4 h-4 accent-[#22C55E]" />
+              <input type="checkbox" checked={showPwd} onChange={(e) => setShowPwd(e.target.checked)} className="w-4 h-4 accent-[var(--ff-accent)]" />
               Afficher le mot de passe
             </label>
 
@@ -157,7 +157,7 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading || !email || !password}
-              className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+              className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Envoi du code..." : "Créer mon compte"}
             </button>
@@ -170,7 +170,7 @@ export default function Signup() {
           <>
             <h1 className="text-2xl font-bold tracking-tight mb-1">Vérifie ton email</h1>
             <p className="text-black/60 mb-2">Entre le code reçu à {email}</p>
-            <p role="note" className="text-sm text-black bg-white border border-[#22C55E] rounded-2xl p-3 mb-6">
+            <p role="note" className="text-sm text-black bg-white border border-accent rounded-2xl p-3 mb-6">
               <strong>Pense aux spams.</strong> Le mail avec ton code arrive souvent dans le courrier indésirable. Il vient de FishFlow.
             </p>
 
@@ -184,7 +184,7 @@ export default function Signup() {
               autoFocus
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className="w-full min-h-[56px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent ff-input"
+              className="w-full min-h-[56px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
               placeholder="000000"
             />
 
@@ -197,7 +197,7 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading || code.length < 6}
-              className="w-full min-h-[48px] rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-30 ff-btn"
+              className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Vérification..." : "Confirmer mon compte"}
             </button>

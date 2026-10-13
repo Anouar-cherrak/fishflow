@@ -54,7 +54,7 @@ export function UpgradeModal({
 
         <button
           onClick={onUpgrade}
-          className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn mb-2"
+          className="w-full py-3 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition ff-btn mb-2"
         >
           Voir les tarifs Pro — 4,99 €/mois
         </button>

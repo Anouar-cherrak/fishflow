@@ -61,7 +61,7 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
     <AppShell size="normal">
       <article className="grid gap-8">
         <header>
-          <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision partagée</p>
+          <p className="text-sm font-semibold text-accent mb-2">Fiche de révision partagée</p>
           <h1 className="ff-title">{fiche.title || "Fiche de révision"}</h1>
           <div className="mt-4">
             <CopyFiche shareId={id} title={fiche.title} data={fiche.data as Record<string, unknown>} className="ff-primary ff-btn" />
@@ -86,7 +86,7 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
             <ul className="grid gap-2.5 md:grid-cols-2">
               {sheet.map((point, i) => (
                 <li key={i} className="bg-surface rounded-2xl border border-black/10 p-4 flex gap-3">
-                  <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />
+                  <span className="mt-2 w-2 h-2 rounded-full bg-accent shrink-0" aria-hidden="true" />
                   <span className="text-black/80">{point}</span>
                 </li>
               ))}
@@ -110,7 +110,7 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
           </section>
         )}
 
-        <section className="rounded-3xl border border-[#22C55E]/60 bg-surface p-6 sm:p-8 grid gap-4 justify-items-start">
+        <section className="rounded-3xl border border-accent/60 bg-surface p-6 sm:p-8 grid gap-4 justify-items-start">
           <h2 className="text-2xl font-extrabold tracking-tight">Fais la même chose avec ton cours.</h2>
           <p className="text-black/70 max-w-[52ch]">
             Colle ton cours, envoie un PDF ou prends-le en photo. FishFlow en fait une fiche, des flashcards{quiz && quiz.length > 0 ? " et un quiz" : ""}, en quelques secondes. 3 fiches gratuites par mois.

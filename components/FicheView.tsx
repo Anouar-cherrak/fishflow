@@ -372,7 +372,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               {template === "cornell" ? (
                 <>
                   <h3 className="font-bold text-black px-4 pt-4 md:py-4 md:border-r border-black/10">
-                    <span className="text-[#22C55E] tabular-nums mr-2">{i + 1}.</span>
+                    <span className="text-accent tabular-nums mr-2">{i + 1}.</span>
                     {s.title}
                   </h3>
                   <div className="px-4 py-4">
@@ -382,7 +382,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               ) : (
                 <>
                   <h3 className={`font-bold tracking-tight text-black ${template === "memo" ? "mb-2" : "text-lg mb-3"}`}>
-                    <span className="text-[#22C55E] tabular-nums mr-2">{i + 1}.</span>
+                    <span className="text-accent tabular-nums mr-2">{i + 1}.</span>
                     {s.title}
                   </h3>
                   <FicheSectionBody blocks={s.blocks} />
@@ -395,10 +395,10 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
         <div className={sheetWrap}>
           {(data.sheet ?? []).map((point, i) => (
             <div key={i} ref={(el) => { sheetItemRefs.current[i] = el; }} className={sheetItem(i, data.sheet!.length)}>
-              {template === "classique" && <span className="mt-2 w-2 h-2 rounded-full bg-[#22C55E] shrink-0" aria-hidden="true" />}
-              {template === "memo" && <span className="text-[#22C55E] font-bold tabular-nums shrink-0 w-6" aria-hidden="true">{i + 1}.</span>}
+              {template === "classique" && <span className="mt-2 w-2 h-2 rounded-full bg-accent shrink-0" aria-hidden="true" />}
+              {template === "memo" && <span className="text-accent font-bold tabular-nums shrink-0 w-6" aria-hidden="true">{i + 1}.</span>}
               {template === "cornell" && (
-                <span className="border-r border-black/10 grid place-items-start justify-items-center pt-3.5 text-[#22C55E] font-bold tabular-nums" aria-hidden="true">{i + 1}</span>
+                <span className="border-r border-black/10 grid place-items-start justify-items-center pt-3.5 text-accent font-bold tabular-nums" aria-hidden="true">{i + 1}</span>
               )}
               <span className={`text-black/80 ${template === "cornell" ? "px-4 py-3" : ""}`}>{point}</span>
             </div>
@@ -413,7 +413,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       <div className={exporting ? "ff-force-light" : ""}>
         <div className="grid gap-8 lg:gap-x-12 lg:gap-y-6 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
           <div ref={logoRef} className="lg:col-start-1 lg:row-start-1">
-            <p className="text-sm font-semibold text-[#22C55E] mb-2">Fiche de révision</p>
+            <p className="text-sm font-semibold text-accent mb-2">Fiche de révision</p>
             <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
             <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
           </div>
@@ -510,7 +510,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                     <h2 className="text-xl font-bold tracking-tight text-black">{hasEssentiel ? "L'essentiel en 5 lignes" : "Résumé"}</h2>
                     <div className="flex items-center gap-4">
                       {isPro && (
-                        <button type="button" onClick={toggleSpeak} className="text-sm text-[#22C55E] font-semibold hover:underline min-h-[44px]">
+                        <button type="button" onClick={toggleSpeak} className="text-sm text-accent font-semibold hover:underline min-h-[44px]">
                           {isSpeaking ? "Arrêter" : "Écouter"}
                         </button>
                       )}
@@ -573,7 +573,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                       </div>
                       <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${bestScore >= 80 ? "bg-[#22C55E]" : "bg-black/40"}`}
+                          className={`h-full rounded-full transition-all ${bestScore >= 80 ? "bg-accent" : "bg-black/40"}`}
                           style={{ width: `${bestScore}%` }}
                         />
                       </div>

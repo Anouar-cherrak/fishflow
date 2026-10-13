@@ -77,7 +77,7 @@ export default function Pricing() {
         <div className="w-full max-w-sm mx-auto bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
           <p className="text-black/50 text-sm mb-6">Jusqu'à 100 fiches par mois, déjà actives sur ton compte.</p>
-          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn">
+          <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition ff-btn">
             Retour à l'outil
           </button>
         </div>
@@ -94,7 +94,7 @@ export default function Pricing() {
       </div>
 
       <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[380px_minmax(0,1fr)] items-start">
-        <div className="bg-white border border-[#22C55E]/60 rounded-3xl p-8 text-center ff-fade-up ff-card lg:sticky lg:top-24">
+        <div className="bg-white border border-accent/60 rounded-3xl p-8 text-center ff-fade-up ff-card lg:sticky lg:top-24">
           <div className="flex items-center justify-center gap-2 mb-5">
             <Logo size={24} />
             <Wordmark />
@@ -103,7 +103,7 @@ export default function Pricing() {
           <h2 className="text-xl font-semibold mb-1">FishFlow Pro</h2>
           <ul className="text-left text-sm grid gap-2 mb-6" aria-label="Ce que tu gagnes avec Pro">
             {["100 fiches par mois", "Cours jusqu'à 15 pages, plusieurs PDF d'un coup", "Quiz de 12 questions", "20 questions par jour dans Apprendre", "Toutes tes fiches gardées", "Résumé lu à voix haute", "Tes cartes difficiles et ta progression sur 30 jours"].map((b) => (
-              <li key={b} className="flex gap-2"><span className="text-[#22C55E] font-bold" aria-hidden="true">✓</span><span>{b}</span></li>
+              <li key={b} className="flex gap-2"><span className="text-accent font-bold" aria-hidden="true">✓</span><span>{b}</span></li>
             ))}
           </ul>
 
@@ -113,7 +113,7 @@ export default function Pricing() {
           <button
             onClick={handleUpgrade}
             disabled={loading}
-            className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition disabled:opacity-50 ff-btn"
+            className="w-full py-3 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-50 ff-btn"
           >
             {loading ? "Redirection..." : "Passer Pro, 4,99 €/mois"}
           </button>
@@ -130,7 +130,7 @@ export default function Pricing() {
                 <tr className="border-b border-black/10">
                   <th scope="col" className="p-3 sm:p-4 w-[34%] sm:w-auto"><span className="sr-only">Fonctionnalité</span></th>
                   <th scope="col" className="p-3 sm:p-4 font-semibold">Gratuit</th>
-                  <th scope="col" className="p-3 sm:p-4 font-semibold"><span className="border-b-2 border-[#22C55E] pb-0.5">Pro</span></th>
+                  <th scope="col" className="p-3 sm:p-4 font-semibold"><span className="border-b-2 border-accent pb-0.5">Pro</span></th>
                 </tr>
               </thead>
               <tbody>

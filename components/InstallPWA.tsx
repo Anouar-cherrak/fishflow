@@ -57,7 +57,7 @@ export function InstallPWA() {
 
       <button
         onClick={handleClick}
-        className="text-sm font-semibold px-4 min-h-[44px] rounded-full bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition shrink-0 ff-btn"
+        className="text-sm font-semibold px-4 min-h-[44px] rounded-full bg-accent text-on-accent hover:bg-accent-strong transition shrink-0 ff-btn"
       >
         Télécharger l'application
       </button>

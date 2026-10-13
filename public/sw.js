@@ -1,5 +1,5 @@
-const CACHE_NAME = "fishflow-shell-v3";
-const APP_SHELL = ["/icons/icon-192.png", "/icons/icon-512.png"];
+const CACHE_NAME = "fishflow-shell-v7";
+const APP_SHELL = ["/icons/icon-192.png", "/icons/icon-512.png", "/brand/logo-sm.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

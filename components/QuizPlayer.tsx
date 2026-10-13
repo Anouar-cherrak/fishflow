@@ -67,13 +67,13 @@ export function QuizPlayer({
         <p className="text-sm text-black/60 mb-4">
           {correctCount} / {quiz.length} bonnes réponses
         </p>
-        <p className={`text-sm font-medium mb-4 ${mastered ? "text-[#16A34A]" : "text-black/60"}`}>
+        <p className={`text-sm font-medium mb-4 ${mastered ? "text-accent-strong" : "text-black/60"}`}>
           {mastered ? "Fiche maîtrisée !" : "Continue, tu y es presque"}
         </p>
         {saving && <p className="text-xs text-black/30 mb-3">Sauvegarde du score...</p>}
         <button
           onClick={restart}
-          className="text-sm px-5 py-2.5 rounded-full bg-[#22C55E] text-[#04130A] font-semibold hover:bg-[#16A34A] transition ff-btn"
+          className="text-sm px-5 py-2.5 rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
         >
           Refaire le quiz
         </button>
@@ -93,7 +93,7 @@ export function QuizPlayer({
           {quiz.map((_, i) => (
             <div
               key={i}
-              className={`w-3 sm:w-6 h-1.5 rounded-full shrink-0 ${i <= current ? "bg-[#22C55E]" : "bg-black/10"}`}
+              className={`w-3 sm:w-6 h-1.5 rounded-full shrink-0 ${i <= current ? "bg-accent" : "bg-black/10"}`}
             />
           ))}
         </div>
@@ -137,7 +137,7 @@ export function QuizPlayer({
       {selected !== null && (
         <button
           onClick={handleNext}
-          className="w-full py-2.5 rounded-full bg-[#22C55E] text-[#04130A] font-semibold hover:bg-[#16A34A] transition ff-btn"
+          className="w-full py-2.5 rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
         >
           {current + 1 < quiz.length ? "Question suivante" : "Voir mon score"}
         </button>

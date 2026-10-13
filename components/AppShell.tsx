@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppNav } from "@/components/AppNav";
+import { Ocean } from "@/components/Ocean";
 
 type Size = "form" | "normal" | "wide";
 
@@ -8,6 +9,7 @@ type Size = "form" | "normal" | "wide";
 export function AppShell({ children, size = "normal", nav = true }: { children: ReactNode; size?: Size; nav?: boolean }) {
   return (
     <div className="ff-frame">
+      <Ocean />
       {nav && <AppNav />}
       <main className="ff-main" data-size={size}>
         {children}

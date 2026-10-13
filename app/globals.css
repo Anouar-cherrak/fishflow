@@ -4,18 +4,25 @@
   --color-white: var(--ff-bg);
   --color-black: var(--ff-fg);
   --color-surface: var(--ff-surface);
+  /* Couleur principale de la marque (bleu de l'eau), réglée par thème plus bas. */
+  --color-accent: var(--ff-accent);
+  --color-accent-strong: var(--ff-accent-strong);
+  --color-on-accent: var(--ff-on-accent);
 }
 
 :root {
   --font-body: 'Inter', sans-serif;
   --font-display: var(--font-body);
-  --ff-bg: #eceae5;
-  --ff-fg: #0a0a0a;
-  --ff-surface: #f8f7f4;
-  --ff-back: #dfddd7;
-  --ff-line: rgba(10, 10, 10, 0.17);
-  --ff-accent: #22c55e;
-  --ff-on-accent: #04130a;
+  /* Thème clair : eau claire, peu profonde (bleus très doux), texte bleu nuit. */
+  --ff-bg: #eef6f9;
+  --ff-fg: #0b1a2e;
+  --ff-surface: #fbfdfe;
+  --ff-back: #d6e8f0;
+  --ff-line: rgba(11, 26, 46, 0.14);
+  /* Bleu « eau » : plus soutenu en thème clair pour rester lisible sur fond pâle. */
+  --ff-accent: #0284c7;
+  --ff-accent-strong: #0369a1;
+  --ff-on-accent: #ffffff;
 }
 
 :root.dark {
@@ -24,6 +31,9 @@
   --ff-surface: #151515;
   --ff-back: #000000;
   --ff-line: rgba(245, 245, 245, 0.14);
+  --ff-accent: #38bdf8;
+  --ff-accent-strong: #0ea5e9;
+  --ff-on-accent: #04121c;
   color-scheme: dark;
 }
 
@@ -140,7 +150,7 @@ body {
 }
 
 .ff-progress-shimmer {
-  background: linear-gradient(90deg, #22C55E 0%, #4ADE80 50%, #22C55E 100%);
+  background: linear-gradient(90deg, var(--ff-accent) 0%, #7dd3fc 50%, var(--ff-accent) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
@@ -287,7 +297,7 @@ body {
 .ff-frame {
   position: relative;
   background:
-    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, #22c55e 9%, transparent), transparent 70%),
+    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, var(--ff-accent) 10%, transparent), transparent 70%),
     var(--ff-bg);
 }
 .ff-main {
@@ -415,7 +425,7 @@ body {
   color: var(--ff-on-accent);
   font-weight: 600;
 }
-.ff-primary:hover:not(:disabled) { background: #4ade80; }
+.ff-primary:hover:not(:disabled) { background: var(--ff-accent-strong); }
 .ff-primary:disabled { opacity: 0.35; }
 .ff-secondary {
   display: inline-flex;
@@ -542,7 +552,7 @@ body {
 .ff-tuto-boxes i { position: absolute; width: 26px; height: 18px; border-radius: 5px; background: var(--ff-accent); left: 24px; bottom: 56px; animation: ffTutoHop 3.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
 @keyframes ffTutoHop { 0%, 8% { transform: translate(0, 0); } 25% { transform: translate(52px, -20px); } 42% { transform: translate(104px, -40px); } 60% { transform: translate(156px, -60px); } 78%, 100% { transform: translate(208px, -80px); } }
 /* 4. la boule et les images */
-.ff-tuto-orb u { width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fff 0, #cfd3d8 18%, #3a3d42 55%, #0b0c0e 100%); box-shadow: 0 0 40px rgba(34, 197, 94, 0.28); }
+.ff-tuto-orb u { width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fff 0, #cfd3d8 18%, #3a3d42 55%, #0b0c0e 100%); box-shadow: 0 0 40px rgba(56, 189, 248, 0.28); }
 .ff-tuto-orb em { position: absolute; width: 38px; height: 50px; border-radius: 8px; background: linear-gradient(135deg, var(--ff-accent), #0e3b1d); opacity: 0; animation: ffTutoSpit 3s ease-out infinite; }
 .ff-tuto-orb em:nth-of-type(1) { --x: -90px; } .ff-tuto-orb em:nth-of-type(2) { --x: 0px; animation-delay: 0.2s; } .ff-tuto-orb em:nth-of-type(3) { --x: 90px; animation-delay: 0.4s; }
 @keyframes ffTutoSpit { 0%, 10% { opacity: 0; transform: translate(0, 0) scale(0.3); } 40% { opacity: 1; } 70%, 100% { opacity: 1; transform: translate(var(--x), 40px) scale(1) rotate(calc(var(--x) / 12)); } }
@@ -595,11 +605,11 @@ body {
 .ex-days { display: flex; gap: 8px; margin-top: 6px; font-size: 11px; opacity: 0.6; } .ex-days span { flex: 1; text-align: center; }
 .ex-input { border: 1px solid var(--ff-line); border-radius: 999px; padding: 12px 16px; background: var(--ff-bg); font-size: 14px; }
 .ex-type { display: inline-block; white-space: nowrap; overflow: hidden; border-right: 2px solid var(--ff-fg); animation: exType 2.4s 0.3s steps(26, end) both; max-width: 100%; }
-.ex-orb { display: block; width: 84px; height: 84px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #9aa 40%, #333 100%); box-shadow: 0 0 40px rgba(34, 197, 94, 0.35); animation: exPulse 1.4s ease-in-out infinite; }
+.ex-orb { display: block; width: 84px; height: 84px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #9aa 40%, #333 100%); box-shadow: 0 0 40px rgba(56, 189, 248, 0.35); animation: exPulse 1.4s ease-in-out infinite; }
 .ex-dots { display: flex; gap: 6px; } .ex-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ff-fg); opacity: 0.3; animation: exDot 1.2s ease-in-out infinite; } .ex-dots i:nth-child(2) { animation-delay: 0.2s; } .ex-dots i:nth-child(3) { animation-delay: 0.4s; }
 .ex-img { display: block; aspect-ratio: 4 / 3; border-radius: 10px; background: linear-gradient(135deg, var(--ff-line), transparent), var(--ff-bg); border: 1px solid var(--ff-line); }
 .ex-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--ff-line); border-radius: 12px; padding: 10px 12px; font-size: 13px; background: var(--ff-bg); }
-.ex-link b { color: #22C55E; font-size: 12px; } .ex-link.off span { text-decoration: line-through; opacity: 0.5; } .ex-link.off b { color: #EF4444; }
+.ex-link b { color: var(--ff-accent); font-size: 12px; } .ex-link.off span { text-decoration: line-through; opacity: 0.5; } .ex-link.off b { color: #EF4444; }
 .ex-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--ff-fg); color: var(--ff-bg); margin: 0; }
 .ex-toggle { width: 46px; height: 26px; border-radius: 999px; background: var(--ff-accent); position: relative; animation: exToggle 0.5s 1s ease both; }
 .ex-toggle i { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; animation: exKnob 0.5s 1s ease both; }
@@ -686,7 +696,7 @@ body {
 .sx-flash { border-radius: 24px; border: 1px solid var(--ff-line); background: var(--ff-surface); display: grid; place-content: center; text-align: center; padding: 30px; gap: 14px; position: relative; }
 .sx-flash .q { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
 .sx-flash small { font-size: 13px; opacity: 0.5; }
-.sx-orb { width: 128px; height: 128px; border-radius: 50%; margin: 0 auto; background: radial-gradient(circle at 34% 28%, #fff 0 6%, #cfd4d1 14%, #4a4f4c 46%, #0b0d0c 74%); box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 18px 50px rgba(34,197,94,.18); }
+.sx-orb { width: 128px; height: 128px; border-radius: 50%; margin: 0 auto; background: radial-gradient(circle at 34% 28%, #fff 0 6%, #cfd4d1 14%, #4a4f4c 46%, #0b0d0c 74%); box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 18px 50px rgba(56,189,248,.18); }
 .sx-orb.think { animation: sxThink 1.1s ease-in-out infinite; }
 .sx-ask { position: absolute; left: 0; right: 0; bottom: 0; height: 74px; border-top: 1px solid var(--ff-line); display: flex; justify-content: center; align-items: center; gap: 10px; background: var(--ff-bg); }
 .sx-ask .in { width: 400px; height: 46px; border-radius: 999px; border: 1px solid var(--ff-line); background: var(--ff-surface); padding: 0 18px; display: flex; align-items: center; font-size: 15px; overflow: hidden; position: relative; }
@@ -816,8 +826,8 @@ body {
 .ff-tab[aria-current="page"] { color: var(--ff-fg); }
 .ff-tab[aria-current="page"] .ff-tab-icon { background: color-mix(in srgb, var(--ff-accent) 18%, transparent); color: var(--ff-accent); }
 .ff-tab-icon { display: grid; place-items: center; width: 44px; height: 28px; border-radius: 999px; transition: background 0.2s, color 0.2s; }
-.ff-tab[data-main="true"] .ff-tab-icon { background: var(--ff-accent); color: #04130A; }
-.ff-tab[data-main="true"][aria-current="page"] .ff-tab-icon { background: var(--ff-accent); color: #04130A; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ff-accent) 30%, transparent); }
+.ff-tab[data-main="true"] .ff-tab-icon { background: var(--ff-accent); color: var(--ff-on-accent); }
+.ff-tab[data-main="true"][aria-current="page"] .ff-tab-icon { background: var(--ff-accent); color: var(--ff-on-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ff-accent) 30%, transparent); }
 /* La page laisse la place à la barre pour que rien ne soit caché dessous. */
 @media (max-width: 767px) {
   .ff-frame:has(.ff-tabs) .ff-main { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
@@ -830,3 +840,199 @@ body {
 .grid > *, .ff-main > * { min-width: 0; }
 .ff-main { overflow-wrap: break-word; }
 .ff-main :where(button, a, input, select, textarea, svg, img, canvas) { overflow-wrap: normal; }
+
+/* ===== Ambiance aquatique (octobre 2026) =====
+   Même design (thème sombre, vert, mêmes pages) avec un fond d'eau profonde, des bulles, des vagues
+   et une raie qui flotte. Uniquement transform et opacity, rien qui ne bouge la mise en page.
+   Tout s'arrête si la personne demande moins d'animations (voir la fin de ce bloc). */
+:root {
+  --ff-ocean-top: #c9e6f3;
+  --ff-ocean-glow: rgba(56, 189, 248, 0.18);
+  --ff-bubble: rgba(14, 116, 144, 0.26);
+  --ff-fish: rgba(14, 116, 144, 0.16);
+  --ff-fish-eye: rgba(255, 255, 255, 0.7);
+}
+:root.dark {
+  --ff-ocean-top: #07111c;
+  --ff-ocean-glow: color-mix(in srgb, #0e7490 14%, transparent);
+  --ff-bubble: rgba(186, 230, 253, 0.2);
+  --ff-fish: rgba(125, 211, 252, 0.11);
+  --ff-fish-eye: rgba(0, 0, 0, 0.5);
+}
+
+/* Thème clair : des rayons de soleil qui traversent l'eau, depuis le haut. */
+:root:not(.dark) .ff-ocean::before {
+  content: ""; position: absolute; left: -20%; right: -20%; top: 0; height: 75vh;
+  background: repeating-linear-gradient(105deg, transparent 0 70px, rgba(255, 255, 255, 0.55) 95px, transparent 130px, transparent 210px);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+  mask-image: linear-gradient(to bottom, #000, transparent);
+  opacity: 0.55; will-change: transform;
+  animation: ff-rays 22s ease-in-out infinite alternate;
+}
+@keyframes ff-rays { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, 0, 0); } }
+@media (prefers-reduced-motion: reduce) { :root:not(.dark) .ff-ocean::before { animation: none; } }
+
+/* Fond : bleu nuit en haut, qui se fond dans la couleur habituelle de la page, avec un halo bleu-vert. */
+.ff-frame {
+  isolation: isolate;
+  background:
+    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, var(--ff-accent) 10%, transparent), transparent 70%),
+    radial-gradient(1100px 620px at 90% 105%, var(--ff-ocean-glow), transparent 70%),
+    linear-gradient(180deg, var(--ff-ocean-top) 0%, var(--ff-bg) 520px);
+}
+
+.ff-ocean { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
+.ff-ocean i {
+  position: absolute; bottom: -24px; left: var(--x);
+  width: var(--s); height: var(--s); border-radius: 50%;
+  border: 1px solid var(--ff-bubble);
+  background: radial-gradient(circle at 32% 30%, color-mix(in srgb, var(--ff-bubble) 90%, transparent), transparent 62%);
+  opacity: 0; will-change: transform, opacity;
+  animation: ff-rise var(--d) linear var(--delay) infinite;
+}
+@keyframes ff-rise {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  12% { opacity: 0.9; }
+  85% { opacity: 0.55; }
+  100% { transform: translate3d(var(--drift), -110vh, 0); opacity: 0; }
+}
+/* Reflets d'eau : de grandes taches de lumière très pâles qui dérivent lentement. */
+.ff-caustic {
+  position: absolute; inset: -30% -30% auto -30%; height: 90vh;
+  background:
+    radial-gradient(40% 18% at 30% 40%, color-mix(in srgb, #7dd3fc 7%, transparent), transparent 70%),
+    radial-gradient(30% 14% at 70% 25%, color-mix(in srgb, #2dd4bf 6%, transparent), transparent 70%),
+    radial-gradient(26% 12% at 55% 60%, color-mix(in srgb, #7dd3fc 5%, transparent), transparent 70%);
+  opacity: 0.8; will-change: transform;
+  animation: ff-caustic 26s ease-in-out infinite alternate;
+}
+@keyframes ff-caustic {
+  from { transform: translate3d(-4%, 0, 0) scale(1); }
+  to { transform: translate3d(4%, 3%, 0) scale(1.08); }
+}
+/* Téléphone : moins de bulles. */
+@media (max-width: 767px) {
+  .ff-ocean i:nth-child(3n) { display: none; }
+}
+
+/* Vagues douces entre les sections de la page d'accueil. */
+.ff-wave { position: relative; z-index: 1; height: 36px; overflow: hidden; color: var(--hot, var(--ff-accent)); pointer-events: none; }
+.ff-wave svg { position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: ff-wave 18s linear infinite; will-change: transform; }
+.ff-wave path { fill: none; stroke: currentColor; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.ff-wave path:first-child { opacity: 0.22; }
+.ff-wave path:last-child { opacity: 0.1; }
+.ff-wave-flip svg { animation-direction: reverse; }
+@keyframes ff-wave { to { transform: translate3d(-50%, 0, 0); } }
+
+/* Interface : légère ondulation au survol des boutons, apparition douce des pages. */
+@layer components {
+  .ff-btn { position: relative; }
+}
+.ff-btn::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  border: 2px solid var(--ff-accent); opacity: 0;
+}
+@media (hover: hover) {
+  .ff-btn:hover:not(:disabled)::after { animation: ff-ripple 0.8s ease-out; }
+}
+@keyframes ff-ripple {
+  0% { opacity: 0.55; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.12, 1.4); }
+}
+.ff-main { animation: ff-page-in 0.28s ease-out both; }
+@keyframes ff-page-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-ocean, .ff-wave svg { animation: none !important; }
+  .ff-ocean i, .ff-ocean .ff-fish { display: none !important; }
+  .ff-caustic, .ff-main, .ff-btn::after, .ff-school *, .ff-school { animation: none !important; }
+}
+
+/* ===== Logo vivant (barre du haut, menu, accueil) ===== */
+.ff-logo { position: relative; display: inline-flex; flex-shrink: 0; }
+.ff-logo img { display: block; transform-origin: 50% 55%; animation: ff-logo-glide 7s ease-in-out infinite; will-change: transform; }
+/* Planer : monte et descend à peine, s'incline un peu, et les ailes ondulent lentement. */
+@keyframes ff-logo-glide {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-3deg) scaleY(1); }
+  25% { transform: translate3d(0, -2px, 0) rotate(0deg) scaleY(0.94); }
+  50% { transform: translate3d(0, -1px, 0) rotate(3deg) scaleY(1); }
+  75% { transform: translate3d(0, 1px, 0) rotate(0deg) scaleY(0.95); }
+}
+/* Au survol (ou au toucher) du lien : battement d'ailes rapide et une bulle qui s'échappe. */
+.ff-brand:hover .ff-logo img, .ff-brand:focus-visible .ff-logo img, .lp .brand:hover img { animation: ff-logo-flap 0.7s ease-in-out 2; }
+@keyframes ff-logo-flap {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1) scaleX(1); }
+  30% { transform: translate3d(0, -3px, 0) scaleY(0.72) scaleX(1.06); }
+  60% { transform: translate3d(0, -1px, 0) scaleY(1.06) scaleX(0.97); }
+}
+.ff-logo i {
+  position: absolute; right: 2px; top: -2px; width: 6px; height: 6px; border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--ff-accent) 80%, transparent); opacity: 0; pointer-events: none;
+}
+.ff-brand:hover .ff-logo i, .ff-brand:focus-visible .ff-logo i { animation: ff-logo-bubble 1.1s ease-out; }
+@keyframes ff-logo-bubble {
+  0% { transform: translate3d(0, 4px, 0) scale(0.5); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translate3d(5px, -16px, 0) scale(1.2); opacity: 0; }
+}
+/* Le nom : une petite vague verte sous « Flow ». */
+.ff-wordmark > span { position: relative; }
+.ff-wordmark > span::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 5px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='5' viewBox='0 0 16 5'%3E%3Cpath d='M0 2.5 Q4 0 8 2.5 T16 2.5' fill='none' stroke='%2338BDF8' stroke-width='1.6'/%3E%3C/svg%3E") repeat-x 0 0 / 16px 5px;
+  opacity: 0; transform: scaleX(0.4); transform-origin: left; transition: opacity 0.3s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ff-brand:hover .ff-wordmark > span::after, .ff-brand:focus-visible .ff-wordmark > span::after {
+  opacity: 1; transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ff-logo img, .ff-logo i, .ff-wordmark > span::after { animation: none !important; }
+}
+
+/* ===== Raie : bonne version selon le thème, et son humeur ===== */
+/* !important : ces règles doivent l'emporter sur les « img { display: block } » des logos. */
+/* « Flow » dans le nom : la couleur du logo (un peu plus soutenue en clair pour rester lisible). */
+:root { --ff-logo-blue: #1c8fd0; }
+:root.dark { --ff-logo-blue: #2aa9e8; }
+.ff-wordmark > span { color: var(--ff-logo-blue); }
+
+/* ===== Poissons ===== */
+/* Fond : quelques poissons traversent l'écran très lentement (40 à 80 s), en ondulant un peu. */
+.ff-fish {
+  position: absolute; top: var(--y); left: 0; width: var(--size); color: var(--ff-fish);
+  animation: ff-fish-cross var(--d) linear var(--delay) infinite; will-change: transform;
+}
+.ff-fish[style*="--dir: -1"], .ff-fish[style*="--dir:-1"] { animation-name: ff-fish-cross-back; }
+.ff-fish span { display: block; animation: ff-fish-bob 5s ease-in-out infinite; }
+.ff-fish svg { display: block; width: 100%; height: auto; animation: ff-fish-wiggle 0.9s ease-in-out infinite; transform-origin: 70% 50%; }
+.ff-fish[style*="--dir: -1"] svg, .ff-fish[style*="--dir:-1"] svg { scale: -1 1; }
+@keyframes ff-fish-cross { from { transform: translate3d(-12vw, 0, 0); } to { transform: translate3d(112vw, 0, 0); } }
+@keyframes ff-fish-cross-back { from { transform: translate3d(112vw, 0, 0); } to { transform: translate3d(-12vw, 0, 0); } }
+@keyframes ff-fish-bob { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -14px, 0); } }
+@keyframes ff-fish-wiggle { 0%, 100% { transform: rotate(-3deg) scaleX(1); } 50% { transform: rotate(3deg) scaleX(0.96); } }
+@media (max-width: 767px) { .ff-fish:nth-of-type(2n) { display: none; } }
+
+/* Chargement : trois poissons tournent l'un derrière l'autre. */
+.ff-school { position: relative; width: 170px; height: 110px; }
+.ff-school-fish { position: absolute; left: 50%; top: 50%; width: 42px; margin: -11px 0 0 -21px; animation: ff-school-loop 3.6s linear infinite; }
+.ff-school-fish svg { display: block; width: 100%; height: auto; animation: ff-fish-wiggle 0.5s ease-in-out infinite; transform-origin: 70% 50%; }
+.ff-school-fish:nth-child(1) { color: var(--ff-accent); }
+.ff-school-fish:nth-child(2) { color: #38bdf8; width: 32px; animation-delay: -1.2s; }
+.ff-school-fish:nth-child(3) { color: #2dd4bf; width: 26px; animation-delay: -2.4s; }
+@keyframes ff-school-loop {
+  0% { transform: rotate(0deg) translateX(58px) rotate(90deg); }
+  100% { transform: rotate(360deg) translateX(58px) rotate(90deg); }
+}
+.ff-school-bubbles { position: absolute; left: 50%; top: 50%; }
+.ff-school-bubbles i {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%; opacity: 0;
+  border: 1.5px solid color-mix(in srgb, #38bdf8 70%, transparent);
+  animation: ff-school-bubble 2.4s ease-out infinite;
+}
+.ff-school-bubbles i:nth-child(2) { left: -16px; width: 6px; height: 6px; animation-delay: 0.8s; }
+.ff-school-bubbles i:nth-child(3) { left: 12px; animation-delay: 1.6s; }
+@keyframes ff-school-bubble {
+  0% { transform: translate3d(0, 10px, 0) scale(0.6); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translate3d(0, -50px, 0) scale(1.1); opacity: 0; }
+}

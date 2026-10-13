@@ -1,5 +1,7 @@
 "use client";
 
+import { Ocean, WaveDivider } from "@/components/Ocean";
+import { RaieImg } from "@/components/Logo";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TrackedLink } from "@/components/TrackedLink";
@@ -72,7 +74,7 @@ function Art({ k }: { k: ArtKey }) {
         <rect width="300" height="400" fill="#0f1320" />
         <path d="M0 220 C40 160 80 280 120 220 S200 160 240 220 300 280 300 220" stroke="#8fa3ff" strokeWidth="6" fill="none" />
         <path d="M0 270 C20 240 40 300 60 270 S100 240 120 270 160 300 180 270 220 240 240 270 280 300 300 270" stroke="#d7dde8" strokeWidth="5" fill="none" />
-        <path d="M0 320 C10 306 20 334 30 320 S50 306 60 320 80 334 90 320 110 306 120 320 140 334 150 320 170 306 180 320 200 334 210 320 230 306 240 320 260 334 270 320 290 306 300 320" stroke="#22c55e" strokeWidth="4" fill="none" />
+        <path d="M0 320 C10 306 20 334 30 320 S50 306 60 320 80 334 90 320 110 306 120 320 140 334 150 320 170 306 180 320 200 334 210 320 230 306 240 320 260 334 270 320 290 306 300 320" stroke="var(--ff-accent)" strokeWidth="4" fill="none" />
       </>
     ),
     sun: (
@@ -87,7 +89,7 @@ function Art({ k }: { k: ArtKey }) {
       <>
         <rect width="300" height="400" fill="#07080b" />
         <ellipse cx="150" cy="200" rx="130" ry="34" fill="none" stroke="#e8ebef" strokeWidth="10" opacity=".9" />
-        <ellipse cx="150" cy="200" rx="104" ry="24" fill="none" stroke="#22c55e" strokeWidth="6" opacity=".8" />
+        <ellipse cx="150" cy="200" rx="104" ry="24" fill="none" stroke="var(--ff-accent)" strokeWidth="6" opacity=".8" />
         <circle cx="150" cy="200" r="52" fill="#000" />
       </>
     ),
@@ -120,14 +122,8 @@ function Art({ k }: { k: ArtKey }) {
 }
 
 function BrandMark() {
-  // Même logo que dans l'application (components/Logo.tsx)
-  return (
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path d="M4 20C4 20 8 12 16 12C24 12 28 20 28 20" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      <path d="M4 24C4 24 8 16 16 16C24 16 28 24 28 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity=".4" />
-      <circle cx="16" cy="8" r="3" fill="#22C55E" />
-    </svg>
-  );
+  // Même logo que dans l'application (components/Logo.tsx) : la raie manta.
+  return <RaieImg small width={44} height={36} />;
 }
 
 /* ---------- Page ---------- */
@@ -137,6 +133,8 @@ export function Landing() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const orbRef = useRef<OrbHandle | null>(null);
   const reduceRef = useRef(false);
+  // Pas de 3D (téléphone ancien, 3D perdue) : une boule dessinée en CSS prend sa place dans la démo.
+  const [orbFallback, setOrbFallback] = useState(false);
 
   const [theme, setTheme] = useState<Theme>("dark");
   // Déjà connecté : la barre propose d'ouvrir son espace au lieu de « Connexion / Créer un compte ».
@@ -174,13 +172,18 @@ export function Landing() {
     reduceRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const fallBack = () => {
+      canvas.style.display = "none";
+      setOrbFallback(true);
+    };
     const orb = createOrb(
       canvas,
       () => Array.from(rootRef.current?.querySelectorAll<HTMLElement>("[data-slot]") ?? []),
-      reduceRef.current
+      reduceRef.current,
+      fallBack
     );
     if (!orb) {
-      canvas.style.display = "none";
+      queueMicrotask(fallBack);
       return;
     }
     orbRef.current = orb;
@@ -195,6 +198,62 @@ export function Landing() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+  /* Fiche d'exemple du haut : elle se remplit toute seule, en boucle (résumé, points, flashcard, quiz). */
+  const HERO_STEPS = 10;
+  const [heroStep, setHeroStep] = useState(HERO_STEPS - 1);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let n = 0;
+    queueMicrotask(() => setHeroStep(0));
+    const id = window.setInterval(() => {
+      if (document.hidden) return;
+      n = (n + 1) % HERO_STEPS;
+      setHeroStep(n);
+    }, 1100);
+    return () => clearInterval(id);
+  }, []);
+  const at = (k: number) => `fd-step${heroStep >= k ? " on" : ""}`;
+
+  /* Apparition douce des blocs quand on fait défiler la page (téléphone et ordinateur, rien à toucher). */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const els = Array.from(root.querySelectorAll<HTMLElement>("main section:not(.hero) .wrap > *"));
+    els.forEach((el) => {
+      const i = Array.from(el.parentElement?.children ?? []).indexOf(el);
+      el.classList.add("rv");
+      el.style.transitionDelay = `${(i % 4) * 60}ms`;
+    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (en.isIntersecting) {
+            en.target.classList.add("rv-in");
+            io.unobserve(en.target);
+          }
+        }
+      },
+      // Se déclenche un peu AVANT que le bloc n'arrive à l'écran : il est déjà visible quand on y arrive.
+      { threshold: 0, rootMargin: "0px 0px 10% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    // Filet de sécurité : au défilement, tout bloc déjà à l'écran apparaît (jamais de bloc qui reste invisible).
+    const check = () => {
+      for (const el of els) {
+        if (el.classList.contains("rv-in")) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight * 1.1 && r.bottom > 0) el.classList.add("rv-in");
+      }
+    };
+    window.addEventListener("scroll", check, { passive: true });
+    const first = window.setTimeout(check, 400);
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", check);
+      clearTimeout(first);
+    };
+  }, []);
 
   /* La fiche, étape par étape */
   const stageRef = useRef<HTMLDivElement>(null);
@@ -325,6 +384,26 @@ export function Landing() {
   const [askInView, setAskInView] = useState(false);
   const [cardsManual, setCardsManual] = useState(false);
   const [askManual, setAskManual] = useState(false);
+  // Un geste met la démo en pause ; sans nouveau geste, elle reprend toute seule (9 s pour les cartes, 15 s pour la question).
+  const cardsTouch = useRef(0);
+  const askTouch = useRef(0);
+  const touchCards = () => {
+    cardsTouch.current = Date.now();
+    setCardsManual(true);
+  };
+  const touchAsk = () => {
+    askTouch.current = Date.now();
+    setAskManual(true);
+  };
+  useEffect(() => {
+    if (!cardsManual && !askManual) return;
+    const id = window.setInterval(() => {
+      const now = Date.now();
+      if (cardsManual && now - cardsTouch.current > 9000) setCardsManual(false);
+      if (askManual && now - askTouch.current > 15000) setAskManual(false);
+    }, 1500);
+    return () => clearInterval(id);
+  }, [cardsManual, askManual]);
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return;
     const watch = (id: string, set: (v: boolean) => void) => {
@@ -355,7 +434,7 @@ export function Landing() {
     for (let i = 0; i < 14; i++) {
       const s = document.createElement("i");
       s.setAttribute("aria-hidden", "true");
-      s.style.cssText = `position:fixed;width:8px;height:8px;border-radius:50%;background:var(--hot, #22c55e);pointer-events:none;z-index:40;left:${x}px;top:${y}px`;
+      s.style.cssText = `position:fixed;width:8px;height:8px;border-radius:50%;background:var(--hot, #38bdf8);pointer-events:none;z-index:40;left:${x}px;top:${y}px`;
       document.body.appendChild(s);
       const a = (Math.PI * 2 * i) / 14 + Math.random() * 0.4, dd = 40 + Math.random() * 60;
       const anim = s.animate(
@@ -458,6 +537,7 @@ export function Landing() {
         </div>
       </header>
 
+      <Ocean />
       <main id="top">
         {/* Accueil */}
         <section className="hero" aria-label="Accueil">
@@ -488,32 +568,33 @@ export function Landing() {
               <div className="fd-head"><strong>Photosynthèse</strong><span>Fiche de révision</span></div>
               <div>
                 <p className="fd-h">Résumé</p>
-                <p>La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie chimique, en produisant du glucose et de l&apos;oxygène.</p>
+                <p className={at(1)}>La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie chimique, en produisant du glucose et de l&apos;oxygène.</p>
               </div>
               <div>
                 <p className="fd-h">Points clés</p>
                 <ul>
-                  <li>Se déroule dans les chloroplastes</li>
-                  <li>Demande de la lumière, de l&apos;eau et du CO₂</li>
-                  <li>Produit du glucose et libère de l&apos;oxygène</li>
+                  <li className={at(2)}>Se déroule dans les chloroplastes</li>
+                  <li className={at(3)}>Demande de la lumière, de l&apos;eau et du CO₂</li>
+                  <li className={at(4)}>Produit du glucose et libère de l&apos;oxygène</li>
                 </ul>
               </div>
               <div className="fd-row">
                 <div className="fd-mini">
                   <p className="fd-h">Flashcard</p>
                   <p><strong>Où se fait la photosynthèse ?</strong></p>
-                  <p className="fd-a">Dans les chloroplastes.</p>
+                  <p className={`fd-a ${at(5)}`}>Dans les chloroplastes.</p>
                 </div>
                 <div className="fd-mini">
                   <p className="fd-h">Quiz</p>
                   <p><strong>Que libère la plante ?</strong></p>
                   <p className="fd-opt">Du CO₂</p>
-                  <p className="fd-opt ok">De l&apos;oxygène</p>
+                  <p className={`fd-opt${heroStep >= 6 ? " ok" : ""}`}>De l&apos;oxygène</p>
                 </div>
               </div>
             </article>
           </div>
         </section>
+        <WaveDivider />
 
         {/* C'est quoi */}
         <section id="quoi" aria-labelledby="t-q">
@@ -597,6 +678,7 @@ export function Landing() {
             </div>
           </div>
         </section>
+        <WaveDivider flip />
 
         {/* Réviser */}
         <section id="retenir" aria-labelledby="t-r">
@@ -612,7 +694,7 @@ export function Landing() {
                     className={`fc${leaving ? ` gone-${leaving}` : ""}`}
                     aria-label={flipped ? "Revoir la question" : "Retourner la carte"}
                     style={{ transform: `rotateX(${rx}deg) rotateY(${ry}deg) rotateY(${flipped ? 180 : 0}deg)` }}
-                    onClick={() => { setCardsManual(true); setFlipped((f) => !f); kick(0.25); }}
+                    onClick={() => { touchCards(); setFlipped((f) => !f); kick(0.25); }}
                     onPointerMove={(e) => {
                       if (reduceRef.current || e.pointerType !== "mouse") return;
                       const r = e.currentTarget.getBoundingClientRect();
@@ -626,8 +708,8 @@ export function Landing() {
                   </button>
                 </div>
                 <div className="fc-actions">
-                  <button type="button" className="btn ghost" onClick={() => { setCardsManual(true); answerCard(false); }}><span>À revoir</span></button>
-                  <button type="button" className="btn" ref={knownBtn} onClick={() => { setCardsManual(true); answerCard(true); }}><span>Je savais</span></button>
+                  <button type="button" className="btn ghost" onClick={() => { touchCards(); answerCard(false); }}><span>À revoir</span></button>
+                  <button type="button" className="btn" ref={knownBtn} onClick={() => { touchCards(); answerCard(true); }}><span>Je savais</span></button>
                 </div>
               </article>
               <article className="card">
@@ -649,10 +731,10 @@ export function Landing() {
             <p className="sub">FishFlow répond aussi à n&apos;importe quelle question, avec des images libres de droits et des liens Wikipédia pour aller plus loin. Les exemples défilent tout seuls, tu peux aussi écrire ta question.</p>
             <div className="demo">
               <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
-                <div className="slot-demo" data-slot="demo" aria-hidden="true" />
+                <div className={`slot-demo${orbFallback ? " slot-css" : ""}`} data-slot="demo" data-phase={phase} aria-hidden="true" />
                 <div className="chips" role="group" aria-label="Questions d'exemple">
-                  <button type="button" className="chip" onClick={() => { setAskManual(true); run("sky"); }}>Pourquoi le ciel est bleu</button>
-                  <button type="button" className="chip" onClick={() => { setAskManual(true); run("hole"); }}>Comment fonctionne un trou noir</button>
+                  <button type="button" className="chip" onClick={() => { touchAsk(); run("sky"); }}>Pourquoi le ciel est bleu</button>
+                  <button type="button" className="chip" onClick={() => { touchAsk(); run("hole"); }}>Comment fonctionne un trou noir</button>
                 </div>
                 <form className="ask" onSubmit={onAsk} autoComplete="off">
                   <label htmlFor="lp-q" hidden>Ta question</label>
@@ -664,7 +746,7 @@ export function Landing() {
                     maxLength={120}
                     value={q}
                     readOnly={phase === "typing" || phase === "thinking"}
-                    onChange={(e) => { setAskManual(true); setQ(e.target.value); setPhase("idle"); setDemoKey(null); setNotice(false); }}
+                    onChange={(e) => { touchAsk(); setQ(e.target.value); setPhase("idle"); setDemoKey(null); setNotice(false); }}
                   />
                   <button className="btn" type="submit"><span>Envoyer</span></button>
                 </form>
@@ -706,6 +788,7 @@ export function Landing() {
             </div>
           </div>
         </section>
+        <WaveDivider />
 
         {/* Confiance */}
         <section aria-labelledby="t-c">
@@ -753,6 +836,7 @@ export function Landing() {
             <p className="cmp-note">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
           </div>
         </section>
+        <WaveDivider flip />
 
         {/* Questions */}
         <section aria-labelledby="t-faq">

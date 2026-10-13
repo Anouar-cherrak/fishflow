@@ -118,8 +118,8 @@ export function AppNav() {
   return (
     <>
     <header className="ff-bar">
-      <Link href="/" className="flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">
-        <Logo size={26} />
+      <Link href="/" className="ff-brand flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">
+        <Logo size={36} />
         <Wordmark className="text-lg" />
       </Link>
 
@@ -161,8 +161,8 @@ export function AppNav() {
     {authReady && email && <BottomTabs />}
     <div id="menu-principal" ref={panelRef} className="ff-menu" data-open={open} role="dialog" aria-modal="true" aria-label="Menu" aria-hidden={!open}>
       <div className="flex items-center justify-between">
-        <Link href="/" onClick={close} className="flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">
-          <Logo size={26} className="!text-current" />
+        <Link href="/" onClick={close} className="ff-brand flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">
+          <Logo size={36} />
           <span className="font-semibold text-lg">FishFlow</span>
         </Link>
         <button
@@ -205,7 +205,7 @@ export function AppNav() {
             <Link href="/login" onClick={() => setOpen(false)} className="min-h-[44px] px-5 inline-flex items-center rounded-full border border-current/30 text-sm font-semibold">
               Connexion
             </Link>
-            <Link href="/signup" onClick={() => setOpen(false)} className="min-h-[44px] px-5 inline-flex items-center rounded-full bg-[#22C55E] text-[#04130A] text-sm font-semibold">
+            <Link href="/signup" onClick={() => setOpen(false)} className="min-h-[44px] px-5 inline-flex items-center rounded-full bg-accent text-on-accent text-sm font-semibold">
               Créer un compte
             </Link>
           </div>
