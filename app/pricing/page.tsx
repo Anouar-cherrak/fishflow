@@ -10,13 +10,13 @@ import { TrackView } from "@/components/TrackView";
 
 // Seulement ce qui change entre Gratuit et Pro. Le reste est identique et résumé en une phrase sous le tableau.
 const ROWS: { label: string; free: string; pro: string }[] = [
-  { label: "Fiches générées", free: "3 par mois", pro: "Illimitées (usage normal)" },
+  { label: "Fiches générées", free: "3 par mois", pro: "100 par mois (10 par jour)" },
   { label: "Quiz", free: "À jouer, avec ton meilleur score", pro: "À jouer, 12 questions par quiz" },
   { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
-  { label: "Documents", free: "Courts et moyens", pro: "Volumineux, plusieurs PDF fusionnés" },
+  { label: "Documents", free: "Jusqu'à 7 pages environ", pro: "Jusqu'à 15 pages environ, plusieurs PDF fusionnés" },
   { label: "Progression", free: "7 derniers jours", pro: "30 jours, taux de réussite, cartes difficiles" },
   { label: "Résumé lu à voix haute", free: "Non", pro: "Oui" },
-  { label: "Historique de fiches", free: "5 fiches", pro: "Illimité" },
+  { label: "Historique de fiches", free: "5 fiches", pro: "Toutes tes fiches gardées" },
 ];
 
 export default function Pricing() {
@@ -76,7 +76,7 @@ export default function Pricing() {
       <AppShell size="form">
         <div className="w-full max-w-sm mx-auto bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
-          <p className="text-black/50 text-sm mb-6">Génération illimitée déjà active sur ton compte.</p>
+          <p className="text-black/50 text-sm mb-6">Jusqu'à 100 fiches par mois, déjà actives sur ton compte.</p>
           <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-full font-semibold bg-[#22C55E] text-[#04130A] hover:bg-[#16A34A] transition ff-btn">
             Retour à l'outil
           </button>
@@ -102,7 +102,7 @@ export default function Pricing() {
 
           <h2 className="text-xl font-semibold mb-1">FishFlow Pro</h2>
           <ul className="text-left text-sm grid gap-2 mb-6" aria-label="Ce que tu gagnes avec Pro">
-            {["Fiches illimitées (usage normal)", "Gros documents et plusieurs PDF d'un coup", "Quiz de 12 questions", "20 questions par jour dans Apprendre", "Historique illimité de tes fiches", "Résumé lu à voix haute", "Tes cartes difficiles et ta progression sur 30 jours"].map((b) => (
+            {["100 fiches par mois", "Cours jusqu'à 15 pages, plusieurs PDF d'un coup", "Quiz de 12 questions", "20 questions par jour dans Apprendre", "Toutes tes fiches gardées", "Résumé lu à voix haute", "Tes cartes difficiles et ta progression sur 30 jours"].map((b) => (
               <li key={b} className="flex gap-2"><span className="text-[#22C55E] font-bold" aria-hidden="true">✓</span><span>{b}</span></li>
             ))}
           </ul>

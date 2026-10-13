@@ -1,32 +1,6 @@
 import { createAdminClient } from "./supabase/admin";
 
-// Pour changer le quota gratuit plus tard, modifie uniquement cette ligne.
-export const FREE_MONTHLY_LIMIT = 3;
-
-function currentMonthKey() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
-export async function getUsage(userId: string) {
-  const supabase = createAdminClient();
-  const month = currentMonthKey();
-
-  const { data } = await supabase
-    .from("usage")
-    .select("count")
-    .eq("user_id", userId)
-    .eq("month", month)
-    .maybeSingle();
-
-  const used = data?.count ?? 0;
-  return {
-    used,
-    limit: FREE_MONTHLY_LIMIT,
-    remaining: Math.max(0, FREE_MONTHLY_LIMIT - used),
-    allowed: used < FREE_MONTHLY_LIMIT,
-  };
-}
+// Les limites elles-mêmes sont dans lib/limits.ts. Ici : les opérations de base sur la table « usage ».
 
 // Réserve UNE utilisation, de façon atomique (deux demandes en même temps ne passent pas toutes les deux).
 // Si la fonction SQL n'est pas encore installée, on retombe sur l'ancienne méthode, qui marche mais moins strictement.
@@ -66,10 +40,6 @@ export async function refundUsage(userId: string, key: string): Promise<void> {
   if (row && row.count > 0) {
     await supabase.from("usage").update({ count: row.count - 1 }).eq("user_id", userId).eq("month", key);
   }
-}
-
-export function monthKey() {
-  return currentMonthKey();
 }
 
 export async function isProUser(userId: string): Promise<boolean> {

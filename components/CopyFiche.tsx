@@ -52,7 +52,7 @@ export function CopyFiche({
       setBusy(false);
       if (String(error.message).includes("FREE_LIMIT")) {
         setFull(true);
-        setMsg("Ton historique gratuit est plein (5 fiches). Supprime une ancienne fiche, ou passe Pro pour un historique illimité.");
+        setMsg("Ton historique gratuit est plein (5 fiches). Supprime une ancienne fiche, ou passe Pro pour garder toutes tes fiches.");
       } else {
         setMsg("La copie n'a pas marché. Réessaie dans un instant.");
       }

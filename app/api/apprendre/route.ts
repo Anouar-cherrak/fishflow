@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isProUser, refundUsage, reserveUsage } from "@/lib/usage";
-import { getApprendreQuota } from "@/lib/apprendre-quota";
-import { answerQuestion } from "@/lib/apprendre-engine";
+import { isProUser } from "@/lib/usage";
+import { recordCost, reserveFor } from "@/lib/quota";
+import { answerQuestion, apprendreCostUsd } from "@/lib/apprendre-engine";
 
 export const runtime = "nodejs";
 // Recherche dans Wikipédia + lecture des articles + réponse : environ 10 à 20 secondes.
@@ -35,24 +35,21 @@ export async function POST(req: Request) {
   if (question.length > MAX_QUESTION) return fail(`Ta question est trop longue (${MAX_QUESTION} caractères max).`, 400);
 
   const pro = await isProUser(user.id);
-  const quota = await getApprendreQuota(user.id, pro);
-  const quotaError = () =>
-    pro
-      ? fail("Tu as atteint la limite du jour. Reviens demain.", 429)
-      : fail("Tu as utilisé ta question gratuite. Passe Pro pour en poser 20 par jour.", 403, { code: "pro_required" });
-  if (!quota.allowed) return quotaError();
-
   if (!process.env.OPENAI_API_KEY) return fail("Service momentanément indisponible.", 503);
 
-  // On réserve l'utilisation avant d'appeler l'IA (impossible de la dépasser en envoyant plusieurs demandes d'un coup),
-  // et on la rend si la réponse n'a pas pu être donnée.
-  if (!(await reserveUsage(user.id, quota.key, quota.limit))) return quotaError();
-  const giveBack = async () => {
-    await refundUsage(user.id, quota.key);
-  };
+  // Limites d'usage (lib/limits.ts) : réservées de façon atomique avant d'appeler l'IA, rendues si la réponse n'a pas pu être donnée.
+  const reservation = await reserveFor(req, user.id, pro, "apprendre");
+  if (!reservation.ok) {
+    const { ok: _ok, status, scope: _scope, error, ...extra } = reservation;
+    void _ok;
+    void _scope;
+    return fail(error, status, extra);
+  }
+  const giveBack = reservation.refund;
 
   try {
-    const { result } = await answerQuestion(question);
+    const { result, usage } = await answerQuestion(question);
+    await recordCost(user.id, apprendreCostUsd(usage));
     // Pas une question de connaissance : on ne compte pas l'utilisation.
     if (!result.found) await giveBack();
     return NextResponse.json(result);

@@ -45,11 +45,11 @@ export function UpgradeModal({
         <p className="text-sm text-black/60 mb-5">{message}</p>
 
         <ul className="text-sm text-black/70 space-y-2 mb-6">
-          <li>✓ Fiches illimitées</li>
-          <li>✓ Documents volumineux</li>
+          <li>✓ 100 fiches par mois</li>
+          <li>✓ Cours jusqu'à 15 pages</li>
           <li>✓ Plusieurs PDF fusionnés en une fiche</li>
           <li>✓ Quiz de 12 questions</li>
-          <li>✓ Historique illimité</li>
+          <li>✓ Toutes tes fiches gardées</li>
         </ul>
 
         <button

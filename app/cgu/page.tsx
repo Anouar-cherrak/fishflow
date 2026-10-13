@@ -30,8 +30,9 @@ export default function CGU() {
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">3. Offres et abonnement</h2>
             <p>
               FishFlow propose une offre gratuite limitée à un nombre défini de générations par mois,
-              ainsi qu'une offre payante ("FishFlow Pro") donnant accès à des générations illimitées dans le cadre d'un usage normal
-              (une limite anti-abus de 50 générations par jour s'applique),
+              ainsi qu'une offre payante ("FishFlow Pro") donnant accès à 100 fiches par mois, dans la limite de 10 par jour,
+              avec des limites raisonnables sur les autres fonctions (questions Apprendre, régénérations) et un plafond
+              anti-abus en cas d'usage anormal,
               facturée mensuellement via notre prestataire de paiement Stripe. Le tarif en vigueur est
               affiché sur la page Tarifs du site et peut être amené à évoluer. L'abonnement est
               résiliable à tout moment ; la résiliation prend effet à la fin de la période de

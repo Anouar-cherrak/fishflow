@@ -9,6 +9,7 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { trackEvent } from "@/lib/tracking";
 import { track } from "@/lib/track";
 import type { User } from "@supabase/supabase-js";
+import { LIMITS } from "@/lib/limits";
 
 type Mode = "text" | "pdf" | "photo";
 type OutputKey = "summary" | "sheet" | "flashcards" | "quiz";
@@ -20,6 +21,9 @@ type UsageInfo = {
   used: number;
   limit: number | null;
   remaining: number | null;
+  fichesLeftMonth?: number;
+  fichesLeftDay?: number | null;
+  resetMonth?: string;
 };
 
 const OUTPUT_OPTIONS: { key: OutputKey; label: string }[] = [
@@ -36,7 +40,7 @@ const LOADING_MESSAGES = [
   "Presque fini...",
 ];
 
-const FREE_FICHES_LIMIT = 5;
+const FREE_FICHES_LIMIT = LIMITS.free.historyMax;
 const MAX_PHOTO_SIDE = 2000;
 const MAX_PHOTOS = 4;
 
@@ -170,7 +174,7 @@ function GenererContent() {
         trackEvent("historique_plein", { mode });
         setUpgradeModal({
           title: "Ton historique est plein",
-          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour un historique illimité.`,
+          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour garder toutes tes fiches.`,
           manage: true,
         });
         return;
@@ -232,7 +236,7 @@ function GenererContent() {
         setLoading(false);
         setUpgradeModal({
           title: "Ton historique est plein",
-          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour un historique illimité.`,
+          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour garder toutes tes fiches.`,
           manage: true,
         });
         return;
@@ -273,7 +277,19 @@ function GenererContent() {
     !loading &&
     (mode === "text" ? !!text : mode === "photo" || isMultiPdfPro ? files.length > 0 : !!file) &&
     outputs.length > 0 &&
-    !(!!user && !!usage && !usage.isPro && usage.remaining === 0);
+    !(!!user && !!usage && !usage.isPro && usage.remaining === 0) &&
+    !(!!usage?.isPro && (usage.fichesLeftMonth === 0 || usage.fichesLeftDay === 0));
+
+  // Ce qu'il reste, affiché discrètement sous le bouton (les limites sont vérifiées par le serveur).
+  const proLeftText = (() => {
+    if (!usage?.isPro || typeof usage.fichesLeftMonth !== "number") return "";
+    const month = usage.fichesLeftMonth;
+    const day = usage.fichesLeftDay ?? month;
+    if (month === 0) return `Tu as atteint la limite de ce mois-ci. Elle se remet à zéro ${usage.resetMonth ?? "le mois prochain"}.`;
+    if (day === 0) return "Tu as atteint la limite du jour. Elle se remet à zéro à minuit.";
+    const base = `Il te reste ${month} fiche${month > 1 ? "s" : ""} ce mois-ci`;
+    return day < month ? `${base}, dont ${day} aujourd'hui.` : `${base}.`;
+  })();
 
   // Photos ajoutées une par une (appareil photo du téléphone) ou plusieurs d'un coup, 4 au maximum.
   const addPhotos = (list: File[]) => {
@@ -550,27 +566,29 @@ function GenererContent() {
             {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer ma fiche"}
           </button>
 
+          {proLeftText && <p className="text-xs text-black/50 text-center -mt-2">{proLeftText}</p>}
+
           {user && usage && !usage.isPro && (
             <section aria-label="Ton offre" className="bg-surface border border-black/10 rounded-3xl overflow-hidden">
               <p className={`px-5 py-3 text-sm font-semibold ${usage.remaining === 0 ? "text-[#22C55E]" : "text-black/80"}`}>
                 {usage.remaining === 0
-                  ? "Tu as atteint ta limite gratuite de ce mois-ci."
-                  : `${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} restante${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
+                  ? `Tu as atteint ta limite gratuite de ce mois-ci. Elle se remet à zéro ${usage.resetMonth ?? "le mois prochain"}.`
+                  : `Il te reste ${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
               </p>
               <div className="px-5 pb-5 grid grid-cols-2 gap-4 border-t border-black/10 pt-4">
                 <div>
                   <p className="text-xs font-semibold text-black/50 mb-2">Gratuit</p>
-                  <p className="text-sm text-black/65">3 fiches par mois</p>
-                  <p className="text-sm text-black/65">Documents courts et moyens</p>
+                  <p className="text-sm text-black/65">{LIMITS.free.fichesPerMonth} fiches par mois</p>
+                  <p className="text-sm text-black/65">Cours jusqu'à 7 pages</p>
                   <p className="text-sm text-black/65">Historique de 5 fiches</p>
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-[#22C55E] mb-2">Pro</p>
-                  <p className="text-sm font-medium">Fiches illimitées</p>
-                  <p className="text-sm font-medium">Documents volumineux</p>
+                  <p className="text-sm font-medium">{LIMITS.pro.fichesPerMonth} fiches par mois</p>
+                  <p className="text-sm font-medium">Cours jusqu'à 15 pages</p>
                   <p className="text-sm font-medium">Plusieurs PDF à la fois</p>
                   <p className="text-sm font-medium">Quiz de 12 questions + audio</p>
-                  <p className="text-sm font-medium">Historique illimité</p>
+                  <p className="text-sm font-medium">Toutes tes fiches gardées</p>
                 </div>
               </div>
               <div className="px-5 pb-5">

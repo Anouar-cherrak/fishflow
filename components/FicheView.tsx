@@ -467,7 +467,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   {remaining === 0 ? "Tu as utilisé tes 3 fiches gratuites ce mois-ci." : "Il te reste 1 fiche gratuite ce mois-ci."}
                 </p>
                 <p className="text-sm text-black/65 mb-4 max-w-[60ch]">
-                  Avec Pro : fiches illimitées, historique complet, quiz de 12 questions, 20 questions par jour dans Apprendre, tes
+                  Avec Pro : 100 fiches par mois, toutes tes fiches gardées, quiz de 12 questions, 20 questions par jour dans Apprendre, tes
                   cartes difficiles et ta progression sur 30 jours.
                 </p>
                 <div className="flex flex-wrap gap-3">

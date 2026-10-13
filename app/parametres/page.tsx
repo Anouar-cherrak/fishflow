@@ -11,6 +11,7 @@ export default function Parametres() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [isPro, setIsPro] = useState(false);
+  const [left, setLeft] = useState<{ month: number; day: number | null } | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteText, setDeleteText] = useState("");
@@ -33,7 +34,10 @@ export default function Parametres() {
       setChecking(false);
       fetch("/api/usage")
         .then((r) => r.json())
-        .then((d) => setIsPro(!!d.isPro))
+        .then((d) => {
+          setIsPro(!!d.isPro);
+          if (typeof d.fichesLeftMonth === "number") setLeft({ month: d.fichesLeftMonth, day: d.fichesLeftDay ?? null });
+        })
         .catch(() => {});
       fetch("/api/preferences")
         .then((r) => r.json())
@@ -135,6 +139,12 @@ export default function Parametres() {
             <p className="text-sm font-semibold text-black/55 mb-3">Compte</p>
             <p className="text-sm text-black/70 mb-1">{user?.email}</p>
             <p className="text-sm text-black/50">{isPro ? "FishFlow Pro actif" : "Compte gratuit"}</p>
+            {left && (
+              <p className="text-sm text-black/50 mt-1">
+                Il te reste {left.month} fiche{left.month > 1 ? "s" : ""} ce mois-ci
+                {left.day !== null && left.day < left.month ? `, dont ${left.day} aujourd'hui` : ""}.
+              </p>
+            )}
           </div>
 
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">

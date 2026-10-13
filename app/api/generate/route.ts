@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
 import { extractText, getDocumentProxy } from "unpdf";
 import { createClient } from "@/lib/supabase/server";
-import { EngineError, makeContext, normalizeFiche, runEngine, transcribeImages, type OutputKey } from "@/lib/fiche-engine";
-import { FREE_MONTHLY_LIMIT, getUsage, isProUser, monthKey, refundUsage, reserveUsage } from "@/lib/usage";
+import { costUsd, EngineError, makeContext, normalizeFiche, runEngine, transcribeImages, type OutputKey } from "@/lib/fiche-engine";
+import { isProUser } from "@/lib/usage";
+import { LIMITS } from "@/lib/limits";
+import { recordCost, reserveFor } from "@/lib/quota";
 
 export const runtime = "nodejs";
 // Le moteur fait plusieurs étapes (plan, rédaction, contrôle, cartes) : il lui faut plus d'une minute sur un long cours.
 export const maxDuration = 120;
 
-const MAX_CHARS_FREE = 15000;
-const MAX_CHARS_PRO = 60000;
 // On rend la main un peu avant la limite de Vercel, pour pouvoir rembourser la fiche en cas d'échec.
 const ENGINE_BUDGET_MS = (maxDuration - 10) * 1000;
 const MAX_PHOTO_BYTES = 4 * 1024 * 1024; // 4 Mo — marge de sécurité sous la limite de payload de Vercel (~4.5 Mo)
 const MAX_PDF_FILES = 10;
 const MAX_PHOTOS = 4;
-const PRO_DAILY_FICHES = 50;
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 const OUTPUT_KEYS = new Set<string>(["summary", "sheet", "flashcards", "quiz"]);
@@ -39,20 +38,24 @@ export async function POST(req: Request) {
   }
 
   const pro = await isProUser(user.id);
-  const MAX_CHARS = pro ? MAX_CHARS_PRO : MAX_CHARS_FREE;
-
-  if (!pro) {
-    const usage = await getUsage(user.id);
-    if (!usage.allowed) {
-      return NextResponse.json(
-        {
-          error: `Tu as atteint ta limite de ${usage.limit} fiches gratuites ce mois-ci. Passe à FishFlow Pro pour continuer.`,
-          quotaExceeded: true,
-        },
-        { status: 403 }
-      );
-    }
-  }
+  const MAX_CHARS = pro ? LIMITS.pro.maxChars : LIMITS.free.maxChars;
+  const fmt = (n: number) => n.toLocaleString("fr-FR");
+  // Cours trop long : on le dit clairement (jamais de coupure en silence).
+  const tooLong = (length: number) =>
+    pro
+      ? NextResponse.json(
+          {
+            error: `Ton cours fait ${fmt(length)} caractères, et la limite est de ${fmt(MAX_CHARS)} par fiche (environ 15 pages). Coupe-le en deux, et fais deux fiches.`,
+          },
+          { status: 413 }
+        )
+      : NextResponse.json(
+          {
+            error: `Ton cours fait ${fmt(length)} caractères, et la limite d'un compte gratuit est de ${fmt(MAX_CHARS)} par fiche. Raccourcis-le, ou passe à FishFlow Pro (jusqu'à ${fmt(LIMITS.pro.maxChars)} caractères par fiche).`,
+            requiresPro: true,
+          },
+          { status: 403 }
+        );
 
   let formData: FormData;
 
@@ -83,10 +86,11 @@ export async function POST(req: Request) {
   let existingFiche = null;
   try {
     const raw = formData.get("fiche");
-    if (typeof raw === "string" && raw.length < 200000) existingFiche = normalizeFiche(JSON.parse(raw));
+    if (typeof raw === "string" && raw.length < 80000) existingFiche = normalizeFiche(JSON.parse(raw));
   } catch {}
+  // Refaire seulement les flashcards, le quiz ou l'essentiel d'une fiche existante : peu coûteux, compté à part.
+  const cheapRegen = !!existingFiche && !outputs.includes("sheet");
 
-  let wasTruncated = false;
   let sourceText: string | undefined;
   let images: string[] = [];
 
@@ -99,18 +103,9 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
-      wasTruncated = text.length > MAX_CHARS;
-      if (wasTruncated && !pro) {
-        return NextResponse.json(
-          {
-            error: `Ce texte est trop long pour un compte gratuit (${MAX_CHARS_FREE.toLocaleString("fr-FR")} caractères maximum). Raccourcis-le, ou passe à FishFlow Pro pour des documents plus volumineux.`,
-            requiresPro: true,
-          },
-          { status: 403 }
-        );
-      }
-      const limitedText = text.slice(0, MAX_CHARS);
-      sourceText = limitedText;
+      // Une régénération repart de la fiche : le cours d'origine (même ancien et long) n'est pas renvoyé à l'IA.
+      if (text.length > MAX_CHARS && !cheapRegen) return tooLong(text.length);
+      sourceText = text.slice(0, MAX_CHARS);
     } else if (mode === "pdf") {
       const files = formData.getAll("files") as File[];
       const singleFile = formData.get("file") as File | null;
@@ -146,10 +141,7 @@ export async function POST(req: Request) {
       }
       const text = textParts.join("\n\n");
 
-      wasTruncated = text.length > MAX_CHARS;
-      const limitedText = text.slice(0, MAX_CHARS);
-
-      if (limitedText.trim().length < 20) {
+      if (text.trim().length < 20) {
         return NextResponse.json(
           {
             error:
@@ -159,18 +151,8 @@ export async function POST(req: Request) {
         );
       }
 
-      if (wasTruncated && !pro) {
-        return NextResponse.json(
-          {
-            error:
-              "Ce document est trop long pour un compte gratuit. Passe à FishFlow Pro pour analyser des documents plus volumineux.",
-            requiresPro: true,
-          },
-          { status: 403 }
-        );
-      }
-
-      sourceText = limitedText;
+      if (text.length > MAX_CHARS) return tooLong(text.length);
+      sourceText = text;
     } else if (mode === "photo") {
       // Une ou plusieurs photos (les pages d'un même cours, dans l'ordre).
       const many = formData.getAll("files").filter((f): f is File => f instanceof File);
@@ -210,39 +192,21 @@ export async function POST(req: Request) {
     );
   }
 
-  // On réserve la génération gratuite avant d'appeler l'IA (plusieurs demandes en même temps ne passent plus),
-  // et on la rend si la génération échoue.
-  const usageKey = monthKey();
-  const proDailyKey = `fiches-${new Date().toISOString().slice(0, 10)}`;
-  if (!pro) {
-    const ok = await reserveUsage(user.id, usageKey, FREE_MONTHLY_LIMIT);
-    if (!ok) {
-      return NextResponse.json(
-        {
-          error: `Tu as atteint ta limite de ${FREE_MONTHLY_LIMIT} fiches gratuites ce mois-ci. Passe à FishFlow Pro pour continuer.`,
-          quotaExceeded: true,
-        },
-        { status: 403 }
-      );
-    }
-  } else {
-    // Pro : limite anti-abus invisible pour un usage normal, qui protège la facture OpenAI.
-    const ok = await reserveUsage(user.id, proDailyKey, PRO_DAILY_FICHES);
-    if (!ok) {
-      return NextResponse.json(
-        { error: `Tu as atteint la limite de ${PRO_DAILY_FICHES} fiches pour aujourd'hui. Reviens demain !` },
-        { status: 429 }
-      );
-    }
+  // Limites d'usage (lib/limits.ts) : réservées de façon atomique AVANT d'appeler l'IA, rendues si la génération échoue.
+  const reservation = await reserveFor(req, user.id, pro, cheapRegen ? "regen" : "fiche");
+  if (!reservation.ok) {
+    const { ok: _ok, status, scope: _scope, ...body } = reservation;
+    void _ok;
+    void _scope;
+    return NextResponse.json(body, { status });
   }
-  const giveBack = async () => {
-    await refundUsage(user.id, pro ? proDailyKey : usageKey);
-  };
+  const giveBack = reservation.refund;
+  let ctx: ReturnType<typeof makeContext> | null = null;
 
   try {
     const deadline = Date.now() + ENGINE_BUDGET_MS;
     // Une seule partie demandée = le bouton « Régénérer » : on veut un résultat différent.
-    const ctx = makeContext({ deadline, vary: outputs.length === 1 });
+    ctx = makeContext({ deadline, vary: outputs.length === 1 });
     // Photo : on recopie d'abord le texte du cours, puis on fait comme pour un texte.
     const source = sourceText ?? (await transcribeImages(ctx, images));
     const { result } = await runEngine(ctx, source, {
@@ -298,5 +262,8 @@ export async function POST(req: Request) {
       { error: "Une erreur est survenue pendant la génération. Réessaie dans quelques instants." },
       { status: 500 }
     );
+  } finally {
+    // Coût réel (même en cas d'échec : l'IA a quand même travaillé), pour le filet de sécurité du mois.
+    if (ctx) await recordCost(user.id, costUsd(ctx.usage));
   }
 }
