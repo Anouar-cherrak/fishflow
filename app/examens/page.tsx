@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { SeaDecor } from "@/components/Ocean";
 import { trackEvent } from "@/lib/tracking";
 
 type Exam = { id: string; title: string; exam_date: string; fiche_ids: string[] };
@@ -219,7 +220,8 @@ export default function Examens() {
       )}
 
       {status === "ready" && exams.length === 0 && !creating && (
-        <div className="bg-surface border border-black/10 rounded-3xl p-8 sm:p-10 text-center grid gap-4 justify-items-center ff-fade-up">
+        <div className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-8 sm:p-10 text-center grid gap-4 justify-items-center ff-fade-up">
+          <SeaDecor y="80%" />
           <p className="font-semibold text-lg">Aucun examen pour l&apos;instant.</p>
           <p className="text-black/60 max-w-[46ch]">Ajoute la date de ton prochain examen et choisis les fiches qui comptent. Ensuite, FishFlow te dit chaque jour combien de cartes revoir, pour être prêt à temps.</p>
           <button type="button" onClick={() => setCreating(true)} className="ff-primary ff-btn">Ajouter mon premier examen</button>

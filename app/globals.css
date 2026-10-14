@@ -19,9 +19,9 @@
   --ff-surface: #fbfdfe;
   --ff-back: #d6e8f0;
   --ff-line: rgba(11, 26, 46, 0.14);
-  /* Bleu « eau » : plus soutenu en thème clair pour rester lisible sur fond pâle. */
-  --ff-accent: #0284c7;
-  --ff-accent-strong: #0369a1;
+  /* Bleu « eau » : assez foncé pour un texte blanc lisible sur les boutons (contraste 4,5:1 minimum). */
+  --ff-accent: #0369a1;
+  --ff-accent-strong: #075985;
   --ff-on-accent: #ffffff;
 }
 
@@ -35,6 +35,30 @@
   --ff-accent-strong: #0ea5e9;
   --ff-on-accent: #04121c;
   color-scheme: dark;
+}
+
+/* ===== Couleurs de la mer (UNIQUEMENT le fond des pages : cartes, champs, barres et boutons gardent leurs couleurs) =====
+   À ajuster ici : haut de l'écran (lumière), milieu, bas (profondeur), reflet du soleil, bulles et poissons. */
+:root {
+  --ff-sea-top: #cdeaf8;
+  --ff-sea-mid: #e2f2fa;
+  --ff-sea-bottom: #f1f8fc;
+  --ff-sea-sun: rgba(255, 247, 220, 0.85);
+  --ff-sea-glow: rgba(56, 189, 248, 0.16);
+  --ff-bubble: rgba(3, 105, 161, 0.3);
+  --ff-fish: rgba(3, 105, 161, 0.2);
+  --ff-fish-eye: rgba(255, 255, 255, 0.8);
+}
+:root.dark {
+  /* Le haut reste assez foncé pour que le texte gris et le bleu clair gardent un contraste de 4,5:1. */
+  --ff-sea-top: #173f63;
+  --ff-sea-mid: #0f2d4b;
+  --ff-sea-bottom: #0a1f36;
+  --ff-sea-sun: rgba(125, 211, 252, 0.05);
+  --ff-sea-glow: rgba(14, 116, 144, 0.22);
+  --ff-bubble: rgba(186, 230, 253, 0.32);
+  --ff-fish: rgba(125, 211, 252, 0.2);
+  --ff-fish-eye: rgba(4, 18, 28, 0.6);
 }
 
 /* Couleurs de feedback du quiz (bonne/mauvaise réponse) — adaptées au thème
@@ -841,24 +865,10 @@ body {
 .ff-main { overflow-wrap: break-word; }
 .ff-main :where(button, a, input, select, textarea, svg, img, canvas) { overflow-wrap: normal; }
 
-/* ===== Ambiance aquatique (octobre 2026) =====
-   Même design (thème sombre, vert, mêmes pages) avec un fond d'eau profonde, des bulles, des vagues
-   et une raie qui flotte. Uniquement transform et opacity, rien qui ne bouge la mise en page.
-   Tout s'arrête si la personne demande moins d'animations (voir la fin de ce bloc). */
-:root {
-  --ff-ocean-top: #c9e6f3;
-  --ff-ocean-glow: rgba(56, 189, 248, 0.18);
-  --ff-bubble: rgba(14, 116, 144, 0.26);
-  --ff-fish: rgba(14, 116, 144, 0.16);
-  --ff-fish-eye: rgba(255, 255, 255, 0.7);
-}
-:root.dark {
-  --ff-ocean-top: #07111c;
-  --ff-ocean-glow: color-mix(in srgb, #0e7490 14%, transparent);
-  --ff-bubble: rgba(186, 230, 253, 0.2);
-  --ff-fish: rgba(125, 211, 252, 0.11);
-  --ff-fish-eye: rgba(0, 0, 0, 0.5);
-}
+/* ===== Ambiance mer (octobre 2026) =====
+   Le fond de toutes les pages est une mer (couleurs « --ff-sea-* » en haut de ce fichier) : plus claire en haut,
+   plus profonde en bas, avec des bulles et de petits poissons. Uniquement transform et opacity, toujours
+   derrière le contenu, jamais cliquable. Tout s'arrête si la personne demande moins d'animations. */
 
 /* Thème clair : des rayons de soleil qui traversent l'eau, depuis le haut. */
 :root:not(.dark) .ff-ocean::before {
@@ -866,22 +876,26 @@ body {
   background: repeating-linear-gradient(105deg, transparent 0 70px, rgba(255, 255, 255, 0.55) 95px, transparent 130px, transparent 210px);
   -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
   mask-image: linear-gradient(to bottom, #000, transparent);
-  opacity: 0.55; will-change: transform;
+  opacity: 0.5; will-change: transform;
   animation: ff-rays 22s ease-in-out infinite alternate;
 }
 @keyframes ff-rays { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, 0, 0); } }
 @media (prefers-reduced-motion: reduce) { :root:not(.dark) .ff-ocean::before { animation: none; } }
 
-/* Fond : bleu nuit en haut, qui se fond dans la couleur habituelle de la page, avec un halo bleu-vert. */
+/* Le cadre des pages garde la couleur du fond de la mer : si la page est plus haute que l'écran, le bas reste « profond ». */
 .ff-frame {
   isolation: isolate;
-  background:
-    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, var(--ff-accent) 10%, transparent), transparent 70%),
-    radial-gradient(1100px 620px at 90% 105%, var(--ff-ocean-glow), transparent 70%),
-    linear-gradient(180deg, var(--ff-ocean-top) 0%, var(--ff-bg) 520px);
+  background: var(--ff-sea-bottom);
 }
 
-.ff-ocean { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
+/* La mer elle-même : fixée à l'écran, la lumière vient toujours du haut. */
+.ff-ocean {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict;
+  background:
+    radial-gradient(70% 220px at 50% 0, var(--ff-sea-sun), transparent 100%),
+    radial-gradient(1100px 620px at 90% 105%, var(--ff-sea-glow), transparent 70%),
+    linear-gradient(180deg, var(--ff-sea-top) 0%, var(--ff-sea-mid) 45%, var(--ff-sea-bottom) 100%);
+}
 .ff-ocean i {
   position: absolute; bottom: -24px; left: var(--x);
   width: var(--s); height: var(--s); border-radius: 50%;
@@ -893,6 +907,7 @@ body {
 @keyframes ff-rise {
   0% { transform: translate3d(0, 0, 0); opacity: 0; }
   12% { opacity: 0.9; }
+  50% { transform: translate3d(calc(var(--drift) * -0.5), -55vh, 0); }
   85% { opacity: 0.55; }
   100% { transform: translate3d(var(--drift), -110vh, 0); opacity: 0; }
 }
@@ -910,9 +925,34 @@ body {
   from { transform: translate3d(-4%, 0, 0) scale(1); }
   to { transform: translate3d(4%, 3%, 0) scale(1.08); }
 }
-/* Téléphone : moins de bulles. */
+/* Téléphone : un peu moins de bulles (les téléphones d'entrée de gamme restent fluides). */
 @media (max-width: 767px) {
-  .ff-ocean i:nth-child(3n) { display: none; }
+  .ff-ocean i:nth-of-type(3n) { display: none; }
+}
+
+/* ===== Petits coins de mer dans les cartes, bandeaux et états vides =====
+   <SeaDecor /> se place dans un bloc qui a la classe « ff-deco-host » : bulles et poisson passent DERRIÈRE le texte. */
+.ff-deco-host { position: relative; isolation: isolate; overflow: hidden; }
+.ff-deco { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; container-type: size; }
+.ff-deco i {
+  position: absolute; bottom: -14px; right: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
+  border: 1px solid var(--ff-bubble);
+  opacity: 0; will-change: transform, opacity;
+  animation: ff-deco-rise var(--d) linear var(--delay) infinite;
+}
+@keyframes ff-deco-rise {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  80% { opacity: 0.7; }
+  100% { transform: translate3d(-6px, -105cqh, 0); opacity: 0; }
+}
+.ff-deco b { position: absolute; left: 0; top: var(--y, 70%); width: 22px; color: var(--ff-fish); animation: ff-deco-swim 26s linear var(--delay, 0s) infinite; will-change: transform; }
+.ff-deco b svg { display: block; width: 100%; height: auto; animation: ff-fish-wiggle 0.9s ease-in-out infinite; transform-origin: 70% 50%; }
+@keyframes ff-deco-swim { from { transform: translate3d(-30px, 0, 0); } to { transform: translate3d(calc(100cqw + 30px), 0, 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .ff-deco i, .ff-deco b, .ff-deco b svg { animation: none !important; }
+  .ff-deco i { display: none; }
+  .ff-deco b { transform: translate3d(calc(100cqw - 40px), 0, 0); }
 }
 
 /* Vagues douces entre les sections de la page d'accueil. */

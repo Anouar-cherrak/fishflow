@@ -36,8 +36,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Couleur de la barre du navigateur : le haut du fond « océan » du thème sombre.
-  themeColor: "#07111c",
+  // Couleur de la barre du navigateur : le haut de la mer du thème sombre (--ff-sea-top).
+  themeColor: "#173f63",
   // L'appli installée passe sous la barre d'état de l'iPhone : les marges « safe-area » du CSS laissent la place à l'encoche.
   viewportFit: "cover",
 };

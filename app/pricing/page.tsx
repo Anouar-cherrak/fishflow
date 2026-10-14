@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo, Wordmark } from "@/components/Logo";
 import { AppShell } from "@/components/AppShell";
+import { SeaDecor } from "@/components/Ocean";
 import { trackEvent } from "@/lib/tracking";
 import { TrackView } from "@/components/TrackView";
 
@@ -94,7 +95,8 @@ export default function Pricing() {
       </div>
 
       <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[380px_minmax(0,1fr)] items-start">
-        <div className="bg-white border border-accent/60 rounded-3xl p-8 text-center ff-fade-up ff-card lg:sticky lg:top-24">
+        <div className="ff-deco-host bg-white border border-accent/60 rounded-3xl p-8 text-center ff-fade-up ff-card lg:sticky lg:top-24">
+          <SeaDecor y="88%" />
           <div className="flex items-center justify-center gap-2 mb-5">
             <Logo size={24} />
             <Wordmark />

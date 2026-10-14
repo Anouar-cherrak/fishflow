@@ -1,4 +1,4 @@
-/* Page d'accueil FishFlow : noir, blanc et un seul vert. Tout est limité à .lp pour ne pas toucher le reste du site. */
+/* Page d'accueil FishFlow : noir, blanc et un seul bleu, sur un fond de mer. Tout est limité à .lp pour ne pas toucher le reste du site. */
 .lp {
   --bg: #0A0A0A; --paper: #141414; --ink: #F5F5F5; --muted: #A8A8A8;
   --line: rgba(245, 245, 245, 0.16); --hot: #38BDF8; --on-hot: #04121C;
@@ -11,7 +11,7 @@
 }
 .lp[data-theme="light"] {
   --bg: #EEF6F9; --paper: #FBFDFE; --ink: #0B1A2E; --muted: #47606F;
-  --line: rgba(11, 26, 46, 0.15); --hot: #0284C7; --on-hot: #FFFFFF;
+  --line: rgba(11, 26, 46, 0.15); --hot: #0369A1; --on-hot: #FFFFFF;
   --shadow: 0 30px 70px -30px rgba(14, 60, 90, 0.28);
   color-scheme: light;
 }
@@ -265,10 +265,8 @@
 .lp .pause:hover { background: var(--paper); }
 .lp .step.halt[aria-current="true"]::after { transition: none; }
 
-/* Fond d'eau profonde : bleu nuit en haut, qui se fond dans le noir habituel. */
-.lp { background: radial-gradient(1100px 620px at 85% 30%, rgba(14, 116, 144, 0.12), transparent 70%), linear-gradient(180deg, #07111c 0, var(--bg) 760px); }
-/* Thème clair : eau claire, du bleu lumineux en haut vers un bleu très pâle. */
-.lp[data-theme="light"] { background: radial-gradient(1100px 620px at 85% 30%, rgba(56, 189, 248, 0.16), transparent 70%), radial-gradient(900px 500px at 10% 70%, rgba(45, 212, 191, 0.10), transparent 70%), linear-gradient(180deg, #c9e6f3 0, var(--bg) 820px); }
+/* Fond : la mer commune à tout le site (couleurs « --ff-sea-* » dans globals.css), dessinée par <Ocean /> derrière la page. */
+.lp, .lp[data-theme="light"] { background: var(--ff-sea-bottom); }
 /* Logo de l'accueil : il plane comme dans l'application. */
 .lp .brand img { animation: ff-logo-glide 7s ease-in-out infinite; transform-origin: 50% 55%; }
 @media (prefers-reduced-motion: reduce) { .lp .brand img { animation: none; } }

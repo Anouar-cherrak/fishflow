@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { SeaDecor } from "@/components/Ocean";
 import { FlashcardStudy } from "@/components/FlashcardStudy";
 import { recordReviewResults, getProgress, type Progress } from "@/lib/reviews";
 import { trackEvent } from "@/lib/tracking";
@@ -188,7 +189,8 @@ export default function Reviser() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] items-stretch">
-        <section aria-live="polite" className="bg-surface border border-black/10 rounded-3xl p-7 sm:p-10 flex flex-col justify-center ff-fade-up">
+        <section aria-live="polite" className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-7 sm:p-10 flex flex-col justify-center ff-fade-up">
+          <SeaDecor y="82%" />
           {status === "loading" && <p className="text-black/50">Chargement...</p>}
 
           {status === "empty" && !finished && (

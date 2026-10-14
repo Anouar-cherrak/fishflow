@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { SeaDecor } from "@/components/Ocean";
 import { countDueCards } from "@/lib/reviews";
 
 type FicheRow = {
@@ -200,7 +201,8 @@ export default function MesFiches() {
       </div>
 
       {dueCount > 0 && (
-        <div className="mb-8 bg-surface border border-accent/50 rounded-3xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 ff-fade-up">
+        <div className="ff-deco-host mb-8 bg-surface border border-accent/50 rounded-3xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 ff-fade-up">
+          <SeaDecor fish={false} />
           <p className="text-black">
             <span className="font-extrabold text-xl mr-1">{dueCount}</span> carte{dueCount > 1 ? "s" : ""} à réviser aujourd&apos;hui
           </p>
@@ -304,7 +306,8 @@ export default function MesFiches() {
         {/* Fiches */}
         <div className="min-w-0">
           {filteredFiches.length === 0 ? (
-            <div className="bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
+            <div className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
+              <SeaDecor y="80%" />
               <p className="text-black/60">
                 {fiches.length === 0 ? "Tu n'as pas encore de fiche. Colle un cours, envoie un PDF ou une photo : ta première fiche arrive en quelques secondes." : "Aucune fiche dans cette section."}
               </p>

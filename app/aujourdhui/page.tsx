@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { FlameIcon, flameState } from "@/components/StreakFlame";
 import { AppShell } from "@/components/AppShell";
+import { SeaDecor } from "@/components/Ocean";
 import { questionOfTheDay } from "@/lib/curiosity";
 import {
   countDueCards,
@@ -147,7 +148,8 @@ export default function Aujourdhui() {
       </div>
 
       {ficheTotal === 0 && (
-        <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8 mb-6 ff-fade-up">
+        <section className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-5 sm:p-8 mb-6 ff-fade-up">
+          <SeaDecor />
           <h2 className="text-xl font-bold tracking-tight mb-2">Commence ici.</h2>
           <p className="text-black/65 mb-5 max-w-[60ch]">
             Colle un cours, un article ou une photo de tes notes : tu obtiens une fiche, des flashcards et un quiz. Ou pose
@@ -162,7 +164,8 @@ export default function Aujourdhui() {
 
       <div className="grid gap-6 lg:gap-8 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start">
         <div className="grid gap-6 min-w-0">
-          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="goal-title">
+          <section className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="goal-title">
+            <SeaDecor fish={false} />
             <div className="flex items-center gap-4 sm:gap-6">
               <div className="relative shrink-0 w-[92px] h-[92px] sm:w-[120px] sm:h-[120px]">
                 <svg viewBox="0 0 120 120" className="w-full h-full" aria-hidden="true">
