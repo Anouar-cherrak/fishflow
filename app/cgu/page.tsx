@@ -11,7 +11,7 @@ export default function CGU() {
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">1. Objet</h2>
             <p>
               Les présentes conditions générales d'utilisation (CGU) régissent l'accès et l'utilisation
-              du site FishFlow (ficheflow.fr), service permettant de générer des supports de révision
+              du site FishFlow (fishflow.fr), service permettant de générer des supports de révision
               (résumés, fiches, flashcards, quiz) à partir de contenus fournis par l'utilisateur (texte,
               PDF, photo), à l'aide d'un traitement par intelligence artificielle.
             </p>
@@ -62,8 +62,8 @@ export default function CGU() {
           <section>
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">6. Résiliation et suppression de compte</h2>
             <p>
-              L'utilisateur peut demander la suppression de son compte et de ses données à tout moment
-              en nous contactant à l'adresse anouarcherrak68100@gmail.com.
+              L'utilisateur peut supprimer son compte et ses données à tout moment, depuis la page
+              Paramètres (« Supprimer mon compte »), ou en nous contactant à l'adresse anouarcherrak68100@gmail.com.
             </p>
           </section>
 

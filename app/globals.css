@@ -774,6 +774,12 @@ body {
   color: color-mix(in oklab, var(--color-black) 70%, transparent);
 }
 
+/* Bandeau cookies : au-dessus de la barre d'onglets du téléphone, pour qu'on puisse toujours naviguer. */
+.ff-consent { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 767px) {
+  body:has(.ff-tabs) .ff-consent { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+}
+
 /* ===== Flamme de série ===== */
 .ff-streak {
   display: inline-flex; align-items: center; gap: 6px;

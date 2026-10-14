@@ -48,13 +48,13 @@ export function Analytics() {
 
       {choice === "unset" && (
         <div
-          role="dialog"
+          role="region"
           aria-label="Cookies"
+          className="ff-consent"
           style={{
             position: "fixed",
             left: 12,
             right: 12,
-            bottom: 12,
             zIndex: 80,
             maxWidth: 520,
             marginInline: "auto",
@@ -82,9 +82,9 @@ export function Analytics() {
                 flex: 1,
                 minHeight: 44,
                 borderRadius: 999,
-                border: 0,
-                background: "var(--ff-fg, #fff)",
-                color: "var(--ff-bg, #000)",
+                border: "1px solid var(--ff-line, rgba(128,128,128,.5))",
+                background: "transparent",
+                color: "inherit",
                 fontWeight: 600,
                 cursor: "pointer",
               }}

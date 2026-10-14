@@ -10,7 +10,7 @@ export default function MentionsLegales() {
           <section>
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">Éditeur du site</h2>
             <p>
-              Le site FishFlow (ficheflow.fr) est édité par :<br />
+              Le site FishFlow (fishflow.fr) est édité par :<br />
               CHERRAK Anouar<br />
               Statut : Entrepreneur individuel (micro-entreprise)<br />
               Numéro SIRET : 943 781 740 00015<br />

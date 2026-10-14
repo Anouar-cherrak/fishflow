@@ -163,7 +163,17 @@ function GenererContent() {
 
   const handleGenerate = async () => {
     if (!user) {
-      router.push("/login");
+      // Le cours déjà collé est gardé pendant l'inscription : il revient tout seul dans la zone de texte.
+      try {
+        if (mode === "text" && text.trim()) sessionStorage.setItem("ff-prefill", text.slice(0, 20000));
+      } catch {}
+      router.push("/signup");
+      return;
+    }
+
+    // Pas de connexion internet : on le dit tout de suite, au lieu d'attendre sans rien afficher.
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      setError("Tu n'es pas connecté à internet. Vérifie ton wifi ou tes données mobiles, puis réessaie.");
       return;
     }
 
@@ -205,7 +215,10 @@ function GenererContent() {
 
     try {
       const res = await fetch("/api/generate", { method: "POST", body: formData });
-      const data = await res.json();
+      // Une réponse qui n'est pas du JSON (délai dépassé chez l'hébergeur, panne) : on l'explique simplement.
+      const data = await res.json().catch(() => ({
+        error: "La création de ta fiche a pris trop de temps ou a échoué. Elle ne t'a pas été décomptée. Réessaie, ou coupe ton cours en deux s'il est long.",
+      }));
 
       if (!res.ok) {
         setLoading(false);
@@ -225,7 +238,7 @@ function GenererContent() {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
           setError(data.error || "Une erreur est survenue. Réessaie.");
         }
-        fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d));
+        fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d)).catch(() => {});
         return;
       }
 
