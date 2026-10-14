@@ -9,16 +9,18 @@ export function TrackedLink({
   event,
   params,
   className,
+  tabIndex,
   children,
 }: {
   href: string;
   event: string;
   params?: Record<string, unknown>;
   className?: string;
+  tabIndex?: number;
   children: ReactNode;
 }) {
   return (
-    <Link href={href} className={className} onClick={() => trackEvent(event, params)}>
+    <Link href={href} className={className} tabIndex={tabIndex} onClick={() => trackEvent(event, params)}>
       {children}
     </Link>
   );

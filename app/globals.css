@@ -37,28 +37,25 @@
   color-scheme: dark;
 }
 
-/* ===== Couleurs de la mer (UNIQUEMENT le fond des pages : cartes, champs, barres et boutons gardent leurs couleurs) =====
-   À ajuster ici : haut de l'écran (lumière), milieu, bas (profondeur), reflet du soleil, bulles et poissons. */
+/* ===== Couleurs du fond des pages (UNIQUEMENT le fond : cartes, champs, barres et boutons gardent leurs couleurs) =====
+   À ajuster ici : --ff-sea-top = le haut de la page (bleu nuit), --ff-sea-bottom = la couleur du reste de la page.
+   En thème sombre, le fond est un peu plus clair que les cartes noires (#151515) pour qu'elles s'en détachent. */
 :root {
-  --ff-sea-top: #cdeaf8;
-  --ff-sea-mid: #e2f2fa;
-  --ff-sea-bottom: #f1f8fc;
-  --ff-sea-sun: rgba(255, 247, 220, 0.85);
-  --ff-sea-glow: rgba(56, 189, 248, 0.16);
-  --ff-bubble: rgba(3, 105, 161, 0.3);
-  --ff-fish: rgba(3, 105, 161, 0.2);
-  --ff-fish-eye: rgba(255, 255, 255, 0.8);
+  /* Thème clair : un vrai bleu d'eau (le blanc ne domine plus), les cartes blanches s'en détachent. */
+  --ff-sea-top: #b9dcef;
+  --ff-sea-bottom: #d8eaf4;
+  --ff-sea-glow: rgba(56, 189, 248, 0.22);
+  --ff-bubble: rgba(14, 116, 144, 0.26);
+  --ff-fish: rgba(14, 116, 144, 0.16);
+  --ff-fish-eye: rgba(255, 255, 255, 0.7);
 }
 :root.dark {
-  /* Le haut reste assez foncé pour que le texte gris et le bleu clair gardent un contraste de 4,5:1. */
-  --ff-sea-top: #173f63;
-  --ff-sea-mid: #0f2d4b;
-  --ff-sea-bottom: #0a1f36;
-  --ff-sea-sun: rgba(125, 211, 252, 0.05);
-  --ff-sea-glow: rgba(14, 116, 144, 0.22);
-  --ff-bubble: rgba(186, 230, 253, 0.32);
-  --ff-fish: rgba(125, 211, 252, 0.2);
-  --ff-fish-eye: rgba(4, 18, 28, 0.6);
+  --ff-sea-top: #0c1d2f;
+  --ff-sea-bottom: #1a1d22;
+  --ff-sea-glow: color-mix(in srgb, #0e7490 16%, transparent);
+  --ff-bubble: rgba(186, 230, 253, 0.2);
+  --ff-fish: rgba(125, 211, 252, 0.11);
+  --ff-fish-eye: rgba(0, 0, 0, 0.5);
 }
 
 /* Couleurs de feedback du quiz (bonne/mauvaise réponse) — adaptées au thème
@@ -360,9 +357,10 @@ body {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  background: color-mix(in srgb, var(--ff-bg) 78%, transparent);
-  backdrop-filter: blur(14px);
+  /* Opaque : le contenu qui défile ne se voit plus à travers (avant, il « bavait » sous la barre). */
+  background: var(--ff-bg);
   border-bottom: 1px solid var(--ff-line);
+  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.5);
 }
 @media (min-width: 768px) { .ff-bar { padding: 14px 32px; } }
 @media (min-width: 1024px) { .ff-bar { padding: 16px max(40px, calc((100% - 1280px) / 2 + 56px)); } }
@@ -774,6 +772,9 @@ body {
   color: color-mix(in oklab, var(--color-black) 70%, transparent);
 }
 
+/* Thème clair : le texte bleu posé sur le fond (et non sur un bouton) est un peu plus foncé, pour rester lisible sur le bleu. */
+:root:not(.dark) .text-accent { color: var(--ff-accent-strong); }
+
 /* Focus clavier : un contour bleu net sur tout ce qui se clique, dans les deux thèmes. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 3px solid var(--ff-accent);
@@ -880,10 +881,10 @@ body {
 .ff-main { overflow-wrap: break-word; }
 .ff-main :where(button, a, input, select, textarea, svg, img, canvas) { overflow-wrap: normal; }
 
-/* ===== Ambiance mer (octobre 2026) =====
-   Le fond de toutes les pages est une mer (couleurs « --ff-sea-* » en haut de ce fichier) : plus claire en haut,
-   plus profonde en bas, avec des bulles et de petits poissons. Uniquement transform et opacity, toujours
-   derrière le contenu, jamais cliquable. Tout s'arrête si la personne demande moins d'animations. */
+/* ===== Ambiance aquatique (octobre 2026) =====
+   Fond bleu nuit en haut qui se fond dans la couleur de la page (couleurs « --ff-sea-* » en haut de ce fichier),
+   avec des bulles et de petits poissons. Uniquement transform et opacity, toujours derrière le contenu, jamais
+   cliquable. Tout s'arrête si la personne demande moins d'animations. */
 
 /* Thème clair : des rayons de soleil qui traversent l'eau, depuis le haut. */
 :root:not(.dark) .ff-ocean::before {
@@ -897,20 +898,16 @@ body {
 @keyframes ff-rays { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, 0, 0); } }
 @media (prefers-reduced-motion: reduce) { :root:not(.dark) .ff-ocean::before { animation: none; } }
 
-/* Le cadre des pages garde la couleur du fond de la mer : si la page est plus haute que l'écran, le bas reste « profond ». */
+/* Fond : bleu nuit en haut, qui se fond dans la couleur de la page, avec un halo bleu-vert (comme avant, un peu plus clair). */
 .ff-frame {
   isolation: isolate;
-  background: var(--ff-sea-bottom);
+  background:
+    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, var(--ff-accent) 10%, transparent), transparent 70%),
+    radial-gradient(1100px 620px at 90% 105%, var(--ff-sea-glow), transparent 70%),
+    linear-gradient(180deg, var(--ff-sea-top) 0%, var(--ff-sea-bottom) 520px);
 }
 
-/* La mer elle-même : fixée à l'écran, la lumière vient toujours du haut. */
-.ff-ocean {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict;
-  background:
-    radial-gradient(70% 220px at 50% 0, var(--ff-sea-sun), transparent 100%),
-    radial-gradient(1100px 620px at 90% 105%, var(--ff-sea-glow), transparent 70%),
-    linear-gradient(180deg, var(--ff-sea-top) 0%, var(--ff-sea-mid) 45%, var(--ff-sea-bottom) 100%);
-}
+.ff-ocean { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
 .ff-ocean i {
   position: absolute; bottom: -24px; left: var(--x);
   width: var(--s); height: var(--s); border-radius: 50%;

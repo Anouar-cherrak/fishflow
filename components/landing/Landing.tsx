@@ -121,6 +121,43 @@ function Art({ k }: { k: ArtKey }) {
   );
 }
 
+// Un chiffre qui « compte » jusqu'à sa valeur quand il arrive à l'écran (affiché directement si on demande moins d'animations).
+function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [n, setN] = useState(to);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    queueMicrotask(() => setN(0));
+    let raf = 0;
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es[0].isIntersecting) return;
+        io.disconnect();
+        const t0 = performance.now();
+        const tick = (t: number) => {
+          const p = Math.min(1, (t - t0) / 900);
+          setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      },
+      { threshold: 0.6 }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [to]);
+  return (
+    <span ref={ref}>
+      {n}
+      {suffix}
+    </span>
+  );
+}
+
 function BrandMark() {
   // Même logo que dans l'application (components/Logo.tsx) : la raie manta.
   return <RaieImg small width={44} height={36} />;
@@ -255,36 +292,74 @@ export function Landing() {
     };
   }, []);
 
-  /* La fiche, étape par étape */
+  /* La fiche, étape par étape : les étapes avancent avec le défilement de la page (rien à toucher).
+     Si la personne demande moins d'animations, la section reste normale et on choisit l'étape avec les boutons. */
   const stageRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLElement>(null);
   const [step, setStep] = useState(0);
-  const [stageInView, setStageInView] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const DUR = 3200;
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el || !("IntersectionObserver" in window)) {
-      setStep(3);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (es) => {
-        setStageInView(es[0].isIntersecting);
-        if (es[0].isIntersecting) setStep(0);
-      },
-      { threshold: 0.2 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  const [scrolly, setScrolly] = useState(false);
   useEffect(() => {
     kick(0.45);
-    // Les étapes défilent toutes seules, même si l'animation du système est réduite (c'est un changement de texte, pas un mouvement).
-    // Un bouton Pause permet de s'arrêter.
-    if (!stageInView || paused) return;
-    const id = setTimeout(() => setStep((s) => (s + 1) % 4), DUR);
-    return () => clearTimeout(id);
-  }, [step, stageInView, paused, kick]);
+  }, [step, kick]);
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduce) queueMicrotask(() => setScrolly(true));
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // Barre de progression de la page, en haut de l'écran.
+      const doc = document.documentElement;
+      const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+      if (progressRef.current) progressRef.current.style.transform = `scaleX(${Math.min(1, window.scrollY / max)})`;
+      // Étape de la fabrication d'une fiche, selon la position dans la section.
+      const el = trackRef.current;
+      if (reduce || !el) return;
+      const r = el.getBoundingClientRect();
+      const total = Math.max(1, r.height - window.innerHeight);
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      setStep(Math.min(3, Math.floor(p * 4)));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+  // Cliquer sur une étape : en mode « défilement », on fait défiler jusqu'à elle.
+  const goStep = (n: number) => {
+    const el = trackRef.current;
+    if (!scrolly || !el) return setStep(n);
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const total = el.offsetHeight - window.innerHeight;
+    window.scrollTo({ top: top + ((n + 0.5) / 4) * total, behavior: "smooth" });
+  };
+
+  /* Barre d'action collante (téléphone) : visible après l'accueil, cachée à la fin où le gros bouton est déjà là. */
+  const [stickyCta, setStickyCta] = useState(false);
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const hero = rootRef.current?.querySelector(".hero");
+    const end = rootRef.current?.querySelector(".final");
+    if (!hero || !end) return;
+    const seen = { hero: true, end: false };
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        if (e.target === hero) seen.hero = e.isIntersecting;
+        if (e.target === end) seen.end = e.isIntersecting;
+      }
+      setStickyCta(!seen.hero && !seen.end);
+    });
+    io.observe(hero);
+    io.observe(end);
+    return () => io.disconnect();
+  }, []);
 
   /* Démo Apprendre : la boule « réfléchit », puis rejette ses images */
   const [demoKey, setDemoKey] = useState<DemoKey | null>(null);
@@ -497,6 +572,7 @@ export function Landing() {
   return (
     <div className="lp" data-theme={theme} ref={rootRef}>
       <a className="skip" href="#top">Aller au contenu</a>
+      <div className="lp-progress" aria-hidden="true"><i ref={progressRef} /></div>
       <canvas id="orb" ref={canvasRef} aria-hidden="true" />
 
       <header className="bar">
@@ -562,6 +638,11 @@ export function Landing() {
               </a>
             </div>
             <p className="note">3 fiches gratuites par mois, sans carte bancaire.</p>
+            <ul className="for" aria-label="Pour qui">
+              {["Collège", "Lycée", "Fac", "Concours", "Code de la route", "Langues"].map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
           </div>
           <div className="fd">
             <p className="fd-tag">Exemple généré à partir d&apos;un cours sur la photosynthèse</p>
@@ -600,7 +681,7 @@ export function Landing() {
         {/* C'est quoi */}
         <section id="quoi" aria-labelledby="t-q">
           <div className="wrap">
-            <h2 id="t-q">Ce que FishFlow fait pour toi.</h2>
+            <h2 id="t-q">Relire son cours ne suffit pas.</h2>
             <p className="sub">FishFlow t&apos;aide à comprendre, puis à ne plus oublier. Le cœur du site : tes fiches de révision.</p>
             <div className="tools">
               <article className="tool main">
@@ -626,24 +707,30 @@ export function Landing() {
                 </dl>
               </article>
             </div>
+            <ul className="stats" aria-label="FishFlow en chiffres">
+              <li><strong><CountUp to={4} /></strong><span>outils d&apos;un coup : fiche, essentiel, flashcards, quiz</span></li>
+              <li><strong>&lt; <CountUp to={1} suffix=" min" /></strong><span>pour transformer un cours en fiche</span></li>
+              <li><strong><CountUp to={3} /></strong><span>fiches gratuites chaque mois, sans carte bancaire</span></li>
+            </ul>
           </div>
         </section>
 
         {/* Fabrication d'une fiche */}
-        <section id="fiche" aria-labelledby="t-f">
-          <div className="wrap">
+        <section id="fiche" aria-labelledby="t-f" className={scrolly ? "scrolly-on" : undefined}>
+          <div className="scrolly-track" ref={trackRef}>
+          <div className="wrap scrolly-sticky">
             <h2 id="t-f">Comment une fiche est fabriquée.</h2>
-            <p className="sub">Quatre étapes qui défilent toutes seules. Tu peux choisir une étape, ou mettre en pause.</p>
+            <p className="sub">{scrolly ? "Fais défiler : les quatre étapes avancent toutes seules." : "Choisis une étape pour la voir."}</p>
             <div className="fab">
               <div className="steps" role="group" aria-label="Étapes">
                 {STEPS.map((s, n) => (
                   <button
                     key={s.label}
                     type="button"
-                    className={`step${n < step ? " done" : ""}${paused ? " halt" : ""}`}
+                    className={`step${n < step ? " done" : ""}`}
                     aria-current={n === step ? "true" : "false"}
-                    style={{ ["--dur" as string]: `${DUR}ms` }}
-                    onClick={() => setStep(n)}
+                    style={{ ["--dur" as string]: "400ms" }}
+                    onClick={() => goStep(n)}
                   >
                     {s.label}
                   </button>
@@ -672,11 +759,9 @@ export function Landing() {
               </div>
               <div className="cap-row">
                 <p className="cap" aria-live="polite">{STEPS[step].caption}</p>
-                <button type="button" className="pause" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
-                  {paused ? "Reprendre" : "Pause"}
-                </button>
               </div>
             </div>
+          </div>
           </div>
         </section>
         <WaveDivider flip />
@@ -853,17 +938,33 @@ export function Landing() {
 
         <section className="final" aria-labelledby="t-end">
           <div className="wrap">
-            <h2 id="t-end">Crée ta première fiche.</h2>
+            <p className="eyebrow">Prêt ?</p>
+            <h2 id="t-end">Ton prochain cours devient une fiche en moins d&apos;une minute.</h2>
+            <ol className="recap">
+              <li>Colle ton cours, un PDF ou une photo.</li>
+              <li>FishFlow écrit ta fiche, tes flashcards et ton quiz.</li>
+              <li>Tu révises un peu chaque jour, et tu retiens.</li>
+            </ol>
             <div className="cta-row">
               {signedIn ? (
-                <Link href="/generer" className="btn"><span>Ouvrir FishFlow</span></Link>
+                <Link href="/generer" className="btn btn-xl"><span>Ouvrir FishFlow</span></Link>
               ) : (
-                <TrackedLink href="/generer" event="cta_click_final" className="btn"><span>Essayer gratuitement</span></TrackedLink>
+                <TrackedLink href="/generer" event="cta_click_final" className="btn btn-xl"><span>Ouvrir FishFlow gratuitement</span></TrackedLink>
               )}
             </div>
+            <p className="note">Sans carte bancaire. 3 fiches gratuites par mois.</p>
           </div>
         </section>
       </main>
+
+      {/* Téléphone : le bouton reste à portée de pouce pendant qu'on fait défiler. */}
+      <div className="sticky-cta" data-show={stickyCta} aria-hidden={!stickyCta}>
+        {signedIn ? (
+          <Link href="/generer" className="btn" tabIndex={stickyCta ? undefined : -1}><span>Ouvrir FishFlow</span></Link>
+        ) : (
+          <TrackedLink href="/generer" event="cta_click_sticky" className="btn" tabIndex={stickyCta ? undefined : -1}><span>Créer ma fiche gratuitement</span></TrackedLink>
+        )}
+      </div>
 
       <footer>
         <div className="wrap">

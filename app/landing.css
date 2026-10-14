@@ -19,14 +19,14 @@
 .lp ul { padding: 0; }
 .lp *, .lp *::before, .lp *::after { box-sizing: border-box; }
 .lp { scroll-behavior: smooth; }
-.lp { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: background 0.6s ease, color 0.6s ease; }
+.lp { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--body); -webkit-font-smoothing: antialiased; overflow-x: clip; transition: background 0.6s ease, color 0.6s ease; }
 .lp a { color: inherit; }
 .lp button { font: inherit; color: inherit; cursor: pointer; }
 .lp :focus-visible { outline: 2px solid var(--hot); outline-offset: 3px; border-radius: 6px; }
 .lp #orb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; z-index: 0; pointer-events: none; }
 .lp main, .lp footer { position: relative; z-index: 1; }
 .lp header.bar .brand { min-height: 44px; display: inline-flex; align-items: center; }
-.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(14px); }
+.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: var(--bg); border-bottom: 1px solid var(--line); }
 .lp .brand { display: inline-flex; align-items: center; gap: 8px; font: 600 18px/1 var(--display); text-decoration: none; letter-spacing: -0.02em; }
 .lp .brand svg, .lp .brand img { width: auto; height: 36px; }
 .lp .brand em { font-style: normal; font-weight: 400; color: var(--ff-logo-blue); }
@@ -47,7 +47,6 @@
 .lp .hero .copy { display: grid; gap: 22px; justify-items: start; }
 .lp .slot-hero { width: min(64vw, 300px); aspect-ratio: 1; justify-self: center; }
 .lp .h-xl { font: 700 clamp(40px, 11vw, 96px)/1.02 var(--display); letter-spacing: -0.025em; margin: 0; text-wrap: balance; }
-.lp .eyebrow { font-size: 15px; font-weight: 700; color: var(--hot); margin: 0; }
 .lp .h-hero { font-size: clamp(38px, 9vw, 76px); }
 .lp .lead { max-width: 34ch; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.5; color: var(--ink); margin: 0; }
 .lp .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -267,8 +266,8 @@
 .lp .pause:hover { background: var(--paper); }
 .lp .step.halt[aria-current="true"]::after { transition: none; }
 
-/* Fond : la mer commune à tout le site (couleurs « --ff-sea-* » dans globals.css), dessinée par <Ocean /> derrière la page. */
-.lp, .lp[data-theme="light"] { background: var(--ff-sea-bottom); }
+/* Fond : bleu nuit en haut qui se fond dans la couleur de la page (couleurs « --ff-sea-* » dans globals.css). */
+.lp, .lp[data-theme="light"] { background: radial-gradient(1100px 620px at 85% 30%, var(--ff-sea-glow), transparent 70%), linear-gradient(180deg, var(--ff-sea-top) 0, var(--ff-sea-bottom) 760px); }
 /* Logo de l'accueil : il plane comme dans l'application. */
 .lp .brand img { animation: ff-logo-glide 7s ease-in-out infinite; transform-origin: 50% 55%; }
 @media (prefers-reduced-motion: reduce) { .lp .brand img { animation: none; } }
@@ -292,3 +291,64 @@
 @keyframes lpOrbFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-8px) scale(1.02); } }
 @keyframes lpOrbThink { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .lp .slot-css { animation: none; } }
+
+/* ===== Accueil « qui se déroule tout seul » (octobre 2026) ===== */
+/* Barre de progression de la page, tout en haut. */
+.lp .lp-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 40; pointer-events: none; }
+.lp .lp-progress i { display: block; height: 100%; background: var(--hot); transform-origin: left; transform: scaleX(0); }
+
+/* « Pour qui » sous le bouton de l'accueil. */
+.lp .for { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; }
+.lp .for li { font-size: 14px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 70%, transparent); }
+
+/* Chiffres clés qui comptent quand ils arrivent à l'écran. */
+.lp .stats { list-style: none; margin: 40px 0 0; display: grid; gap: 12px; }
+.lp .stats li { border-radius: 24px; border: 1px solid var(--line); background: var(--paper); padding: 22px 24px; display: grid; gap: 6px; }
+.lp .stats strong { font: 800 clamp(40px, 7vw, 64px)/1 var(--display); letter-spacing: -0.04em; color: var(--hot); }
+.lp .stats li > span { color: var(--muted); font-size: 16px; }
+@media (min-width: 900px) { .lp .stats { grid-template-columns: repeat(3, 1fr); } }
+
+/* La fabrication d'une fiche avance avec le défilement : la section est haute, le contenu reste collé à l'écran. */
+.lp #fiche.scrolly-on { padding-top: 0; padding-bottom: 0; }
+.lp .scrolly-on .scrolly-track { height: 340vh; position: relative; }
+.lp .scrolly-on .scrolly-sticky { position: sticky; top: 72px; min-height: calc(100svh - 72px); display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }
+.lp .scrolly-on .step::after { transition: width 0.4s ease; }
+/* Téléphone : le cours et la fiche se remplacent au même endroit (tout tient dans l'écran). */
+@media (max-width: 899px) {
+  .lp .scrolly-on .sub { margin-bottom: 18px; }
+  .lp .scrolly-on .steps { gap: 6px; }
+  .lp .scrolly-on .step { font-size: 13px; }
+  .lp .scrolly-on .stage { display: grid; }
+  .lp .scrolly-on .stage > * { grid-area: 1 / 1; transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  .lp .scrolly-on .stage.s3 .doc, .lp .scrolly-on .stage.s4 .doc { opacity: 0; transform: scale(0.94); }
+  .lp .scrolly-on .stage.s1 .sheet, .lp .scrolly-on .stage.s2 .sheet { opacity: 0; transform: translateY(16px); }
+  .lp .scrolly-on .cap { font-size: 16px; min-height: 2.6em; }
+}
+
+/* Fin de la page : on récapitule, puis on ouvre l'application. */
+.lp .eyebrow { font-size: 15px; font-weight: 700; color: var(--hot); margin: 0 0 8px; }
+.lp .final { text-align: left; }
+.lp .final h2 { max-width: 22ch; }
+.lp .recap { margin: 8px 0 0; padding: 0; list-style: none; counter-reset: r; display: grid; gap: 10px; max-width: 52ch; }
+.lp .recap li { counter-increment: r; display: flex; gap: 12px; align-items: baseline; font-size: 18px; }
+.lp .recap li::before { content: counter(r); flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--hot); color: var(--on-hot); font-weight: 800; font-size: 15px; transform: translateY(5px); }
+.lp .final .note { margin-top: 14px; }
+.lp .btn-xl { min-height: 62px; padding: 0 38px; font-size: 19px; }
+
+/* Téléphone : bouton collant en bas pendant le défilement. */
+.lp .sticky-cta { display: none; }
+@media (max-width: 767px) {
+  .lp .sticky-cta {
+    display: block; position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 35;
+    transform: translateY(140%); opacity: 0; transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  }
+  .lp .sticky-cta[data-show="true"] { transform: none; opacity: 1; }
+  .lp .sticky-cta .btn { width: 100%; box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6); }
+  .lp footer { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp .sticky-cta { transition: none; }
+}
+
+/* Thème clair : petit texte bleu posé sur le fond bleuté, un ton plus foncé pour rester lisible. */
+.lp[data-theme="light"] .eyebrow { color: #075985; }
