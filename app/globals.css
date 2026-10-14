@@ -357,18 +357,11 @@ body {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  /* Un voile couleur de l'eau, très flouté : la barre se fond dans la mer, mais son bord et son ombre la marquent bien. */
-  background: color-mix(in srgb, var(--ff-sea-top) 95%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.7);
-}
-/* Thème clair : un voile d'eau très clair, pour que le logo bleu ressorte bien. */
-:root:not(.dark) .ff-bar {
-  background: color-mix(in srgb, #f3f9fc 95%, transparent);
-  border-bottom-color: rgba(11, 26, 46, 0.1);
-  box-shadow: 0 10px 30px -20px rgba(14, 60, 90, 0.35);
+  /* Comme avant (noir et flouté), juste un peu plus transparent pour laisser deviner l'eau. */
+  background: color-mix(in srgb, var(--ff-bg) 68%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ff-line);
 }
 @media (min-width: 768px) { .ff-bar { padding: 14px 32px; } }
 @media (min-width: 1024px) { .ff-bar { padding: 16px max(40px, calc((100% - 1280px) / 2 + 56px)); } }

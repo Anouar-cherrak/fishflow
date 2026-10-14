@@ -26,9 +26,7 @@
 .lp #orb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; z-index: 0; pointer-events: none; }
 .lp main, .lp footer { position: relative; z-index: 1; }
 .lp header.bar .brand { min-height: 44px; display: inline-flex; align-items: center; }
-.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--ff-sea-top) 95%, transparent); -webkit-backdrop-filter: blur(24px) saturate(150%); backdrop-filter: blur(24px) saturate(150%); border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.7); }
-/* Thème clair : un voile d'eau très clair, pour que le logo bleu ressorte bien. */
-.lp[data-theme="light"] header.bar { background: color-mix(in srgb, #F3F9FC 95%, transparent); border-bottom-color: rgba(11, 26, 46, 0.1); box-shadow: 0 10px 30px -20px rgba(14, 60, 90, 0.35); }
+.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--bg) 60%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .lp .brand { display: inline-flex; align-items: center; gap: 8px; font: 600 18px/1 var(--display); text-decoration: none; letter-spacing: -0.02em; }
 .lp .brand svg, .lp .brand img { width: auto; height: 36px; }
 .lp .brand em { font-style: normal; font-weight: 400; color: var(--ff-logo-blue); }
