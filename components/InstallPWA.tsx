@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDialog } from "@/lib/use-dialog";
 import { createPortal } from "react-dom";
 
 // Événement « installer l'appli » de Chrome (pas encore dans les types du navigateur).
@@ -12,6 +13,8 @@ export function InstallPWA() {
   const [isIOS, setIsIOS] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [guideType, setGuideType] = useState<"ios" | "generic">("generic");
+  const guideRef = useRef<HTMLDivElement>(null);
+  useDialog(guideRef, () => setShowGuide(false), showGuide);
 
   useEffect(() => {
     const standalone =
@@ -68,6 +71,10 @@ export function InstallPWA() {
           onClick={() => setShowGuide(false)}
         >
           <div
+            ref={guideRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={guideType === "ios" ? "Installer FishFlow sur iPhone" : "Installer FishFlow"}
             className="bg-surface border border-black/10 rounded-2xl p-6 max-w-sm w-full shadow-xl max-h-[85dvh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
@@ -76,8 +83,9 @@ export function InstallPWA() {
                 {guideType === "ios" ? "Installer FishFlow sur iPhone" : "Installer FishFlow"}
               </p>
               <button
+                type="button"
                 onClick={() => setShowGuide(false)}
-                className="text-black/30 hover:text-black text-xl leading-none shrink-0 ml-3"
+                className="w-11 h-11 -mr-2 -mt-2 flex items-center justify-center rounded-full text-black/60 hover:text-black text-xl leading-none shrink-0 ml-3"
                 aria-label="Fermer"
               >
                 ✕
@@ -94,15 +102,17 @@ export function InstallPWA() {
             ) : (
               <>
                 <p className="text-sm text-black/70 mb-3">Sur Chrome ou Edge (PC, Android), cherche la petite icône d'installation directement dans la barre d'adresse (à droite, à côté de l'URL) et clique dessus.</p>
-                <p className="text-xs text-black/40">
+                <p className="text-xs text-black/60">
                   Si tu ne la vois pas : ouvre le menu du navigateur (⋮ en haut à droite) puis choisis « Installer FishFlow ».
                 </p>
               </>
             )}
 
             <button
+              type="button"
+              data-autofocus
               onClick={() => setShowGuide(false)}
-              className="mt-5 w-full py-2.5 rounded-lg bg-surface hover:bg-black/10 transition text-sm text-black"
+              className="ff-secondary mt-5 w-full text-sm"
             >
               Compris
             </button>

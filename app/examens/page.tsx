@@ -39,6 +39,8 @@ export default function Examens() {
   const [date, setDate] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState("");
+  // Quel champ pose problème : l'erreur s'affiche juste sous lui.
+  const [errorField, setErrorField] = useState<"title" | "date" | "fiches" | "save" | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -95,7 +97,7 @@ export default function Examens() {
     );
 
   const chip = (active: boolean) =>
-    `shrink-0 min-h-[40px] px-4 rounded-full text-sm font-semibold whitespace-nowrap transition border ${
+    `shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold whitespace-nowrap transition border ${
       active ? "bg-black text-white border-transparent" : "bg-white text-black/70 border-black/15 hover:text-black"
     }`;
 
@@ -104,13 +106,20 @@ export default function Examens() {
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!title.trim()) return setError("Donne un nom à ton examen.");
-    if (!date || daysLeft(date) < 0) return setError("Choisis une date à venir.");
-    if (selected.length === 0) return setError("Choisis au moins une fiche à réviser.");
+    setErrorField(null);
+    const fail = (field: "title" | "date" | "fiches" | "save", message: string) => {
+      setErrorField(field);
+      setError(message);
+      if (field !== "save") document.getElementById(field === "title" ? "exam-title" : field === "date" ? "exam-date" : "exam-fiches")?.focus();
+    };
+    if (!title.trim()) return fail("title", "Donne un nom à ton examen, par exemple « Partiel de droit ».");
+    if (!date || daysLeft(date) < 0) return fail("date", "Choisis une date d'aujourd'hui ou plus tard.");
+    if (selected.length === 0) return fail("fiches", "Coche au moins une fiche à réviser pour cet examen.");
     setSaving(true);
     const { error: err } = await createClient().from("exams").insert({ title: title.trim().slice(0, 80), exam_date: date, fiche_ids: selected });
     setSaving(false);
-    if (err) return setError("Impossible d'enregistrer. Réessaie.");
+    if (err) return fail("save", "L'examen n'a pas pu être enregistré. Vérifie ta connexion et réessaie.");
+    setErrorField(null);
     trackEvent("examen_cree", { fiches: selected.length });
     setCreating(false);
     setTitle("");
@@ -160,16 +169,20 @@ export default function Examens() {
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={80}
                 placeholder="Ex : Partiel de droit"
+                aria-invalid={errorField === "title" || undefined}
+                aria-describedby={errorField === "title" ? "exam-error" : undefined}
                 className="min-h-[48px] px-4 rounded-xl border border-black/15 bg-white"
               />
+              {errorField === "title" && <p id="exam-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)]">{error}</p>}
             </div>
             <div className="grid gap-1.5">
               <label htmlFor="exam-date" className="text-sm font-semibold text-black/70">2. La date</label>
-              <input id="exam-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={date} onChange={(e) => setDate(e.target.value)} className="min-h-[48px] px-4 rounded-xl border border-black/15 bg-white" />
+              <input id="exam-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={date} onChange={(e) => setDate(e.target.value)} aria-invalid={errorField === "date" || undefined} aria-describedby={errorField === "date" ? "exam-error" : undefined} className="min-h-[48px] px-4 rounded-xl border border-black/15 bg-white" />
+              {errorField === "date" && <p id="exam-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)]">{error}</p>}
             </div>
           </div>
 
-          <fieldset className="grid gap-2">
+          <fieldset id="exam-fiches" tabIndex={-1} className="grid gap-2 outline-none" aria-describedby={errorField === "fiches" ? "exam-error" : undefined}>
             <legend className="text-sm font-semibold text-black/70 mb-1">3. Les fiches à réviser pour cet examen</legend>
             {fiches.length === 0 ? (
               <p className="text-sm text-black/60">
@@ -206,15 +219,16 @@ export default function Examens() {
                   </li>
                 ))}
               </ul>
+              {errorField === "fiches" && <p id="exam-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)]">{error}</p>}
               {selected.length > 0 && <p className="text-xs text-black/60" aria-live="polite">{selected.length} fiche{selected.length > 1 ? "s" : ""} choisie{selected.length > 1 ? "s" : ""}</p>}
               </>
             )}
           </fieldset>
 
-          {error && <p className="text-sm text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
+          {errorField === "save" && <p className="text-sm text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
           <div className="flex flex-wrap gap-3">
             <button type="submit" disabled={saving} className="ff-primary ff-btn">{saving ? "Enregistrement..." : "Enregistrer"}</button>
-            <button type="button" onClick={() => { setCreating(false); setError(""); }} className="ff-secondary">Annuler</button>
+            <button type="button" onClick={() => { setCreating(false); setError(""); setErrorField(null); }} className="ff-secondary">Annuler</button>
           </div>
         </form>
       )}
@@ -280,7 +294,7 @@ export default function Examens() {
                       Réviser pour cet examen
                     </button>
                   )}
-                  <button type="button" onClick={() => remove(exam.id)} className="text-sm text-black/55 hover:text-black underline underline-offset-4 min-h-[44px] px-1">
+                  <button type="button" onClick={() => remove(exam.id)} aria-label={`Supprimer l'examen ${exam.title}`} className="text-sm text-black/55 hover:text-black underline underline-offset-4 min-h-[44px] px-1">
                     Supprimer
                   </button>
                 </div>

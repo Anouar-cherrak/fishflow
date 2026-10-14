@@ -82,7 +82,7 @@ function GenererPage({
   ];
   return (
     <div className="sx-page">
-      <h1 className="sx-h1">Génère ta fiche de révision.</h1>
+      <p className="sx-h1">Génère ta fiche de révision.</p>
       <p className="sx-lead" style={{ maxWidth: 700 }}>Colle ton cours, envoie un PDF ou prends-le en photo.</p>
       <div style={{ display: "grid", gridTemplateColumns: "440px 1fr", gap: 24, marginTop: 20 }}>
         <div className="sx-card" style={{ padding: 18 }}>
@@ -158,7 +158,7 @@ function FichePage({ share, shareD = 0, copied }: { share?: "link"; shareD?: num
     <div className="sx-page" style={{ display: "grid", gridTemplateColumns: "1fr 270px", gap: 40, alignContent: "start" }}>
       <div>
         <p className="sx-eyebrow" style={{ margin: 0 }}>Fiche de révision</p>
-        <h1 className="sx-h1" style={{ fontSize: 44, marginTop: 4 }}>La photosynthèse</h1>
+        <p className="sx-h1" style={{ fontSize: 44, marginTop: 4 }}>La photosynthèse</p>
         <p className="sx-lead" style={{ fontSize: 15 }}>Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
         <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
           <span className="sx-pill on sm">Classique</span><span className="sx-pill sm">Mémo</span><span className="sx-pill sm">Cornell</span>
@@ -268,7 +268,7 @@ function Boxes({ dot }: { dot?: boolean }) {
 function ReviserPage({ left, dot }: { left: ReactNode; dot?: boolean }) {
   return (
     <div className="sx-page">
-      <h1 className="sx-h1">Réviser.</h1>
+      <p className="sx-h1">Réviser.</p>
       <p className="sx-lead" style={{ fontSize: 16, maxWidth: 800 }}>Tes cartes reviennent au bon moment : vite si tu les rates, plus tard si tu les sais.</p>
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 22, marginTop: 18 }}>
         {left}
@@ -380,7 +380,7 @@ function ExamPage({ children, btn }: { children: ReactNode; btn?: boolean }) {
     <div className="sx-page">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
-          <h1 className="sx-h1">Mes examens.</h1>
+          <p className="sx-h1">Mes examens.</p>
           <p className="sx-lead" style={{ fontSize: 16 }}>Donne une date. FishFlow te dit combien de cartes revoir chaque jour.</p>
         </div>
         {btn && <span className="sx-primary sx-press" style={at(1.4)} data-t="add">Ajouter un examen</span>}
@@ -489,7 +489,7 @@ function AskPage({ typed, typedD, think, children }: { typed?: boolean; typedD?:
         {children ?? (
           <>
             <div className={`sx-orb${think ? " think" : ""}`} style={{ marginTop: 14 }} />
-            <h1 className="sx-h1" style={{ fontSize: 30, marginTop: 28 }}>Que veux-tu savoir ?</h1>
+            <p className="sx-h1" style={{ fontSize: 30, marginTop: 28 }}>Que veux-tu savoir ?</p>
             <p className="sx-lead" style={{ margin: "8px auto 0", fontSize: 15, maxWidth: 420 }}>Pose une question. Tu reçois une réponse courte, des images et les sources.</p>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 16 }}>
               <span className="sx-pill sm">Comment fonctionne un trou noir</span>
@@ -546,7 +546,7 @@ export const APPRENDRE: Scene[] = [
             <div style={{ display: "flex", gap: 10 }}>
               {[0, 1, 2].map((i) => <span key={i} className="sx-img sx-in" style={at(0.2 + i * 0.3)} />)}
             </div>
-            <h1 className="sx-h1 sx-in" style={{ ...at(1), fontSize: 28, marginTop: 14 }}>Pourquoi le ciel est bleu</h1>
+            <p className="sx-h1 sx-in" style={{ ...at(1), fontSize: 28, marginTop: 14 }}>Pourquoi le ciel est bleu</p>
             <p className="sx-in" style={{ ...at(1.3), margin: "8px 0 0", opacity: 0.8, lineHeight: 1.55, fontSize: 15 }}>
               La lumière du Soleil contient toutes les couleurs. L&apos;air diffuse surtout le bleu dans toutes les directions : c&apos;est ce qu&apos;on voit en levant la tête.
             </p>
@@ -562,7 +562,7 @@ export const APPRENDRE: Scene[] = [
       <Screen n={4} label="Garde-la en fiche">
         <AskPage typed>
           <div style={{ textAlign: "left", maxWidth: 640, margin: "0 auto" }}>
-            <h1 className="sx-h1" style={{ fontSize: 28 }}>Pourquoi le ciel est bleu</h1>
+            <p className="sx-h1" style={{ fontSize: 28 }}>Pourquoi le ciel est bleu</p>
             <p style={{ margin: "8px 0 16px", opacity: 0.8, lineHeight: 1.55, fontSize: 15 }}>
               La lumière du Soleil contient toutes les couleurs. L&apos;air diffuse surtout le bleu dans toutes les directions.
             </p>
@@ -605,7 +605,7 @@ export const PARTAGER: Scene[] = [
       <Screen n={3} label="Ton ami la lit">
         <div className="sx-page" style={{ maxWidth: 760 }}>
           <span className="sx-tag sx-in" style={at(0.2)}>Lecture seule</span>
-          <h1 className="sx-h1" style={{ marginTop: 12 }}>La photosynthèse</h1>
+          <p className="sx-h1" style={{ marginTop: 12 }}>La photosynthèse</p>
           <div className="sx-card sx-in" style={{ ...at(0.5), marginTop: 18 }}>
             <h3>Résumé</h3>
             <p style={{ margin: "8px 0 0", opacity: 0.8, lineHeight: 1.55 }}>
@@ -625,7 +625,7 @@ export const PARTAGER: Scene[] = [
     art: (
       <Screen n={4} label="Arrête le partage quand tu veux">
         <div className="sx-page" style={{ maxWidth: 560 }}>
-          <h1 className="sx-h1" style={{ fontSize: 34 }}>La photosynthèse</h1>
+          <p className="sx-h1" style={{ fontSize: 34 }}>La photosynthèse</p>
           <div className="sx-card" style={{ marginTop: 20, display: "grid", gap: 10 }}>
             <p className="sx-muted" style={{ fontWeight: 700, margin: 0 }}>Lien de ta fiche</p>
             <div className="sx-field" style={{ position: "relative" }}>
@@ -662,7 +662,7 @@ function TodayPage({ pick, pickD = 0, ask, bars }: { pick?: number; pickD?: numb
   const goals = [5, 10, 20, 30];
   return (
     <div className="sx-page" style={{ paddingTop: 14 }}>
-      <h1 className="sx-h1" style={{ fontSize: 38 }}>Aujourd&apos;hui.</h1>
+      <p className="sx-h1" style={{ fontSize: 38 }}>Aujourd&apos;hui.</p>
       <p className="sx-lead" style={{ fontSize: 15, margin: "4px 0 0" }}>Mercredi 7 octobre</p>
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 20, marginTop: 10 }}>
         <div style={{ display: "grid", gap: 10, alignContent: "start" }}>

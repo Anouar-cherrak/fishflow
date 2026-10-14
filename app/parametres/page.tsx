@@ -162,14 +162,16 @@ export default function Parametres() {
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
             <p className="text-sm font-semibold text-black/55 mb-3">Notifications</p>
             <button
+              type="button"
+              role="switch"
               onClick={handleToggleEmailOptOut}
               disabled={prefsLoading}
-              className="w-full flex items-center justify-between py-1 disabled:opacity-50"
-              aria-pressed={!emailOptOut}
+              className="w-full flex items-center justify-between min-h-[44px] py-1 disabled:opacity-50"
+              aria-checked={!emailOptOut}
             >
               <span className="text-sm font-medium text-black text-left">
                 Recevoir les emails de relance
-                <span className="block text-xs text-black/40 font-normal mt-0.5">
+                <span className="block text-xs text-black/60 font-normal mt-0.5">
                   Rappels et nouveautés FishFlow par email
                 </span>
               </span>
@@ -192,7 +194,7 @@ export default function Parametres() {
             <a
               href="/api/account/export"
               download
-              className="w-full inline-block text-center py-2.5 rounded-lg font-medium border border-black/20 hover:bg-surface transition ff-btn"
+              className="ff-secondary w-full text-sm"
             >
               Télécharger mes données
             </a>
@@ -202,16 +204,18 @@ export default function Parametres() {
             <p className="text-sm font-semibold text-black/55 mb-3">Abonnement</p>
             {isPro ? (
               <button
+                type="button"
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
-                className="w-full py-2.5 rounded-lg font-medium border border-black/20 hover:bg-surface transition disabled:opacity-50 ff-btn"
+                className="ff-secondary w-full text-sm disabled:opacity-50"
               >
                 {portalLoading ? "Redirection..." : "Gérer mon abonnement"}
               </button>
             ) : (
               <button
+                type="button"
                 onClick={() => router.push("/pricing")}
-                className="w-full py-2.5 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition ff-btn"
+                className="ff-primary w-full text-sm ff-btn"
               >
                 Passer Pro — 4,99 €/mois
               </button>
@@ -219,19 +223,24 @@ export default function Parametres() {
           </div>
 
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-black/55 mb-3">Mot de passe</p>
+            <label htmlFor="new-password" className="text-sm font-semibold text-black/55 mb-3 block">Mot de passe</label>
             <input
+              id="new-password"
               type="password"
+              autoComplete="new-password"
+              aria-describedby="new-password-help"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Nouveau mot de passe"
-              className="w-full p-2.5 border border-black/15 rounded-lg mb-3 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+              className="w-full min-h-[44px] px-3 border border-black/15 rounded-lg mb-1 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
             />
-            {passwordMessage && <p className="text-sm text-black/60 mb-3">{passwordMessage}</p>}
+            <p id="new-password-help" className="text-xs text-black/60 mb-3">6 caractères minimum.</p>
+            {passwordMessage && <p role="status" className="text-sm text-black/70 mb-3">{passwordMessage}</p>}
             <button
+              type="button"
               onClick={handleChangePassword}
               disabled={passwordLoading || !newPassword}
-              className="w-full py-2.5 rounded-lg font-medium border border-black/20 hover:bg-surface transition disabled:opacity-30 ff-btn"
+              className="ff-secondary w-full text-sm disabled:opacity-40"
             >
               {passwordLoading ? "Mise à jour..." : "Changer le mot de passe"}
             </button>
@@ -241,38 +250,45 @@ export default function Parametres() {
             <p className="text-sm font-semibold text-[var(--quiz-wrong-text)] mb-3">Zone dangereuse</p>
             {!showDeleteConfirm ? (
               <button
+                type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="w-full py-2.5 rounded-lg font-medium border border-[var(--quiz-wrong-text)] text-[var(--quiz-wrong-text)] hover:bg-[var(--quiz-wrong-bg)] transition ff-btn"
+                className="w-full min-h-[44px] rounded-full font-medium border border-[var(--quiz-wrong-text)] text-[var(--quiz-wrong-text)] hover:bg-[var(--quiz-wrong-bg)] transition ff-btn"
               >
                 Supprimer mon compte
               </button>
             ) : (
               <div>
-                <p className="text-sm text-black/70 mb-3">
+                <p id="delete-help" className="text-sm text-black/70 mb-3">
                   Cette action est <strong>définitive</strong> : toutes tes fiches, ton abonnement et ton compte
                   seront supprimés. Tape <strong>SUPPRIMER</strong> pour confirmer.
                 </p>
+                <label htmlFor="delete-confirm" className="sr-only">Tape SUPPRIMER pour confirmer</label>
                 <input
+                  id="delete-confirm"
                   type="text"
+                  autoComplete="off"
+                  aria-describedby="delete-help"
                   value={deleteText}
                   onChange={(e) => setDeleteText(e.target.value)}
-                  className="w-full p-2.5 border border-black/15 rounded-lg mb-3 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-black ff-input"
+                  className="w-full min-h-[44px] px-3 border border-black/15 rounded-lg mb-3 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
                   placeholder="SUPPRIMER"
                 />
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       setShowDeleteConfirm(false);
                       setDeleteText("");
                     }}
-                    className="flex-1 py-2.5 rounded-lg font-medium border border-black/20 hover:bg-surface transition ff-btn"
+                    className="ff-secondary flex-1 text-sm"
                   >
                     Annuler
                   </button>
                   <button
+                    type="button"
                     onClick={handleDeleteAccount}
                     disabled={deleteText !== "SUPPRIMER" || deleting}
-                    className="flex-1 py-2.5 rounded-lg font-medium bg-red-600 text-[#ffffff] hover:bg-red-700 transition disabled:opacity-30 ff-btn"
+                    className="flex-1 min-h-[44px] rounded-full font-medium bg-red-600 text-[#ffffff] hover:bg-red-700 transition disabled:opacity-30 ff-btn"
                   >
                     {deleting ? "Suppression..." : "Confirmer la suppression"}
                   </button>

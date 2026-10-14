@@ -50,11 +50,14 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
+      type="button"
+      role="switch"
       className="w-full flex items-center justify-between min-h-[44px]"
-      aria-pressed={isDark}
+      aria-checked={isDark}
     >
       <span className="text-sm font-medium text-black">Mode sombre</span>
       <span
+        aria-hidden="true"
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
           isDark ? "bg-accent" : "bg-black/15"
         }`}

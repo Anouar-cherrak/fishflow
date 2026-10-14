@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDialog } from "@/lib/use-dialog";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -46,7 +47,9 @@ export default function MesFiches() {
   const [newFolderColor, setNewFolderColor] = useState(PASTEL_COLORS[0].value);
   const [movingFicheId, setMovingFicheId] = useState<string | null>(null);
   const [dueCount, setDueCount] = useState(0);
+  const moveRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  useDialog(moveRef, () => setMovingFicheId(null), !!movingFicheId);
 
   useEffect(() => {
     countDueCards().then(setDueCount);
@@ -234,7 +237,7 @@ export default function MesFiches() {
                 <button
                   type="button"
                   onClick={() => deleteFolder(folder.id)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-current opacity-60 hover:opacity-100 text-sm"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full text-current opacity-60 hover:opacity-100 text-sm"
                   aria-label={`Supprimer le dossier ${folder.name}`}
                   title="Supprimer le dossier"
                 >
@@ -278,7 +281,7 @@ export default function MesFiches() {
                     key={c.value}
                     onClick={() => setNewFolderColor(c.value)}
                     aria-pressed={newFolderColor === c.value}
-                    className={`w-8 h-8 rounded-full transition ${
+                    className={`w-11 h-11 rounded-full transition ${
                       newFolderColor === c.value ? "ring-2 ring-offset-2 ring-offset-[var(--ff-surface)] ring-accent" : ""
                     }`}
                     style={{ backgroundColor: c.value }}
@@ -404,9 +407,10 @@ export default function MesFiches() {
           onClick={() => setMovingFicheId(null)}
         >
           <div
+            ref={moveRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Déplacer la fiche"
+            aria-label="Ranger la fiche dans un dossier"
             className="bg-surface border border-black/10 rounded-3xl shadow-xl p-4 w-full max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >

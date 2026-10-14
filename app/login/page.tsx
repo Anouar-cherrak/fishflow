@@ -93,7 +93,7 @@ export default function Login() {
 
         <p className="text-sm text-black/50 text-center mt-4">
           Pas encore de compte ?{" "}
-          <button type="button" onClick={() => router.push("/signup")} className="text-black hover:underline font-medium ff-link-underline">
+          <button type="button" onClick={() => router.push("/signup")} className="inline-flex items-center min-h-[44px] px-1 text-black underline underline-offset-4 font-medium">
             Créer un compte
           </button>
         </p>

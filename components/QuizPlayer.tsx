@@ -70,10 +70,11 @@ export function QuizPlayer({
         <p className={`text-sm font-medium mb-4 ${mastered ? "text-accent-strong" : "text-black/60"}`}>
           {mastered ? "Fiche maîtrisée !" : "Continue, tu y es presque"}
         </p>
-        {saving && <p className="text-xs text-black/30 mb-3">Sauvegarde du score...</p>}
+        {saving && <p className="text-xs text-black/60 mb-3">Sauvegarde du score...</p>}
         <button
+          type="button"
           onClick={restart}
-          className="text-sm px-5 py-2.5 rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
+          className="text-sm px-5 min-h-[44px] rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
         >
           Refaire le quiz
         </button>
@@ -86,10 +87,10 @@ export function QuizPlayer({
   return (
     <div className="border border-black/10 rounded-xl p-6 bg-surface">
       <div className="flex items-center justify-between mb-4 gap-2">
-        <p className="text-xs font-semibold text-black/40 uppercase tracking-wide shrink-0">
+        <p className="text-xs font-semibold text-black/60 uppercase tracking-wide shrink-0">
           Question {current + 1} / {quiz.length}
         </p>
-        <div className="flex flex-wrap justify-end gap-1 min-w-0">
+        <div className="flex flex-wrap justify-end gap-1 min-w-0" aria-hidden="true">
           {quiz.map((_, i) => (
             <div
               key={i}
@@ -113,14 +114,22 @@ export function QuizPlayer({
               style = "bg-white border-black/10 text-black/40";
             }
           }
+          const mark = selected === null ? null : i === q.correctIndex ? "✓" : i === selected ? "✗" : null;
           return (
             <button
               key={i}
+              type="button"
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition ${style}`}
+              className={`w-full min-h-[48px] text-left px-4 py-3 rounded-lg border text-sm transition flex items-center justify-between gap-3 ${style}`}
             >
-              {opt}
+              <span>{opt}</span>
+              {mark && (
+                <span className="shrink-0 font-bold" aria-hidden="true">
+                  {mark}
+                </span>
+              )}
+              {mark && <span className="sr-only">{mark === "✓" ? " (bonne réponse)" : " (ta réponse, fausse)"}</span>}
             </button>
           );
         })}
@@ -136,8 +145,9 @@ export function QuizPlayer({
 
       {selected !== null && (
         <button
+          type="button"
           onClick={handleNext}
-          className="w-full py-2.5 rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
+          className="w-full min-h-[48px] rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
         >
           {current + 1 < quiz.length ? "Question suivante" : "Voir mon score"}
         </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useDialog } from "@/lib/use-dialog";
 import { createPortal } from "react-dom";
 import { trackEvent } from "@/lib/tracking";
 import { getStreak, REVIEWED_EVENT } from "@/lib/reviews";
@@ -42,6 +43,7 @@ export function FlashcardStudy({
   const [firstTry, setFirstTry] = useState<Record<number, boolean>>({});
   const [done, setDone] = useState(false);
   const reportedRef = useRef(false);
+  const boxRef = useRef<HTMLDivElement>(null);
   const [streak, setStreak] = useState<{ streak: number; activeToday: boolean } | null>(null);
 
   const close = () => {
@@ -122,13 +124,13 @@ export function FlashcardStudy({
     };
   }, []);
 
-  // Raccourcis clavier : Échap = fermer, Espace = retourner, ← = à revoir, → = je savais.
+  // Le focus entre dans la fenêtre, Tab y reste, Échap ferme (en gardant les cartes déjà répondues).
+  useDialog(boxRef, close);
+
+  // Raccourcis clavier : Espace = retourner, ← = à revoir, → = je savais.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        close();
-        return;
-      }
+      if (e.key === "Escape") return;
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "BUTTON" || target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
         return;
@@ -158,18 +160,20 @@ export function FlashcardStudy({
     >
       <div
         className="w-full max-w-md bg-surface rounded-2xl p-5 ff-fade-up max-h-[90dvh] overflow-y-auto"
+        ref={boxRef}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Étudier les flashcards"
       >
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-semibold text-black/40 uppercase tracking-wide">
+          <p className="text-xs font-semibold text-black/60 uppercase tracking-wide" aria-live="polite">
             {done ? "Terminé" : round === 1 ? `Carte ${pos + 1} / ${deck.length}` : `Tour ${round} · carte ${pos + 1} / ${deck.length}`}
           </p>
           <button
+            type="button"
             onClick={close}
-            className="w-11 h-11 -mr-2 -my-2 flex items-center justify-center rounded-full text-black/50 hover:text-black text-xl leading-none"
+            className="w-11 h-11 -mr-2 -my-2 flex items-center justify-center rounded-full text-black/60 hover:text-black text-xl leading-none"
             aria-label="Fermer"
           >
             ✕
@@ -222,14 +226,16 @@ export function FlashcardStudy({
             )}
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={restart}
-                className="flex-1 py-2.5 rounded-lg border border-black/15 text-sm font-medium text-black hover:bg-white transition"
+                className="flex-1 min-h-[44px] rounded-full border border-black/15 text-sm font-medium text-black hover:bg-white transition"
               >
                 Recommencer
               </button>
               <button
+                type="button"
                 onClick={close}
-                className="flex-1 py-2.5 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition ff-btn"
+                className="flex-1 min-h-[44px] rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition ff-btn"
               >
                 Fermer
               </button>
@@ -238,37 +244,41 @@ export function FlashcardStudy({
         ) : (
           <>
             <button
+              type="button"
+              data-autofocus
               onClick={() => setFlipped((f) => !f)}
               className="w-full min-h-[220px] bg-white border border-black/10 rounded-xl p-6 text-left flex flex-col justify-between hover:border-black/25 transition"
-              aria-label={flipped ? "Voir la question" : "Voir la réponse"}
             >
-              <span className="text-xs font-semibold text-black/40 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-black/60 uppercase tracking-wide">
                 {flipped ? "Réponse" : "Question"}
               </span>
               <span className={`my-4 ${flipped ? "text-black/80" : "text-black font-medium text-lg"}`}>
                 {flipped ? current.answer : current.question}
               </span>
-              <span className="text-xs text-black/30">{flipped ? "Touche pour revoir la question" : "Touche pour voir la réponse"}</span>
+              <span className="text-xs text-black/60">{flipped ? "Touche pour revoir la question" : "Touche pour voir la réponse"}</span>
             </button>
 
             <div className="grid grid-cols-2 gap-2 mt-4">
               <button
+                type="button"
                 onClick={() => answer(false)}
                 disabled={!flipped}
-                className="py-3 rounded-lg border border-black/15 text-sm font-medium text-black hover:bg-white transition disabled:opacity-30 disabled:hover:bg-transparent"
+                className="min-h-[48px] rounded-full border border-black/15 text-sm font-medium text-black hover:bg-white transition disabled:opacity-30 disabled:hover:bg-transparent"
               >
                 À revoir
               </button>
               <button
+                type="button"
                 onClick={() => answer(true)}
                 disabled={!flipped}
-                className="py-3 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+                className="min-h-[48px] rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
               >
                 Je savais
               </button>
             </div>
 
-            <p className="hidden sm:block text-center text-xs text-black/30 mt-3">
+            {!flipped && <p className="text-center text-xs text-black/60 mt-3 sm:hidden">Retourne la carte pour pouvoir répondre.</p>}
+            <p className="hidden sm:block text-center text-xs text-black/60 mt-3">
               Espace : retourner · ← à revoir · → je savais · Échap : fermer
             </p>
           </>

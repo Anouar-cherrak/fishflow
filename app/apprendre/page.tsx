@@ -198,6 +198,7 @@ export default function Apprendre() {
           </div>
         )}
 
+        {showResult && status !== "done" && <h1 className="sr-only">Apprendre : {asked}</h1>}
         <div aria-live="polite" className="w-full">
           {status === "loading" && (
             <p className="text-center text-black/60 text-sm ff-fade">Je réfléchis à ta question…</p>
@@ -369,7 +370,7 @@ export default function Apprendre() {
             disabled={status === "loading" || question.trim().length < 3}
             className="min-h-[48px] px-5 rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition disabled:opacity-40 ff-btn shrink-0"
           >
-            {status === "loading" ? "…" : "Envoyer"}
+            {status === "loading" ? "Envoi…" : "Envoyer"}
           </button>
         </div>
       </form>

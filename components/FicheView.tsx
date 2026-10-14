@@ -43,6 +43,8 @@ const TEMPLATES: { key: Template; label: string; hint: string }[] = [
 ];
 const TEMPLATE_KEY = "ff-template";
 
+const SECTION_NAMES: Record<SectionKey, string> = { summary: "l'essentiel", sheet: "la fiche", flashcards: "les flashcards", quiz: "le quiz" };
+
 function RegenButton({
   sectionKey,
   hasSource,
@@ -56,13 +58,15 @@ function RegenButton({
 }) {
   return (
     <button
+      type="button"
+      aria-label={regenerating ? undefined : `Régénérer ${SECTION_NAMES[sectionKey]}`}
       onClick={() => onRegenerate(sectionKey)}
       disabled={!hasSource || regenerating}
       className="flex items-center gap-1.5 text-sm text-black/70 font-medium hover:text-black hover:underline disabled:opacity-50 disabled:no-underline min-h-[44px]"
     >
       {regenerating ? (
         <>
-          <span className="w-3 h-3 border-2 border-black/25 border-t-black rounded-full animate-spin" />
+          <span className="w-3 h-3 border-2 border-black/25 border-t-black rounded-full animate-spin" aria-hidden="true" />
           Régénération...
         </>
       ) : (
@@ -428,7 +432,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               >
                 {downloading ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" aria-hidden="true" />
                     PDF en cours...
                   </>
                 ) : (

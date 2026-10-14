@@ -9,9 +9,10 @@ type Size = "form" | "normal" | "wide";
 export function AppShell({ children, size = "normal", nav = true }: { children: ReactNode; size?: Size; nav?: boolean }) {
   return (
     <div className="ff-frame">
+      <a href="#contenu" className="ff-skip">Aller au contenu</a>
       <Ocean />
       {nav && <AppNav />}
-      <main className="ff-main" data-size={size}>
+      <main id="contenu" tabIndex={-1} className="ff-main outline-none" data-size={size}>
         {children}
       </main>
     </div>
