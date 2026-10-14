@@ -630,16 +630,16 @@ export function Landing() {
                 </Link>
               ) : (
                 <TrackedLink href="/generer" event="cta_click_hero" className="btn">
-                  <span>Essayer gratuitement</span>
+                  <span>Créer ma première fiche</span>
                 </TrackedLink>
               )}
-              <a className="btn ghost" href="#quoi">
-                <span>Comment ça marche</span>
+              <a className="btn ghost" href="#avant-apres">
+                <span>Voir comment ça marche</span>
               </a>
             </div>
             <p className="note">3 fiches gratuites par mois, sans carte bancaire.</p>
             <ul className="for" aria-label="Pour qui">
-              {["Collège", "Lycée", "Fac", "Concours", "Code de la route", "Langues"].map((t) => (
+              {["Collège", "Lycée", "Études supérieures", "Concours", "Formation"].map((t) => (
                 <li key={t}>{t}</li>
               ))}
             </ul>
@@ -649,7 +649,7 @@ export function Landing() {
             <article className="fd-card" aria-label="Exemple de fiche générée">
               <div className="fd-head"><strong>Photosynthèse</strong><span>Fiche de révision</span></div>
               <div>
-                <p className="fd-h">Résumé</p>
+                <p className="fd-h">L&apos;essentiel</p>
                 <p className={at(1)}>La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie chimique, en produisant du glucose et de l&apos;oxygène.</p>
               </div>
               <div>
@@ -678,11 +678,42 @@ export function Landing() {
         </section>
         <WaveDivider />
 
+        {/* Avant / Après : ce que ton cours devient */}
+        <section id="avant-apres" aria-labelledby="t-aa">
+          <div className="wrap">
+            <h2 id="t-aa">Ce que FishFlow fait de ton cours.</h2>
+            <p className="sub">Tu donnes ton cours tel qu&apos;il est. Tu récupères de quoi le comprendre et le retenir.</p>
+            <div className="aa">
+              <article className="aa-card aa-before">
+                <p className="aa-tag">Avant</p>
+                <h3>Des pages de cours à relire</h3>
+                <div className="aa-lines" aria-hidden="true">
+                  <i /><i /><i /><i /><i /><i /><i /><i />
+                </div>
+                <p>Tu ne sais pas quoi retenir, ni par où commencer.</p>
+              </article>
+              <div className="aa-arrow" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M10 24h26M26 13l11 11-11 11" /></svg>
+              </div>
+              <article className="aa-card aa-after">
+                <p className="aa-tag">Après, en moins d&apos;une minute</p>
+                <h3>Tout est prêt pour réviser</h3>
+                <ul>
+                  <li><span><b>1 fiche claire</b>, rangée en parties</span></li>
+                  <li><span><b>L&apos;essentiel</b> en 5 lignes</span></li>
+                  <li><span><b>Des flashcards</b> pour t&apos;entraîner</span></li>
+                  <li><span><b>Un quiz</b> pour te tester</span></li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
         {/* C'est quoi */}
         <section id="quoi" aria-labelledby="t-q">
           <div className="wrap">
             <h2 id="t-q">Relire son cours ne suffit pas.</h2>
-            <p className="sub">FishFlow t&apos;aide à comprendre, puis à ne plus oublier. Le cœur du site : tes fiches de révision.</p>
+            <p className="sub">Pour retenir, il faut d&apos;abord trier l&apos;important, puis s&apos;entraîner. FishFlow fait les deux avec toi.</p>
             <div className="tools">
               <article className="tool main">
                 <p className="badge">L&apos;outil principal</p>
@@ -695,8 +726,8 @@ export function Landing() {
               <article className="tool">
                 <h3>Poser une question</h3>
                 <dl>
-                  <div><dt>Tu donnes</dt><dd>Une question, sur n&apos;importe quel sujet.</dd></div>
-                  <div><dt>Tu reçois</dt><dd>Une réponse claire et bien expliquée, des images libres de droits et des liens pour aller plus loin.</dd></div>
+                  <div><dt>Tu donnes</dt><dd>Une question sur un sujet qui t&apos;intrigue.</dd></div>
+                  <div><dt>Tu reçois</dt><dd>Une réponse claire, avec des images et des liens pour vérifier. (1 essai gratuit, puis avec Pro.)</dd></div>
                 </dl>
               </article>
               <article className="tool">
@@ -753,7 +784,7 @@ export function Landing() {
                   <div className="tags">
                     <span>3 flashcards</span>
                     <span>Quiz</span>
-                    <span>Résumé</span>
+                    <span>L&apos;essentiel</span>
                   </div>
                 </div>
               </div>
@@ -814,7 +845,7 @@ export function Landing() {
         <section id="apprendre" aria-labelledby="t-app">
           <div className="wrap">
             <h2 id="t-app">Et si tu as une question ?</h2>
-            <p className="sub">FishFlow répond aussi à tes questions, avec des images libres de droits et des liens Wikipédia pour aller plus loin. Les exemples défilent tout seuls, tu peux aussi écrire ta question.</p>
+            <p className="sub">Avec « Apprendre », FishFlow répond aussi à tes questions, avec des images et des liens Wikipédia pour vérifier. Regarde l&apos;exemple : il se lance tout seul.</p>
             <div className="demo">
               <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
                 <div className={`slot-demo${orbFallback ? " slot-css" : ""}`} data-slot="demo" data-phase={phase} aria-hidden="true" />
@@ -892,32 +923,58 @@ export function Landing() {
         {/* Gratuit / Pro */}
         <section id="tarifs" aria-labelledby="t-p">
           <div className="wrap">
-            <h2 id="t-p">Gratuit ou Pro : ce que tu as vraiment.</h2>
-            <p className="sub">Tu peux tout essayer gratuitement. Pro te donne bien plus de fiches et d'outils.</p>
+            <h2 id="t-p">Gratuit ou Pro : qu&apos;est-ce qui change ?</h2>
+            <p className="sub">Le compte gratuit suffit pour essayer. Pro, c&apos;est pour réviser souvent : beaucoup plus de fiches et quelques outils en plus.</p>
+            <div className="plans">
+              <article className="plan">
+                <h3>Gratuit</h3>
+                <p className="price">0 €</p>
+                <ul>
+                  <li>3 fiches par mois</li>
+                  <li>Tes 5 dernières fiches gardées</li>
+                  <li>Flashcards, quiz et révision chaque jour</li>
+                  <li>1 question pour essayer Apprendre</li>
+                </ul>
+              </article>
+              <article className="plan pro">
+                <h3>Pro</h3>
+                <p className="price">4,99 € <small>par mois</small></p>
+                <ul>
+                  <li>100 fiches par mois (10 par jour)</li>
+                  <li>Toutes tes fiches gardées</li>
+                  <li>Des cours plus longs (environ 15 pages)</li>
+                  <li>20 questions par jour dans Apprendre</li>
+                </ul>
+                <p className="plan-note">Tu arrêtes quand tu veux, en un clic.</p>
+              </article>
+            </div>
+            <details className="cmp-details">
+              <summary>Voir le détail complet</summary>
             <div className="cmp-wrap" tabIndex={0} role="region" aria-label="Comparaison Gratuit et Pro">
               <table className="cmp">
                 <thead>
                   <tr><th scope="col"><span className="sr-only">Fonctionnalité</span></th><th scope="col">Gratuit</th><th scope="col" className="pro">Pro</th></tr>
                 </thead>
                 <tbody>
-                  <tr><th scope="row">Prix</th><td data-label="Gratuit">0 €</td><td data-label="Pro" className="pro">4,99 € par mois, résiliable à tout moment</td></tr>
+                  <tr><th scope="row">Prix</th><td data-label="Gratuit">0 €</td><td data-label="Pro" className="pro">4,99 € par mois, tu arrêtes quand tu veux</td></tr>
                   <tr><th scope="row">Fiches créées</th><td data-label="Gratuit">3 par mois</td><td data-label="Pro" className="pro">100 par mois (10 par jour)</td></tr>
                   <tr><th scope="row">Fiche, essentiel, flashcards</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Quiz</th><td data-label="Gratuit">À jouer, avec ton meilleur score</td><td data-label="Pro" className="pro">À jouer, 12 questions par quiz</td></tr>
+                  <tr><th scope="row">Quiz</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui, avec 12 questions</td></tr>
                   <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 essai</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
+                  <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 question pour essayer</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
                   <tr><th scope="row">Taille d'un cours</th><td data-label="Gratuit">Jusqu'à 7 pages environ</td><td data-label="Pro" className="pro">Jusqu'à 15 pages environ, plusieurs PDF dans une seule fiche</td></tr>
                   <tr><th scope="row">Objectif du jour et série</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Présentations (Classique, Mémo, Cornell)</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Progression</th><td data-label="Gratuit">7 derniers jours</td><td data-label="Pro" className="pro">30 jours, réussite, cartes difficiles</td></tr>
-                  <tr><th scope="row">Résumé lu à voix haute</th><td data-label="Gratuit">Non</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Historique de fiches</th><td data-label="Gratuit">5 fiches</td><td data-label="Pro" className="pro">Toutes tes fiches gardées</td></tr>
+                  <tr><th scope="row">3 façons d&apos;afficher ta fiche</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                  <tr><th scope="row">Progression</th><td data-label="Gratuit">Les 7 derniers jours</td><td data-label="Pro" className="pro">30 jours, ton taux de réussite et tes cartes difficiles</td></tr>
+                  <tr><th scope="row">L&apos;essentiel lu à voix haute</th><td data-label="Gratuit">Non</td><td data-label="Pro" className="pro">Oui</td></tr>
+                  <tr><th scope="row">Fiches gardées</th><td data-label="Gratuit">Les 5 dernières</td><td data-label="Pro" className="pro">Toutes tes fiches gardées</td></tr>
                 </tbody>
               </table>
             </div>
+            </details>
             <div className="cmp-cta">
               <TrackedLink href="/generer" event="cta_click_offer_free" className="btn ghost"><span>Créer ma fiche gratuitement</span></TrackedLink>
-              <TrackedLink href="/pricing" event="cta_click_offer_premium" className="btn"><span>Passer Pro</span></TrackedLink>
+              <TrackedLink href="/pricing" event="cta_click_offer_premium" className="btn"><span>Voir Pro</span></TrackedLink>
             </div>
             <p className="cmp-note">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
           </div>
@@ -929,8 +986,10 @@ export function Landing() {
           <div className="wrap">
             <h2 id="t-faq">Questions fréquentes.</h2>
             <div className="faq">
-              <details><summary>C&apos;est pour qui ?</summary><p>Pour tout le monde. Un cours à réviser, mais aussi un livre à retenir, des mots d&apos;une langue, le code de la route, un sujet de culture générale ou un dossier de travail. Tout ce que tu veux apprendre ou retenir, toute l&apos;année.</p></details>
+              <details><summary>Comment ça marche, concrètement ?</summary><p>Tu crées ton compte gratuit. Tu colles ton cours (ou tu envoies un PDF, ou une photo de tes notes) et tu appuies sur « Créer ma fiche ». Moins d&apos;une minute plus tard, tu as ta fiche, tes flashcards et ton quiz. Ensuite, FishFlow te dit chaque jour quelles cartes revoir.</p></details>
+              <details><summary>C&apos;est pour qui ?</summary><p>Pour toute personne qui a un cours à apprendre : collège, lycée, études supérieures, concours, formation. Il te faut juste ton cours, en texte, en PDF ou en photo.</p></details>
               <details><summary>C&apos;est gratuit ?</summary><p>Oui pour commencer : 3 fiches par mois et un essai d&apos;Apprendre, sans carte bancaire. Avec Pro, tu peux créer jusqu'à 100 fiches par mois.</p></details>
+              <details><summary>Je peux arrêter Pro quand je veux ?</summary><p>Oui, en un clic dans Paramètres. Tu gardes Pro jusqu&apos;à la fin du mois déjà payé.</p></details>
               <details><summary>Les réponses sont-elles vraies ?</summary><p>Pour les fiches, elles viennent de ton propre cours. Pour les questions d&apos;Apprendre, c&apos;est une IA qui répond : elle peut se tromper, donc pour un détail important, vérifie dans les liens proposés ou dans ton cours.</p></details>
             </div>
           </div>

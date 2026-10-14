@@ -26,7 +26,9 @@
 .lp #orb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; z-index: 0; pointer-events: none; }
 .lp main, .lp footer { position: relative; z-index: 1; }
 .lp header.bar .brand { min-height: 44px; display: inline-flex; align-items: center; }
-.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: var(--bg); border-bottom: 1px solid var(--line); }
+.lp header.bar { position: sticky; top: 0; padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 12px max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter))); background: color-mix(in srgb, var(--ff-sea-top) 95%, transparent); -webkit-backdrop-filter: blur(24px) saturate(150%); backdrop-filter: blur(24px) saturate(150%); border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.7); }
+/* Thème clair : un voile d'eau très clair, pour que le logo bleu ressorte bien. */
+.lp[data-theme="light"] header.bar { background: color-mix(in srgb, #F3F9FC 95%, transparent); border-bottom-color: rgba(11, 26, 46, 0.1); box-shadow: 0 10px 30px -20px rgba(14, 60, 90, 0.35); }
 .lp .brand { display: inline-flex; align-items: center; gap: 8px; font: 600 18px/1 var(--display); text-decoration: none; letter-spacing: -0.02em; }
 .lp .brand svg, .lp .brand img { width: auto; height: 36px; }
 .lp .brand em { font-style: normal; font-weight: 400; color: var(--ff-logo-blue); }
@@ -352,3 +354,43 @@
 
 /* Thème clair : petit texte bleu posé sur le fond bleuté, un ton plus foncé pour rester lisible. */
 .lp[data-theme="light"] .eyebrow { color: #075985; }
+
+/* ===== Avant / Après ===== */
+.lp .aa { display: grid; gap: 16px; align-items: stretch; }
+.lp .aa-card { border-radius: 28px; border: 1px solid var(--line); background: var(--paper); padding: clamp(20px, 3vw, 32px); display: grid; gap: 14px; align-content: start; }
+.lp .aa-card h3 { font: 700 clamp(24px, 3vw, 32px)/1.1 var(--display); letter-spacing: -0.025em; margin: 0; }
+.lp .aa-card p { color: var(--muted); margin: 0; }
+.lp .aa-tag { font-size: 13px !important; font-weight: 700; color: var(--hot) !important; text-transform: uppercase; letter-spacing: 0.06em; }
+.lp .aa-before .aa-tag { color: var(--muted) !important; }
+.lp .aa-lines { display: grid; gap: 9px; padding: 6px 0; }
+.lp .aa-lines i { display: block; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.lp .aa-lines i:nth-child(2n) { width: 86%; } .lp .aa-lines i:nth-child(3n) { width: 94%; } .lp .aa-lines i:nth-child(5n) { width: 70%; }
+.lp .aa-after { border-color: var(--hot); box-shadow: var(--shadow); }
+.lp .aa-after ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.lp .aa-after li { display: flex; gap: 12px; align-items: baseline; font-size: 17px; }
+.lp .aa-after li::before { content: "✓"; flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--hot); color: var(--on-hot); font-weight: 800; font-size: 14px; transform: translateY(4px); }
+.lp .aa-arrow { display: grid; place-items: center; color: var(--hot); }
+.lp .aa-arrow svg { width: 44px; height: 44px; transform: rotate(90deg); }
+@media (min-width: 900px) {
+  .lp .aa { grid-template-columns: 1fr auto 1fr; align-items: center; }
+  .lp .aa-arrow svg { transform: none; width: 56px; height: 56px; }
+}
+/* La flèche « nage » doucement vers l'après ; les éléments de l'après arrivent un par un. */
+.lp .aa-arrow svg { animation: lpNudge 2.2s ease-in-out infinite; }
+@keyframes lpNudge { 0%, 100% { translate: 0 0; } 50% { translate: 0 6px; } }
+@media (min-width: 900px) { @keyframes lpNudge { 0%, 100% { translate: 0 0; } 50% { translate: 8px 0; } } }
+.lp .aa.rv .aa-after li { opacity: 0; transform: translateX(14px); transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1); }
+.lp .aa.rv.rv-in .aa-after li { opacity: 1; transform: none; }
+.lp .aa-after li:nth-child(2) { transition-delay: 0.15s; } .lp .aa-after li:nth-child(3) { transition-delay: 0.3s; } .lp .aa-after li:nth-child(4) { transition-delay: 0.45s; }
+@media (prefers-reduced-motion: reduce) { .lp .aa-arrow svg { animation: none; } .lp .aa-after li { opacity: 1 !important; transform: none !important; } }
+
+/* ===== Gratuit / Pro : deux cartes simples ===== */
+.lp .plan h3 { font: 700 26px/1 var(--display); margin: 0; }
+.lp .plan .price { font-size: clamp(40px, 6vw, 56px); margin: 0; }
+.lp .plan li { display: flex; align-items: baseline; font-size: 17px; }
+.lp .plan li::before { flex: none; transform: translateY(-2px); }
+.lp .plan-note { font-size: 15px; opacity: 0.8; margin: 0; }
+.lp .plan.pro { border-color: transparent; }
+.lp .cmp-details { margin-top: 20px; }
+.lp .cmp-details > summary { cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.lp .cmp-details[open] > summary { margin-bottom: 12px; }
