@@ -98,7 +98,7 @@ export default function Aujourdhui() {
       setFicheTotal(fiches.count ?? (fiches.data ?? []).length);
       setReady(true);
     };
-    // Quoi qu'il arrive (réseau coupé, réponse inattendue), la page s'affiche : jamais bloquée sur « Chargement... ».
+    // Quoi qu'il arrive (réseau coupé, réponse inattendue), la page s'affiche : jamais bloquée sur « Chargement… ».
     load()
       .catch((err) => console.error("Aujourd'hui : chargement incomplet", err))
       .finally(() => {
@@ -152,8 +152,8 @@ export default function Aujourdhui() {
           <SeaDecor />
           <h2 className="text-xl font-bold tracking-tight mb-2">Commence ici.</h2>
           <p className="text-black/65 mb-5 max-w-[60ch]">
-            Colle un cours, un article ou une photo de tes notes : tu obtiens une fiche, des flashcards et un quiz. Ou pose
-            simplement une question que tu te poses.
+            Colle un cours, un article ou une photo de tes notes : tu obtiens une fiche, des flashcards et un quiz.
+            Tu peux aussi poser une question.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/generer" className="ff-primary ff-btn">Créer ma première fiche</Link>

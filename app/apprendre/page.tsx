@@ -103,7 +103,7 @@ export default function Apprendre() {
       }
       if (!res.ok) {
         setStatus("error");
-        setMessage(data.error ?? "Une erreur est survenue. Réessaie.");
+        setMessage(data.error ?? "Pas de réponse cette fois. Réessaie dans un instant.");
         return;
       }
       if (!data.found) {
@@ -118,7 +118,7 @@ export default function Apprendre() {
     } catch (err) {
       if ((err as Error)?.name === "AbortError") return;
       setStatus("error");
-      setMessage("Connexion impossible. Vérifie ta connexion et réessaie.");
+      setMessage("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
     }
   };
 
@@ -177,7 +177,7 @@ export default function Apprendre() {
           <div className="text-center ff-fade-up">
             <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Que veux-tu savoir ?</h1>
             <p className="text-black/60 text-sm sm:text-base max-w-sm mx-auto mb-6">
-              Pose une question. Tu reçois une réponse claire et bien expliquée, des images et des liens pour aller plus loin.
+              Pose ta question. Tu reçois une réponse claire, des images et des liens pour aller plus loin.
             </p>
             <ul className="flex flex-wrap justify-center gap-2">
               {EXAMPLES.map((example) => (
@@ -221,7 +221,7 @@ export default function Apprendre() {
 
           {status === "pro" && (
             <div className="bg-surface border border-black/10 rounded-2xl p-6 text-center ff-fade-up">
-              <p className="font-medium mb-1">{message || "Cette fonctionnalité est réservée aux Pro."}</p>
+              <p className="font-medium mb-1">{message || "Apprendre est réservé aux comptes Pro."}</p>
               <p className="text-sm text-black/60 mb-4">Avec Pro, tu peux poser 20 questions par jour.</p>
               <Link
                 href="/pricing"

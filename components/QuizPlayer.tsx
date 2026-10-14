@@ -68,9 +68,9 @@ export function QuizPlayer({
           {correctCount} / {quiz.length} bonnes réponses
         </p>
         <p className={`text-sm font-medium mb-4 ${mastered ? "text-accent-strong" : "text-black/60"}`}>
-          {mastered ? "Fiche maîtrisée !" : "Continue, tu y es presque"}
+          {mastered ? "Fiche maîtrisée !" : "Continue, tu y es presque."}
         </p>
-        {saving && <p className="text-xs text-black/60 mb-3">Sauvegarde du score...</p>}
+        {saving && <p className="text-xs text-black/60 mb-3">Enregistrement du score…</p>}
         <button
           type="button"
           onClick={restart}

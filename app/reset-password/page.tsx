@@ -20,7 +20,7 @@ export default function ResetPasswordRequest() {
     });
     setLoading(false);
     if (error) {
-      setError("Une erreur est survenue. Réessaie.");
+      setError("Le lien n'a pas pu être envoyé. Vérifie ton adresse email, puis réessaie.");
       return;
     }
     setSent(true);
@@ -31,7 +31,7 @@ export default function ResetPasswordRequest() {
       <AuthLayout>
         <h1 className="text-2xl font-bold tracking-tight mb-2">Email envoyé</h1>
         <p className="text-black/60">
-          Si un compte existe avec cet email, tu vas recevoir un lien pour réinitialiser ton mot de passe. <strong>Regarde aussi dans tes spams.</strong>
+          Si un compte existe avec cette adresse, tu vas recevoir un lien pour choisir un nouveau mot de passe. <strong>Regarde aussi dans tes spams.</strong>
         </p>
       </AuthLayout>
     );
@@ -47,7 +47,7 @@ export default function ResetPasswordRequest() {
         }}
       >
         <h1 className="text-2xl font-bold tracking-tight mb-1">Mot de passe oublié</h1>
-        <p className="text-black/60 mb-6">On t'envoie un lien pour le réinitialiser.</p>
+        <p className="text-black/60 mb-6">Tape ton adresse email : on t&apos;envoie un lien pour choisir un nouveau mot de passe.</p>
 
         <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
         <input id="field-1"
@@ -71,7 +71,7 @@ export default function ResetPasswordRequest() {
           disabled={loading || !email}
           className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
         >
-          {loading ? "Envoi..." : "Envoyer le lien"}
+          {loading ? "Envoi…" : "Envoyer le lien"}
         </button>
       </form>
 

@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const title = fiche.title || "Fiche de révision";
   const description = (fiche.data.summary ?? "Une fiche de révision créée avec FishFlow.").slice(0, 155);
   return {
-    title: `${title} — fiche FishFlow`,
+    title: { absolute: `${title} — fiche FishFlow` },
     description,
     // Un lien partagé reste entre les mains de la personne qui l'envoie : pas d'indexation par les moteurs.
     robots: { index: false, follow: false },

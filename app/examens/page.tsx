@@ -149,12 +149,12 @@ export default function Examens() {
         )}
       </div>
 
-      {status === "loading" && <p className="text-black/50 text-sm py-16 text-center" role="status">Chargement...</p>}
+      {status === "loading" && <p className="text-black/50 text-sm py-16 text-center" role="status">Chargement…</p>}
 
       {status === "unavailable" && (
         <div className="bg-surface border border-black/10 rounded-3xl p-8 text-center">
           <p className="font-semibold mb-1">Cette page arrive bientôt.</p>
-          <p className="text-sm text-black/60">Elle sera disponible dès que la mise à jour sera terminée.</p>
+          <p className="text-sm text-black/60">Elle sera disponible très vite. Reviens un peu plus tard.</p>
         </div>
       )}
 
@@ -227,7 +227,7 @@ export default function Examens() {
 
           {errorField === "save" && <p className="text-sm text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
           <div className="flex flex-wrap gap-3">
-            <button type="submit" disabled={saving} className="ff-primary ff-btn">{saving ? "Enregistrement..." : "Enregistrer"}</button>
+            <button type="submit" disabled={saving} className="ff-primary ff-btn">{saving ? "Enregistrement…" : "Enregistrer l'examen"}</button>
             <button type="button" onClick={() => { setCreating(false); setError(""); setErrorField(null); }} className="ff-secondary">Annuler</button>
           </div>
         </form>

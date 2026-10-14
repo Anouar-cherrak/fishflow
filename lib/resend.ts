@@ -41,8 +41,8 @@ export function emailLayout(
     <div style="text-align:center;margin:28px 0 8px;">
       <a href="${ctaUrl}" style="background:#0369A1;color:#ffffff;padding:12px 30px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;">${ctaLabel}</a>
     </div>
-    <p style="color:#6B7280;font-size:12px;text-align:center;margin-top:24px;">FishFlow — fiches de révision par IA</p>
-    ${unsubscribeUrl ? `<p style="text-align:center;margin-top:8px;"><a href="${unsubscribeUrl}" style="color:#6B7280;font-size:12px;">Se désinscrire de ces emails</a></p>` : ""}
+    <p style="color:#6B7280;font-size:12px;text-align:center;margin-top:24px;">FishFlow : tes fiches de révision, faites à partir de tes cours</p>
+    ${unsubscribeUrl ? `<p style="text-align:center;margin-top:8px;"><a href="${unsubscribeUrl}" style="color:#6B7280;font-size:12px;">Ne plus recevoir ces e-mails</a></p>` : ""}
   </div>`;
 }
 

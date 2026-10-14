@@ -69,8 +69,8 @@ export function Analytics() {
           }}
         >
           <p style={{ margin: 0 }}>
-            On utilise des cookies de mesure d&apos;audience (Google) pour savoir comment FishFlow est utilisé.
-            Tu peux refuser, le site marche pareil.{" "}
+            On utilise des cookies de Google pour mesurer l&apos;audience et l&apos;efficacité de nos publicités.
+            Tu peux refuser : le site marche pareil.{" "}
             <a href="/confidentialite" style={{ textDecoration: "underline" }}>
               En savoir plus
             </a>

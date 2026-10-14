@@ -11,10 +11,10 @@ import { TrackView } from "@/components/TrackView";
 
 // Seulement ce qui change entre Gratuit et Pro. Le reste est identique et résumé en une phrase sous le tableau.
 const ROWS: { label: string; free: string; pro: string }[] = [
-  { label: "Fiches générées", free: "3 par mois", pro: "100 par mois (10 par jour)" },
+  { label: "Fiches créées", free: "3 par mois", pro: "100 par mois (10 par jour)" },
   { label: "Quiz", free: "À jouer, avec ton meilleur score", pro: "À jouer, 12 questions par quiz" },
   { label: "Apprendre (poser une question)", free: "1 essai", pro: "20 questions par jour" },
-  { label: "Documents", free: "Jusqu'à 7 pages environ", pro: "Jusqu'à 15 pages environ, plusieurs PDF fusionnés" },
+  { label: "Taille d'un cours", free: "Jusqu'à 7 pages environ", pro: "Jusqu'à 15 pages environ, plusieurs PDF dans une seule fiche" },
   { label: "Progression", free: "7 derniers jours", pro: "30 jours, taux de réussite, cartes difficiles" },
   { label: "Résumé lu à voix haute", free: "Non", pro: "Oui" },
   { label: "Historique de fiches", free: "5 fiches", pro: "Toutes tes fiches gardées" },
@@ -52,14 +52,14 @@ export default function Pricing() {
       const res = await fetch("/api/stripe/checkout", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Erreur, réessaie.");
+        alert(data.error || "Le paiement n'a pas pu s'ouvrir. Réessaie.");
         setLoading(false);
         return;
       }
       trackEvent("clic_passage_premium");
       window.location.href = data.url;
     } catch {
-      alert("Erreur de connexion. Réessaie.");
+      alert("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
       setLoading(false);
     }
   };
@@ -67,7 +67,7 @@ export default function Pricing() {
   if (checkingStatus) {
     return (
       <AppShell size="form">
-        <p className="text-black/40 text-sm text-center py-20" role="status">Chargement...</p>
+        <p className="text-black/60 text-sm text-center py-20" role="status">Chargement…</p>
       </AppShell>
     );
   }
@@ -77,9 +77,9 @@ export default function Pricing() {
       <AppShell size="form">
         <div className="w-full max-w-sm mx-auto bg-white border border-black/10 rounded-2xl p-8 text-center ff-fade-up ff-card">
           <h1 className="text-xl font-semibold mb-1">Tu es déjà FishFlow Pro</h1>
-          <p className="text-black/50 text-sm mb-6">Jusqu'à 100 fiches par mois, déjà actives sur ton compte.</p>
+          <p className="text-black/60 text-sm mb-6">Tu peux créer jusqu'à 100 fiches par mois (10 par jour).</p>
           <button onClick={() => router.push("/generer")} className="w-full py-3 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition ff-btn">
-            Retour à l'outil
+            Créer une fiche
           </button>
         </div>
       </AppShell>
@@ -91,7 +91,7 @@ export default function Pricing() {
       <TrackView name="pricing_view" />
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-2">Gratuit ou Pro.</h1>
-        <p className="ff-lead">Le gratuit suffit pour essayer. Pro enlève toutes les limites. Tu peux arrêter quand tu veux.</p>
+        <p className="ff-lead">Le gratuit suffit pour essayer. Pro te donne bien plus : jusqu'à 100 fiches par mois et des outils en plus. Tu peux arrêter quand tu veux.</p>
       </div>
 
       <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[380px_minmax(0,1fr)] items-start">
@@ -117,7 +117,7 @@ export default function Pricing() {
             disabled={loading}
             className="w-full py-3 rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-50 ff-btn"
           >
-            {loading ? "Redirection..." : "Passer Pro, 4,99 €/mois"}
+            {loading ? "Ouverture du paiement…" : "Passer Pro, 4,99 €/mois"}
           </button>
 
           <button onClick={() => router.push("/generer")} className="w-full mt-3 text-sm text-black/55 hover:text-black hover:underline transition ff-link-underline min-h-[44px]">
@@ -146,7 +146,7 @@ export default function Pricing() {
               </tbody>
             </table>
           </div>
-          <p className="text-sm text-black/65 mt-4">Dans les deux formules : résumé, fiche, flashcards, quiz, révision avec rappels, objectif du jour et les 3 présentations (Classique, Mémo, Cornell).</p>
+          <p className="text-sm text-black/65 mt-4">Dans les deux formules : la fiche, l'essentiel, les flashcards, le quiz, la révision avec rappels, l'objectif du jour et les 3 présentations (Classique, Mémo, Cornell).</p>
           <p className="text-xs text-black/50 mt-2">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
         </div>
       </div>

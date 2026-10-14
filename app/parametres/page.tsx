@@ -69,13 +69,13 @@ export default function Parametres() {
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Erreur, réessaie.");
+        alert(data.error || "La page d'abonnement n'a pas pu s'ouvrir. Réessaie.");
         setPortalLoading(false);
         return;
       }
       window.location.href = data.url;
     } catch {
-      alert("Erreur de connexion. Réessaie.");
+      alert("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
       setPortalLoading(false);
     }
   };
@@ -91,7 +91,7 @@ export default function Parametres() {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setPasswordLoading(false);
     if (error) {
-      setPasswordMessage("Impossible de changer le mot de passe. Réessaie.");
+      setPasswordMessage("Le mot de passe n'a pas pu être changé. Vérifie ta connexion et réessaie.");
       return;
     }
     setNewPassword("");
@@ -104,7 +104,7 @@ export default function Parametres() {
       const res = await fetch("/api/account/delete", { method: "POST" });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Erreur pendant la suppression.");
+        alert(data.error || "Ton compte n'a pas pu être supprimé. Réessaie, ou écris-nous.");
         setDeleting(false);
         return;
       }
@@ -112,7 +112,7 @@ export default function Parametres() {
       await supabase.auth.signOut();
       router.push("/");
     } catch {
-      alert("Erreur de connexion. Réessaie.");
+      alert("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
       setDeleting(false);
     }
   };
@@ -120,7 +120,7 @@ export default function Parametres() {
   if (checking) {
     return (
       <AppShell size="normal">
-        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement...</p>
+        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement…</p>
       </AppShell>
     );
   }
@@ -138,7 +138,7 @@ export default function Parametres() {
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
             <p className="text-sm font-semibold text-black/55 mb-3">Compte</p>
             <p className="text-sm text-black/70 mb-1">{user?.email}</p>
-            <p className="text-sm text-black/50">{isPro ? "FishFlow Pro actif" : "Compte gratuit"}</p>
+            <p className="text-sm text-black/60">{isPro ? "FishFlow Pro actif" : "Compte gratuit"}</p>
             {left && (
               <p className="text-sm text-black/50 mt-1">
                 Il te reste {left.month} fiche{left.month > 1 ? "s" : ""} ce mois-ci
@@ -170,9 +170,9 @@ export default function Parametres() {
               aria-checked={!emailOptOut}
             >
               <span className="text-sm font-medium text-black text-left">
-                Recevoir les emails de relance
+                Recevoir les e-mails de rappel
                 <span className="block text-xs text-black/60 font-normal mt-0.5">
-                  Rappels et nouveautés FishFlow par email
+                  Tes cartes à revoir et les nouveautés de FishFlow
                 </span>
               </span>
               <span
@@ -209,7 +209,7 @@ export default function Parametres() {
                 disabled={portalLoading}
                 className="ff-secondary w-full text-sm disabled:opacity-50"
               >
-                {portalLoading ? "Redirection..." : "Gérer mon abonnement"}
+                {portalLoading ? "Ouverture…" : "Gérer mon abonnement"}
               </button>
             ) : (
               <button
@@ -242,12 +242,12 @@ export default function Parametres() {
               disabled={passwordLoading || !newPassword}
               className="ff-secondary w-full text-sm disabled:opacity-40"
             >
-              {passwordLoading ? "Mise à jour..." : "Changer le mot de passe"}
+              {passwordLoading ? "Mise à jour…" : "Changer le mot de passe"}
             </button>
           </div>
 
           <div className="bg-surface border border-red-500/40 rounded-3xl p-6 sm:p-7 md:col-span-2 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-[var(--quiz-wrong-text)] mb-3">Zone dangereuse</p>
+            <p className="text-sm font-semibold text-[var(--quiz-wrong-text)] mb-3">Supprimer mon compte</p>
             {!showDeleteConfirm ? (
               <button
                 type="button"
@@ -259,8 +259,8 @@ export default function Parametres() {
             ) : (
               <div>
                 <p id="delete-help" className="text-sm text-black/70 mb-3">
-                  Cette action est <strong>définitive</strong> : toutes tes fiches, ton abonnement et ton compte
-                  seront supprimés. Tape <strong>SUPPRIMER</strong> pour confirmer.
+                  C&apos;est <strong>définitif</strong> : ton compte, toutes tes fiches et ton abonnement seront supprimés.
+                  Pour confirmer, tape <strong>SUPPRIMER</strong> en majuscules.
                 </p>
                 <label htmlFor="delete-confirm" className="sr-only">Tape SUPPRIMER pour confirmer</label>
                 <input
@@ -290,7 +290,7 @@ export default function Parametres() {
                     disabled={deleteText !== "SUPPRIMER" || deleting}
                     className="flex-1 min-h-[44px] rounded-full font-medium bg-red-600 text-[#ffffff] hover:bg-red-700 transition disabled:opacity-30 ff-btn"
                   >
-                    {deleting ? "Suppression..." : "Confirmer la suppression"}
+                    {deleting ? "Suppression…" : "Confirmer la suppression"}
                   </button>
                 </div>
               </div>

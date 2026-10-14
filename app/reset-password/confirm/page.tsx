@@ -55,7 +55,7 @@ function ConfirmContent() {
     return (
       <AuthLayout>
         <h1 className="text-2xl font-bold tracking-tight mb-2">Mot de passe mis à jour</h1>
-        <p className="text-black/60" role="status">Redirection...</p>
+        <p className="text-black/60" role="status">Redirection…</p>
       </AuthLayout>
     );
   }
@@ -103,7 +103,7 @@ function ConfirmContent() {
           disabled={loading || !ready || !password || !confirmPassword}
           className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
         >
-          {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+          {loading ? "Mise à jour…" : "Mettre à jour le mot de passe"}
         </button>
       </form>
     </AuthLayout>

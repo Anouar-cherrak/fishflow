@@ -86,11 +86,11 @@ export default function MesFiches() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cette fiche ? Cette action est irréversible.")) return;
+    if (!confirm("Supprimer cette fiche ? Tu ne pourras pas la récupérer.")) return;
     const supabase = createClient();
     const { error } = await supabase.from("fiches").delete().eq("id", id);
     if (error) {
-      alert("Impossible de supprimer cette fiche pour l'instant. Vérifie ta connexion et réessaie.");
+      alert("La fiche n'a pas pu être supprimée. Vérifie ta connexion et réessaie.");
       return;
     }
     setFiches((prev) => prev.filter((f) => f.id !== id));
@@ -146,7 +146,7 @@ export default function MesFiches() {
   };
 
   const deleteFolder = async (id: string) => {
-    if (!confirm("Supprimer ce dossier ? Les fiches à l'intérieur ne seront pas supprimées, juste déclassées.")) return;
+    if (!confirm("Supprimer ce dossier ? Les fiches qu'il contient restent dans « Mes fiches », sans dossier.")) return;
     const supabase = createClient();
     await supabase.from("folders").delete().eq("id", id);
     setFolders((prev) => prev.filter((f) => f.id !== id));
@@ -164,7 +164,7 @@ export default function MesFiches() {
   if (loading) {
     return (
       <AppShell size="wide">
-        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement...</p>
+        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement…</p>
       </AppShell>
     );
   }
@@ -273,7 +273,7 @@ export default function MesFiches() {
                 type="text"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                placeholder="Matière (ex : Anglais, Droit...)"
+                placeholder="Matière (ex : Anglais, Droit…)"
                 className="w-full min-h-[44px] px-3 border border-black/15 rounded-xl mb-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent"
                 autoFocus
               />
@@ -406,7 +406,7 @@ export default function MesFiches() {
                       <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Renommer
                       </button>
-                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Ranger cette fiche dans un dossier (une matière, par exemple)">
+                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Ranger cette fiche dans un dossier (par exemple une matière)">
                         Classer
                       </button>
                       <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-[var(--quiz-wrong-text)] transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">

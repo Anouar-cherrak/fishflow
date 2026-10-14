@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     formData = await req.formData();
   } catch {
     return NextResponse.json(
-      { error: "Impossible de lire les données envoyées. Réessaie." },
+      { error: "L'envoi n'a pas marché. Réessaie." },
       { status: 400 }
     );
   }
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
 
   if (outputs.length === 0) {
     return NextResponse.json(
-      { error: "Sélectionne au moins une sortie à générer." },
+      { error: "Coche au moins une case dans « Ce que tu veux recevoir »." },
       { status: 400 }
     );
   }
@@ -99,7 +99,7 @@ export async function POST(req: Request) {
       const text = formData.get("text") as string;
       if (!text || text.trim().length < 10) {
         return NextResponse.json(
-          { error: "Le texte est trop court ou vide. Ajoute plus de contenu." },
+          { error: "Ton cours est trop court. Colle au moins quelques phrases, puis réessaie." },
           { status: 400 }
         );
       }
@@ -112,14 +112,14 @@ export async function POST(req: Request) {
       const allFiles = files.length > 0 ? files : singleFile ? [singleFile] : [];
 
       if (allFiles.length === 0) {
-        return NextResponse.json({ error: "Aucun fichier PDF reçu." }, { status: 400 });
+        return NextResponse.json({ error: "Le PDF n'est pas arrivé. Choisis ton fichier à nouveau, puis réessaie." }, { status: 400 });
       }
 
       if (allFiles.length > MAX_PDF_FILES) {
         return NextResponse.json({ error: `${MAX_PDF_FILES} PDF au maximum à la fois.` }, { status: 400 });
       }
       if (allFiles.some((f) => !(f instanceof File) || (f.type && !/pdf$/i.test(f.type)))) {
-        return NextResponse.json({ error: "Seuls les fichiers PDF sont acceptés ici." }, { status: 400 });
+        return NextResponse.json({ error: "Ce fichier n'est pas un PDF. Choisis un fichier qui finit par .pdf, ou utilise « Photo » pour une image." }, { status: 400 });
       }
 
       if (allFiles.length > 1 && !pro) {
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
         return NextResponse.json(
           {
             error:
-              "Impossible d'extraire du texte de ce PDF. Il s'agit probablement d'un PDF scanné (image), pas d'un PDF avec du vrai texte. Essaie avec un autre fichier.",
+              "Ce PDF ne contient pas de texte lisible (c'est sûrement un document scanné). Prends plutôt les pages en photo avec « Photo ».",
           },
           { status: 400 }
         );
@@ -160,7 +160,7 @@ export async function POST(req: Request) {
       const photos = many.length > 0 ? many : single instanceof File ? [single] : [];
 
       if (photos.length === 0) {
-        return NextResponse.json({ error: "Aucune photo reçue." }, { status: 400 });
+        return NextResponse.json({ error: "La photo n'est pas arrivée. Choisis-la à nouveau, puis réessaie." }, { status: 400 });
       }
       if (photos.length > MAX_PHOTOS) {
         return NextResponse.json({ error: `${MAX_PHOTOS} photos au maximum pour une fiche.` }, { status: 400 });
@@ -187,7 +187,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Erreur lecture/extraction fichier:", err);
     return NextResponse.json(
-      { error: "Impossible de lire ce fichier. Vérifie qu'il n'est pas corrompu et réessaie." },
+      { error: "Ce fichier n'a pas pu être lu. Il est peut-être abîmé : essaie avec un autre fichier." },
       { status: 400 }
     );
   }
@@ -232,21 +232,21 @@ export async function POST(req: Request) {
 
     if (e instanceof EngineError && e.code === "EMPTY") {
       return NextResponse.json(
-        { error: "L'IA a renvoyé une réponse incomplète. Réessaie." },
+        { error: "Ta fiche n'a pas pu être terminée. Elle ne t'a pas été décomptée : réessaie." },
         { status: 502 }
       );
     }
 
     if (err?.code === "TIMEOUT") {
       return NextResponse.json(
-        { error: "La génération a pris trop de temps. Réessaie avec un contenu plus court." },
+        { error: "La création a pris trop de temps. Elle ne t'a pas été décomptée : réessaie, ou coupe ton cours en deux." },
         { status: 504 }
       );
     }
 
     if (err?.status === 401) {
       return NextResponse.json(
-        { error: "Problème de configuration du service. Contacte le support." },
+        { error: "Le service a un problème de notre côté. Réessaie plus tard ; si ça dure, écris-nous (adresse dans les mentions légales)." },
         { status: 500 }
       );
     }
@@ -259,7 +259,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { error: "Une erreur est survenue pendant la génération. Réessaie dans quelques instants." },
+      { error: "Ta fiche n'a pas pu être créée. Elle ne t'a pas été décomptée : réessaie dans un instant." },
       { status: 500 }
     );
   } finally {

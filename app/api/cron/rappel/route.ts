@@ -64,7 +64,7 @@ export async function GET(req: Request) {
         to: email,
         subject: `${n} carte${n > 1 ? "s" : ""} à revoir aujourd'hui`,
         html: emailLayout(
-          `<p style="color:#333333;font-size:15px;">Tu as <strong>${n} carte${n > 1 ? "s" : ""}</strong> à revoir aujourd'hui. Ça prend quelques minutes, et c'est ce qui fait que ça reste en tête.</p>`,
+          `<p style="color:#333333;font-size:15px;">Tu as <strong>${n} carte${n > 1 ? "s" : ""}</strong> à revoir aujourd'hui. Ça prend quelques minutes, et c'est comme ça que tu retiens pour de bon.</p>`,
           "Revoir mes cartes",
           "https://fishflow.fr/aujourdhui",
           `https://fishflow.fr/api/unsubscribe?id=${userId}`

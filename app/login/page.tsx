@@ -26,7 +26,7 @@ export default function Login() {
       setError(
         error.message.toLowerCase().includes("not confirmed")
           ? "Ton email n'est pas encore confirmé. Refais l'inscription avec le même email pour recevoir un nouveau code (pense aux spams)."
-          : "Email ou mot de passe incorrect."
+          : "Email ou mot de passe incorrect. Vérifie les deux, ou utilise « Mot de passe oublié ? »."
       );
       setLoading(false);
       return;
@@ -100,7 +100,7 @@ export default function Login() {
           disabled={loading}
           className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
         >
-          {loading ? "Connexion..." : "Se connecter"}
+          {loading ? "Connexion…" : "Se connecter"}
         </button>
       </form>
 

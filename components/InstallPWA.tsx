@@ -114,7 +114,7 @@ export function InstallPWA() {
               </ol>
             ) : (
               <>
-                <p className="text-sm text-black/70 mb-3">Sur Chrome ou Edge (PC, Android), cherche la petite icône d'installation directement dans la barre d'adresse (à droite, à côté de l'URL) et clique dessus.</p>
+                <p className="text-sm text-black/70 mb-3">Sur Chrome ou Edge (ordinateur, Android) : clique sur la petite icône d&apos;installation, à droite dans la barre d&apos;adresse.</p>
                 <p className="text-xs text-black/60">
                   Si tu ne la vois pas : ouvre le menu du navigateur (⋮ en haut à droite) puis choisis « Installer FishFlow ».
                 </p>

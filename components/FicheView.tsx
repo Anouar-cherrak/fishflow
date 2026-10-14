@@ -68,7 +68,7 @@ function RegenButton({
       {regenerating ? (
         <>
           <span className="w-3 h-3 border-2 border-black/25 border-t-black rounded-full animate-spin" aria-hidden="true" />
-          Régénération...
+          Régénération…
         </>
       ) : (
         "Régénérer"
@@ -152,7 +152,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       const newData = await res.json();
 
       if (!res.ok) {
-        alert(newData.error || "Erreur pendant la régénération.");
+        alert(newData.error || "Cette partie n'a pas pu être refaite. Réessaie dans un instant.");
         return;
       }
 
@@ -176,7 +176,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
         localStorage.setItem("fishflow_result", JSON.stringify(updated));
       }
     } catch {
-      alert("Erreur de connexion pendant la régénération. Réessaie.");
+      alert("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
     } finally {
       setRegeneratingKey(null);
     }
@@ -278,7 +278,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       trackEvent("fiche_telechargee");
     } catch (err) {
       console.error(err);
-      alert("Erreur pendant la génération du PDF. Réessaie.");
+      alert("Le PDF n'a pas pu être créé. Réessaie.");
     } finally {
       setExporting(false);
       setDownloading(false);
@@ -432,7 +432,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
             )}
             <p className="text-sm font-semibold text-accent mb-2">Fiche de révision</p>
             <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
-            <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
+            <p className="ff-lead mt-3">Ta fiche, l&apos;essentiel, les flashcards et le quiz, créés à partir de ton cours.</p>
           </div>
 
           <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-28 grid gap-3" aria-label="Actions sur la fiche">
@@ -446,7 +446,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                 {downloading ? (
                   <>
                     <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" aria-hidden="true" />
-                    PDF en cours...
+                    PDF en cours…
                   </>
                 ) : (
                   "Télécharger en PDF"
@@ -500,8 +500,8 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   {remaining === 0 ? "Tu as utilisé tes 3 fiches gratuites ce mois-ci." : "Il te reste 1 fiche gratuite ce mois-ci."}
                 </p>
                 <p className="text-sm text-black/65 mb-4 max-w-[60ch]">
-                  Avec Pro : 100 fiches par mois, toutes tes fiches gardées, quiz de 12 questions, 20 questions par jour dans Apprendre, tes
-                  cartes difficiles et ta progression sur 30 jours.
+                  Avec Pro : 100 fiches par mois, toutes tes fiches gardées, des quiz de 12 questions, 20 questions par jour dans Apprendre,
+                  tes cartes difficiles et ta progression sur 30 jours.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <button type="button" onClick={() => { trackEvent("pro_nudge_clic"); router.push("/pricing"); }} className="ff-primary text-sm ff-btn">

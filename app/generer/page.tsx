@@ -28,7 +28,7 @@ type UsageInfo = {
 };
 
 const OUTPUT_OPTIONS: { key: OutputKey; label: string }[] = [
-  { key: "summary", label: "Résumé" },
+  { key: "summary", label: "L'essentiel" },
   { key: "sheet", label: "Fiche de révision" },
   { key: "flashcards", label: "Flashcards" },
   { key: "quiz", label: "Quiz" },
@@ -189,7 +189,7 @@ function GenererContent() {
         trackEvent("historique_plein", { mode });
         setUpgradeModal({
           title: "Ton historique est plein",
-          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour garder toutes tes fiches.`,
+          message: `Un compte gratuit garde ${FREE_FICHES_LIMIT} fiches au maximum. Supprime une ancienne fiche dans « Mes fiches », ou passe Pro pour toutes les garder.`,
           manage: true,
         });
         return;
@@ -230,7 +230,7 @@ function GenererContent() {
           trackEvent("quota_atteint", { mode });
           setUpgradeModal({
             title: "Limite gratuite atteinte",
-            message: data.error || "Tu as atteint ta limite de fiches gratuites ce mois-ci. Passe Pro pour continuer à réviser sans limite.",
+            message: data.error || "Tu as utilisé tes fiches gratuites de ce mois-ci. Avec Pro, tu peux en créer jusqu'à 100 par mois.",
           });
         } else if (data.requiresPro) {
           trackEvent("pdf_trop_volumineux", { mode });
@@ -240,7 +240,7 @@ function GenererContent() {
           });
         } else {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
-          setError(data.error || "Une erreur est survenue. Réessaie.");
+          setError(data.error || "Ta fiche n'a pas pu être créée. Réessaie dans un instant.");
         }
         fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d)).catch(() => {});
         return;
@@ -254,7 +254,7 @@ function GenererContent() {
         setLoading(false);
         setUpgradeModal({
           title: "Ton historique est plein",
-          message: `Les comptes gratuits gardent au maximum ${FREE_FICHES_LIMIT} fiches. Supprime une ancienne fiche depuis "Mes fiches", ou passe Pro pour garder toutes tes fiches.`,
+          message: `Un compte gratuit garde ${FREE_FICHES_LIMIT} fiches au maximum. Supprime une ancienne fiche dans « Mes fiches », ou passe Pro pour toutes les garder.`,
           manage: true,
         });
         return;
@@ -284,7 +284,7 @@ function GenererContent() {
       setTimeout(() => router.push(destination), 150);
     } catch {
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
-      setError("Erreur de connexion. Vérifie ta connexion internet et réessaie.");
+      setError("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
       setLoading(false);
     }
   };
@@ -450,7 +450,7 @@ function GenererContent() {
                 <span className="text-black font-semibold mb-1">
                   {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
                 </span>
-                <span className="text-black/50 text-sm">Avec Pro, plusieurs PDF sont fusionnés en une seule fiche</span>
+                <span className="text-black/60 text-sm">Avec Pro, tu peux mettre plusieurs PDF dans une seule fiche.</span>
                 <input
                   type="file"
                   accept="application/pdf"
@@ -564,7 +564,7 @@ function GenererContent() {
                   <option value="moyen">Moyen</option>
                   <option value="difficile">Difficile</option>
                 </select>
-                <p className="text-xs text-black/50 mt-1.5">Des mots simples ou plus techniques.</p>
+                <p className="text-xs text-black/60 mt-1.5">Des mots simples, ou plus techniques.</p>
               </div>
               <div>
                 <label htmlFor="longueur" className="text-sm font-semibold text-black/60 block mb-2">Longueur</label>
@@ -578,11 +578,11 @@ function GenererContent() {
                   <option value="moyen">Moyen</option>
                   <option value="detaille">Détaillé</option>
                 </select>
-                <p className="text-xs text-black/50 mt-1.5">Court : l'essentiel. Détaillé : plus de cartes.</p>
+                <p className="text-xs text-black/60 mt-1.5">Court : le principal. Détaillé : plus de cartes.</p>
               </div>
             </div>
             <fieldset>
-              <legend className="text-sm font-semibold text-black/60 mb-3">Ce que tu veux recevoir (coche au moins un)</legend>
+              <legend className="text-sm font-semibold text-black/60 mb-3">Ce que tu veux recevoir (coche au moins une case)</legend>
               <div className="grid grid-cols-2 gap-2">
                 {OUTPUT_OPTIONS.map((opt) => (
                   <label
@@ -639,14 +639,14 @@ function GenererContent() {
                   <p className="text-xs font-semibold text-black/50 mb-2">Gratuit</p>
                   <p className="text-sm text-black/65">{LIMITS.free.fichesPerMonth} fiches par mois</p>
                   <p className="text-sm text-black/65">Cours jusqu'à 7 pages</p>
-                  <p className="text-sm text-black/65">Historique de 5 fiches</p>
+                  <p className="text-sm text-black/65">5 fiches gardées</p>
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-accent mb-2">Pro</p>
                   <p className="text-sm font-medium">{LIMITS.pro.fichesPerMonth} fiches par mois</p>
                   <p className="text-sm font-medium">Cours jusqu'à 15 pages</p>
-                  <p className="text-sm font-medium">Plusieurs PDF à la fois</p>
-                  <p className="text-sm font-medium">Quiz de 12 questions + audio</p>
+                  <p className="text-sm font-medium">Plusieurs PDF dans une fiche</p>
+                  <p className="text-sm font-medium">Quiz de 12 questions et lecture à voix haute</p>
                   <p className="text-sm font-medium">Toutes tes fiches gardées</p>
                 </div>
               </div>

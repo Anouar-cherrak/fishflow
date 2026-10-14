@@ -40,7 +40,7 @@ export function ShareFiche({ ficheId, className }: { ficheId: string; className:
     const { error: err } = await createClient().from("fiches").update({ share_id: next }).eq("id", ficheId);
     setBusy(false);
     if (err) {
-      setError("Impossible de changer le partage. Réessaie.");
+      setError("Le partage n'a pas pu être modifié. Vérifie ta connexion et réessaie.");
       return;
     }
     setShareId(next);
@@ -60,7 +60,7 @@ export function ShareFiche({ ficheId, className }: { ficheId: string; className:
   if (!shareId) {
     return (
       <button type="button" onClick={() => setShare(crypto.randomUUID())} disabled={busy} className={className}>
-        {busy ? "Création du lien..." : "Partager par lien"}
+        {busy ? "Création du lien…" : "Partager par lien"}
       </button>
     );
   }

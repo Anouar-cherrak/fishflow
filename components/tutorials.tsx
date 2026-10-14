@@ -82,13 +82,13 @@ function GenererPage({
   ];
   return (
     <div className="sx-page">
-      <p className="sx-h1">Génère ta fiche de révision.</p>
+      <p className="sx-h1">Crée ta fiche de révision.</p>
       <p className="sx-lead" style={{ maxWidth: 700 }}>Colle ton cours, envoie un PDF ou prends-le en photo.</p>
       <div style={{ display: "grid", gridTemplateColumns: "440px 1fr", gap: 24, marginTop: 20 }}>
         <div className="sx-card" style={{ padding: 18 }}>
           <div className="sx-tabs"><span className="on">Texte</span><span>PDF</span><span>Photo</span></div>
           <div className="sx-ta" style={{ marginTop: 12 }} data-t="ta">
-            {!text && <span style={{ opacity: 0.4 }}>Colle ton cours ici...</span>}
+            {!text && <span style={{ opacity: 0.4 }}>Colle ton cours ici…</span>}
             {text && (
               <div style={{ lineHeight: 1.65 }}>
                 {lines.map((l, i) =>
@@ -133,11 +133,11 @@ function GenererPage({
             >
               {gen ? (
                 <>
-                  <span className="sx-hide" style={at(genD + 0.4)}>Générer</span>
-                  <span className="sx-show" style={{ ...at(genD + 0.4), position: "absolute" }}>Génération…</span>
+                  <span className="sx-hide" style={at(genD + 0.4)}>Créer ma fiche</span>
+                  <span className="sx-show" style={{ ...at(genD + 0.4), position: "absolute" }}>Création en cours…</span>
                 </>
               ) : (
-                "Générer"
+                "Créer ma fiche"
               )}
             </span>
             {gen && (
@@ -159,7 +159,7 @@ function FichePage({ share, shareD = 0, copied }: { share?: "link"; shareD?: num
       <div>
         <p className="sx-eyebrow" style={{ margin: 0 }}>Fiche de révision</p>
         <p className="sx-h1" style={{ fontSize: 44, marginTop: 4 }}>La photosynthèse</p>
-        <p className="sx-lead" style={{ fontSize: 15 }}>Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
+        <p className="sx-lead" style={{ fontSize: 15 }}>Ta fiche, l&apos;essentiel, les flashcards et le quiz, créés à partir de ton cours.</p>
         <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
           <span className="sx-pill on sm">Classique</span><span className="sx-pill sm">Mémo</span><span className="sx-pill sm">Cornell</span>
         </div>
@@ -216,7 +216,7 @@ export const GENERER: Scene[] = [
     ),
   },
   {
-    caption: "Coche ce que tu veux recevoir : résumé, fiche, flashcards, quiz.",
+    caption: "Coche ce que tu veux recevoir : fiche, essentiel, flashcards, quiz.",
     art: (
       <Screen n={2} label="Choisis ce que tu veux">
         <GenererPage text quiz quizD={1.5} />
@@ -225,9 +225,9 @@ export const GENERER: Scene[] = [
     ),
   },
   {
-    caption: "Clique sur « Générer ». Il faut quelques secondes.",
+    caption: "Appuie sur « Créer ma fiche ». Ça prend moins d'une minute.",
     art: (
-      <Screen n={3} label="Clique sur Générer">
+      <Screen n={3} label="Appuie sur Créer ma fiche">
         <GenererPage text quiz gen genD={1.4} />
         <Cur from={[780, 300]} to={[740, 447]} d={0.3} t={1} />
       </Screen>
@@ -365,7 +365,7 @@ export const REVISER: Scene[] = [
               <p className="sx-muted" style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 20px" }}>
                 Les cartes que tu connais reviendront plus tard, celles à revoir demain.
               </p>
-              <div><span className="sx-primary">Retour à mes fiches</span></div>
+              <div><span className="sx-primary">Voir ma progression</span></div>
             </ReviserLeft>
           }
         />

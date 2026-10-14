@@ -62,7 +62,7 @@ export async function GET(req: Request) {
           to: user.email,
           subject: "Tes fiches gratuites sont renouvelées ce mois-ci",
           html: emailLayout(
-            `<p style="color:#333333;font-size:15px;">Un nouveau mois commence, et tes fiches gratuites sont de retour ! Transforme un nouveau cours en fiche de révision en quelques secondes.</p>`,
+            `<p style="color:#333333;font-size:15px;">Un nouveau mois commence : tes fiches gratuites sont de retour ! Transforme un nouveau cours en fiche de révision en quelques secondes.</p>`,
             undefined,
             undefined,
             `https://fishflow.fr/api/unsubscribe?id=${user.id}`
@@ -94,9 +94,9 @@ export async function GET(req: Request) {
           const result = await sendMail({
             from: "FishFlow <noreply@fishflow.fr>",
             to: user.email,
-            subject: "Ça fait un moment... reviens réviser avec FishFlow",
+            subject: "Ça fait un moment… Reviens réviser avec FishFlow",
             html: emailLayout(
-              `<p style="color:#333333;font-size:15px;">Tu n'as pas généré de fiche depuis un moment. Un cours à réviser ? FishFlow s'en occupe en quelques secondes.</p>`,
+              `<p style="color:#333333;font-size:15px;">Tu n'as pas créé de fiche depuis un moment. Un cours à réviser ? FishFlow en fait une fiche en quelques secondes.</p>`,
               undefined,
               undefined,
               `https://fishflow.fr/api/unsubscribe?id=${user.id}`

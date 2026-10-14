@@ -174,7 +174,7 @@ export default function Reviser() {
     <AppShell size="normal">
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-3">Réviser.</h1>
-        <p className="ff-lead">Chaque jour, tu revois les cartes qu'il faut revoir. Tu réponds, et FishFlow décide quand te les remontrer.</p>
+        <p className="ff-lead">Chaque jour, tu revois les cartes du jour. Tu dis si tu savais, et FishFlow choisit quand te les remontrer.</p>
       </div>
 
       {stats && (
@@ -191,7 +191,7 @@ export default function Reviser() {
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] items-stretch">
         <section aria-live="polite" className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-7 sm:p-10 flex flex-col justify-center ff-fade-up">
           <SeaDecor y="82%" />
-          {status === "loading" && <p className="text-black/50">Chargement...</p>}
+          {status === "loading" && <p className="text-black/50">Chargement…</p>}
 
           {status === "empty" && !finished && (
             <>
@@ -242,7 +242,7 @@ export default function Reviser() {
             <>
               <h2 className="text-2xl font-bold tracking-tight mb-2">Séance terminée.</h2>
               <p className="text-black/60 mb-6 max-w-[48ch]">
-                Les cartes que tu connais reviendront plus tard, celles à revoir demain. Reviens quand il y en a de nouvelles.
+                Les cartes que tu savais reviendront plus tard, celles à revoir reviendront demain.
               </p>
               <div>
                 <button type="button" onClick={() => router.push("/aujourdhui")} className="ff-primary ff-btn">

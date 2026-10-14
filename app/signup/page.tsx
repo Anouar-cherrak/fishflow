@@ -22,7 +22,7 @@ function frenchAuthError(msg: string): string {
   if (m.includes("password")) return "Ton mot de passe doit faire au moins 6 caractères.";
   if (m.includes("email") && (m.includes("invalid") || m.includes("valid"))) return "Cette adresse email n'est pas valide. Vérifie-la.";
   if (m.includes("rate") || m.includes("too many") || m.includes("seconds")) return "Trop d'essais d'un coup. Attends une minute puis réessaie.";
-  return "Une erreur est survenue. Vérifie ton email et réessaie.";
+  return "Le compte n'a pas pu être créé. Vérifie ton adresse email, puis réessaie.";
 }
 
 export default function Signup() {
@@ -87,7 +87,7 @@ export default function Signup() {
     });
 
     if (error) {
-      setMessage("Code incorrect ou expiré. Vérifie et réessaie.");
+      setMessage("Ce code ne marche pas : il est faux ou trop ancien. Vérifie-le, ou demande un nouveau code.");
       setLoading(false);
       return;
     }
@@ -176,17 +176,17 @@ export default function Signup() {
               disabled={loading}
               className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
             >
-              {loading ? "Envoi du code..." : "Créer mon compte"}
+              {loading ? "Envoi du code…" : "Créer mon compte"}
             </button>
 
             <p className="text-xs text-black/40 text-center mt-4">
-              Tes données restent privées · Résiliable en un clic
+              Tes données restent privées. Aucune carte bancaire demandée.
             </p>
           </>
         ) : (
           <>
             <h1 className="text-2xl font-bold tracking-tight mb-1">Vérifie ton email</h1>
-            <p className="text-black/60 mb-2">Entre le code reçu à {email}</p>
+            <p className="text-black/60 mb-2">Tape le code reçu à l&apos;adresse {email}.</p>
             <p role="note" className="text-sm text-black bg-white border border-accent rounded-2xl p-3 mb-6">
               <strong>Pense aux spams.</strong> Le mail avec ton code arrive souvent dans le courrier indésirable. Il vient de FishFlow.
             </p>
@@ -216,7 +216,7 @@ export default function Signup() {
               disabled={loading || code.length < 6}
               className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
             >
-              {loading ? "Vérification..." : "Confirmer mon compte"}
+              {loading ? "Vérification…" : "Confirmer mon compte"}
             </button>
 
             <button

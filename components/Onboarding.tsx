@@ -23,7 +23,7 @@ const STEPS: Step[] = [
   },
   {
     title: "Tu reçois quatre outils d'un coup",
-    text: "Un résumé, une fiche de révision, des flashcards et un quiz. Tu as 3 fiches gratuites par mois.",
+    text: "Une fiche de révision, l'essentiel en 5 lignes, des flashcards et un quiz. Tu as 3 fiches gratuites par mois.",
     scene: GENERER[3],
   },
   {
@@ -142,7 +142,7 @@ export function Onboarding() {
               Plus tard
             </button>
             <button type="button" onClick={close} className="text-sm text-black/60 hover:text-black min-h-[44px] px-3">
-              Passer le tuto
+              Passer le tutoriel
             </button>
           </div>
         </div>

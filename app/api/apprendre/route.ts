@@ -29,13 +29,13 @@ export async function POST(req: Request) {
     const body = (await req.json()) as { question?: unknown };
     question = asText(body.question);
   } catch {
-    return fail("Question invalide.", 400);
+    return fail("Ta question n'a pas pu être lue. Réessaie.", 400);
   }
   if (question.length < MIN_QUESTION) return fail("Écris une question un peu plus longue.", 400);
-  if (question.length > MAX_QUESTION) return fail(`Ta question est trop longue (${MAX_QUESTION} caractères max).`, 400);
+  if (question.length > MAX_QUESTION) return fail(`Ta question est trop longue : ${MAX_QUESTION} caractères au maximum. Raccourcis-la.`, 400);
 
   const pro = await isProUser(user.id);
-  if (!process.env.OPENAI_API_KEY) return fail("Service momentanément indisponible.", 503);
+  if (!process.env.OPENAI_API_KEY) return fail("Apprendre est indisponible pour le moment. Réessaie plus tard.", 503);
 
   // Limites d'usage (lib/limits.ts) : réservées de façon atomique avant d'appeler l'IA, rendues si la réponse n'a pas pu être donnée.
   const reservation = await reserveFor(req, user.id, pro, "apprendre");
@@ -56,6 +56,6 @@ export async function POST(req: Request) {
   } catch (e) {
     console.error("Erreur Apprendre:", (e as Error)?.message || e);
     await giveBack();
-    return fail("L'IA n'a pas répondu. Réessaie.", 502);
+    return fail("Pas de réponse cette fois. Ta question ne t'a pas été décomptée : réessaie.", 502);
   }
 }

@@ -15,7 +15,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fishflow.fr"),
-  title: "FishFlow",
+  title: { default: "FishFlow : ton cours devient une fiche de révision", template: "%s · FishFlow" },
   description: "Transforme un cours en fiche, flashcards et quiz, puis révise avec des rappels. Le savoir est une force.",
   openGraph: { siteName: "FishFlow", type: "website", locale: "fr_FR" },
   twitter: { card: "summary_large_image" },
