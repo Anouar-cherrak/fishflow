@@ -340,11 +340,11 @@ export default function Aujourdhui() {
             )}
             <div className="flex flex-wrap gap-3">
               {apprendreLeft > 0 ? (
-                <Link href={`/apprendre?q=${encodeURIComponent(question)}&go=1`} className="ff-primary ff-btn w-full sm:w-auto">
+                <Link href={`/apprendre?q=${encodeURIComponent(question)}&go=1`} className="ff-secondary w-full sm:w-auto">
                   {isPro ? "Poser cette question" : "Poser cette question (essai gratuit)"}
                 </Link>
               ) : !isPro ? (
-                <Link href="/pricing" className="ff-primary ff-btn w-full sm:w-auto">
+                <Link href="/pricing" className="ff-secondary w-full sm:w-auto">
                   Voir Pro
                 </Link>
               ) : null}

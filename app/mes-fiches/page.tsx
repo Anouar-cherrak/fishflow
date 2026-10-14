@@ -46,6 +46,7 @@ export default function MesFiches() {
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderColor, setNewFolderColor] = useState(PASTEL_COLORS[0].value);
   const [movingFicheId, setMovingFicheId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
   const [dueCount, setDueCount] = useState(0);
   const moveRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -174,7 +175,9 @@ export default function MesFiches() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
+  const needle = search.trim().toLowerCase();
   const filteredFiches = fiches.filter((f) => {
+    if (needle && !f.title.toLowerCase().includes(needle)) return false;
     if (activeFolder === "all") return true;
     if (activeFolder === "none") return !f.folder_id;
     return f.folder_id === activeFolder;
@@ -308,11 +311,28 @@ export default function MesFiches() {
 
         {/* Fiches */}
         <div className="min-w-0">
+          {fiches.length > 3 && (
+            <div className="mb-5">
+              <label htmlFor="fiche-search" className="text-sm font-semibold text-black/70 block mb-1.5">Chercher une fiche</label>
+              <input
+                id="fiche-search"
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Ex : Révolution, cellule…"
+                className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+            </div>
+          )}
           {filteredFiches.length === 0 ? (
             <div className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
               <SeaDecor y="80%" />
               <p className="text-black/60">
-                {fiches.length === 0 ? "Tu n'as pas encore de fiche. Colle un cours, envoie un PDF ou une photo : ta première fiche arrive en quelques secondes." : "Aucune fiche dans cette section."}
+                {fiches.length === 0
+                  ? "Tu n'as pas encore de fiche. Crée la première : colle un cours, envoie un PDF ou une photo."
+                  : needle
+                    ? `Aucune fiche ne contient « ${search.trim()} ». Essaie un autre mot.`
+                    : "Aucune fiche dans ce dossier. Utilise « Classer » sur une fiche pour la ranger ici."}
               </p>
               {fiches.length === 0 && (
                 <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
@@ -381,7 +401,7 @@ export default function MesFiches() {
                     </div>
                     <div className="grid grid-cols-3 gap-1 sm:flex sm:items-center sm:flex-wrap sm:-mx-2">
                       <button type="button" onClick={() => handleView(fiche)} className="ff-primary text-sm min-h-[44px] sm:min-h-[40px] px-5 sm:mx-2 ff-btn col-span-3 sm:col-span-1 mb-1 sm:mb-0">
-                        Ouvrir
+                        Ouvrir et réviser
                       </button>
                       <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Renommer

@@ -13,6 +13,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<{ email?: string; password?: string }>({});
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -43,11 +44,17 @@ export default function Login() {
         onSubmit={(e) => {
           // La touche « OK » du clavier du téléphone valide le formulaire.
           e.preventDefault();
-          if (!loading && email && password) handleLogin();
+          if (loading) return;
+          const next: { email?: string; password?: string } = {};
+          if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = email.trim() ? "Cette adresse email semble incomplète. Exemple : toi@exemple.com" : "Écris ton adresse email. Exemple : toi@exemple.com";
+          if (!password) next.password = "Écris ton mot de passe.";
+          setFieldError(next);
+          if (next.email || next.password) return;
+          handleLogin();
         }}
       >
         <h1 className="text-2xl font-bold tracking-tight mb-1">Connexion</h1>
-        <p className="text-black/60 mb-6">Accède à ton compte</p>
+        <p className="text-black/60 mb-6">Retrouve tes fiches et tes révisions.</p>
 
         <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
         <input id="field-1"
@@ -58,7 +65,10 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
           placeholder="toi@exemple.com"
+          aria-invalid={!!fieldError.email || undefined}
+          aria-describedby={fieldError.email ? "email-error" : undefined}
         />
+        {fieldError.email && <p id="email-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.email}</p>}
 
         <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Mot de passe</label>
         <input id="field-2"
@@ -68,7 +78,10 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-2 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
           placeholder="Ton mot de passe"
+          aria-invalid={!!fieldError.password || undefined}
+          aria-describedby={fieldError.password ? "password-error" : undefined}
         />
+        {fieldError.password && <p id="password-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] mb-2">{fieldError.password}</p>}
 
         <p className="text-right mb-4">
           <Link href="/reset-password" className="inline-flex items-center min-h-[44px] text-sm text-black/60 hover:text-black hover:underline transition">
@@ -84,7 +97,7 @@ export default function Login() {
 
         <button
           type="submit"
-          disabled={loading || !email || !password}
+          disabled={loading}
           className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
         >
           {loading ? "Connexion..." : "Se connecter"}

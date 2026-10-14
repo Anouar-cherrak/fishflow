@@ -2,6 +2,7 @@
 
 import { ShareFiche } from "@/components/ShareFiche";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { trackEvent } from "@/lib/tracking";
@@ -90,6 +91,8 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const ficheId = initialData.id ?? "";
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [studying, setStudying] = useState(false);
+  // Arrivée juste après la création : on dit ce qui s'est passé et quoi faire ensuite.
+  const [justCreated, setJustCreated] = useState(false);
 
   const logoRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -109,6 +112,11 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       if (storedTemplate === "classique" || storedTemplate === "memo" || storedTemplate === "cornell") setTemplate(storedTemplate);
       if (sessionStorage.getItem("ff-nudge-hidden") === "1") setNudgeHidden(true);
     } catch {}
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("nouvelle") === "1") {
+      setJustCreated(true);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
 
     const checkPro = async () => {
       try {
@@ -278,14 +286,14 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   };
 
   const handleClear = async () => {
-    if (!confirm("Effacer cette fiche ? Cette action est irréversible.")) return;
+    if (!confirm("Supprimer cette fiche ? Tu ne pourras pas la récupérer.")) return;
     localStorage.removeItem("fishflow_result");
     localStorage.removeItem("fishflow_settings");
 
     if (ficheId) {
       const { error } = await createClient().from("fiches").delete().eq("id", ficheId);
       if (error) {
-        alert("Impossible d'effacer cette fiche pour l'instant. Réessaie.");
+        alert("La fiche n'a pas pu être supprimée. Vérifie ta connexion et réessaie.");
         return;
       }
       router.push("/mes-fiches");
@@ -417,6 +425,11 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
       <div className={exporting ? "ff-force-light" : ""}>
         <div className="grid gap-8 lg:gap-x-12 lg:gap-y-6 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
           <div ref={logoRef} className="lg:col-start-1 lg:row-start-1">
+            {!exporting && (
+              <Link href="/mes-fiches" className="inline-flex items-center gap-1 min-h-[44px] -mt-2 mb-1 text-sm font-semibold text-black/70 hover:text-black">
+                <span aria-hidden="true">←</span> Mes fiches
+              </Link>
+            )}
             <p className="text-sm font-semibold text-accent mb-2">Fiche de révision</p>
             <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
             <p className="ff-lead mt-3">Résumé, fiche, flashcards et quiz, générés à partir de ton cours.</p>
@@ -460,11 +473,27 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               {data.id && <ShareFiche ficheId={data.id} className={actionClass} />}
             </div>
             <button type="button" onClick={handleClear} className="text-sm text-black/50 hover:text-black transition ff-link-underline justify-self-start mt-1 min-h-[44px]">
-              Effacer cette fiche
+              Supprimer cette fiche
             </button>
           </aside>
 
           <div className="lg:col-start-1 lg:row-start-2 min-w-0">
+            {justCreated && !exporting && (
+              <div role="status" className="mb-6 bg-surface border border-accent/60 rounded-2xl p-5">
+                <p className="font-semibold mb-1">Ta fiche est prête et enregistrée dans « Mes fiches ».</p>
+                <p className="text-sm text-black/70 mb-4">Lis-la, puis entraîne-toi : les flashcards reviendront aussi dans « Réviser ».</p>
+                <div className="flex flex-wrap gap-3">
+                  {hasCards && (
+                    <button type="button" onClick={() => setStudying(true)} className="ff-primary text-sm ff-btn">
+                      Étudier les flashcards
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setJustCreated(false)} className="ff-secondary text-sm">
+                    D&apos;accord
+                  </button>
+                </div>
+              </div>
+            )}
             {showNudge && (
               <aside className="mb-6 bg-surface border border-black/10 rounded-2xl p-5" aria-label="À propos de Pro">
                 <p className="font-semibold mb-1">

@@ -57,8 +57,8 @@ export default function FichePage() {
           <h1 className="ff-title">Fiche introuvable.</h1>
           <p className="ff-lead">Cette fiche n&apos;existe pas, ou elle appartient à un autre compte.</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/mes-fiches" className="ff-secondary text-sm">Mes fiches</Link>
-            <Link href="/login" className="ff-primary text-sm ff-btn">Me connecter</Link>
+            <Link href="/mes-fiches" className="ff-primary text-sm ff-btn">Voir mes fiches</Link>
+            <Link href="/login" className="ff-secondary text-sm">Me connecter</Link>
           </div>
         </div>
       </AppShell>

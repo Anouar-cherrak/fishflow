@@ -35,10 +35,10 @@ const OUTPUT_OPTIONS: { key: OutputKey; label: string }[] = [
 ];
 
 const LOADING_MESSAGES = [
-  "Lecture du contenu...",
-  "Analyse en cours...",
-  "Génération de ta fiche...",
-  "Presque fini...",
+  "Je lis ton cours…",
+  "Je repère les idées importantes…",
+  "J'écris ta fiche…",
+  "Je prépare les flashcards et le quiz…",
 ];
 
 const FREE_FICHES_LIMIT = LIMITS.free.historyMax;
@@ -96,6 +96,7 @@ function GenererContent() {
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
   const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string; manage?: boolean } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -137,10 +138,13 @@ function GenererContent() {
     if (!loading) {
       setLoadingStep(0);
       setProgress(0);
+      setElapsed(0);
       return;
     }
+    const started = Date.now();
     const messageInterval = setInterval(() => {
-      setLoadingStep((prev) => (prev + 1) % LOADING_MESSAGES.length);
+      setLoadingStep((prev) => Math.min(prev + 1, LOADING_MESSAGES.length - 1));
+      setElapsed(Math.round((Date.now() - started) / 1000));
     }, 3000);
     const progressInterval = setInterval(() => {
       setProgress((prev) => (prev < 92 ? prev + (92 - prev) * 0.08 : prev));
@@ -231,7 +235,7 @@ function GenererContent() {
         } else if (data.requiresPro) {
           trackEvent("pdf_trop_volumineux", { mode });
           setUpgradeModal({
-            title: "Fonctionnalité Pro",
+            title: /caractères/.test(data.error ?? "") ? "Ton cours est trop long" : "Réservé à Pro",
             message: data.error,
           });
         } else {
@@ -276,7 +280,7 @@ function GenererContent() {
 
       setProgress(100);
       // Une fiche enregistrée a sa propre adresse ; sinon on garde la page de secours.
-      const destination = inserted?.id ? `/fiche/${inserted.id}` : "/result";
+      const destination = inserted?.id ? `/fiche/${inserted.id}?nouvelle=1` : "/result";
       setTimeout(() => router.push(destination), 150);
     } catch {
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
@@ -328,7 +332,7 @@ function GenererContent() {
       e.preventDefault();
       setDragging(false);
       const got = Array.from(e.dataTransfer.files).filter(accept);
-      if (got.length === 0) return setError("Ce type de fichier n'est pas accepté ici.");
+      if (got.length === 0) return setError(mode === "photo" ? "Ce fichier n'est pas une photo. Choisis une image JPG ou PNG." : "Ce fichier n'est pas un PDF. Choisis un fichier qui finit par .pdf, ou utilise « Photo » pour une image.");
       setError(null);
       if (mode === "photo") addPhotos(got);
       else if (multiple) setFiles(got);
@@ -353,7 +357,10 @@ function GenererContent() {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-black/50 text-sm mt-3">Ta fiche complète peut prendre jusqu&apos;à une minute.</p>
+          <p className="text-black/60 text-sm mt-3">
+            Ça prend en général 20 à 60 secondes. Reste sur cette page.
+            {elapsed >= 9 && <span className="block mt-1 tabular-nums" aria-hidden="true">{elapsed} s</span>}
+          </p>
         </div>
       )}
 
@@ -372,24 +379,43 @@ function GenererContent() {
       )}
 
       <div className="mb-8 ff-fade-up">
-        <h1 className="ff-title mb-3">Génère ta fiche de révision.</h1>
-        <p className="ff-lead">Colle un cours, un article ou tes notes, envoie un PDF ou prends-les en photo. Tu reçois un résumé, une fiche, des flashcards et un quiz.</p>
+        <h1 className="ff-title mb-3">Crée ta fiche de révision.</h1>
+        <p className="ff-lead">Donne ton cours (texte, PDF ou photo), puis appuie sur « Créer ma fiche ». Tu reçois une fiche, l&apos;essentiel, des flashcards et un quiz.</p>
       </div>
+
+      {/* Ce qu'il reste, visible tout de suite (sans défiler), avec un lien vers ce que Pro change. */}
+      {user && usage && (
+        <p className="mb-5 -mt-4 text-sm text-black/70 ff-fade-up" aria-live="polite">
+          {usage.isPro
+            ? proLeftText
+            : usage.remaining === 0
+              ? "Tu as utilisé tes fiches gratuites de ce mois-ci."
+              : `Il te reste ${usage.remaining} fiche${(usage.remaining ?? 0) > 1 ? "s" : ""} gratuite${(usage.remaining ?? 0) > 1 ? "s" : ""} ce mois-ci.`}{" "}
+          {!usage.isPro && (
+            <a href="/pricing" className="underline font-semibold whitespace-nowrap">
+              Ce que Pro change
+            </a>
+          )}
+        </p>
+      )}
 
       <div className="ff-fade-up" style={{ animationDelay: "0.05s" }}>
         <InstallPWA />
       </div>
 
       {!user && !checkingAuth && (
-        <div className="mb-6 px-4 py-3 rounded-xl text-sm bg-surface text-black/70 ff-fade-up">
-          Connecte-toi pour générer des fiches (3 gratuites par mois).
+        <div className="mb-6 px-4 py-3 rounded-xl text-sm bg-surface text-black/80 ff-fade-up">
+          Pour créer une fiche, il te faut un compte gratuit (3 fiches par mois, sans carte bancaire).{" "}
+          <a href="/signup" className="underline font-semibold">Créer mon compte</a> ou{" "}
+          <a href="/login" className="underline font-semibold">me connecter</a>.
         </div>
       )}
 
       <div className="grid gap-6 lg:gap-10 lg:grid-cols-[1.3fr_1fr] items-start">
         {/* Colonne de gauche : le cours */}
         <section aria-label="Ton cours" className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-7 ff-fade-up" style={{ animationDelay: "0.1s" }}>
-          <div className="flex gap-1 mb-5 bg-white border border-black/10 rounded-full p-1" role="group" aria-label="Type de document">
+          <p className="text-sm font-semibold text-black/70 mb-2" id="source-label">D&apos;où vient ton cours ?</p>
+          <div className="flex gap-1 mb-5 bg-white border border-black/10 rounded-full p-1" role="group" aria-labelledby="source-label">
             {(["text", "pdf", "photo"] as Mode[]).map((m) => (
               <button
                 key={m}
@@ -412,7 +438,7 @@ function GenererContent() {
                 id="cours"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Colle ici un cours, un article, un chapitre ou tes notes..."
+                placeholder="Colle ici ton cours, un article ou tes notes (quelques phrases au minimum)…"
                 className="w-full h-44 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-base ff-input resize-y"
               />
             </>
@@ -450,7 +476,23 @@ function GenererContent() {
             <label className={dropClass} {...dropProps(isPdf, false)}>
               <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir un PDF"}</span>
               <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : <><span className="ff-desk-only">ou glisse-dépose ton fichier ici</span><span className="ff-mobile-only">Touche ici pour choisir</span></>}</span>
-              <input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sr-only" />
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => {
+                  const f = e.target.files?.[0] || null;
+                  // Mauvais fichier : on le dit tout de suite, avant d'envoyer quoi que ce soit.
+                  if (f && !isPdf(f)) {
+                    setFile(null);
+                    setError("Ce fichier n'est pas un PDF. Choisis un fichier qui finit par .pdf, ou utilise « Photo » pour une image.");
+                    e.target.value = "";
+                    return;
+                  }
+                  setError(null);
+                  setFile(f);
+                }}
+                className="sr-only"
+              />
             </label>
           )}
 
@@ -575,8 +617,13 @@ function GenererContent() {
             disabled={!canGenerate}
             className="ff-primary w-full text-base ff-btn"
           >
-            {loading ? "Génération..." : !user ? "Se connecter pour générer" : "Générer ma fiche"}
+            {loading ? "Création en cours…" : !user ? "Créer mon compte pour continuer" : "Créer ma fiche"}
           </button>
+          {!loading && user && !canGenerate && (mode === "text" ? !text : files.length === 0 && !file) && (
+            <p className="text-sm text-black/60 text-center -mt-3">
+              {mode === "text" ? "Colle d'abord ton cours dans la zone de texte." : mode === "pdf" ? "Choisis d'abord ton fichier PDF." : "Ajoute d'abord une photo de ton cours."}
+            </p>
+          )}
 
           {proLeftText && <p className="text-xs text-black/50 text-center -mt-2">{proLeftText}</p>}
 
@@ -584,7 +631,7 @@ function GenererContent() {
             <section aria-label="Ton offre" className="bg-surface border border-black/10 rounded-3xl overflow-hidden">
               <p className={`px-5 py-3 text-sm font-semibold ${usage.remaining === 0 ? "text-accent" : "text-black/80"}`}>
                 {usage.remaining === 0
-                  ? `Tu as atteint ta limite gratuite de ce mois-ci. Elle se remet à zéro ${usage.resetMonth ?? "le mois prochain"}.`
+                  ? `Tu as utilisé tes ${LIMITS.free.fichesPerMonth} fiches gratuites de ce mois-ci. Elles reviennent ${usage.resetMonth ?? "le mois prochain"}.`
                   : `Il te reste ${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
               </p>
               <div className="px-5 pb-5 grid grid-cols-2 gap-4 border-t border-black/10 pt-4">

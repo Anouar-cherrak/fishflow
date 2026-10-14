@@ -34,6 +34,7 @@ export default function Signup() {
   const [showPwd, setShowPwd] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<{ email?: string; password?: string }>({});
   const router = useRouter();
 
   const handleSignup = async () => {
@@ -109,7 +110,13 @@ export default function Signup() {
           // La touche « OK » du clavier du téléphone valide le formulaire.
           e.preventDefault();
           if (loading) return;
-          if (step === "form" && email && password) handleSignup();
+          if (step === "form") {
+            const next: { email?: string; password?: string } = {};
+            if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = email.trim() ? "Cette adresse email semble incomplète. Exemple : toi@exemple.com" : "Écris ton adresse email. Exemple : toi@exemple.com";
+            if (password.length < 6) next.password = "Choisis un mot de passe d'au moins 6 caractères.";
+            setFieldError(next);
+            if (!next.email && !next.password) handleSignup();
+          }
           if (step === "code" && code.length >= 6) handleVerify();
         }}
       >
@@ -127,7 +134,10 @@ export default function Signup() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
               placeholder="toi@exemple.com"
+              aria-invalid={!!fieldError.email || undefined}
+              aria-describedby={fieldError.email ? "email-error" : undefined}
             />
+            {fieldError.email && <p id="email-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.email}</p>}
 
             <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Mot de passe</label>
             <input id="field-2"
@@ -137,7 +147,14 @@ export default function Signup() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
               placeholder="6 caractères minimum"
+              aria-invalid={!!fieldError.password || undefined}
+              aria-describedby={fieldError.password ? "password-error" : "password-help"}
             />
+            {fieldError.password ? (
+              <p id="password-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.password}</p>
+            ) : (
+              <p id="password-help" className="text-xs text-black/60 -mt-3 mb-4">Au moins 6 caractères. Évite « 123456 » : il est refusé.</p>
+            )}
 
             <label className="flex items-center gap-2 text-sm text-black/70 min-h-[44px] -mt-2 mb-2 cursor-pointer">
               <input type="checkbox" checked={showPwd} onChange={(e) => setShowPwd(e.target.checked)} className="w-4 h-4 accent-[var(--ff-accent)]" />
@@ -156,7 +173,7 @@ export default function Signup() {
 
             <button
               type="submit"
-              disabled={loading || !email || !password}
+              disabled={loading}
               className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
             >
               {loading ? "Envoi du code..." : "Créer mon compte"}

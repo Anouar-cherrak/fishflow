@@ -199,8 +199,11 @@ export default function Reviser() {
               <p className="text-black/60 mb-6 max-w-[48ch]">
                 Tout est à jour. Tes cartes reviendront ici toutes seules, au bon moment. Pour en avoir de nouvelles, crée une fiche : ses flashcards arriveront ici.
               </p>
-              <div>
-                <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-primary ff-btn">
+              <div className="flex flex-wrap gap-3">
+                <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
+                  Créer une fiche
+                </button>
+                <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-secondary">
                   Voir mes fiches
                 </button>
               </div>
@@ -229,7 +232,7 @@ export default function Reviser() {
                   }}
                   className="ff-primary ff-btn"
                 >
-                  Commencer
+                  Commencer la révision
                 </button>
               </div>
             </>
@@ -242,8 +245,8 @@ export default function Reviser() {
                 Les cartes que tu connais reviendront plus tard, celles à revoir demain. Reviens quand il y en a de nouvelles.
               </p>
               <div>
-                <button type="button" onClick={() => router.push("/mes-fiches")} className="ff-primary ff-btn">
-                  Retour à mes fiches
+                <button type="button" onClick={() => router.push("/aujourdhui")} className="ff-primary ff-btn">
+                  Voir ma progression
                 </button>
               </div>
             </>
@@ -267,6 +270,10 @@ export default function Reviser() {
               </li>
             ))}
           </ol>
+          <p className="text-sm text-black/70 mt-6">
+            Un examen bientôt ?{" "}
+            <a href="/examens" className="underline font-semibold">Prépare-le dans Examens</a> : FishFlow te dit combien de cartes revoir chaque jour.
+          </p>
         </section>
       </div>
 

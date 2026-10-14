@@ -10,6 +10,7 @@ type InstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Pro
 export function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [guideType, setGuideType] = useState<"ios" | "generic">("generic");
@@ -21,6 +22,9 @@ export function InstallPWA() {
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
     setIsStandalone(standalone);
+    try {
+      if (localStorage.getItem("ff-install-hidden") === "1") setDismissed(true);
+    } catch {}
 
     const ua = window.navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua) && !("MSStream" in window));
@@ -49,21 +53,30 @@ export function InstallPWA() {
     setShowGuide(true);
   };
 
-  if (isStandalone) return null;
+  if (isStandalone || dismissed) return null;
+
+  const hide = () => {
+    setDismissed(true);
+    try {
+      localStorage.setItem("ff-install-hidden", "1");
+    } catch {}
+  };
 
   return (
     <div className="mb-4 bg-surface border border-black/10 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
       <div>
-        <p className="text-sm font-semibold text-black">L'app FishFlow est disponible !</p>
-        <p className="text-xs text-black/50">Installe-la sur ton téléphone ou ton PC en un clic.</p>
+        <p className="text-sm font-semibold text-black">Mets FishFlow sur ton écran d&apos;accueil</p>
+        <p className="text-xs text-black/60">Tu l&apos;ouvres ensuite comme une appli, en un geste.</p>
       </div>
 
-      <button
-        onClick={handleClick}
-        className="text-sm font-semibold px-4 min-h-[44px] rounded-full bg-accent text-on-accent hover:bg-accent-strong transition shrink-0 ff-btn"
-      >
-        Télécharger l'application
-      </button>
+      <div className="flex items-center gap-1 shrink-0">
+        <button type="button" onClick={handleClick} className="ff-secondary text-sm min-h-[44px] px-4">
+          Installer
+        </button>
+        <button type="button" onClick={hide} className="text-sm text-black/60 hover:text-black underline underline-offset-4 min-h-[44px] px-3">
+          Plus tard
+        </button>
+      </div>
 
       {showGuide && typeof document !== "undefined" && createPortal(
         <div

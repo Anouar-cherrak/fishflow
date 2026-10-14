@@ -542,9 +542,10 @@ export function Landing() {
         {/* Accueil */}
         <section className="hero" aria-label="Accueil">
           <div className="copy">
-            <h1 className="h-xl">Le savoir est une force.</h1>
+            <p className="eyebrow">Le savoir est une force.</p>
+            <h1 className="h-xl h-hero">Ton cours devient une fiche de révision.</h1>
             <p className="lead">
-              Colle un cours, un article ou tes notes, envoie un PDF ou prends une photo. FishFlow en fait une fiche, des flashcards et un quiz, en quelques secondes.
+              Colle ton cours, envoie un PDF ou prends une photo. FishFlow en fait une fiche, des flashcards et un quiz, en quelques secondes.
             </p>
             <div className="cta-row">
               {signedIn ? (
@@ -852,7 +853,7 @@ export function Landing() {
 
         <section className="final" aria-labelledby="t-end">
           <div className="wrap">
-            <h2 id="t-end">Commence par une question.</h2>
+            <h2 id="t-end">Crée ta première fiche.</h2>
             <div className="cta-row">
               {signedIn ? (
                 <Link href="/generer" className="btn"><span>Ouvrir FishFlow</span></Link>
