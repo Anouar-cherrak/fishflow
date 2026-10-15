@@ -43,15 +43,16 @@ fs.writeFileSync("public/icons/icon-192.png", await onSquare(logo, 192, 0.8, TIN
 fs.writeFileSync("public/icons/icon-512.png", await onSquare(logo, 512, 0.8, TINT));
 // Maskable : Android peut rogner l'icône en rond ; le logo reste dans la zone sûre (cercle de 80 %), avec de la marge.
 fs.writeFileSync("public/icons/icon-maskable-512.png", await onSquare(logo, 512, 0.6, TINT));
-fs.writeFileSync("public/icons/apple-touch-icon.png", await onSquare(logo, 180, 0.78, TINT));
+// Icône Apple (180×180), à la racine du site.
+fs.writeFileSync("public/apple-touch-icon.png", await onSquare(logo, 180, 0.78, TINT));
 
 // Favicon : le logo seul, sur fond transparent (bleu lisible sur un onglet clair comme sombre).
+// Tailles multiples de 48 px, comme le demande Google pour l'icône des résultats de recherche.
 const favicon = (size) =>
   sharp(logo).resize({ width: size, height: size, fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
 const fav = {};
-for (const s of [16, 32, 48, 64]) fav[s] = await favicon(s);
-fs.writeFileSync("public/icons/favicon-32.png", fav[32]);
-fs.writeFileSync("public/icons/favicon-64.png", fav[64]);
+for (const s of [16, 32, 48, 96, 192]) fav[s] = await favicon(s);
+for (const s of [48, 96, 192]) fs.writeFileSync(`public/favicon-${s}x${s}.png`, fav[s]);
 
 // favicon.ico (16, 32, 48) : un fichier ICO qui contient simplement les PNG.
 function ico(entries) {
@@ -73,7 +74,8 @@ function ico(entries) {
   });
   return Buffer.concat([header, dir, ...entries.map(([, buf]) => buf)]);
 }
-fs.writeFileSync("app/favicon.ico", ico([[16, fav[16]], [32, fav[32]], [48, fav[48]]]));
+// Dans public/ (et pas app/) : Next.js n'ajoute pas de balise en double, seules celles de app/layout.tsx comptent.
+fs.writeFileSync("public/favicon.ico", ico([[16, fav[16]], [32, fav[32]], [48, fav[48]]]));
 
 // Logo des emails (sur fond blanc) et de l'image de partage.
 fs.writeFileSync(`${OUT}/logo-email.png`, await onSquare(logo, 120, 0.92, "#ffffff"));

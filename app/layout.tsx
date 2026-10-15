@@ -24,14 +24,15 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "FishFlow",
   },
-  // Icônes générées depuis la mascotte par scripts/brand.mjs.
+  // Icônes générées depuis le logo par scripts/brand.mjs (tailles multiples de 48 px pour Google).
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
-      { url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
-      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+      { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
+      { url: "/favicon-192x192.png", type: "image/png", sizes: "192x192" },
     ],
-    apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180" },
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
   },
 };
 
