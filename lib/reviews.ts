@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/lazy";
 
 // Révision espacée par « boîtes » (méthode de Leitner) :
 // plus on sait une carte, plus elle revient tard. Si on la rate, elle repart de la boîte 1.
@@ -22,7 +22,7 @@ export async function recordReviewResults(results: ReviewResult[]): Promise<void
   if (results.length === 0) return;
 
   try {
-    const supabase = createClient();
+    const supabase = await getSupabase();
     const ficheIds = Array.from(new Set(results.map((r) => r.ficheId)));
 
     const { data: existing, error } = await supabase
@@ -70,7 +70,7 @@ export async function recordReviewResults(results: ReviewResult[]): Promise<void
 // Nombre de cartes à réviser maintenant (0 si la table n'existe pas encore).
 export async function countDueCards(): Promise<number> {
   try {
-    const { count, error } = await createClient()
+    const { count, error } = await (await getSupabase())
       .from("card_reviews")
       .select("id", { count: "exact", head: true })
       .lte("due_at", new Date().toISOString());
@@ -84,7 +84,7 @@ export async function countDueCards(): Promise<number> {
 // Efface les suivis d'une fiche (quand ses flashcards sont régénérées, les numéros de cartes changent).
 export async function clearFicheReviews(ficheId: string): Promise<void> {
   try {
-    await createClient().from("card_reviews").delete().eq("fiche_id", ficheId);
+    await (await getSupabase()).from("card_reviews").delete().eq("fiche_id", ficheId);
   } catch {}
 }
 
@@ -107,7 +107,7 @@ function computeStreak(days: Set<string>): { streak: number; activeToday: boolea
 async function reviewDays(lastReviewed: (string | null)[]): Promise<Set<string>> {
   const days = new Set<string>();
   for (const d of lastReviewed) if (d) days.add(new Date(d).toDateString());
-  const { data } = await createClient()
+  const { data } = await (await getSupabase())
     .from("review_log")
     .select("reviewed_at")
     .gte("reviewed_at", startOfDay(400).toISOString())
@@ -120,7 +120,7 @@ async function reviewDays(lastReviewed: (string | null)[]): Promise<Set<string>>
 export async function getProgress(): Promise<Progress> {
   const empty = { tracked: 0, mastered: 0, streak: 0, reviewedToday: 0, activeToday: false };
   try {
-    const { data, error } = await createClient()
+    const { data, error } = await (await getSupabase())
       .from("card_reviews")
       .select("box, last_reviewed_at")
       .limit(5000);
@@ -140,7 +140,7 @@ export async function getProgress(): Promise<Progress> {
 // Série seule, pour la flamme de la barre du haut (requête légère).
 export async function getStreak(): Promise<{ streak: number; activeToday: boolean }> {
   try {
-    const { data } = await createClient()
+    const { data } = await (await getSupabase())
       .from("card_reviews")
       .select("last_reviewed_at")
       .order("last_reviewed_at", { ascending: false, nullsFirst: false })
@@ -168,7 +168,7 @@ export async function getDailyCounts(days: number): Promise<{ counts: DayCount[]
   const counts: DayCount[] = [];
   for (let i = days - 1; i >= 0; i--) counts.push({ date: startOfDay(i), total: 0, correct: 0 });
   try {
-    const { data, error } = await createClient()
+    const { data, error } = await (await getSupabase())
       .from("review_log")
       .select("reviewed_at, correct")
       .gte("reviewed_at", startOfDay(days - 1).toISOString())
@@ -193,7 +193,7 @@ export type HardCard = { ficheId: string; ficheTitle: string; question: string; 
 // Les cartes que la personne rate le plus souvent.
 export async function getHardCards(limit = 8): Promise<HardCard[]> {
   try {
-    const supabase = createClient();
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from("card_reviews")
       .select("fiche_id, card_index, times_wrong")

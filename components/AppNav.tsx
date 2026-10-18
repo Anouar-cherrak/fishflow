@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/lazy";
+import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 import { Logo, Wordmark } from "@/components/Logo";
 import { StreakFlame } from "@/components/StreakFlame";
 import { BottomTabs } from "@/components/BottomTabs";
@@ -34,8 +35,13 @@ export function AppNav() {
 
   useEffect(() => {
     let cancelled = false;
-    createClient()
-      .auth.getUser()
+    // Pas de cookie de session : personne n'est connecté, inutile de télécharger Supabase.
+    if (!hasAuthCookie()) {
+      queueMicrotask(() => setAuthReady(true));
+      return;
+    }
+    getSupabase()
+      .then((supabase) => supabase.auth.getUser())
       .then(({ data }) => {
         if (cancelled) return;
         setEmail(data.user?.email ?? null);
@@ -108,7 +114,7 @@ export function AppNav() {
   }, [open, close]);
 
   const logout = async () => {
-    await createClient().auth.signOut();
+    await (await getSupabase()).auth.signOut();
     setEmail(null);
     setOpen(false);
     router.push("/");

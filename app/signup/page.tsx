@@ -3,7 +3,7 @@ import { pendingCopyPath } from "@/components/CopyFiche";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase, preloadSupabase } from "@/lib/supabase/lazy";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
 import { track } from "@/lib/track";
@@ -36,11 +36,13 @@ export default function Signup() {
   const [message, setMessage] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<{ email?: string; password?: string }>({});
   const router = useRouter();
+  // Supabase se télécharge en arrière-plan après l'affichage : prêt avant qu'on valide le formulaire.
+  useEffect(preloadSupabase, []);
 
   const handleSignup = async () => {
     setLoading(true);
     setMessage(null);
-    const supabase = createClient();
+    const supabase = await getSupabase();
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -71,14 +73,14 @@ export default function Signup() {
     if (cooldown > 0) return;
     setMessage(null);
     setCooldown(60);
-    const { error } = await createClient().auth.resend({ type: "signup", email });
+    const { error } = await (await getSupabase()).auth.resend({ type: "signup", email });
     setMessage(error ? "Impossible de renvoyer le code pour l'instant. Réessaie dans une minute." : "Nouveau code envoyé. Regarde aussi dans tes spams.");
   };
 
   const handleVerify = async () => {
     setLoading(true);
     setMessage(null);
-    const supabase = createClient();
+    const supabase = await getSupabase();
 
     const { error } = await supabase.auth.verifyOtp({
       email,

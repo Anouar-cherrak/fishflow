@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/lazy";
 import { trackEvent } from "@/lib/tracking";
 
 const KEY = "ff-pending-copy";
@@ -30,7 +30,7 @@ export function CopyFiche({
     setBusy(true);
     setMsg("");
     setFull(false);
-    const supabase = createClient();
+    const supabase = await getSupabase();
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
       try {

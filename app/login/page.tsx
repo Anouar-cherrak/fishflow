@@ -1,10 +1,10 @@
 "use client";
 import { pendingCopyPath } from "@/components/CopyFiche";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase, preloadSupabase } from "@/lib/supabase/lazy";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
 
@@ -15,11 +15,13 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<{ email?: string; password?: string }>({});
   const router = useRouter();
+  // Supabase se télécharge en arrière-plan après l'affichage : prêt avant qu'on clique sur « Se connecter ».
+  useEffect(preloadSupabase, []);
 
   const handleLogin = async () => {
     setLoading(true);
     setError(null);
-    const supabase = createClient();
+    const supabase = await getSupabase();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {

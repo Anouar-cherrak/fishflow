@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/lazy";
+import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 import { Logo, Wordmark } from "@/components/Logo";
 import { AppShell } from "@/components/AppShell";
 import { SeaDecor } from "@/components/Ocean";
@@ -28,7 +29,12 @@ export default function Pricing() {
 
   useEffect(() => {
     const check = async () => {
-      const supabase = createClient();
+      // Pas de session : visiteur non connecté, inutile de télécharger Supabase.
+      if (!hasAuthCookie()) {
+        setCheckingStatus(false);
+        return;
+      }
+      const supabase = await getSupabase();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setCheckingStatus(false);
