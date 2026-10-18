@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 
 /**
  * Applique la préférence de mode sombre sauvegardée sur le compte de
@@ -14,7 +15,8 @@ export function ThemeSync() {
     try {
       stored = localStorage.getItem("ff-theme2");
     } catch {}
-    if (stored) return;
+    // Pas connecté : pas de préférence de compte à lire (et pas d'erreur 401 dans la console).
+    if (stored || !hasAuthCookie()) return;
     fetch("/api/preferences")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {

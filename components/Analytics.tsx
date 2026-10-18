@@ -46,7 +46,8 @@ export function Analytics() {
         </>
       )}
 
-      {choice === "unset" && (
+      {/* Bannière présente dès le HTML (sans attendre le JavaScript) ; cachée d'office si un choix existe déjà (classe ff-consented). */}
+      {(choice === "unset" || choice === null) && (
         <div
           role="region"
           aria-label="Cookies"

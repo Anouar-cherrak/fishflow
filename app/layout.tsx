@@ -1,8 +1,7 @@
 import { Analytics } from "@/components/Analytics";
-import { Onboarding } from "@/components/Onboarding";
+import { OnboardingGate } from "@/components/OnboardingGate";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -50,21 +49,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        {/* Exécuté tout de suite, avant le premier affichage (pas de flash de thème, pas d'attente du JavaScript).
+            Clé « ff-theme2 » : en octobre 2026, le thème sombre a été remis par défaut pour tout le monde.
+            « ff-consented » : la personne a déjà répondu pour les cookies, la bannière reste cachée. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var d=document.documentElement;if(localStorage.getItem('ff-theme2')!=='light')d.classList.add('dark');var c=localStorage.getItem('ff-consent');if(c==='yes'||c==='no')d.classList.add('ff-consented')}catch(e){}`,
+          }}
+        />
+      </head>
       <body className={`${inter.variable} antialiased`}>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`
-            try {
-              // Clé « ff-theme2 » : en octobre 2026, le thème sombre a été remis par défaut pour tout le monde.
-              if (localStorage.getItem('ff-theme2') !== 'light') {
-                document.documentElement.classList.add('dark');
-              }
-            } catch (e) {}
-          `}
-        </Script>
         <RegisterSW />
         <SplashScreen />
         <ThemeSync />
-        <Onboarding />
+        <OnboardingGate />
         {children}
 
         <Analytics />

@@ -5,8 +5,8 @@ import { RaieImg } from "@/components/Logo";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TrackedLink } from "@/components/TrackedLink";
-import { createClient } from "@/lib/supabase/client";
-import { createOrb, type OrbHandle } from "./orb-gl";
+import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
+import type { OrbHandle } from "./orb-gl";
 
 type Theme = "dark" | "light";
 
@@ -177,13 +177,17 @@ export function Landing() {
   // Déjà connecté : la barre propose d'ouvrir son espace au lieu de « Connexion / Créer un compte ».
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
-    createClient()
-      .auth.getSession()
+    // Sans cookie de session, personne n'est connecté : on évite de charger Supabase pour rien.
+    if (!hasAuthCookie()) return;
+    import("@/lib/supabase/client")
+      .then(({ createClient }) => createClient().auth.getSession())
       .then(({ data }) => setSignedIn(!!data.session))
       .catch(() => {});
   }, []);
 
   const kick = useCallback((a: number) => orbRef.current?.kick(a), []);
+  // Thème actuel, lu par la boule quand elle est créée (plus tard, au défilement).
+  const themeRef = useRef<Theme>("dark");
 
   /* Thème : sombre par défaut, le choix est retenu sur cet appareil. */
   useEffect(() => {
@@ -193,6 +197,7 @@ export function Landing() {
     } catch {}
   }, []);
   useEffect(() => {
+    themeRef.current = theme;
     orbRef.current?.setDark(theme === "dark");
   }, [theme]);
   const toggleTheme = () => {
@@ -204,35 +209,60 @@ export function Landing() {
     } catch {}
   };
 
-  /* La boule */
+  /* La boule : elle n'est visible qu'à côté de la démo « question ». La 3D est lourde pour un téléphone :
+     on ne la prépare qu'à l'approche de cette démo, pour que le haut de la page s'affiche tout de suite. */
   useEffect(() => {
     reduceRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const slot = rootRef.current?.querySelector<HTMLElement>("[data-slot]");
+    if (!canvas || !slot) return;
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
     const fallBack = () => {
       canvas.style.display = "none";
       setOrbFallback(true);
     };
-    const orb = createOrb(
-      canvas,
-      () => Array.from(rootRef.current?.querySelectorAll<HTMLElement>("[data-slot]") ?? []),
-      reduceRef.current,
-      fallBack
-    );
-    if (!orb) {
-      queueMicrotask(fallBack);
-      return;
-    }
-    orbRef.current = orb;
-    orb.setDark(theme === "dark");
-    const onDown = () => orb.kick(0.3);
-    window.addEventListener("pointerdown", onDown, { passive: true });
-    return () => {
-      window.removeEventListener("pointerdown", onDown);
-      orb.destroy();
-      orbRef.current = null;
+    const start = async () => {
+      const { createOrb } = await import("./orb-gl");
+      if (cancelled) return;
+      const orb = createOrb(
+        canvas,
+        () => Array.from(rootRef.current?.querySelectorAll<HTMLElement>("[data-slot]") ?? []),
+        reduceRef.current,
+        fallBack
+      );
+      if (!orb) {
+        fallBack();
+        return;
+      }
+      orbRef.current = orb;
+      orb.setDark(themeRef.current === "dark");
+      const onDown = () => orb.kick(0.3);
+      window.addEventListener("pointerdown", onDown, { passive: true });
+      cleanup = () => {
+        window.removeEventListener("pointerdown", onDown);
+        orb.destroy();
+        orbRef.current = null;
+      };
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!("IntersectionObserver" in window)) {
+      start();
+    } else {
+      const io = new IntersectionObserver(
+        (es) => {
+          if (!es[0].isIntersecting) return;
+          io.disconnect();
+          start();
+        },
+        { rootMargin: "150% 0px" }
+      );
+      io.observe(slot);
+      cleanup = () => io.disconnect();
+    }
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, []);
 
 

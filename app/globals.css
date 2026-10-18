@@ -787,6 +787,7 @@ body {
 
 /* Bandeau cookies : au-dessus de la barre d'onglets du téléphone, pour qu'on puisse toujours naviguer. */
 .ff-consent { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.ff-consented .ff-consent { display: none; }
 @media (max-width: 767px) {
   body:has(.ff-tabs) .ff-consent { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
 }
