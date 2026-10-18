@@ -273,8 +273,16 @@
 @media (prefers-reduced-motion: reduce) { .lp .brand img { animation: none; } }
 
 /* Fiche d'exemple qui se remplit toute seule (étapes pilotées par la page). */
-.lp .fd-step { opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-.lp .fd-step.on { opacity: 1; transform: none; }
+/* Le fondu passe par un masque (--fd-a) et non par l'opacité : le texte garde toujours son contraste complet,
+   même au milieu de l'apparition (les outils d'accessibilité ne voient jamais un texte à moitié transparent). */
+@property --fd-a { syntax: "<number>"; inherits: false; initial-value: 1; }
+.lp .fd-step {
+  --fd-a: 0; transform: translateY(6px);
+  -webkit-mask-image: linear-gradient(rgb(0 0 0 / var(--fd-a)), rgb(0 0 0 / var(--fd-a)));
+  mask-image: linear-gradient(rgb(0 0 0 / var(--fd-a)), rgb(0 0 0 / var(--fd-a)));
+  transition: --fd-a 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lp .fd-step.on { --fd-a: 1; transform: none; }
 .lp .fd-opt { transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .lp .fd-opt.ok { transform: scale(1.03); }
 
@@ -283,6 +291,7 @@
 .lp .rv.rv-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .lp .fd-step, .lp .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .lp .fd-step { -webkit-mask-image: none !important; mask-image: none !important; }
 }
 
 /* Boule de secours (sans 3D) : une sphère dessinée en CSS, qui flotte et « réfléchit » pendant la démo. */

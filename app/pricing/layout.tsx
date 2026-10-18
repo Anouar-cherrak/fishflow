@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Gratuit ou Pro",
   description: "Ce que tu as avec le compte gratuit et avec FishFlow Pro.",
+  alternates: { canonical: "/pricing" },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

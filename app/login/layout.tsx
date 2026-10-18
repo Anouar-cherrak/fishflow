@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Connexion",
   description: "Connecte-toi pour retrouver tes fiches.",
+  alternates: { canonical: "/login" },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

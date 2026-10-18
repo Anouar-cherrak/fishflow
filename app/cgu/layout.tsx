@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Conditions d’utilisation",
   description: "Les conditions générales d’utilisation de FishFlow.",
+  alternates: { canonical: "/cgu" },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

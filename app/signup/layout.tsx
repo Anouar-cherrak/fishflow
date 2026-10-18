@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Créer un compte",
   description: "Crée ton compte gratuit : 3 fiches par mois, sans carte bancaire.",
+  alternates: { canonical: "/signup" },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

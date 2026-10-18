@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Confidentialité",
   description: "Comment FishFlow protège tes données.",
+  alternates: { canonical: "/confidentialite" },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

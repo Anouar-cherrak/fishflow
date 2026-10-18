@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Mentions légales",
   description: "Les mentions légales de FishFlow.",
+  alternates: { canonical: "/mentions-legales" },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
