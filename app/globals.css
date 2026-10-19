@@ -36,14 +36,14 @@
   --ff-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* ---- Thème clair : surface ensoleillée ---- */
-  --ff-back: #A9DBF4;           /* eau autour des plaques */
+  --ff-back: #8FD5FB;           /* eau autour des plaques */
   --ff-bg: #EDF8FE;             /* champs et blocs intérieurs (classe bg-white) */
   --ff-surface: #FBFEFF;        /* plaques (classe bg-surface) */
   --ff-fg: #052036;             /* encre (texte) */
-  --ff-fg-2: #1D4361;           /* texte secondaire (10:1 sur les plaques, 5,4:1 sur l'eau la plus profonde) */
+  --ff-fg-2: #163A57;           /* texte secondaire (10:1 sur les plaques, 5,4:1 sur l'eau la plus profonde) */
   --ff-line: rgba(5, 32, 54, 0.13);
   --ff-accent: #38BDF8;         /* bleu FishFlow : boutons */
-  --ff-accent-strong: #08507A;  /* bleu en texte sur fond clair (5:1 sur l'eau, 8,9:1 sur les plaques) */
+  --ff-accent-strong: #064A73;  /* bleu en texte sur fond clair (5:1 sur l'eau, 8,9:1 sur les plaques) */
   --ff-accent-hover: #5CCBFA;
   --ff-on-accent: #052036;      /* texte sur les boutons bleus (7,7:1) */
   --ff-ok: #128A5C; --ff-ok-soft: #DDF5EA;
@@ -53,16 +53,16 @@
   --ff-snow: rgba(255, 255, 255, 0.7);   /* particules en suspension */
   --ff-silhouette: #0B2A44;               /* silhouettes lointaines */
   --ff-plate-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 26px 50px -28px rgba(6, 40, 70, 0.55), 0 2px 8px -4px rgba(6, 40, 70, 0.18);
-  --ff-sea-1: #D6F0FC; --ff-sea-2: #AEDDF5; --ff-sea-3: #8ECDEE;
+  --ff-sea-1: #C6EDFF; --ff-sea-2: #9EDDFF; --ff-sea-3: #72CAF6;
 }
 
 :root.dark {
   /* ---- Thème sombre : eau profonde ---- */
-  --ff-back: #041427;
-  --ff-bg: #071C31;
-  --ff-surface: #0B243B;
+  --ff-back: #06223F;
+  --ff-bg: #0A2848;
+  --ff-surface: #0D3256;
   --ff-fg: #EAF6FF;
-  --ff-fg-2: #A9C6DB;
+  --ff-fg-2: #B4D2E8;
   --ff-line: rgba(234, 246, 255, 0.13);
   --ff-accent: #38BDF8;
   --ff-accent-strong: #7DD3FC;
@@ -75,7 +75,7 @@
   --ff-snow: rgba(200, 235, 255, 0.45);
   --ff-silhouette: #020B16;
   --ff-plate-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 30px 60px -34px rgba(0, 0, 0, 0.8), 0 2px 10px -4px rgba(0, 0, 0, 0.4);
-  --ff-sea-1: #0E3A5C; --ff-sea-2: #082842; --ff-sea-3: #041427;
+  --ff-sea-1: #0F4A78; --ff-sea-2: #0A3560; --ff-sea-3: #06223F;
   color-scheme: dark;
 }
 
