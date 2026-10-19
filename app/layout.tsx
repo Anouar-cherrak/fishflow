@@ -1,15 +1,23 @@
 import { Analytics } from "@/components/Analytics";
 import { OnboardingGate } from "@/components/OnboardingGate";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ThemeSync } from "@/components/ThemeSync";
 
-const inter = Inter({
+// Deux polices seulement, préchargées : Figtree pour le texte, Bricolage Grotesque pour les titres.
+const figtree = Figtree({
   subsets: ["latin"],
   variable: "--font-body",
+  display: "swap",
+});
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  variable: "--font-display",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -36,8 +44,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Couleur de la barre du navigateur : le haut de la mer du thème sombre (--ff-sea-top).
-  themeColor: "#173f63",
+  // Couleur de la barre du navigateur : le haut de l'eau, selon le thème du téléphone.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#E4F5FE" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B243B" },
+  ],
   // L'appli installée passe sous la barre d'état de l'iPhone : les marges « safe-area » du CSS laissent la place à l'encoche.
   viewportFit: "cover",
 };
@@ -59,7 +70,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${figtree.variable} ${bricolage.variable} antialiased`}>
         <RegisterSW />
         <SplashScreen />
         <ThemeSync />

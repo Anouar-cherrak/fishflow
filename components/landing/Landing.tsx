@@ -1,183 +1,83 @@
 "use client";
 
-import { Ocean, WaveDivider } from "@/components/Ocean";
-import { RaieImg } from "@/components/Logo";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { RaieImg } from "@/components/Logo";
+import { Manta } from "@/components/ocean/Manta";
 import { TrackedLink } from "@/components/TrackedLink";
 import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
-import type { OrbHandle } from "./orb-gl";
+import { trackEvent } from "@/lib/tracking";
+import { Jelly } from "./Jelly";
+import { School } from "./School";
+import { depthClick, disableDepthSound, enableDepthSound } from "./depth-sound";
 
-type Theme = "dark" | "light";
+type Theme = "light" | "dark";
 
-/* ---------- Contenu ---------- */
+const COURS =
+  "La photosynthèse permet aux plantes de fabriquer leur nourriture à partir de la lumière, de l'eau et du CO₂. Elle se déroule dans les chloroplastes, grâce à la chlorophylle. La plante produit du glucose et libère de l'oxygène.";
 
 const STEPS = [
-  { label: "1. Tu colles ton cours", caption: "Tu colles ton cours, ou tu envoies un PDF ou une photo." },
-  { label: "2. FishFlow le lit", caption: "FishFlow lit le texte et repère les idées importantes : elles s'allument." },
-  { label: "3. La fiche s'écrit", caption: "Il écrit la fiche : l'essentiel, en phrases courtes." },
-  { label: "4. Tu retiens", caption: "Il crée aussi les flashcards et le quiz, pour que tu retiennes." },
+  { label: "Tu colles ton cours", caption: "Tu colles ton cours, ou tu envoies un PDF ou une photo.", depth: "20 m" },
+  { label: "FishFlow le lit", caption: "FishFlow lit le texte et repère les idées importantes : elles s'allument.", depth: "60 m" },
+  { label: "La fiche s'écrit", caption: "Il écrit la fiche : l'essentiel, en phrases courtes.", depth: "120 m" },
+  { label: "Tu retiens", caption: "Il crée aussi les flashcards et le quiz, pour que tu retiennes.", depth: "200 m" },
 ];
 
-type DemoKey = "sky" | "hole";
-type ArtKey = "sky" | "wave" | "sun" | "hole" | "star" | "ring";
+const FREE = ["3 fiches par mois", "Tes 5 dernières fiches gardées", "Flashcards, quiz et révision chaque jour", "1 question pour essayer Apprendre"];
+const PRO = ["100 fiches par mois (10 par jour)", "Toutes tes fiches gardées", "Des cours plus longs (environ 15 pages)", "20 questions par jour dans Apprendre"];
 
-const DEMO: Record<DemoKey, { q: string; title: string; text: string; src: { label: string; url: string }[]; pics: ArtKey[] }> = {
-  sky: {
-    q: "Pourquoi le ciel est bleu",
-    title: "La lumière bleue est la plus dispersée",
-    text: "La lumière du Soleil contient toutes les couleurs. En traversant l'atmosphère, la lumière bleue, de petite longueur d'onde, est dispersée par les molécules d'air bien plus que le rouge. Elle nous arrive de toutes les directions : c'est la diffusion de Rayleigh.",
-    src: [
-      { label: "Wikipédia · Diffusion de Rayleigh", url: "https://fr.wikipedia.org/wiki/Diffusion_Rayleigh" },
-      { label: "Futura Sciences", url: "https://www.futura-sciences.com/" },
-    ],
-    pics: ["sky", "wave", "sun"],
-  },
-  hole: {
-    q: "Comment fonctionne un trou noir",
-    title: "Une gravité dont rien ne s'échappe",
-    text: "Un trou noir est une région où la gravité est si forte que rien, pas même la lumière, ne peut en sortir une fois passé l'horizon des événements. Beaucoup naissent de l'effondrement d'une étoile très massive en fin de vie.",
-    src: [
-      { label: "Wikipédia · Trou noir", url: "https://fr.wikipedia.org/wiki/Trou_noir" },
-      { label: "NASA", url: "https://www.nasa.gov/" },
-    ],
-    pics: ["hole", "star", "ring"],
-  },
-};
+const SNOW_NEAR = Array.from({ length: 18 }, (_, i) => ({ x: (i * 41 + 7) % 100, y: (i * 67 + 13) % 100, s: 2 + (i % 3) }));
+const SNOW_FAR = Array.from({ length: 26 }, (_, i) => ({ x: (i * 29 + 3) % 100, y: (i * 43 + 31) % 100, s: 1 + (i % 2) }));
 
-const CAPTIONS: Record<ArtKey, string> = { sky: "Ciel", wave: "Ondes", sun: "Soleil", hole: "Horizon", star: "Étoile", ring: "Disque" };
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-const CARDS: [string, string][] = [
-  ["Pourquoi le ciel est bleu ?", "L'atmosphère disperse plus la lumière bleue que les autres couleurs."],
-  ["Que devient la lumière à l'horizon d'un trou noir ?", "Elle ne peut plus en sortir."],
-  ["Où se fait la photosynthèse ?", "Dans les chloroplastes des cellules des feuilles."],
-];
-
-
-function Art({ k }: { k: ArtKey }) {
-  const inner: Record<ArtKey, React.ReactNode> = {
-    sky: (
-      <>
-        <defs>
-          <linearGradient id="lp-sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#1b2a6b" />
-            <stop offset=".65" stopColor="#9fb4d6" />
-            <stop offset="1" stopColor="#f2d2b0" />
-          </linearGradient>
-        </defs>
-        <rect width="300" height="400" fill="url(#lp-sky)" />
-        <circle cx="220" cy="305" r="34" fill="#fff4d6" />
-      </>
-    ),
-    wave: (
-      <>
-        <rect width="300" height="400" fill="#0f1320" />
-        <path d="M0 220 C40 160 80 280 120 220 S200 160 240 220 300 280 300 220" stroke="#8fa3ff" strokeWidth="6" fill="none" />
-        <path d="M0 270 C20 240 40 300 60 270 S100 240 120 270 160 300 180 270 220 240 240 270 280 300 300 270" stroke="#d7dde8" strokeWidth="5" fill="none" />
-        <path d="M0 320 C10 306 20 334 30 320 S50 306 60 320 80 334 90 320 110 306 120 320 140 334 150 320 170 306 180 320 200 334 210 320 230 306 240 320 260 334 270 320 290 306 300 320" stroke="var(--ff-accent)" strokeWidth="4" fill="none" />
-      </>
-    ),
-    sun: (
-      <>
-        <rect width="300" height="400" fill="#d9c9b0" />
-        <circle cx="150" cy="200" r="70" fill="#fff4d6" />
-        <circle cx="150" cy="200" r="110" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="3" />
-        <circle cx="150" cy="200" r="150" fill="none" stroke="#fff" strokeOpacity=".3" strokeWidth="3" />
-      </>
-    ),
-    hole: (
-      <>
-        <rect width="300" height="400" fill="#07080b" />
-        <ellipse cx="150" cy="200" rx="130" ry="34" fill="none" stroke="#e8ebef" strokeWidth="10" opacity=".9" />
-        <ellipse cx="150" cy="200" rx="104" ry="24" fill="none" stroke="var(--ff-accent)" strokeWidth="6" opacity=".8" />
-        <circle cx="150" cy="200" r="52" fill="#000" />
-      </>
-    ),
-    star: (
-      <>
-        <rect width="300" height="400" fill="#0d1230" />
-        <circle cx="150" cy="200" r="46" fill="#ffd9a8" />
-        <circle cx="150" cy="200" r="78" fill="none" stroke="#ffd9a8" strokeOpacity=".4" strokeWidth="3" />
-        <circle cx="60" cy="70" r="2" fill="#fff" />
-        <circle cx="240" cy="110" r="2" fill="#fff" />
-        <circle cx="90" cy="330" r="2" fill="#fff" />
-        <circle cx="250" cy="320" r="2" fill="#fff" />
-      </>
-    ),
-    ring: (
-      <>
-        <rect width="300" height="400" fill="#1a1d24" />
-        <circle cx="150" cy="200" r="40" fill="#000" />
-        <circle cx="150" cy="200" r="70" fill="none" stroke="#e8ebef" strokeWidth="4" />
-        <circle cx="150" cy="200" r="100" fill="none" stroke="#e8ebef" strokeOpacity=".5" strokeWidth="3" />
-        <circle cx="150" cy="200" r="130" fill="none" stroke="#e8ebef" strokeOpacity=".25" strokeWidth="2" />
-      </>
-    ),
-  };
+/* Le profondimètre : quatre colonnes de chiffres qui roulent. */
+function Gauge({ sound, onSound }: { sound: boolean; onSound: () => void }) {
   return (
-    <svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {inner[k]}
-    </svg>
+    <div className="gauge">
+      <p className="gauge-read" aria-hidden="true">
+        <span className="gauge-digits">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className="gauge-col" data-col={i}>
+              {Array.from({ length: 10 }, (_, d) => <i key={d}>{d}</i>)}
+            </span>
+          ))}
+        </span>
+        <span className="gauge-unit">m</span>
+        <span className="gauge-tick" />
+      </p>
+      <button
+        type="button"
+        className="gauge-sound"
+        aria-pressed={sound}
+        aria-label={sound ? "Couper le son des mètres" : "Entendre les mètres défiler"}
+        onClick={onSound}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M4 9.5h3l4.5-4v13L7 14.5H4z" />
+          {sound ? <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /> : <path d="M16 9.5l5 5M21 9.5l-5 5" />}
+        </svg>
+      </button>
+    </div>
   );
 }
-
-// Un chiffre qui « compte » jusqu'à sa valeur quand il arrive à l'écran (affiché directement si on demande moins d'animations).
-function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [n, setN] = useState(to);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    queueMicrotask(() => setN(0));
-    let raf = 0;
-    const io = new IntersectionObserver(
-      (es) => {
-        if (!es[0].isIntersecting) return;
-        io.disconnect();
-        const t0 = performance.now();
-        const tick = (t: number) => {
-          const p = Math.min(1, (t - t0) / 900);
-          setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
-          if (p < 1) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-      },
-      { threshold: 0.6 }
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [to]);
-  return (
-    <span ref={ref}>
-      {n}
-      {suffix}
-    </span>
-  );
-}
-
-function BrandMark() {
-  // Même logo que dans l'application (components/Logo.tsx) : la raie manta.
-  return <RaieImg small width={44} height={36} />;
-}
-
-/* ---------- Page ---------- */
 
 export function Landing() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const orbRef = useRef<OrbHandle | null>(null);
-  const reduceRef = useRef(false);
-  // Pas de 3D (téléphone ancien, 3D perdue) : une boule dessinée en CSS prend sa place dans la démo.
-  const [orbFallback, setOrbFallback] = useState(false);
-
+  const root = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const [theme, setTheme] = useState<Theme>("dark");
-  // Déjà connecté : la barre propose d'ouvrir son espace au lieu de « Connexion / Créer un compte ».
   const [signedIn, setSignedIn] = useState(false);
+  const [sound, setSound] = useState(false);
+  const soundRef = useRef(false);
+  const [step, setStep] = useState(0);
+  const [scrolly, setScrolly] = useState(false);
+  const [stickyCta, setStickyCta] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  /* Déjà connecté : la barre propose d'ouvrir son espace. Sans cookie de session, on ne charge pas Supabase. */
   useEffect(() => {
-    // Sans cookie de session, personne n'est connecté : on évite de charger Supabase pour rien.
     if (!hasAuthCookie()) return;
     import("@/lib/supabase/client")
       .then(({ createClient }) => createClient().auth.getSession())
@@ -185,21 +85,12 @@ export function Landing() {
       .catch(() => {});
   }, []);
 
-  const kick = useCallback((a: number) => orbRef.current?.kick(a), []);
-  // Thème actuel, lu par la boule quand elle est créée (plus tard, au défilement).
-  const themeRef = useRef<Theme>("dark");
-
-  /* Thème : sombre par défaut, le choix est retenu sur cet appareil. */
+  /* Thème : sombre par défaut, le choix est retenu sur cet appareil (même clé que tout le site). */
   useEffect(() => {
     try {
-      // Même choix que sur tout le site : « light » seulement si la personne l'a demandé.
       if (localStorage.getItem("ff-theme2") === "light") queueMicrotask(() => setTheme("light"));
     } catch {}
   }, []);
-  useEffect(() => {
-    themeRef.current = theme;
-    orbRef.current?.setDark(theme === "dark");
-  }, [theme]);
   const toggleTheme = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
     setTheme(next);
@@ -209,432 +100,292 @@ export function Landing() {
     } catch {}
   };
 
-  /* La boule : elle n'est visible qu'à côté de la démo « question ». La 3D est lourde pour un téléphone :
-     on ne la prépare qu'à l'approche de cette démo, pour que le haut de la page s'affiche tout de suite. */
-  useEffect(() => {
-    reduceRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const canvas = canvasRef.current;
-    const slot = rootRef.current?.querySelector<HTMLElement>("[data-slot]");
-    if (!canvas || !slot) return;
-    let cancelled = false;
-    let cleanup: (() => void) | null = null;
-    const fallBack = () => {
-      canvas.style.display = "none";
-      setOrbFallback(true);
-    };
-    const start = async () => {
-      const { createOrb } = await import("./orb-gl");
-      if (cancelled) return;
-      const orb = createOrb(
-        canvas,
-        () => Array.from(rootRef.current?.querySelectorAll<HTMLElement>("[data-slot]") ?? []),
-        reduceRef.current,
-        fallBack
-      );
-      if (!orb) {
-        fallBack();
-        return;
-      }
-      orbRef.current = orb;
-      orb.setDark(themeRef.current === "dark");
-      const onDown = () => orb.kick(0.3);
-      window.addEventListener("pointerdown", onDown, { passive: true });
-      cleanup = () => {
-        window.removeEventListener("pointerdown", onDown);
-        orb.destroy();
-        orbRef.current = null;
-      };
-    };
-    if (!("IntersectionObserver" in window)) {
-      start();
-    } else {
-      const io = new IntersectionObserver(
-        (es) => {
-          if (!es[0].isIntersecting) return;
-          io.disconnect();
-          start();
-        },
-        { rootMargin: "150% 0px" }
-      );
-      io.observe(slot);
-      cleanup = () => io.disconnect();
-    }
-    return () => {
-      cancelled = true;
-      cleanup?.();
-    };
-  }, []);
-
-
-  /* Fiche d'exemple du haut : elle se remplit toute seule, en boucle (résumé, points, flashcard, quiz). */
-  const HERO_STEPS = 10;
-  const [heroStep, setHeroStep] = useState(HERO_STEPS - 1);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let n = 0;
-    queueMicrotask(() => setHeroStep(0));
-    const id = window.setInterval(() => {
-      if (document.hidden) return;
-      n = (n + 1) % HERO_STEPS;
-      setHeroStep(n);
-    }, 1100);
-    return () => clearInterval(id);
-  }, []);
-  const at = (k: number) => `fd-step${heroStep >= k ? " on" : ""}`;
-
-  /* Apparition douce des blocs quand on fait défiler la page (téléphone et ordinateur, rien à toucher). */
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const els = Array.from(root.querySelectorAll<HTMLElement>("main section:not(.hero) .wrap > *"));
-    els.forEach((el) => {
-      const i = Array.from(el.parentElement?.children ?? []).indexOf(el);
-      el.classList.add("rv");
-      el.style.transitionDelay = `${(i % 4) * 60}ms`;
-    });
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const en of entries) {
-          if (en.isIntersecting) {
-            en.target.classList.add("rv-in");
-            io.unobserve(en.target);
-          }
-        }
-      },
-      // Se déclenche un peu AVANT que le bloc n'arrive à l'écran : il est déjà visible quand on y arrive.
-      { threshold: 0, rootMargin: "0px 0px 10% 0px" }
-    );
-    els.forEach((el) => io.observe(el));
-    // Filet de sécurité : au défilement, tout bloc déjà à l'écran apparaît (jamais de bloc qui reste invisible).
-    const check = () => {
-      for (const el of els) {
-        if (el.classList.contains("rv-in")) continue;
-        const r = el.getBoundingClientRect();
-        if (r.top < window.innerHeight * 1.1 && r.bottom > 0) el.classList.add("rv-in");
-      }
-    };
-    window.addEventListener("scroll", check, { passive: true });
-    const first = window.setTimeout(check, 400);
-    return () => {
-      io.disconnect();
-      window.removeEventListener("scroll", check);
-      clearTimeout(first);
-    };
-  }, []);
-
-  /* La fiche, étape par étape : les étapes avancent avec le défilement de la page (rien à toucher).
-     Si la personne demande moins d'animations, la section reste normale et on choisit l'étape avec les boutons. */
-  const stageRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLElement>(null);
-  const [step, setStep] = useState(0);
-  const [scrolly, setScrolly] = useState(false);
-  useEffect(() => {
-    kick(0.45);
-  }, [step, kick]);
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduce) queueMicrotask(() => setScrolly(true));
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      // Barre de progression de la page, en haut de l'écran.
-      const doc = document.documentElement;
-      const max = Math.max(1, doc.scrollHeight - window.innerHeight);
-      if (progressRef.current) progressRef.current.style.transform = `scaleX(${Math.min(1, window.scrollY / max)})`;
-      // Étape de la fabrication d'une fiche, selon la position dans la section.
-      const el = trackRef.current;
-      if (reduce || !el) return;
-      const r = el.getBoundingClientRect();
-      const total = Math.max(1, r.height - window.innerHeight);
-      const p = Math.min(1, Math.max(0, -r.top / total));
-      setStep(Math.min(3, Math.floor(p * 4)));
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-  // Cliquer sur une étape : en mode « défilement », on fait défiler jusqu'à elle.
-  const goStep = (n: number) => {
-    const el = trackRef.current;
-    if (!scrolly || !el) return setStep(n);
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const total = el.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: top + ((n + 0.5) / 4) * total, behavior: "smooth" });
+  const toggleSound = () => {
+    const next = !sound;
+    if (next && !enableDepthSound()) return;
+    if (!next) disableDepthSound();
+    soundRef.current = next;
+    setSound(next);
   };
 
-  /* Barre d'action collante (téléphone) : visible après l'accueil, cachée à la fin où le gros bouton est déjà là. */
-  const [stickyCta, setStickyCta] = useState(false);
+  /* Commencer depuis l'accueil : le texte collé suit jusqu'à « Générer » (même passage que depuis Apprendre). */
+  const start = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (draft.trim()) sessionStorage.setItem("ff-prefill", draft.slice(0, 20000));
+    } catch {}
+    trackEvent("cta_click_hero", draft.trim() ? { with_text: true } : undefined);
+    router.push("/generer");
+  };
+
+  /* ===== La descente : tout ce qui suit le défilement, dans une seule boucle d'animation ===== */
   useEffect(() => {
-    if (!("IntersectionObserver" in window)) return;
-    const hero = rootRef.current?.querySelector(".hero");
-    const end = rootRef.current?.querySelector(".final");
-    if (!hero || !end) return;
-    const seen = { hero: true, end: false };
-    const io = new IntersectionObserver((es) => {
+    const el = root.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!reduce) queueMicrotask(() => setScrolly(true));
+
+    const cols = Array.from(el.querySelectorAll<HTMLElement>(".gauge-col"));
+    const tick = el.querySelector<HTMLElement>(".gauge-tick");
+    const light = el.querySelector<HTMLElement>(".fx-light");
+    const snowNear = el.querySelector<HTMLElement>(".fx-snow.near");
+    const snowFar = el.querySelector<HTMLElement>(".fx-snow.far");
+    const manta = el.querySelector<HTMLElement>(".fx-manta");
+    const track = el.querySelector<HTMLElement>(".steps-track");
+    const bubbles = Array.from(el.querySelectorAll<HTMLElement>(".fx-bub"));
+    const wings = manta ? Array.from(manta.querySelectorAll<HTMLElement>(".ff-manta-l, .ff-manta-r")) : [];
+
+    // Mesures (au chargement et au redimensionnement seulement, jamais pendant le défilement).
+    let vw = 0, vh = 0, maxY = 1, anchors: [number, number][] = [], trackTop = 0, trackLen = 1;
+    const measure = () => {
+      vw = window.innerWidth;
+      vh = window.innerHeight;
+      maxY = Math.max(1, document.documentElement.scrollHeight - vh);
+      anchors = Array.from(el.querySelectorAll<HTMLElement>("[data-depth]")).map((s) => [s.getBoundingClientRect().top + window.scrollY, Number(s.dataset.depth)] as [number, number]);
+      if (track) {
+        trackTop = track.getBoundingClientRect().top + window.scrollY;
+        trackLen = Math.max(1, track.offsetHeight - vh);
+      }
+    };
+    measure();
+
+    const depthAt = (y: number) => {
+      const probe = y + vh * 0.35;
+      let m = 0;
+      for (let i = 0; i < anchors.length; i++) {
+        const [a, ma] = anchors[i];
+        const next = anchors[i + 1];
+        if (probe < a) break;
+        m = next ? lerp(ma, next[1], clamp((probe - a) / Math.max(1, next[0] - a), 0, 1)) : ma;
+      }
+      return y >= maxY - 4 ? anchors[anchors.length - 1]?.[1] ?? m : m;
+    };
+
+    let shownDepth = -1, lastTen = 0, lastY = window.scrollY, vel = 0, raf = 0, lastStep = -1;
+    const cur = { x: 0, y: 0, r: 0, s: 1 }, shy = { x: 0, y: 0 };
+    let mouse = { x: -999, y: -999 };
+    const wingAnims = () => wings.flatMap((w) => w.getAnimations());
+
+    // Elle nage aussi toute seule (le temps fait avancer son parcours), même quand on ne défile pas.
+    const swim = !!manta && !reduce;
+    const t0 = performance.now();
+    let head = 90, prevX = 0, prevY = 0;
+    const target = (y: number) => {
+      const t = y / 700 + (performance.now() - t0) / 9000;
+      const p = y / maxY;
+      const wide = vw >= 900;
+      // Ordinateur : grandes boucles dans la moitié droite. Téléphone : elle n'arrive qu'après l'accueil,
+      // et glisse dans le bas de l'écran, côté droit (jamais au milieu du texte).
+      const enter = wide ? 1 : clamp((y - vh * 0.5) / (vh * 0.6), 0, 1);
+      const x = wide ? vw * (0.74 + 0.13 * Math.sin(t)) : vw * (0.7 + 0.12 * Math.sin(t * 1.2));
+      const yy = wide ? vh * (0.46 + 0.17 * Math.sin(t * 0.8 + 0.6)) : lerp(vh * 0.97, vh * (0.8 + 0.05 * Math.sin(t * 1.6)), enter);
+      return { x, y: yy, r: 0, s: lerp(1, 0.78, p) };
+    };
+
+    const frame = () => {
+      raf = 0;
+      const y = window.scrollY;
+      vel = lerp(vel, y - lastY, 0.25);
+      lastY = y;
+      const m = depthAt(y);
+      const p = y / maxY;
+
+      // Profondimètre : les chiffres roulent, un « clic » tous les 10 m.
+      const meters = Math.round(m);
+      if (meters !== shownDepth) {
+        shownDepth = meters;
+        const s = String(meters).padStart(4, " ");
+        cols.forEach((c, i) => {
+          const ch = s[i];
+          c.dataset.blank = String(ch === " ");
+          c.style.transform = `translate3d(0, ${ch === " " ? 0 : -Number(ch) * 10}%, 0)`;
+        });
+        const ten = Math.floor(meters / 10);
+        if (ten !== lastTen) {
+          lastTen = ten;
+          tick?.animate([{ opacity: 1, transform: "scaleX(1)" }, { opacity: 0, transform: "scaleX(.2)" }], { duration: 260, easing: "ease-out" });
+          if (soundRef.current) depthClick(meters);
+        }
+      }
+
+      // La lumière du soleil s'éteint en descendant ; la neige marine avance à deux vitesses (profondeur).
+      if (light) light.style.opacity = String(clamp(1 - p * 1.6, 0, 1));
+      if (snowNear) snowNear.style.transform = `translate3d(0, ${(-(y * 0.18) % vh).toFixed(1)}px, 0)`;
+      if (snowFar) snowFar.style.transform = `translate3d(0, ${(-(y * 0.07) % vh).toFixed(1)}px, 0)`;
+
+      // La raie : elle suit la descente au loin, penche selon la vitesse, et s'écarte de la souris.
+      if (swim && manta) {
+        const tg = target(y);
+        if (fine) {
+          const dx = cur.x - mouse.x, dy = cur.y - mouse.y, d = Math.hypot(dx, dy) || 1;
+          const push = d < 260 ? (260 - d) / 260 : 0;
+          shy.x = lerp(shy.x, (dx / d) * push * 140, 0.07);
+          shy.y = lerp(shy.y, (dy / d) * push * 100, 0.07);
+        }
+        cur.x = lerp(cur.x, tg.x + shy.x, 0.07);
+        cur.y = lerp(cur.y, tg.y + shy.y, 0.07);
+        // Elle regarde là où elle va (la tête du dessin est en haut), en tournant doucement.
+        const mx = cur.x - prevX, my = cur.y - prevY + Math.max(0, vel) * 0.25;
+        prevX = cur.x; prevY = cur.y;
+        if (Math.hypot(mx, my) > 0.15) {
+          const want = (Math.atan2(my, mx) * 180) / Math.PI + 90;
+          const diff = ((want - head + 540) % 360) - 180;
+          head += clamp(diff, -40, 40) * 0.05;
+        }
+        cur.r = head + clamp(vel * 0.6, -18, 18);
+        cur.s = lerp(cur.s, tg.s, 0.1);
+        manta.style.transform = `translate3d(${cur.x.toFixed(1)}px, ${cur.y.toFixed(1)}px, 0) translate(-50%, -50%) rotate(${cur.r.toFixed(2)}deg) scale(${cur.s.toFixed(3)})`;
+        const rate = 1 + Math.min(2.2, Math.abs(vel) / 12);
+        for (const a of wingAnims()) a.playbackRate = rate;
+      }
+
+      // Étapes de la démo, selon la position dans la section.
+      if (track && !reduce) {
+        const pr = clamp((y - trackTop) / trackLen, 0, 0.999);
+        const st = Math.floor(pr * 4);
+        if (st !== lastStep) { lastStep = st; setStep(st); }
+      }
+
+      // La boucle continue tant que la raie nage (onglet visible) ou que la page bouge encore.
+      if ((swim && !document.hidden) || Math.abs(vel) > 0.08) raf = requestAnimationFrame(frame);
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    if (swim) { const tg = target(window.scrollY); cur.x = prevX = tg.x; cur.y = prevY = tg.y; cur.s = tg.s; }
+    const onVisible = () => { if (!document.hidden) kick(); };
+    document.addEventListener("visibilitychange", onVisible);
+    frame();
+
+    // Bulles sous le doigt ou la souris (un petit stock réutilisé).
+    let bi = 0, lastB = 0, bx = 0, by = 0;
+    const bubble = (x: number, y: number, force = false) => {
+      if (reduce) return;
+      const now = performance.now();
+      if (!force && (now - lastB < 50 || Math.hypot(x - bx, y - by) < 18)) return;
+      lastB = now; bx = x; by = y;
+      const b = bubbles[bi++ % bubbles.length];
+      if (!b) return;
+      const size = 5 + Math.random() * 12;
+      b.style.width = b.style.height = `${size}px`;
+      b.animate(
+        [
+          { transform: `translate3d(${x}px, ${y}px, 0) scale(.4)`, opacity: 0 },
+          { opacity: 0.85, offset: 0.12 },
+          { transform: `translate3d(${x + (Math.random() - 0.5) * 50}px, ${y - 150 - size * 5}px, 0) scale(1)`, opacity: 0 },
+        ],
+        { duration: 1500 + size * 40, easing: "cubic-bezier(.23,1,.32,1)" }
+      );
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") { mouse = { x: e.clientX, y: e.clientY }; kick(); bubble(e.clientX, e.clientY); }
+    };
+    const onTouchMove = (e: TouchEvent) => { const t = e.touches[0]; if (t) bubble(t.clientX, t.clientY); };
+    const onTouchStart = (e: TouchEvent) => { const t = e.touches[0]; if (t) for (let i = 0; i < 4; i++) bubble(t.clientX + (i - 1.5) * 9, t.clientY, true); };
+
+    // Les blocs remontent de l'eau trouble quand on arrive dessus (une seule fois).
+    const reveals = Array.from(el.querySelectorAll<HTMLElement>("[data-reveal]"));
+    let io: IntersectionObserver | null = null;
+    if (!reduce && "IntersectionObserver" in window) {
+      el.classList.add("lp-js");
+      io = new IntersectionObserver((es) => {
+        for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); io?.unobserve(e.target); }
+      }, { rootMargin: "0px 0px -8% 0px" });
+      reveals.forEach((r) => io!.observe(r));
+    }
+    // Les scènes (méduses, fond) ne s'animent qu'à l'écran.
+    const scenes = new IntersectionObserver((es) => {
+      for (const e of es) (e.target as HTMLElement).dataset.on = String(e.isIntersecting);
+    }, { rootMargin: "100px 0px" });
+    el.querySelectorAll("[data-scene]").forEach((s) => scenes.observe(s));
+
+    // Barre d'action collante (téléphone) : visible après l'accueil, cachée à la fin.
+    const hero = el.querySelector(".hero"), end = el.querySelector(".final"), demo = el.querySelector(".steps-track");
+    const seen = { hero: true, end: false, demo: false };
+    const ctaIo = new IntersectionObserver((es) => {
       for (const e of es) {
         if (e.target === hero) seen.hero = e.isIntersecting;
         if (e.target === end) seen.end = e.isIntersecting;
+        if (e.target === demo) seen.demo = e.isIntersecting;
       }
-      setStickyCta(!seen.hero && !seen.end);
+      setStickyCta(!seen.hero && !seen.end && !seen.demo);
     });
-    io.observe(hero);
-    io.observe(end);
-    return () => io.disconnect();
+    [hero, end, demo].forEach((t) => t && ctaIo.observe(t));
+
+    const onScroll = () => kick();
+    const onResize = () => { measure(); kick(); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    window.addEventListener("pointermove", onPointer, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.fonts?.ready.then(onResize);
+    const late = window.setTimeout(onResize, 1200);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.clearTimeout(late);
+      document.removeEventListener("visibilitychange", onVisible);
+      io?.disconnect();
+      scenes.disconnect();
+      ctaIo.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
-  /* Démo Apprendre : la boule « réfléchit », puis rejette ses images */
-  const [demoKey, setDemoKey] = useState<DemoKey | null>(null);
-  const [q, setQ] = useState("");
-  const [notice, setNotice] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "typing" | "thinking" | "done">("idle");
-  const [shown, setShown] = useState(0);
-  const timers = useRef<number[]>([]);
-  const picRefs = useRef<(HTMLElement | null)[]>([]);
-  const clearTimers = () => {
-    timers.current.forEach((t) => clearTimeout(t));
-    timers.current = [];
-  };
-  useEffect(() => clearTimers, []);
-  const later = (fn: () => void, ms: number) => {
-    timers.current.push(window.setTimeout(fn, ms));
+  // Cliquer sur une étape : on fait défiler jusqu'à elle (ou on l'affiche, sans animation).
+  const goStep = (n: number) => {
+    const t = root.current?.querySelector<HTMLElement>(".steps-track");
+    if (!scrolly || !t) return setStep(n);
+    const top = t.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + ((n + 0.5) / 4) * (t.offsetHeight - window.innerHeight), behavior: "smooth" });
   };
 
-  const run = (key: DemoKey) => {
-    if (phase === "typing" || phase === "thinking") return;
-    clearTimers();
-    const d = DEMO[key];
-    const reduce = reduceRef.current;
-    setNotice(false);
-    setDemoKey(null);
-    setShown(0);
-    setPhase("typing");
-    setQ("");
-    let i = 0;
-    const type = () => {
-      i += 1;
-      setQ(d.q.slice(0, i));
-      if (i < d.q.length) {
-        later(type, reduce ? 0 : 28);
-      } else {
-        setPhase("thinking");
-        orbRef.current?.think(true);
-        later(() => {
-          orbRef.current?.think(false);
-          kick(1);
-          setDemoKey(key);
-          setPhase("done");
-        }, reduce ? 0 : 1100);
-      }
-    };
-    type();
-  };
-
-  // Quand la réponse arrive : les images sortent de la boule, une par une.
-  useEffect(() => {
-    if (phase !== "done" || !demoKey) return;
-    const reduce = reduceRef.current;
-    const orbSlot = rootRef.current?.querySelector<HTMLElement>('[data-slot="demo"]');
-    const o = orbSlot?.getBoundingClientRect();
-    picRefs.current.forEach((el, n) => {
-      if (!el || !o || reduce || !el.animate) return;
-      const r = el.getBoundingClientRect();
-      const dx = o.left + o.width / 2 - (r.left + r.width / 2);
-      const dy = o.top + o.height / 2 - (r.top + r.height / 2);
-      el.animate(
-        [
-          { transform: `translate(${dx}px,${dy}px) scale(.12) rotate(${(n - 1) * 28}deg)`, opacity: 0 },
-          { opacity: 1, offset: 0.2 },
-          { transform: "none", opacity: 1 },
-        ],
-        { duration: 1100, delay: 150 + n * 260, easing: "cubic-bezier(.16,1,.3,1)", fill: "backwards" }
-      );
-      later(() => kick(0.7), 150 + n * 260);
-    });
-    // Le texte s'écrit pendant que les images sortent.
-    const full = DEMO[demoKey].text.length;
-    if (reduce) {
-      setShown(full);
-      return;
-    }
-    let s = 0;
-    const id = window.setInterval(() => {
-      s = Math.min(full, s + 3);
-      setShown(s);
-      if (s >= full) clearInterval(id);
-    }, 16);
-    return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, demoKey]);
-
-  const onAsk = (e: React.FormEvent) => {
-    e.preventDefault();
-    const text = q.toLowerCase();
-    if (/trou|noir/.test(text)) run("hole");
-    else if (/ciel|bleu/.test(text)) run("sky");
-    else setNotice(true);
-  };
-
-
-  /* Les deux démos tournent toutes seules quand elles sont à l'écran. Un geste de la personne les arrête. */
-  const [cardsInView, setCardsInView] = useState(false);
-  const [askInView, setAskInView] = useState(false);
-  const [cardsManual, setCardsManual] = useState(false);
-  const [askManual, setAskManual] = useState(false);
-  // Un geste met la démo en pause ; sans nouveau geste, elle reprend toute seule (9 s pour les cartes, 15 s pour la question).
-  const cardsTouch = useRef(0);
-  const askTouch = useRef(0);
-  const touchCards = () => {
-    cardsTouch.current = Date.now();
-    setCardsManual(true);
-  };
-  const touchAsk = () => {
-    askTouch.current = Date.now();
-    setAskManual(true);
-  };
-  useEffect(() => {
-    if (!cardsManual && !askManual) return;
-    const id = window.setInterval(() => {
-      const now = Date.now();
-      if (cardsManual && now - cardsTouch.current > 9000) setCardsManual(false);
-      if (askManual && now - askTouch.current > 15000) setAskManual(false);
-    }, 1500);
-    return () => clearInterval(id);
-  }, [cardsManual, askManual]);
-  useEffect(() => {
-    if (!("IntersectionObserver" in window)) return;
-    const watch = (id: string, set: (v: boolean) => void) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      const io = new IntersectionObserver((es) => set(es[0].isIntersecting), { threshold: 0.35 });
-      io.observe(el);
-      return io;
-    };
-    const a = watch("retenir", setCardsInView);
-    const b = watch("apprendre", setAskInView);
-    return () => { a?.disconnect(); b?.disconnect(); };
-  }, []);
-
-  /* Flashcards */
-  const [cardIdx, setCardIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [leaving, setLeaving] = useState<null | "l" | "r">(null);
-  const [streak, setStreak] = useState(4);
-  const [rx, setRx] = useState(0);
-  const [ry, setRy] = useState(0);
-  const knownBtn = useRef<HTMLButtonElement>(null);
-  const card = CARDS[cardIdx % CARDS.length];
-
-  const sparks = (btn: HTMLElement | null) => {
-    if (!btn || reduceRef.current) return;
-    const r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-    for (let i = 0; i < 14; i++) {
-      const s = document.createElement("i");
-      s.setAttribute("aria-hidden", "true");
-      s.style.cssText = `position:fixed;width:8px;height:8px;border-radius:50%;background:var(--hot, #38bdf8);pointer-events:none;z-index:40;left:${x}px;top:${y}px`;
-      document.body.appendChild(s);
-      const a = (Math.PI * 2 * i) / 14 + Math.random() * 0.4, dd = 40 + Math.random() * 60;
-      const anim = s.animate(
-        [
-          { transform: "translate(0,0) scale(1)", opacity: 1 },
-          { transform: `translate(${Math.cos(a) * dd}px,${Math.sin(a) * dd - 20}px) scale(.2)`, opacity: 0 },
-        ],
-        { duration: 700, easing: "cubic-bezier(.16,1,.3,1)" }
-      );
-      anim.onfinish = () => s.remove();
-    }
-  };
-  const answerCard = (known: boolean) => {
-    if (leaving) return;
-    setLeaving(known ? "r" : "l");
-    if (known) {
-      setStreak((n) => n + 1);
-      sparks(knownBtn.current);
-    }
-    kick(known ? 0.8 : 0.3);
-    later(() => {
-      setCardIdx((n) => n + 1);
-      setFlipped(false);
-      setLeaving(null);
-    }, 520);
-  };
-
-  /* Cartes : la carte se retourne, puis elle est notée, puis la suivante arrive */
-  useEffect(() => {
-    if (!cardsInView || cardsManual || leaving) return;
-    const id = window.setTimeout(
-      () => {
-        if (!flipped) setFlipped(true);
-        else answerCard(cardIdx % 3 !== 1);
-      },
-      flipped ? 2200 : 2000
+  const cta = (event: string, label: string, cls = "btn") =>
+    signedIn ? (
+      <Link href="/generer" className={cls}><span>Ouvrir FishFlow</span></Link>
+    ) : (
+      <TrackedLink href="/generer" event={event} className={cls}><span>{label}</span></TrackedLink>
     );
-    return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardsInView, cardsManual, flipped, leaving, cardIdx]);
-
-  /* Question : les deux exemples s'enchaînent */
-  const autoKey = useRef(0);
-  useEffect(() => {
-    if (!askInView || askManual || phase === "typing" || phase === "thinking") return;
-    const id = window.setTimeout(
-      () => {
-        const k: DemoKey = autoKey.current % 2 === 0 ? "sky" : "hole";
-        autoKey.current += 1;
-        run(k);
-      },
-      phase === "done" ? 7000 : 900
-    );
-    return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [askInView, askManual, phase]);
-
-  const answer = demoKey ? DEMO[demoKey] : null;
 
   return (
-    <div className="lp" data-theme={theme} ref={rootRef}>
+    <div className="lp" data-theme={theme} ref={root}>
       <a className="skip" href="#top">Aller au contenu</a>
-      <div className="lp-progress" aria-hidden="true"><i ref={progressRef} /></div>
-      <canvas id="orb" ref={canvasRef} aria-hidden="true" />
+
+      {/* ===== L'eau : lumière, reflets, neige marine, la raie au loin, bulles. Fixe, derrière tout, jamais cliquable. ===== */}
+      <div className="fx" aria-hidden="true">
+        <div className="fx-light">
+          <span className="fx-rays" />
+          <span className="fx-caustic a" />
+          <span className="fx-caustic b" />
+        </div>
+        <div className="fx-snow far">{SNOW_FAR.map((s, i) => <i key={i} style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.s, height: s.s }} />)}{SNOW_FAR.map((s, i) => <i key={`b${i}`} style={{ left: `${s.x}%`, top: `${100 + s.y}%`, width: s.s, height: s.s }} />)}</div>
+        <div className="fx-manta"><Manta /></div>
+        <div className="fx-snow near">{SNOW_NEAR.map((s, i) => <i key={i} style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.s, height: s.s }} />)}{SNOW_NEAR.map((s, i) => <i key={`b${i}`} style={{ left: `${s.x}%`, top: `${100 + s.y}%`, width: s.s, height: s.s }} />)}</div>
+        {Array.from({ length: 16 }, (_, i) => <i key={i} className="fx-bub" />)}
+      </div>
 
       <header className="bar">
         <Link className="brand" href="/" aria-label="FishFlow, accueil">
-          <BrandMark />
+          <RaieImg small width={42} height={34} />
           <span>Fish<em>Flow</em></span>
         </Link>
+        <Gauge sound={sound} onSound={toggleSound} />
         <div className="bar-actions">
           {signedIn ? (
-            <Link href="/generer" className="btn bar-open">
-              <span>Ouvrir FishFlow</span>
-            </Link>
+            <Link href="/generer" className="btn bar-open"><span>Ouvrir FishFlow</span></Link>
           ) : (
             <>
               <Link className="bar-link" href="/login">Connexion</Link>
-              <TrackedLink href="/signup" event="cta_click_header_signup" className="btn bar-cta">
-                <span>Créer un compte</span>
-              </TrackedLink>
+              <TrackedLink href="/signup" event="cta_click_header_signup" className="btn bar-cta"><span>Créer un compte</span></TrackedLink>
             </>
           )}
-          <button
-            type="button"
-            className="round theme"
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Passer en thème clair" : "Passer en thème sombre"}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <button type="button" className="round" onClick={toggleTheme} aria-label={theme === "dark" ? "Passer en thème clair" : "Passer en thème sombre"}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true">
               {theme === "dark" ? (
-                <>
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-                </>
+                <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>
               ) : (
                 <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" />
               )}
@@ -643,405 +394,182 @@ export function Landing() {
         </div>
       </header>
 
-      <Ocean />
       <main id="top">
-        {/* Accueil */}
-        <section className="hero" aria-label="Accueil">
-          <div className="copy">
-            <p className="eyebrow">Le savoir est une force.</p>
-            <h1 className="h-xl h-hero">Ton cours devient une fiche de révision.</h1>
-            <p className="lead">
-              Colle ton cours, envoie un PDF ou prends une photo. FishFlow en fait une fiche, des flashcards et un quiz, en quelques secondes.
-            </p>
-            <div className="cta-row">
-              {signedIn ? (
-                <Link href="/generer" className="btn">
-                  <span>Ouvrir FishFlow</span>
-                </Link>
-              ) : (
-                <TrackedLink href="/generer" event="cta_click_hero" className="btn">
-                  <span>Créer ma première fiche</span>
-                </TrackedLink>
-              )}
-              <a className="btn ghost" href="#avant-apres">
-                <span>Voir comment ça marche</span>
-              </a>
-            </div>
-            <p className="note">3 fiches gratuites par mois, sans carte bancaire.</p>
-            <ul className="for" aria-label="Pour qui">
-              {["Collège", "Lycée", "Études supérieures", "Concours", "Formation"].map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
+        {/* ===== 0 m : la surface ===== */}
+        <section className="hero" data-depth="0" aria-labelledby="t-hero">
+          <div className="surface" aria-hidden="true">
+            <span className="surface-sky" />
+            <span className="surface-ripple a" />
+            <span className="surface-ripple b" />
+            <span className="surface-sun" />
           </div>
-          <div className="fd">
-            <p className="fd-tag">Exemple généré à partir d&apos;un cours sur la photosynthèse</p>
-            <article className="fd-card" aria-label="Exemple de fiche générée">
-              <div className="fd-head"><strong>Photosynthèse</strong><span>Fiche de révision</span></div>
-              <div>
-                <p className="fd-h">L&apos;essentiel</p>
-                <p className={at(1)}>La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie chimique, en produisant du glucose et de l&apos;oxygène.</p>
-              </div>
-              <div>
-                <p className="fd-h">Points clés</p>
-                <ul>
-                  <li className={at(2)}>Se déroule dans les chloroplastes</li>
-                  <li className={at(3)}>Demande de la lumière, de l&apos;eau et du CO₂</li>
-                  <li className={at(4)}>Produit du glucose et libère de l&apos;oxygène</li>
-                </ul>
-              </div>
-              <div className="fd-row">
-                <div className="fd-mini">
-                  <p className="fd-h">Flashcard</p>
-                  <p><strong>Où se fait la photosynthèse ?</strong></p>
-                  <p className={`fd-a ${at(5)}`}>Dans les chloroplastes.</p>
-                </div>
-                <div className="fd-mini">
-                  <p className="fd-h">Quiz</p>
-                  <p><strong>Que libère la plante ?</strong></p>
-                  <p className="fd-opt">Du CO₂</p>
-                  <p className={`fd-opt${heroStep >= 6 ? " ok" : ""}`}>De l&apos;oxygène</p>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section>
-        <WaveDivider />
-
-        {/* Avant / Après : ce que ton cours devient */}
-        <section id="avant-apres" aria-labelledby="t-aa">
-          <div className="wrap">
-            <h2 id="t-aa">Ce que FishFlow fait de ton cours.</h2>
-            <p className="sub">Tu donnes ton cours tel qu&apos;il est. Tu récupères de quoi le comprendre et le retenir.</p>
-            <div className="aa">
-              <article className="aa-card aa-before">
-                <p className="aa-tag">Avant</p>
-                <h3>Des pages de cours à relire</h3>
-                <div className="aa-lines" aria-hidden="true">
-                  <i /><i /><i /><i /><i /><i /><i /><i />
-                </div>
-                <p>Tu ne sais pas quoi retenir, ni par où commencer.</p>
-              </article>
-              <div className="aa-arrow" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M10 24h26M26 13l11 11-11 11" /></svg>
-              </div>
-              <article className="aa-card aa-after">
-                <p className="aa-tag">Après, en moins d&apos;une minute</p>
-                <h3>Tout est prêt pour réviser</h3>
-                <ul>
-                  <li><span><b>1 fiche claire</b>, rangée en parties</span></li>
-                  <li><span><b>L&apos;essentiel</b> en 5 lignes</span></li>
-                  <li><span><b>Des flashcards</b> pour t&apos;entraîner</span></li>
-                  <li><span><b>Un quiz</b> pour te tester</span></li>
-                </ul>
-              </article>
+          <div className="wrap hero-grid">
+            <div className="hero-copy">
+              <h1 id="t-hero" className="h-hero">Révise en profondeur.</h1>
+              <p className="lead">Colle ton cours, envoie un PDF ou prends une photo. FishFlow en fait une fiche, des flashcards et un quiz, en quelques secondes.</p>
+              <form className="start" onSubmit={start}>
+                <label htmlFor="lp-cours" className="sr-only">Colle ton cours</label>
+                <textarea id="lp-cours" rows={3} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Colle ton cours ici…" enterKeyHint="go" />
+                <button className="btn"><span>{signedIn ? "Créer ma fiche" : "Créer ma première fiche"}</span></button>
+              </form>
+              <p className="note">3 fiches gratuites par mois, sans carte bancaire.</p>
             </div>
+            <div className="hero-room" aria-hidden="true" />
           </div>
         </section>
 
-        {/* C'est quoi */}
-        <section id="quoi" aria-labelledby="t-q">
-          <div className="wrap">
-            <h2 id="t-q">Relire son cours ne suffit pas.</h2>
-            <p className="sub">Pour retenir, il faut d&apos;abord trier l&apos;important, puis s&apos;entraîner. FishFlow fait les deux avec toi.</p>
-            <div className="tools">
-              <article className="tool main">
-                <p className="badge">L&apos;outil principal</p>
-                <h3>Créer des fiches</h3>
-                <dl>
-                  <div><dt>Tu donnes</dt><dd>Un cours collé, un PDF ou une photo.</dd></div>
-                  <div><dt>Tu reçois</dt><dd>Une fiche claire, l&apos;essentiel en 5 lignes, des flashcards et un quiz.</dd></div>
-                </dl>
-              </article>
-              <article className="tool">
-                <h3>Poser une question</h3>
-                <dl>
-                  <div><dt>Tu donnes</dt><dd>Une question sur un sujet qui t&apos;intrigue.</dd></div>
-                  <div><dt>Tu reçois</dt><dd>Une réponse claire, avec des images et des liens pour vérifier. (1 essai gratuit, puis avec Pro.)</dd></div>
-                </dl>
-              </article>
-              <article className="tool">
-                <h3>Réviser</h3>
-                <dl>
-                  <div><dt>Tu donnes</dt><dd>Quelques minutes par jour.</dd></div>
-                  <div><dt>Tu reçois</dt><dd>Des cartes qui reviennent au bon moment : vite si tu les rates, plus tard si tu les sais.</dd></div>
-                </dl>
-              </article>
-            </div>
-            <ul className="stats" aria-label="FishFlow en chiffres">
-              <li><strong><CountUp to={4} /></strong><span>outils d&apos;un coup : fiche, essentiel, flashcards, quiz</span></li>
-              <li><strong>&lt; <CountUp to={1} suffix=" min" /></strong><span>pour transformer un cours en fiche</span></li>
-              <li><strong><CountUp to={3} /></strong><span>fiches gratuites chaque mois, sans carte bancaire</span></li>
-            </ul>
+        {/* ===== 20 m → 200 m : comment ça marche ===== */}
+        <section className="steps" data-depth="20" aria-labelledby="t-steps" id="comment">
+          <div className="scene school-scene" data-scene aria-hidden="true">
+            <School className="school" count={{ phone: 30, desktop: 70 }} />
           </div>
-        </section>
-
-        {/* Fabrication d'une fiche */}
-        <section id="fiche" aria-labelledby="t-f" className={scrolly ? "scrolly-on" : undefined}>
-          <div className="scrolly-track" ref={trackRef}>
-          <div className="wrap scrolly-sticky">
-            <h2 id="t-f">Comment une fiche est fabriquée.</h2>
-            <p className="sub">{scrolly ? "Fais défiler : les quatre étapes avancent toutes seules." : "Choisis une étape pour la voir."}</p>
-            <div className="fab">
-              <div className="steps" role="group" aria-label="Étapes">
-                {STEPS.map((s, n) => (
-                  <button
-                    key={s.label}
-                    type="button"
-                    className={`step${n < step ? " done" : ""}`}
-                    aria-current={n === step ? "true" : "false"}
-                    style={{ ["--dur" as string]: "400ms" }}
-                    onClick={() => goStep(n)}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+          <div className={`steps-track${scrolly ? " scrolly" : ""}`}>
+            <div className="steps-sticky wrap">
+              <div className="steps-copy plate" data-reveal>
+                <p className="depth-tag" aria-hidden="true">{STEPS[step].depth}</p>
+                <h2 id="t-steps">Ton cours descend, ta fiche remonte.</h2>
+                <ol className="steps-list">
+                  {STEPS.map((s, i) => (
+                    <li key={s.label}>
+                      <button type="button" aria-current={i === step ? "step" : undefined} onClick={() => goStep(i)}>
+                        <span className="n" aria-hidden="true">{i + 1}</span>
+                        <span><b>{s.label}</b><small>{s.caption}</small></span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
               </div>
-              <div className={`stage s${step + 1}`} ref={stageRef}>
-                <div className="doc">
-                  <div className="beam" />
-                  <p className="type">
-                    La photosynthèse est le processus par lequel les plantes fabriquent leur énergie. Elle se déroule dans les <mark>chloroplastes</mark> des cellules des feuilles. Grâce à la lumière, la plante transforme l&apos;eau et le dioxyde de carbone en <mark>glucose</mark>, et elle <mark>libère de l&apos;oxygène</mark> dans l&apos;air.
+              <div className="stage plate" data-step={step} aria-live="polite">
+                <p className="sr-only">Étape {step + 1} sur 4 : {STEPS[step].caption}</p>
+                <div className="panel p0" aria-hidden={step !== 0}>
+                  <p className="panel-tag">Ton cours</p>
+                  <p className="cours">{COURS}</p>
+                </div>
+                <div className="panel p1" aria-hidden={step !== 1}>
+                  <p className="panel-tag">FishFlow lit</p>
+                  <p className="cours">
+                    La <mark>photosynthèse</mark> permet aux plantes de fabriquer leur nourriture à partir de <mark>la lumière, de l&apos;eau et du CO₂</mark>. Elle se déroule dans <mark>les chloroplastes</mark>, grâce à la chlorophylle. La plante produit <mark>du glucose</mark> et libère <mark>de l&apos;oxygène</mark>.
                   </p>
                 </div>
-                <div className="sheet">
-                  <h3>Photosynthèse</h3>
-                  <ul>
-                    <li>Se passe dans les chloroplastes</li>
-                    <li>Produit du glucose</li>
-                    <li>Libère de l&apos;oxygène</li>
-                  </ul>
-                  <div className="tags">
-                    <span>3 flashcards</span>
-                    <span>Quiz</span>
-                    <span>L&apos;essentiel</span>
-                  </div>
+                <div className="panel p2" aria-hidden={step !== 2}>
+                  <p className="panel-tag">Ta fiche</p>
+                  <p className="fiche-h">L&apos;essentiel</p>
+                  <p className="fiche-p w">Les plantes transforment la lumière en énergie chimique : du glucose, et de l&apos;oxygène libéré.</p>
+                  <p className="fiche-h">Points clés</p>
+                  <ul className="dots w"><li>Dans les chloroplastes</li><li>Lumière, eau et CO₂</li><li>Glucose et oxygène</li></ul>
+                </div>
+                <div className="panel p3" aria-hidden={step !== 3}>
+                  <p className="panel-tag">Tu retiens</p>
+                  <div className="flip"><div className="flip-in"><p className="face">Où se fait la photosynthèse ?</p><p className="face back">Dans les chloroplastes.</p></div></div>
+                  <div className="quiz"><p><strong>Que libère la plante ?</strong></p><p className="opt">Du CO₂</p><p className="opt ok">De l&apos;oxygène<i /><i /><i /></p></div>
                 </div>
               </div>
-              <div className="cap-row">
-                <p className="cap" aria-live="polite">{STEPS[step].caption}</p>
-              </div>
-            </div>
-          </div>
-          </div>
-        </section>
-        <WaveDivider flip />
-
-        {/* Réviser */}
-        <section id="retenir" aria-labelledby="t-r">
-          <div className="wrap">
-            <h2 id="t-r">Retiens-le pour de bon.</h2>
-            <p className="sub">Les cartes se retournent toutes seules, tu peux aussi les toucher. Une carte que tu savais revient plus tard, une carte ratée revient plus vite.</p>
-            <div className="gestures">
-              <article className="card">
-                <div className="deck">
-                  <button
-                    key={cardIdx}
-                    type="button"
-                    className={`fc${leaving ? ` gone-${leaving}` : ""}`}
-                    aria-label={flipped ? "Revoir la question" : "Retourner la carte"}
-                    style={{ transform: `rotateX(${rx}deg) rotateY(${ry}deg) rotateY(${flipped ? 180 : 0}deg)` }}
-                    onClick={() => { touchCards(); setFlipped((f) => !f); kick(0.25); }}
-                    onPointerMove={(e) => {
-                      if (reduceRef.current || e.pointerType !== "mouse") return;
-                      const r = e.currentTarget.getBoundingClientRect();
-                      setRy(((e.clientX - r.left) / r.width - 0.5) * 12);
-                      setRx(-((e.clientY - r.top) / r.height - 0.5) * 10);
-                    }}
-                    onPointerLeave={() => { setRx(0); setRy(0); }}
-                  >
-                    <span className="face front"><small>Question</small><span>{card[0]}</span><small>Touche pour voir la réponse</small></span>
-                    <span className="face back"><small>Réponse</small><span>{card[1]}</span><small>Tu la savais ?</small></span>
-                  </button>
-                </div>
-                <div className="fc-actions">
-                  <button type="button" className="btn ghost" onClick={() => { touchCards(); answerCard(false); }}><span>À revoir</span></button>
-                  <button type="button" className="btn" ref={knownBtn} onClick={() => { touchCards(); answerCard(true); }}><span>Je savais</span></button>
-                </div>
-              </article>
-              <article className="card">
-                <h3>Ta série</h3>
-                <p>Chaque jour de révision allume un jour de plus. Ne la casse pas.</p>
-                <div className="streak">
-                  <span key={streak} className="roll-n">{streak}</span>
-                  <span className="unit">jours d&apos;affilée (exemple)</span>
-                </div>
-              </article>
             </div>
           </div>
         </section>
 
-        {/* Apprendre */}
-        <section id="apprendre" aria-labelledby="t-app">
-          <div className="wrap">
-            <h2 id="t-app">Et si tu as une question ?</h2>
-            <p className="sub">Avec « Apprendre », FishFlow répond aussi à tes questions, avec des images et des liens Wikipédia pour vérifier. Regarde l&apos;exemple : il se lance tout seul.</p>
-            <div className="demo">
-              <div className="demo-panel" style={{ background: "transparent", boxShadow: "none" }}>
-                <div className={`slot-demo${orbFallback ? " slot-css" : ""}`} data-slot="demo" data-phase={phase} aria-hidden="true" />
-                <div className="chips" role="group" aria-label="Questions d'exemple">
-                  <button type="button" className="chip" onClick={() => { touchAsk(); run("sky"); }}>Pourquoi le ciel est bleu</button>
-                  <button type="button" className="chip" onClick={() => { touchAsk(); run("hole"); }}>Comment fonctionne un trou noir</button>
-                </div>
-                <form className="ask" onSubmit={onAsk} autoComplete="off">
-                  <label htmlFor="lp-q" hidden>Ta question</label>
-                  <input
-                    id="lp-q"
-                    type="text"
-                    placeholder="Que veux-tu savoir ?"
-                    enterKeyHint="send"
-                    maxLength={120}
-                    value={q}
-                    readOnly={phase === "typing" || phase === "thinking"}
-                    onChange={(e) => { touchAsk(); setQ(e.target.value); setPhase("idle"); setDemoKey(null); setNotice(false); }}
-                  />
-                  <button className="btn" type="submit"><span>Envoyer</span></button>
-                </form>
-                <p className="demo-note">Démo avec deux exemples. Dans FishFlow, tu poses ta propre question et les images viennent de Wikipédia, avec leur auteur et leur licence.</p>
+        {/* ===== 300 m : chaque jour, un peu ===== */}
+        <section className="daily" data-depth="300" aria-labelledby="t-daily">
+          <div className="wrap daily-grid">
+            <div className="plate daily-main" data-reveal>
+              <h2 id="t-daily">Cinq minutes par jour, et ça reste.</h2>
+              <p>FishFlow te dit chaque jour quelles cartes revoir. Ta série grandit, ton objectif du jour se remplit, et le jour de l&apos;examen tu n&apos;as plus qu&apos;à relire.</p>
+              <div className="today" aria-hidden="true">
+                <span className="today-ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" /><circle className="on" cx="22" cy="22" r="18" /></svg><b>7</b></span>
+                <span><b>Aujourd&apos;hui</b><small>7 cartes sur 10 · série de 12 jours</small></span>
               </div>
-              <div className="demo-panel" aria-live="polite">
-                {!answer && !notice && (
-                  <p className="note">
-                    {phase === "thinking" ? "FishFlow réfléchit…" : "La réponse apparaît ici, avec ses images."}
-                  </p>
-                )}
-                {!answer && notice && (
-                  <div className="notice">
-                    <p>Cette démo ne connaît que deux exemples. Dans FishFlow, tu peux poser ta vraie question.</p>
-                    <TrackedLink href="/signup" event="cta_click_demo_signup" className="btn"><span>Créer un compte</span></TrackedLink>
-                  </div>
-                )}
-                {answer && (
-                  <div className="answer show">
-                    <div className="pics">
-                      {answer.pics.map((p, n) => (
-                        <figure key={`${demoKey}-${p}`} className="pic" ref={(el) => { picRefs.current[n] = el; }}>
-                          <Art k={p} />
-                          <figcaption>{CAPTIONS[p]}</figcaption>
-                        </figure>
-                      ))}
-                    </div>
-                    <h3>{answer.title}</h3>
-                    <p className="sr-only">{answer.text}</p>
-                    <p aria-hidden="true" className={shown < answer.text.length ? "typed" : undefined}>{answer.text.slice(0, shown)}</p>
-                    <div className="src">
-                      {answer.src.map((s, n) => (
-                        <a key={s.url} href={s.url} target="_blank" rel="noopener noreferrer">[{n + 1}] {s.label}</a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+            </div>
+            <div className="plate daily-ask" data-reveal>
+              <h3>Une notion te bloque ?</h3>
+              <p>Pose ta question dans Apprendre : une réponse claire, avec ses sources et des images. Tu peux ensuite en faire une fiche.</p>
+              <p className="ask" aria-hidden="true"><span>Pourquoi le ciel est bleu ?</span><i /></p>
             </div>
           </div>
         </section>
-        <WaveDivider />
 
-        {/* Confiance */}
-        <section aria-labelledby="t-c">
-          <div className="wrap">
-            <h2 id="t-c">Des réponses claires, et honnêtes sur leurs limites.</h2>
-            <p className="sub">Quand tu poses une question, une IA te répond à partir d&apos;articles de Wikipédia. Elle peut se tromper, alors on te donne de quoi vérifier.</p>
-            <ul className="trust">
-              <li><strong>Des liens pour vérifier</strong>Les articles Wikipédia sur le sujet sont proposés sous la réponse, pour aller plus loin.</li>
-              <li><strong>Des images libres de droits</strong>Elles viennent de Wikipédia, avec leur auteur et leur licence.</li>
-              <li><strong>Il dit quand il hésite</strong>Si un détail est incertain ou peut avoir changé, la réponse te le signale au lieu de l'inventer.</li>
-            </ul>
+        {/* ===== 600 m : les prix ===== */}
+        <section className="price" data-depth="600" aria-labelledby="t-price" id="prix">
+          <div className="scene jelly-scene" data-scene aria-hidden="true">
+            <Jelly id="j1" className="j1" />
+            <Jelly id="j2" className="j2" />
+            <Jelly id="j3" className="j3" />
           </div>
-        </section>
-
-        {/* Gratuit / Pro */}
-        <section id="tarifs" aria-labelledby="t-p">
           <div className="wrap">
-            <h2 id="t-p">Gratuit ou Pro : qu&apos;est-ce qui change ?</h2>
-            <p className="sub">Le compte gratuit suffit pour essayer. Pro, c&apos;est pour réviser souvent : beaucoup plus de fiches et quelques outils en plus.</p>
+            <h2 id="t-price" data-reveal>Gratuit ou Pro : qu&apos;est-ce qui change ?</h2>
+            <p className="sub" data-reveal>Le compte gratuit suffit pour essayer. Pro, c&apos;est pour réviser souvent : beaucoup plus de fiches et quelques outils en plus.</p>
             <div className="plans">
-              <article className="plan">
+              <article className="plan plate" data-reveal>
                 <h3>Gratuit</h3>
-                <p className="price">0 €</p>
-                <ul>
-                  <li>3 fiches par mois</li>
-                  <li>Tes 5 dernières fiches gardées</li>
-                  <li>Flashcards, quiz et révision chaque jour</li>
-                  <li>1 question pour essayer Apprendre</li>
-                </ul>
+                <p className="amount">0 €</p>
+                <ul className="dots">{FREE.map((x) => <li key={x}>{x}</li>)}</ul>
+                {cta("cta_click_offer_free", "Créer ma fiche gratuitement", "btn ghost")}
               </article>
-              <article className="plan pro">
+              <article className="plan plate pro" data-reveal>
                 <h3>Pro</h3>
-                <p className="price">4,99 € <small>par mois</small></p>
-                <ul>
-                  <li>100 fiches par mois (10 par jour)</li>
-                  <li>Toutes tes fiches gardées</li>
-                  <li>Des cours plus longs (environ 15 pages)</li>
-                  <li>20 questions par jour dans Apprendre</li>
-                </ul>
+                <p className="amount">4,99 € <small>par mois</small></p>
+                <ul className="dots">{PRO.map((x) => <li key={x}>{x}</li>)}</ul>
+                <TrackedLink href="/pricing" event="cta_click_offer_premium" className="btn"><span>Voir Pro</span></TrackedLink>
                 <p className="plan-note">Tu arrêtes quand tu veux, en un clic.</p>
               </article>
             </div>
-            <details className="cmp-details">
+            <details className="cmp-details" data-reveal>
               <summary>Voir le détail complet</summary>
-            <div className="cmp-wrap" tabIndex={0} role="region" aria-label="Comparaison Gratuit et Pro">
-              <table className="cmp">
-                <thead>
-                  <tr><th scope="col"><span className="sr-only">Fonctionnalité</span></th><th scope="col">Gratuit</th><th scope="col" className="pro">Pro</th></tr>
-                </thead>
-                <tbody>
-                  <tr><th scope="row">Prix</th><td data-label="Gratuit">0 €</td><td data-label="Pro" className="pro">4,99 € par mois, tu arrêtes quand tu veux</td></tr>
-                  <tr><th scope="row">Fiches créées</th><td data-label="Gratuit">3 par mois</td><td data-label="Pro" className="pro">100 par mois (10 par jour)</td></tr>
-                  <tr><th scope="row">Fiche, essentiel, flashcards</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Quiz</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui, avec 12 questions</td></tr>
-                  <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit" className="yes">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 question pour essayer</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
-                  <tr><th scope="row">Taille d'un cours</th><td data-label="Gratuit">Jusqu'à 7 pages environ</td><td data-label="Pro" className="pro">Jusqu'à 15 pages environ, plusieurs PDF dans une seule fiche</td></tr>
-                  <tr><th scope="row">Objectif du jour et série</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">3 façons d&apos;afficher ta fiche</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Progression</th><td data-label="Gratuit">Les 7 derniers jours</td><td data-label="Pro" className="pro">30 jours, ton taux de réussite et tes cartes difficiles</td></tr>
-                  <tr><th scope="row">L&apos;essentiel lu à voix haute</th><td data-label="Gratuit">Non</td><td data-label="Pro" className="pro">Oui</td></tr>
-                  <tr><th scope="row">Fiches gardées</th><td data-label="Gratuit">Les 5 dernières</td><td data-label="Pro" className="pro">Toutes tes fiches gardées</td></tr>
-                </tbody>
-              </table>
-            </div>
+              <div className="cmp-wrap" tabIndex={0} role="region" aria-label="Comparaison Gratuit et Pro">
+                <table className="cmp">
+                  <thead>
+                    <tr><th scope="col"><span className="sr-only">Fonctionnalité</span></th><th scope="col">Gratuit</th><th scope="col" className="pro">Pro</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">Prix</th><td data-label="Gratuit">0 €</td><td data-label="Pro" className="pro">4,99 € par mois, tu arrêtes quand tu veux</td></tr>
+                    <tr><th scope="row">Fiches créées</th><td data-label="Gratuit">3 par mois</td><td data-label="Pro" className="pro">100 par mois (10 par jour)</td></tr>
+                    <tr><th scope="row">Fiche, essentiel, flashcards</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                    <tr><th scope="row">Quiz</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui, avec 12 questions</td></tr>
+                    <tr><th scope="row">Réviser avec rappels</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                    <tr><th scope="row">Apprendre (poser une question)</th><td data-label="Gratuit">1 question pour essayer</td><td data-label="Pro" className="pro">20 questions par jour</td></tr>
+                    <tr><th scope="row">Taille d&apos;un cours</th><td data-label="Gratuit">Jusqu&apos;à 7 pages environ</td><td data-label="Pro" className="pro">Jusqu&apos;à 15 pages environ, plusieurs PDF dans une seule fiche</td></tr>
+                    <tr><th scope="row">Objectif du jour et série</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                    <tr><th scope="row">3 façons d&apos;afficher ta fiche</th><td data-label="Gratuit">Oui</td><td data-label="Pro" className="pro">Oui</td></tr>
+                    <tr><th scope="row">Progression</th><td data-label="Gratuit">Les 7 derniers jours</td><td data-label="Pro" className="pro">30 jours, ton taux de réussite et tes cartes difficiles</td></tr>
+                    <tr><th scope="row">L&apos;essentiel lu à voix haute</th><td data-label="Gratuit">Non</td><td data-label="Pro" className="pro">Oui</td></tr>
+                    <tr><th scope="row">Fiches gardées</th><td data-label="Gratuit">Les 5 dernières</td><td data-label="Pro" className="pro">Toutes tes fiches gardées</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </details>
-            <div className="cmp-cta">
-              <TrackedLink href="/generer" event="cta_click_offer_free" className="btn ghost"><span>Créer ma fiche gratuitement</span></TrackedLink>
-              <TrackedLink href="/pricing" event="cta_click_offer_premium" className="btn"><span>Voir Pro</span></TrackedLink>
-            </div>
             <p className="cmp-note">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
           </div>
         </section>
-        <WaveDivider flip />
 
-        {/* Questions */}
-        <section aria-labelledby="t-faq">
+        {/* ===== 800 m : questions ===== */}
+        <section className="faq-sec" data-depth="800" aria-labelledby="t-faq">
           <div className="wrap">
-            <h2 id="t-faq">Questions fréquentes.</h2>
-            <div className="faq">
-              <details><summary>Comment ça marche, concrètement ?</summary><p>Tu crées ton compte gratuit. Tu colles ton cours (ou tu envoies un PDF, ou une photo de tes notes) et tu appuies sur « Créer ma fiche ». Moins d&apos;une minute plus tard, tu as ta fiche, tes flashcards et ton quiz. Ensuite, FishFlow te dit chaque jour quelles cartes revoir.</p></details>
-              <details><summary>C&apos;est pour qui ?</summary><p>Pour toute personne qui a un cours à apprendre : collège, lycée, études supérieures, concours, formation. Il te faut juste ton cours, en texte, en PDF ou en photo.</p></details>
-              <details><summary>C&apos;est gratuit ?</summary><p>Oui pour commencer : 3 fiches par mois et un essai d&apos;Apprendre, sans carte bancaire. Avec Pro, tu peux créer jusqu'à 100 fiches par mois.</p></details>
-              <details><summary>Je peux arrêter Pro quand je veux ?</summary><p>Oui, en un clic dans Paramètres. Tu gardes Pro jusqu&apos;à la fin du mois déjà payé.</p></details>
-              <details><summary>Les réponses sont-elles vraies ?</summary><p>Pour les fiches, elles viennent de ton propre cours. Pour les questions d&apos;Apprendre, c&apos;est une IA qui répond : elle peut se tromper, donc pour un détail important, vérifie dans les liens proposés ou dans ton cours.</p></details>
+            <h2 id="t-faq" data-reveal>Questions fréquentes.</h2>
+            <div className="faq plate" data-reveal>
+              <details><summary>Comment ça marche, concrètement ?</summary><p>Tu crées ton compte gratuit. Tu colles ton cours (ou tu envoies un PDF, ou une photo de tes notes) et tu appuies sur « Créer ma fiche ». Moins d&apos;une minute plus tard, tu as ta fiche, tes flashcards et ton quiz. Ensuite, FishFlow te dit chaque jour quelles cartes revoir.</p></details>
+              <details><summary>C&apos;est pour qui ?</summary><p>Pour toute personne qui a un cours à apprendre : collège, lycée, études supérieures, concours, formation. Il te faut juste ton cours, en texte, en PDF ou en photo.</p></details>
+              <details><summary>C&apos;est gratuit ?</summary><p>Oui pour commencer : 3 fiches par mois et un essai d&apos;Apprendre, sans carte bancaire. Avec Pro, tu peux créer jusqu&apos;à 100 fiches par mois.</p></details>
+              <details><summary>Je peux arrêter Pro quand je veux ?</summary><p>Oui, en un clic dans Paramètres. Tu gardes Pro jusqu&apos;à la fin du mois déjà payé.</p></details>
+              <details><summary>Les réponses sont-elles vraies ?</summary><p>Pour les fiches, elles viennent de ton propre cours. Pour les questions d&apos;Apprendre, c&apos;est une IA qui répond : elle peut se tromper, donc pour un détail important, vérifie dans les liens proposés ou dans ton cours.</p></details>
             </div>
           </div>
         </section>
 
-        <section className="final" aria-labelledby="t-end">
+        {/* ===== 1 000 m : le fond ===== */}
+        <section className="final" data-depth="1000" aria-labelledby="t-end">
           <div className="wrap">
-            <p className="eyebrow">Prêt ?</p>
-            <h2 id="t-end">Ton prochain cours devient une fiche en moins d&apos;une minute.</h2>
-            <ol className="recap">
-              <li>Colle ton cours, un PDF ou une photo.</li>
-              <li>FishFlow écrit ta fiche, tes flashcards et ton quiz.</li>
-              <li>Tu révises un peu chaque jour, et tu retiens.</li>
-            </ol>
-            <div className="cta-row">
-              {signedIn ? (
-                <Link href="/generer" className="btn btn-xl"><span>Ouvrir FishFlow</span></Link>
-              ) : (
-                <TrackedLink href="/generer" event="cta_click_final" className="btn btn-xl"><span>Ouvrir FishFlow gratuitement</span></TrackedLink>
-              )}
+            <div className="plate final-plate" data-reveal>
+              <h2 id="t-end">Plonge avec ton prochain cours.</h2>
+              <p>Ton prochain cours devient une fiche en moins d&apos;une minute.</p>
+              <div className="cta-row">{cta("cta_click_final", "Ouvrir FishFlow gratuitement", "btn btn-xl")}</div>
+              <p className="note">Sans carte bancaire. 3 fiches gratuites par mois.</p>
             </div>
-            <p className="note">Sans carte bancaire. 3 fiches gratuites par mois.</p>
+          </div>
+          <div className="seabed" data-scene aria-hidden="true">
+            <svg viewBox="0 0 1200 220" preserveAspectRatio="none" focusable="false">
+              <path d="M0 130C160 92 300 160 470 120s320-64 480 0 210 22 250 12v88H0z" className="bed2" />
+              <path d="M0 168c200-34 380 32 600 0s400-22 600 10v42H0z" className="bed1" />
+            </svg>
+            <span className="glow g1" /><span className="glow g2" /><span className="glow g3" /><span className="glow g4" /><span className="glow g5" />
           </div>
         </section>
       </main>

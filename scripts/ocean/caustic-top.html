@@ -1,0 +1,15 @@
+<!doctype html><canvas id="c" width="512" height="320"></canvas><script>
+const c=document.getElementById('c'),gl=c.getContext('webgl',{preserveDrawingBuffer:true,premultipliedAlpha:false});
+const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
+// Caustiques d'eau répétables (méthode itérative classique, périodique sur 2π).
+const fs=`precision highp float;uniform float t;
+void main(){vec2 uv=vec2(gl_FragCoord.x/512.,gl_FragCoord.y/512.);float fy=gl_FragCoord.y/320.;const float TAU=6.28318530718;
+vec2 p=mod(uv*TAU,TAU)-250.;vec2 i=p;float c=1.;float inten=.005;
+for(int n=0;n<5;n++){float tt=t*(1.-(3.5/float(n+1)));i=p+vec2(cos(tt-i.x)+sin(tt+i.y),sin(tt-i.y)+cos(tt+i.x));c+=1./length(vec2(p.x/(sin(i.x+tt)/inten),p.y/(cos(i.y+tt)/inten)));}
+c/=5.;c=1.17-pow(c,1.4);float v=pow(abs(c),8.);v=clamp(v,0.,1.);gl_FragColor=vec4(1.,1.,1.,v*smoothstep(0.,1.,fy)*smoothstep(0.,.18,1.-fy+.02));}`;
+const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o};
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const l=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+window.render=(t)=>{gl.uniform1f(gl.getUniformLocation(pr,'t'),t);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);return c.toDataURL('image/png')};
+</script>

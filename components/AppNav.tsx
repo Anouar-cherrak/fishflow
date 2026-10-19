@@ -129,6 +129,20 @@ export function AppNav() {
         <Wordmark className="text-lg" />
       </Link>
 
+      {/* Ordinateur : les quatre pages du quotidien sont toujours à portée (sur téléphone, c'est la barre du bas). */}
+      {authReady && email && (
+        <nav className="ff-navlinks" aria-label="Raccourcis">
+          {LINKS.filter((l) => ["/aujourdhui", "/generer", "/mes-fiches", "/reviser"].includes(l.href)).map((l) => {
+            const active = pathname === l.href || pathname.startsWith(`${l.href}/`) || (l.href === "/mes-fiches" && pathname.startsWith("/fiche/"));
+            return (
+              <Link key={l.href} href={l.href} aria-current={active ? "page" : undefined}>
+                {l.label}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+
       <div className="flex items-center gap-2">
         {authReady && email && <StreakFlame />}
         <button

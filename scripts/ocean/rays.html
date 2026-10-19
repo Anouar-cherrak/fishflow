@@ -1,0 +1,21 @@
+<!doctype html><canvas id="c" width="1200" height="900"></canvas><script>
+// Rayons de soleil sous l'eau (« god rays ») : bandes de lumière qui s'élargissent et s'effacent en profondeur.
+const c=document.getElementById('c'),gl=c.getContext('webgl',{preserveDrawingBuffer:true,premultipliedAlpha:false});
+const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
+const fs=`precision highp float;
+float h(float n){return fract(sin(n)*43758.5453);}
+float nz(float x){float i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(h(i),h(i+1.),f);}
+void main(){vec2 uv=gl_FragCoord.xy/vec2(1200.,900.);float y=1.-uv.y;
+// les rayons partent d'un point au-dessus de l'écran : coordonnée d'angle
+float a=(uv.x-.55)/(y+.35);
+float r=0.;r+=pow(nz(a*9.+1.3),3.)*.9;r+=pow(nz(a*23.+7.1),4.)*.55;r+=pow(nz(a*4.+3.7),2.)*.5;
+float fade=pow(1.-y,1.6)*smoothstep(0.,.08,y+.02);
+float top=exp(-y*6.)*.35;
+float v=clamp(r*fade*.85+top,0.,1.);
+gl_FragColor=vec4(1.,1.,1.,v*.9);}`;
+const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const l=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+window.render=()=>{gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);return c.toDataURL('image/png')};
+</script>

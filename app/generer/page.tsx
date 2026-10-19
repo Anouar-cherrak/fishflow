@@ -107,7 +107,8 @@ function GenererContent() {
       setUser(data.user);
       setCheckingAuth(false);
       if (data.user) {
-        fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d)).catch(() => {});
+        // Réponse d'erreur (serveur indisponible…) : on n'affiche pas de compteur plutôt qu'un « undefined ».
+        fetch("/api/usage").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && typeof d.isPro === "boolean") setUsage(d); }).catch(() => {});
       }
     });
   }, []);
@@ -242,7 +243,8 @@ function GenererContent() {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
           setError(data.error || "Ta fiche n'a pas pu être créée. Réessaie dans un instant.");
         }
-        fetch("/api/usage").then((r) => r.json()).then((d) => setUsage(d)).catch(() => {});
+        // Réponse d'erreur (serveur indisponible…) : on n'affiche pas de compteur plutôt qu'un « undefined ».
+        fetch("/api/usage").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && typeof d.isPro === "boolean") setUsage(d); }).catch(() => {});
         return;
       }
 
