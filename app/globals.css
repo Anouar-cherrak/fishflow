@@ -36,14 +36,14 @@
   --ff-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* ---- Thème clair : surface ensoleillée ---- */
-  --ff-back: #CFEAF8;           /* eau autour des plaques */
+  --ff-back: #A9DBF4;           /* eau autour des plaques */
   --ff-bg: #EDF8FE;             /* champs et blocs intérieurs (classe bg-white) */
   --ff-surface: #FBFEFF;        /* plaques (classe bg-surface) */
   --ff-fg: #052036;             /* encre (texte) */
-  --ff-fg-2: #2D506B;           /* texte secondaire (7,3:1 sur les plaques) */
+  --ff-fg-2: #1D4361;           /* texte secondaire (10:1 sur les plaques, 5,4:1 sur l'eau la plus profonde) */
   --ff-line: rgba(5, 32, 54, 0.13);
   --ff-accent: #38BDF8;         /* bleu FishFlow : boutons */
-  --ff-accent-strong: #0B6FA8;  /* bleu en texte sur fond clair (5,4:1) */
+  --ff-accent-strong: #08507A;  /* bleu en texte sur fond clair (5:1 sur l'eau, 8,9:1 sur les plaques) */
   --ff-accent-hover: #5CCBFA;
   --ff-on-accent: #052036;      /* texte sur les boutons bleus (7,7:1) */
   --ff-ok: #128A5C; --ff-ok-soft: #DDF5EA;
@@ -52,8 +52,8 @@
   --ff-ray: rgba(255, 246, 214, 0.55);   /* rayons */
   --ff-snow: rgba(255, 255, 255, 0.7);   /* particules en suspension */
   --ff-silhouette: #0B2A44;               /* silhouettes lointaines */
-  --ff-plate-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 24px 48px -30px rgba(5, 32, 54, 0.45), 0 2px 8px -4px rgba(5, 32, 54, 0.12);
-  --ff-sea-1: #E4F5FE; --ff-sea-2: #BFE5F7; --ff-sea-3: #9AD3EF;
+  --ff-plate-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 26px 50px -28px rgba(6, 40, 70, 0.55), 0 2px 8px -4px rgba(6, 40, 70, 0.18);
+  --ff-sea-1: #D6F0FC; --ff-sea-2: #AEDDF5; --ff-sea-3: #8ECDEE;
 }
 
 :root.dark {
@@ -909,6 +909,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 .ff-ocean { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
 /* Rayons de soleil : une seule image légère (public/ocean/rays.webp) qui se balance ; pas de flou calculé. */
 .ff-rays { position: absolute; left: -15%; right: -15%; top: -6%; height: 90vh; width: 130%; opacity: 0; transition: opacity 1.2s ease; transform-origin: 50% 0; animation: ff-sway 16s ease-in-out infinite alternate; }
+:root { --ff-rays-op: 1; }
 :root.dark { --ff-rays-op: 0.28; }
 @keyframes ff-sway { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, 0, 0) scaleX(1.05); } }
 /* Reflets du soleil : deux réseaux de lumière qui glissent l'un sur l'autre (comme au fond d'une piscine, en très doux). */
@@ -916,7 +917,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   animation: ff-caustic 28s linear infinite; }
 @keyframes ff-caustic { to { transform: translate3d(-560px, 0, 0); } }
 /* Texture de caustiques (scripts/ocean/caustic.html, rendue en WebGL puis compressée : 35 Ko, répétable). */
-:root { --ff-caustic-img: url(/ocean/caustic-a.webp); --ff-caustic-op: 0.55; }
+:root { --ff-caustic-img: url(/ocean/caustic-a.webp); --ff-caustic-op: 0.75; }
 :root.dark { --ff-caustic-op: 0.16; }
 /* Particules en suspension : de la « neige marine » qui dérive très lentement. */
 .ff-snow { position: absolute; inset: 0; }

@@ -30,6 +30,18 @@ const FEATURES = [
   { id: "apprendre", title: "Une notion te bloque ? Pose ta question.", text: "Apprendre te répond clairement, avec ses sources et des images. Tu peux ensuite en faire une fiche en un geste.", Show: AskShow },
 ];
 
+// Bulles d'ambiance : quelques-unes par « étage » de la page (valeurs fixes : même rendu serveur et navigateur).
+const BUBBLE_BANDS = [0, 1, 2, 3, 4, 5].map((band) => ({
+  top: `${band * 115}vh`,
+  items: Array.from({ length: 6 }, (_, i) => ({
+    x: `${(i * 17 + band * 23 + 6) % 96}%`,
+    s: `${5 + ((i * 7 + band * 3) % 12)}px`,
+    d: `${16 + ((i * 5 + band) % 12)}s`,
+    delay: `${-((i * 4 + band * 3) % 18)}s`,
+    drift: `${((i * 11 + band * 7) % 40) - 20}px`,
+  })),
+}));
+
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -263,6 +275,14 @@ export function Landing() {
       <div className="fx" aria-hidden="true">
         <TextureCanvas className="fx-rays" src="/ocean/rays.webp" />
         <TextureCanvas className="fx-caustic" src="/ocean/caustic-top.webp" tileW={560} />
+      </div>
+
+      <div className="bubbles" aria-hidden="true">
+        {BUBBLE_BANDS.map((b, k) => (
+          <div key={k} className="bubbles-band" style={{ top: b.top }}>
+            {b.items.map((it, i) => <i key={i} style={{ "--x": it.x, "--s": it.s, "--d": it.d, "--delay": it.delay, "--drift": it.drift } as CSSProperties} />)}
+          </div>
+        ))}
       </div>
 
       <header className="bar">
