@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Manta } from "@/components/ocean/Manta";
+import { RaieImg } from "@/components/Logo";
 import { TextureCanvas } from "@/components/ocean/TextureCanvas";
 
 // L'eau autour des pages de l'application : la lumière qui descend, des reflets du soleil, des particules
@@ -25,26 +25,6 @@ const BUBBLES = [
   { x: "92%", s: 8, d: 24, delay: -14, drift: "10px" },
 ];
 
-// Un banc au loin : de petites silhouettes de poissons (formes allongées, sans œil ni contour).
-const SCHOOL = Array.from({ length: 16 }, (_, i) => ({
-  x: (i * 29) % 180,
-  y: 10 + ((i * 17) % 56),
-  s: 0.7 + ((i * 7) % 5) / 10,
-}));
-export function FarSchool({ y = "38%", delay = "-20s" }: { y?: string; delay?: string }) {
-  return (
-    <div className="ff-school-far" style={{ "--y": y, "--delay": delay } as CSSProperties}>
-      <svg viewBox="0 0 200 80" focusable="false">
-        <g>
-          {SCHOOL.map((f, i) => (
-            <path key={i} transform={`translate(${f.x} ${f.y}) scale(${f.s})`} d="M0 3C3 0.6 8 0 12 1.2L15.5 0 14.6 3 15.5 6 12 4.8C8 6 3 5.4 0 3Z" fill="currentColor" />
-          ))}
-        </g>
-      </svg>
-    </div>
-  );
-}
-
 export function Ocean() {
   return (
     <div className="ff-ocean" aria-hidden="true">
@@ -55,7 +35,6 @@ export function Ocean() {
           <i key={i} style={{ "--x": s.x, "--y": s.y, "--s": `${s.s}px`, "--d": `${s.d}s`, "--delay": `${s.delay}s`, "--dx": s.dx, "--dy": s.dy } as CSSProperties} />
         ))}
       </div>
-      <FarSchool />
       {BUBBLES.map((b, i) => (
         <i key={i} className="ff-bub" style={{ "--x": b.x, "--s": `${b.s}px`, "--d": `${b.d}s`, "--delay": `${b.delay}s`, "--drift": b.drift } as CSSProperties} />
       ))}
@@ -81,11 +60,11 @@ export function SeaDecor(_props: { fish?: boolean; y?: string }) {
   );
 }
 
-// Chargement : la raie nage en rond, quelques bulles remontent.
+// Chargement : la raie du logo nage en rond, quelques bulles remontent.
 export function FishSchool() {
   return (
     <div className="ff-swim" aria-hidden="true">
-      <Manta />
+      <span className="ff-swim-raie"><RaieImg small={false} width={92} height={76} /></span>
       <i /><i /><i />
     </div>
   );

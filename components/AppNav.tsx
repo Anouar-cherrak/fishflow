@@ -5,7 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase/lazy";
 import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
-import { Logo, Wordmark } from "@/components/Logo";
+import { Wordmark } from "@/components/Logo";
+import { BrandMark } from "@/components/BrandMark";
 import { StreakFlame } from "@/components/StreakFlame";
 import { BottomTabs } from "@/components/BottomTabs";
 
@@ -125,7 +126,7 @@ export function AppNav() {
     <>
     <header className="ff-bar">
       <Link href="/" className="ff-brand flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">
-        <Logo size={36} />
+        <BrandMark size={36} />
         <Wordmark className="text-lg" />
       </Link>
 
@@ -182,7 +183,7 @@ export function AppNav() {
     <div id="menu-principal" ref={panelRef} className="ff-menu" data-open={open} role="dialog" aria-modal="true" aria-label="Menu" aria-hidden={!open}>
       <div className="flex items-center justify-between">
         <Link href="/" onClick={close} className="ff-brand flex items-center gap-2 min-h-[44px]" aria-label="FishFlow, accueil">
-          <Logo size={36} />
+          <BrandMark size={36} />
           <span className="font-semibold text-lg">FishFlow</span>
         </Link>
         <button

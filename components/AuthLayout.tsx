@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Manta } from "@/components/ocean/Manta";
 
 // Page de connexion / inscription : sur ordinateur, le message de FishFlow à gauche et le formulaire à droite.
 export function AuthLayout({ children }: { children: ReactNode }) {
@@ -8,7 +7,6 @@ export function AuthLayout({ children }: { children: ReactNode }) {
     <AppShell size="wide">
       <div className="grid gap-10 lg:gap-20 lg:grid-cols-2 items-center lg:min-h-[60vh]">
         <div className="hidden lg:grid gap-7 content-center ff-fade-up relative">
-          <Manta className="ff-auth-manta" />
           <p className="ff-title" aria-hidden="true">Révise en profondeur.</p>
           <p className="ff-lead">Colle un cours, FishFlow en fait une fiche de révision, des flashcards et un quiz. Tu poses aussi n&apos;importe quelle question, avec les sources.</p>
           <ul className="grid gap-3 text-black/80">
