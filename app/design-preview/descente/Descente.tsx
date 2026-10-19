@@ -57,7 +57,8 @@ export function Descente() {
     // La raie : position voulue (selon le défilement) + position affichée (qui la rattrape en douceur).
     let lastY = window.scrollY, vel = 0;
     let cur = { x: 0, y: 0, r: 0 };
-    let shy = { x: 0, y: 0 }, mouse = { x: -999, y: -999 };
+    const shy = { x: 0, y: 0 };
+    let mouse = { x: -999, y: -999 };
     let raf = 0, lastDepth = -1, jumpReady = 0;
 
     const target = () => {
