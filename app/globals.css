@@ -1033,7 +1033,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 }
 .ff-logo i { display: none; }
 .ff-wordmark { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; }
-.ff-wordmark > span { color: var(--ff-accent-strong); font-weight: 800; }
+.ff-wordmark > span { color: #1A8BC9; font-weight: 800; }
 :root.dark .ff-wordmark > span { color: #38BDF8; }
 @media (prefers-reduced-motion: reduce) {
   .ff-logo img { animation: none !important; }
@@ -1061,8 +1061,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 
 /* ===== Logo : la raie (dessin d'Anouar) en blanc dans une tuile bleue en relief, comme une icône d'appli ===== */
 .ff-mark { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 28%; overflow: hidden;
-  background: linear-gradient(160deg, #6AD3FB 0%, #1F9AD9 46%, #0B4F7C 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(4, 20, 39, 0.32), 0 8px 18px -8px rgba(11, 79, 124, 0.75); }
+  background: linear-gradient(160deg, #7FDCFF 0%, #38BDF8 50%, #1C93D6 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(11, 79, 124, 0.22), 0 8px 18px -8px rgba(11, 111, 168, 0.6); }
 .ff-mark::after { content: ""; position: absolute; left: -10%; right: -10%; top: -40%; height: 70%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.45), transparent); pointer-events: none; }
 .ff-mark > span { position: relative; z-index: 1; width: 72%; aspect-ratio: 512 / 420; background: #fff; -webkit-mask: url(/brand/logo.png) center / contain no-repeat; mask: url(/brand/logo.png) center / contain no-repeat; transform: translateY(2%); }
 .ff-brand:hover .ff-mark > span, .brand:hover .ff-mark > span { animation: ff-mark-flap 0.7s ease-in-out 2; }
