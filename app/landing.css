@@ -7,25 +7,25 @@
 
 .lp {
   /* Clair : une eau ensoleillée, bien bleue (le blanc ne domine pas) ; les objets blancs ressortent dessus. */
-  --bg: #CDEBFA; --bg-2: #7EC4EA; --ink: #061B2E; --ink-2: #1D4361; --ink-3: #3E6079;
-  --brand: #38BDF8; --brand-deep: #08507A; --on-brand: #052036; --ok: #15803D; --ok-soft: #DCFCE7;
-  --paper: #FFFFFF; --paper-2: #EAF5FC; --line: rgba(6, 40, 70, 0.12); --line-2: rgba(6, 40, 70, 0.2);
-  --shadow: 0 1px 1px rgba(6, 40, 70, 0.06), 0 12px 24px -10px rgba(6, 40, 70, 0.22), 0 46px 80px -34px rgba(6, 40, 70, 0.5);
-  --shadow-sm: 0 1px 1px rgba(6, 40, 70, 0.06), 0 10px 20px -10px rgba(6, 40, 70, 0.3);
-  --ray-op: 0.95; --caustic-op: 0.75; --flow: #08507A; --bubble: rgba(255, 255, 255, 0.9);
+  --bg: #D2EBFF; --bg-2: #7FC5FF; --ink: #022450; --ink-2: #134D91; --ink-3: #376CA7;
+  --brand: #46B5FF; --brand-deep: #0058A0; --on-brand: #002A59; --ok: #04B260; --ok-soft: #E0FFEE;
+  --paper: #FFFFFF; --paper-2: #EBF5FF; --line: rgba(0, 49, 107, 0.12); --line-2: rgba(0, 49, 107, 0.2);
+  --shadow: 0 1px 1px rgba(0, 49, 107, 0.06), 0 12px 24px -10px rgba(0, 49, 107, 0.22), 0 46px 80px -34px rgba(0, 49, 107, 0.5);
+  --shadow-sm: 0 1px 1px rgba(0, 49, 107, 0.06), 0 10px 20px -10px rgba(0, 49, 107, 0.3);
+  --ray-op: 0.95; --caustic-op: 0.75; --flow: #0058A0; --bubble: rgba(255, 255, 255, 0.9);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --ease-io: cubic-bezier(0.77, 0, 0.175, 1); --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   position: relative; min-height: 100vh; overflow-x: clip; color: var(--ink); font-family: var(--font-body);
   /* L'eau s'approfondit doucement jusqu'au fond de la page (puis la fin, en eau profonde). */
-  background: linear-gradient(180deg, #E2F5FE 0, var(--bg) 520px, #AEDDF5 32%, #93D0F0 58%, var(--bg-2) 100%);
+  background: linear-gradient(180deg, #E6F4FF 0, var(--bg) 520px, #B3DDFF 32%, #97D0FF 58%, var(--bg-2) 100%);
 }
 .lp[data-theme="dark"] {
-  --bg: #061626; --bg-2: #041120; --ink: #EAF6FF; --ink-2: #A9C6DB; --ink-3: #8EABC1;
-  --brand-deep: #7DD3FC; --ok: #4ADE80; --ok-soft: rgba(34, 197, 94, 0.16);
-  --paper: #0D2740; --paper-2: #11304D; --line: rgba(234, 246, 255, 0.1); --line-2: rgba(234, 246, 255, 0.16);
+  --bg: #031F45; --bg-2: #02193D; --ink: #EEF6FF; --ink-2: #A6CAF2; --ink-3: #8AB2E0;
+  --brand-deep: #8DCEFF; --ok: #43FFA2; --ok-soft: rgba(8, 251, 134, 0.16);
+  --paper: #073068; --paper-2: #093978; --line: rgba(238, 246, 255, 0.1); --line-2: rgba(238, 246, 255, 0.16);
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 12px 24px -10px rgba(0, 0, 0, 0.5), 0 44px 80px -30px rgba(0, 0, 0, 0.8);
   --shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 22px -12px rgba(0, 0, 0, 0.6);
-  --ray-op: 0.22; --caustic-op: 0.14; --flow: #38BDF8; --bubble: rgba(186, 230, 253, 0.55);
-  background: linear-gradient(180deg, #0C3150 0, var(--bg) 760px, var(--bg) 70%, var(--bg-2) 100%);
+  --ray-op: 0.22; --caustic-op: 0.14; --flow: #46B5FF; --bubble: rgba(196, 228, 255, 0.55);
+  background: linear-gradient(180deg, #033A7B 0, var(--bg) 760px, var(--bg) 70%, var(--bg-2) 100%);
 }
 .lp *, .lp *::before, .lp *::after { box-sizing: border-box; }
 .lp :where(h1, h2, h3, p, ul, ol) { margin: 0; }
@@ -45,10 +45,10 @@ main, footer, .sticky-cta { position: relative; z-index: 2; }
 .lp .btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px; border-radius: 999px;
   background-color: var(--brand); background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 58%);
   color: var(--on-brand); font-weight: 800; font-size: 16px; text-decoration: none; white-space: nowrap; -webkit-user-select: none; user-select: none;
-  box-shadow: 0 12px 26px -12px rgba(11, 111, 168, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow: 0 12px 26px -12px rgba(0, 115, 205, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.55);
   transition: transform 140ms var(--ease-out), box-shadow 160ms ease, background-color 200ms ease; }
-.lp .btn:active { transform: scale(0.97); box-shadow: 0 6px 14px -8px rgba(11, 111, 168, 0.7); }
-@media (hover: hover) and (pointer: fine) { .lp .btn:hover { background-color: #5CCBFA; transform: translateY(-2px); box-shadow: 0 18px 34px -14px rgba(11, 111, 168, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.55); } }
+.lp .btn:active { transform: scale(0.97); box-shadow: 0 6px 14px -8px rgba(0, 115, 205, 0.7); }
+@media (hover: hover) and (pointer: fine) { .lp .btn:hover { background-color: #6CC5FF; transform: translateY(-2px); box-shadow: 0 18px 34px -14px rgba(0, 115, 205, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.55); } }
 .lp .btn.ghost { background: var(--paper); background-image: none; color: var(--ink); border: 1.5px solid var(--line-2); box-shadow: var(--shadow-sm); }
 .lp .btn-xl { min-height: 58px; padding: 0 30px; font-size: 18px; }
 .round { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 999px; border: 1px solid var(--line-2); background: var(--paper); color: var(--ink); transition: transform 140ms var(--ease-out); }
@@ -60,7 +60,7 @@ main, footer, .sticky-cta { position: relative; z-index: 2; }
 .bar::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--bg) 82%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); border-bottom: 1px solid var(--line); }
 .brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 20px; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
 /* « Flow » : le bleu du logo (gros et gras : lisible dès 3:1). */
-.brand em { font-style: normal; color: #1A8BC9; }
+.brand em { font-style: normal; color: #008EFD; }
 .lp[data-theme="dark"] .brand em { color: var(--brand); }
 .bar-nav { display: none; }
 .bar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
@@ -333,7 +333,7 @@ canvas.fx-rays, canvas.fx-caustic, canvas.final-caustic { display: block; }
 .amount { font-size: 54px; letter-spacing: -0.03em; line-height: 1; }
 .amount small { font-family: var(--font-body); font-size: 16px; font-weight: 700; letter-spacing: 0; color: var(--ink-2); }
 .plan .btn { justify-self: start; }
-.plan.pro { background: linear-gradient(180deg, #0E3A5C, #071F36); color: #EAF6FF; border-color: rgba(125, 211, 252, 0.35); --ink-2: #B8D3E6; --line-2: rgba(234, 246, 255, 0.2); }
+.plan.pro { background: linear-gradient(180deg, #034389, #02285A); color: #EEF6FF; border-color: rgba(141, 206, 255, 0.35); --ink-2: #B6D5F8; --line-2: rgba(238, 246, 255, 0.2); }
 .plan-note { font-size: 14px; color: var(--ink-2); }
 .dots { display: grid; gap: 8px; }
 .dots li { position: relative; padding-left: 22px; line-height: 1.45; }
@@ -370,21 +370,21 @@ canvas.fx-rays, canvas.fx-caustic, canvas.final-caustic { display: block; }
 .faq details p { padding: 0 20px 20px; color: var(--ink-2); line-height: 1.6; max-width: 70ch; }
 
 /* ---------- Le fond : l'eau profonde ---------- */
-.final { position: relative; overflow: hidden; padding: 96px 0 104px; color: #EAF6FF; text-align: center;
-  background: radial-gradient(70% 60% at 50% 0%, rgba(56, 189, 248, 0.28), transparent 70%), linear-gradient(180deg, #0B3352 0%, #041427 100%); }
+.final { position: relative; overflow: hidden; padding: 96px 0 104px; color: #EEF6FF; text-align: center;
+  background: radial-gradient(70% 60% at 50% 0%, rgba(70, 181, 255, 0.28), transparent 70%), linear-gradient(180deg, #013D7D 0%, #011B46 100%); }
 .final-caustic { position: absolute; left: 0; top: 0; width: calc(100% + 560px); height: 60%; opacity: 0; transition: opacity 1.4s ease; animation: lp-caustic 30s linear infinite; }
 .final-caustic[data-ready] { opacity: 0.22; }
 .final-in { position: relative; display: grid; justify-items: center; gap: 16px; }
 .final-mark { margin-bottom: 10px; animation: lp-float 6s ease-in-out infinite; }
 @keyframes lp-float { 50% { transform: translateY(-8px) rotate(-2deg); } }
 .final h2 { font-size: clamp(36px, 8vw, 76px); max-width: 14ch; }
-.final p { font-size: 19px; color: #B8D3E6; }
-.final .note { font-size: 15px; color: #B8D3E6; }
+.final p { font-size: 19px; color: #B6D5F8; }
+.final .note { font-size: 15px; color: #B6D5F8; }
 .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
-footer { background: #031021; color: #A9C6DB; padding: 24px 0 calc(28px + env(safe-area-inset-bottom)); font-size: 14px; }
+footer { background: #00173E; color: #A6CAF2; padding: 24px 0 calc(28px + env(safe-area-inset-bottom)); font-size: 14px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
 footer .links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
-footer a { color: #EAF6FF; min-height: 44px; display: inline-flex; align-items: center; }
+footer a { color: #EEF6FF; min-height: 44px; display: inline-flex; align-items: center; }
 
 /* ---------- Bouton collant (téléphone) ---------- */
 .sticky-cta { position: fixed !important; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 40; display: flex; transform: translate3d(0, 140%, 0); transition: transform 340ms cubic-bezier(0.32, 0.72, 0, 1); }
@@ -426,4 +426,19 @@ footer a { color: #EAF6FF; min-height: 44px; display: inline-flex; align-items: 
 @media (max-width: 899px) { .bubbles i:nth-child(2n) { display: none; } }
 @media (prefers-reduced-motion: reduce) { .bubbles { display: none; } }
 /* Reflets du soleil sur les objets blancs (clair seulement) : une lueur douce en haut de chaque plaque. */
-.lp:not([data-theme="dark"]) :is(.plan:not(.pro), .faq, .cmp-details, .mini, .start) { background-image: linear-gradient(180deg, #fff, #F6FBFE); }
+.lp:not([data-theme="dark"]) :is(.plan:not(.pro), .faq, .cmp-details, .mini, .start) { background-image: linear-gradient(180deg, #fff, #F7FBFF); }
+
+/* ---------- Animations en plus (identiques sur téléphone et ordinateur) ---------- */
+/* Les titres remontent de sous la ligne d'eau quand on arrive dessus. */
+.lp-js h2[data-reveal], .lp-js [data-reveal] > h2 { transition: opacity 700ms ease, transform 1000ms var(--ease-out), clip-path 1000ms var(--ease-out); clip-path: inset(-20% -5% -20% -5%); }
+.lp-js h2[data-reveal]:not(.in), .lp-js [data-reveal]:not(.in) > h2 { clip-path: inset(-20% -5% 100% -5%); transform: translate3d(0, 0.5em, 0); }
+/* Arrivée de la page : la scène monte de l'eau et se pose (le titre, lui, est là tout de suite). */
+.stage { animation: lp-stage-in 1.3s var(--ease-out) 0.15s both; }
+@keyframes lp-stage-in { from { opacity: 0; transform: translate3d(0, 60px, 0) scale(0.94); } }
+/* La carte Pro : un reflet de lumière la traverse quand elle apparaît, puis toutes les 6 s. */
+.plan.pro { position: relative; overflow: hidden; }
+.plan.pro::after { content: ""; position: absolute; inset: -40% auto -40% -60%; width: 40%; transform: rotate(18deg) translateX(-120%); pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent); }
+.plan.pro.in::after, .lp:not(.lp-js) .plan.pro::after { animation: lp-shine 6s var(--ease-io) 0.6s infinite; }
+@keyframes lp-shine { 0% { transform: rotate(18deg) translateX(-120%); } 30%, 100% { transform: rotate(18deg) translateX(520%); } }
+@media (prefers-reduced-motion: reduce) { .stage, .plan.pro::after { animation: none !important; } .lp-js h2 { clip-path: none !important; } }

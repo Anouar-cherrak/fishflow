@@ -8,6 +8,7 @@ import { TextureCanvas } from "@/components/ocean/TextureCanvas";
 import { TrackedLink } from "@/components/TrackedLink";
 import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 import { trackEvent } from "@/lib/tracking";
+import { burstBubbles } from "@/lib/bubbles";
 import { depthClick, disableDepthSound, enableDepthSound } from "./depth-sound";
 import { AskShow, CardsShow, DailyShow, FicheShow, HeroStage, QuizShow, StepPaste, StepRead, StepReady } from "./Objects";
 
@@ -138,10 +139,15 @@ export function Landing() {
     const story = el.querySelector<HTMLElement>(".story-text");
     const words = story ? Array.from(story.querySelectorAll<HTMLElement>("span.w")) : [];
     const tilt = el.querySelector<HTMLElement>(".stage-tilt");
+    const shows = Array.from(el.querySelectorAll<HTMLElement>(".feature-show, .steps-grid .mini"));
+    const marquee = el.querySelector<HTMLElement>(".marquee-track");
 
     let vh = 0, maxY = 1, flowTop = 0, flowH = 1, storyTop = 0, storyH = 1, total = 1;
+    let showMid: number[] = [];
     const measure = () => {
       vh = window.innerHeight;
+      shows.forEach((s) => (s.style.translate = ""));
+      showMid = shows.map((s) => { const r = s.getBoundingClientRect(); return r.top + window.scrollY + r.height / 2; });
       maxY = Math.max(1, document.documentElement.scrollHeight - vh);
       if (flowZone) { flowTop = flowZone.getBoundingClientRect().top + window.scrollY; flowH = flowZone.offsetHeight; }
       if (story) { storyTop = story.getBoundingClientRect().top + window.scrollY; storyH = story.offsetHeight; }
@@ -149,11 +155,13 @@ export function Landing() {
     };
     measure();
 
-    let raf = 0, shown = -1, lastTen = 0, lit = -1;
+    let raf = 0, shown = -1, lastTen = 0, lit = -1, lastY = window.scrollY, vel = 0;
     const pointer = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
     const frame = () => {
       raf = 0;
       const y = window.scrollY;
+      vel = lerp(vel, y - lastY, 0.3);
+      lastY = y;
 
       // Profondeur : de 0 m en haut à 1 000 m tout en bas de la page.
       const meters = Math.round((y / maxY) * 1000);
@@ -194,19 +202,43 @@ export function Landing() {
         }
       }
 
+      // Profondeur : les démos glissent un peu moins vite que le texte (plans à des distances différentes).
+      if (!reduce) {
+        for (let i = 0; i < shows.length; i++) {
+          const d = showMid[i] - (y + vh / 2);
+          if (Math.abs(d) > vh * 1.4) continue;
+          shows[i].style.translate = `0 ${(d * -0.08).toFixed(1)}px`;
+        }
+        // Le bandeau des matières accélère quand on défile vite (comme un courant).
+        if (marquee) for (const a of marquee.getAnimations()) a.playbackRate = 1 + Math.min(5, Math.abs(vel) / 6);
+      }
+
+      // Téléphone : sans souris, la scène de l'accueil pivote doucement avec le défilement.
+      if (tilt && !fine && !reduce && y < vh * 1.5) {
+        const p = clamp(y / vh, 0, 1);
+        tilt.style.transform = `rotateX(${(8 + p * 10).toFixed(2)}deg) rotateY(${(-10 + p * 14).toFixed(2)}deg) scale(${(0.92 - p * 0.06).toFixed(3)})`;
+      }
+
       // Ordinateur : la scène de l'accueil suit un peu la souris (relief).
-      let moving = false;
+      let moving = Math.abs(vel) > 0.1;
       if (tilt && fine && !reduce) {
         cur.x = lerp(cur.x, pointer.x, 0.08);
         cur.y = lerp(cur.y, pointer.y, 0.08);
         tilt.style.transform = `rotateX(${(10 - cur.y * 6).toFixed(2)}deg) rotateY(${(-16 + cur.x * 10).toFixed(2)}deg)`;
-        moving = Math.abs(cur.x - pointer.x) > 0.002 || Math.abs(cur.y - pointer.y) > 0.002;
+        moving = moving || Math.abs(cur.x - pointer.x) > 0.002 || Math.abs(cur.y - pointer.y) > 0.002;
       }
       if (moving) raf = requestAnimationFrame(frame);
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
     frame();
 
+    // Appui sur un bouton : une petite gerbe de bulles part du doigt ou de la souris.
+    const onPress = (e: PointerEvent) => {
+      if (reduce) return;
+      const t = (e.target as HTMLElement | null)?.closest(".btn");
+      if (t) burstBubbles(e.clientX, e.clientY, 10);
+    };
+    window.addEventListener("pointerdown", onPress, { passive: true });
     const onPointer = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       pointer.x = e.clientX / window.innerWidth - 0.5;
@@ -253,6 +285,7 @@ export function Landing() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("pointerdown", onPress);
       window.clearTimeout(late);
       io?.disconnect();
       scenes.disconnect();
