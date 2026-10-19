@@ -121,7 +121,7 @@ export function Preview() {
     <div className="pv">
       <header className="pv-head">
         <h1>Trois directions pour FishFlow</h1>
-        <p>Page de travail, à supprimer après ton choix. Les écrans sont des maquettes : les boutons ne font rien.</p>
+        <p>Page de travail, à supprimer après ton choix. Les écrans sont des maquettes : les boutons ne font rien. <a href="/design-preview/descente">Voir la démo animée de La Descente</a></p>
         <div className="pv-controls">
           <div role="tablist" aria-label="Direction" className="pv-seg">
             {DIRECTIONS.map((x) => (
