@@ -233,79 +233,39 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 .ff-underline-grow.is-active::after {
   transform: scaleX(1);
 }
-/* ===== Page « Apprendre » : la boule lumineuse ===== */
-.ff-orb {
-  --orb-size: clamp(150px, 46vw, 230px);
-  --speed: 1;
-  position: relative;
-  width: var(--orb-size);
-  aspect-ratio: 1;
-  flex-shrink: 0;
-  filter: hue-rotate(var(--orb-shift, 0deg));
-  transition: filter 1.4s ease, width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: ffOrbBreathe calc(6s / var(--speed)) ease-in-out infinite;
-  will-change: transform;
-}
-.ff-orb[data-compact="true"] {
-  --orb-size: clamp(76px, 20vw, 100px);
-}
-.ff-orb[data-state="thinking"] {
-  --speed: 3;
-}
-.ff-orb-glow {
-  position: absolute;
-  inset: -22%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.5), transparent 65%);
-  filter: blur(22px);
-  animation: ffOrbPulse calc(4s / var(--speed)) ease-in-out infinite;
-}
-.ff-orb-body {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background: radial-gradient(circle at 32% 28%, #c7d2fe 0%, #6366f1 42%, #1e1b4b 100%);
-  box-shadow: inset -10px -14px 30px rgba(15, 12, 60, 0.55), inset 8px 10px 24px rgba(255, 255, 255, 0.25);
-}
-.ff-orb-blob {
-  position: absolute;
-  inset: 0;
-  animation: ffOrbSpin calc(var(--d) / var(--speed)) linear infinite;
-}
-.ff-orb-blob::before {
-  content: "";
-  position: absolute;
-  width: 62%;
-  height: 62%;
-  top: var(--y, 0);
-  left: var(--x, 0);
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--c), transparent 68%);
-  filter: blur(8px);
-}
-.ff-orb-shine {
-  position: absolute;
-  top: 9%;
-  left: 18%;
-  width: 34%;
-  height: 20%;
-  border-radius: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
-  transform: rotate(-24deg);
-}
+/* ===== Apprendre : la bulle d'eau (components/KnowledgeBubble.tsx) ===== */
+.ff-kb { --kb-size: clamp(170px, 52vw, 250px); position: relative; width: var(--kb-size); aspect-ratio: 1; transition: width 0.6s var(--ff-ease-out); }
+.ff-kb[data-compact="true"] { --kb-size: clamp(84px, 22vw, 108px); }
+.ff-kb-body { position: absolute; inset: 0; border-radius: 50%; animation: ff-kb-wobble 7s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(255, 255, 255, 0.10) 64%, rgba(200, 236, 255, 0.55) 69.5%, rgba(255, 255, 255, 0.9) 70.5%, transparent 71.5%),
+    radial-gradient(circle at 62% 70%, rgba(125, 211, 252, 0.22), transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 60%, transparent 71%);
+  box-shadow: 0 30px 60px -30px rgba(5, 32, 54, 0.45); }
+:root.dark .ff-kb-body { box-shadow: 0 0 60px -10px rgba(125, 211, 252, 0.25); }
+/* Film irisé, comme une vraie bulle (teinte qui tourne lentement). */
+.ff-kb-film { position: absolute; inset: 0; border-radius: 50%; opacity: 0.55; filter: hue-rotate(var(--kb-hue, 0deg));
+  background: conic-gradient(from 20deg, rgba(110, 240, 207, 0.55), rgba(125, 211, 252, 0.15), rgba(255, 190, 220, 0.5), rgba(255, 238, 186, 0.35), rgba(110, 240, 207, 0.55));
+  -webkit-mask-image: radial-gradient(circle, transparent 60%, #000 69%, transparent 71%); mask-image: radial-gradient(circle, transparent 60%, #000 69%, transparent 71%);
+  animation: ff-kb-spin 14s linear infinite; }
+.ff-kb-shine { position: absolute; left: 20%; top: 14%; width: 30%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0)); transform: rotate(-28deg); }
+.ff-kb-shine.b { left: auto; right: 22%; top: auto; bottom: 18%; width: 14%; height: 8%; opacity: 0.6; transform: rotate(-28deg); }
+.ff-kb-rise { position: absolute; inset: 20%; pointer-events: none; }
+.ff-kb-rise i { position: absolute; bottom: 0; left: calc(18% + var(--n, 0) * 15%); width: 8px; height: 8px; border-radius: 50%; opacity: 0;
+  border: 1px solid rgba(255, 255, 255, 0.85); background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.9) 0 16%, transparent 50%); }
+.ff-kb-rise i:nth-child(1) { --n: 0; } .ff-kb-rise i:nth-child(2) { --n: 1; width: 5px; height: 5px; } .ff-kb-rise i:nth-child(3) { --n: 2; } .ff-kb-rise i:nth-child(4) { --n: 3; width: 6px; height: 6px; } .ff-kb-rise i:nth-child(5) { --n: 4; width: 4px; height: 4px; }
+.ff-kb[data-state="thinking"] .ff-kb-body { animation-duration: 1.6s; }
+.ff-kb[data-state="thinking"] .ff-kb-film { animation-duration: 3s; }
+.ff-kb[data-state="thinking"] .ff-kb-rise i { animation: ff-kb-up 1.4s ease-in infinite; }
+.ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(2) { animation-delay: 0.3s; } .ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(3) { animation-delay: 0.6s; }
+.ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(4) { animation-delay: 0.9s; } .ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(5) { animation-delay: 1.15s; }
+.ff-kb[data-state="done"] .ff-kb-body { animation: ff-kb-settle 0.9s var(--ff-ease-out), ff-kb-wobble 7s ease-in-out 0.9s infinite; }
+@keyframes ff-kb-wobble { 0%, 100% { transform: scale(1, 1) translateY(0); } 33% { transform: scale(1.025, 0.975) translateY(-4px); } 66% { transform: scale(0.98, 1.02) translateY(2px); } }
+@keyframes ff-kb-spin { to { transform: rotate(360deg); } }
+@keyframes ff-kb-up { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-120%) scale(1.1); opacity: 0; } }
+@keyframes ff-kb-settle { 0% { transform: scale(1.08, 0.92); } 50% { transform: scale(0.96, 1.04); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ff-kb *, .ff-kb { animation: none !important; } }
 
-@keyframes ffOrbSpin {
-  to { transform: rotate(360deg); }
-}
-@keyframes ffOrbBreathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.045); }
-}
-@keyframes ffOrbPulse {
-  0%, 100% { opacity: 0.55; transform: scale(0.96); }
-  50% { opacity: 1; transform: scale(1.06); }
-}
 /* Les images « sortent » de la boule, depuis le haut, vers leur place. */
 @keyframes ffFly {
   from { opacity: 0; transform: translate3d(var(--fx, 0px), var(--fy, -70px), 0) scale(0.2) rotate(var(--fr, 0deg)); }
@@ -321,11 +281,6 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 
 /* Pour les personnes qui demandent moins de mouvement : tout reste lisible, rien ne bouge. */
 @media (prefers-reduced-motion: reduce) {
-  .ff-orb,
-  .ff-orb-glow,
-  .ff-orb-blob {
-    animation: none;
-  }
   .ff-fly,
   .ff-fade-up,
   .ff-fade {
@@ -366,7 +321,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   font-size: clamp(32px, 5vw, 58px);
   line-height: 1.02;
   letter-spacing: -0.035em;
-  font-variation-settings: "opsz" 96;
+ 
   text-wrap: balance;
 }
 .ff-lead {
@@ -615,11 +570,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 @keyframes ffClimb { 0% { opacity: 0; transform: translateY(14px); } 6%, 14% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .ff-box-card::after { animation: none; opacity: 1; } }
 
-/* Boule argent (Apprendre) */
-.ff-silver-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; z-index: 0; pointer-events: none; }
-.ff-silver-slot { width: min(68vw, 300px); aspect-ratio: 1; margin-inline: auto; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-.ff-silver-slot[data-compact="true"] { width: 112px; }
-@media (min-width: 1024px) { .ff-silver-slot { width: 340px; } .ff-silver-slot[data-compact="true"] { width: 128px; } }
 
 /* Tutoriel de bienvenue */
 .ff-tuto-back { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; }
@@ -958,11 +908,11 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
    un banc de poissons au loin. Uniquement transform et opacity, fixe, derrière le contenu, jamais cliquable. */
 .ff-ocean { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
 /* Rayons de soleil : une seule image légère (public/ocean/rays.webp) qui se balance ; pas de flou calculé. */
-.ff-rays { position: absolute; left: -15%; right: -15%; top: -6%; height: 90vh; background: url(/ocean/rays.webp) center top / 100% 100% no-repeat; opacity: var(--ff-rays-op, 0.85); transform-origin: 50% 0; animation: ff-sway 16s ease-in-out infinite alternate; }
+.ff-rays { position: absolute; left: -15%; right: -15%; top: -6%; height: 90vh; width: 130%; opacity: 0; transition: opacity 1.2s ease; transform-origin: 50% 0; animation: ff-sway 16s ease-in-out infinite alternate; }
 :root.dark { --ff-rays-op: 0.28; }
 @keyframes ff-sway { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, 0, 0) scaleX(1.05); } }
 /* Reflets du soleil : deux réseaux de lumière qui glissent l'un sur l'autre (comme au fond d'une piscine, en très doux). */
-.ff-caustic { position: absolute; left: 0; right: -560px; top: 0; height: 55vh; background: url(/ocean/caustic-top.webp) 0 0 / 560px 100% repeat-x; opacity: var(--ff-caustic-op);
+.ff-caustic { position: absolute; left: 0; right: -560px; top: 0; width: calc(100% + 560px); height: 55vh; opacity: 0; transition: opacity 1.2s ease;
   animation: ff-caustic 28s linear infinite; }
 @keyframes ff-caustic { to { transform: translate3d(-560px, 0, 0); } }
 /* Texture de caustiques (scripts/ocean/caustic.html, rendue en WebGL puis compressée : 35 Ko, répétable). */
@@ -1090,3 +1040,20 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 
 /* Connexion / inscription (ordinateur) : une raie passe au loin derrière le message. */
 .ff-auth-manta { position: absolute; right: -10%; top: -40%; width: 260px; opacity: 0.14; transform: rotate(-16deg); filter: blur(1px); pointer-events: none; }
+
+/* Génération en cours : on plonge (eau qui s'assombrit, rayons, la raie qui nage). Le texte reste sur une eau calme. */
+.ff-dive { background: linear-gradient(180deg, color-mix(in srgb, var(--ff-sea-1) 97%, transparent), color-mix(in srgb, var(--ff-sea-3) 98%, transparent)); color: var(--ff-fg); isolation: isolate; }
+.ff-dive::before { content: ""; position: absolute; left: -15%; right: -15%; top: 0; height: 80vh; z-index: -1; background: url(/ocean/rays.webp) center top / 100% 100% no-repeat; opacity: var(--ff-rays-op, 0.85); animation: ff-sway 9s ease-in-out infinite alternate; }
+.ff-dive .ff-swim { width: 260px; height: 180px; }
+.ff-dive .ff-swim .ff-manta { width: 136px; margin: -56px 0 0 -68px; }
+@media (prefers-reduced-motion: reduce) { .ff-dive::before { animation: none; } }
+
+/* Voile derrière les fenêtres : de l'eau profonde, légèrement floutée. */
+.ff-veil { background: rgba(2, 12, 26, 0.62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+/* Écran de démarrage de l'appli installée : la lumière descend dans l'eau profonde. */
+.ff-splash { background: radial-gradient(90% 60% at 50% -10%, rgba(125, 211, 252, 0.3), transparent 60%), linear-gradient(180deg, #0B3352, #041427); }
+
+.ff-rays[data-ready] { opacity: var(--ff-rays-op, 0.85); }
+.ff-caustic[data-ready] { opacity: var(--ff-caustic-op); }
+/* Cartes : seulement des bulles (une texture dans chaque carte serait prise pour l'élément principal). */
+.ff-deco::before { display: none; }

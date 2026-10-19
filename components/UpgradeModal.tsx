@@ -26,7 +26,7 @@ export function UpgradeModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-[#000000]/60 backdrop-blur-sm flex items-center justify-center z-50 px-4 ff-fade"
+      className="fixed inset-0 ff-veil flex items-center justify-center z-50 px-4 ff-fade"
       onClick={onClose}
     >
       <div

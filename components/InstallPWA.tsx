@@ -80,7 +80,7 @@ export function InstallPWA() {
 
       {showGuide && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-sm flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 ff-veil flex items-center justify-center px-4"
           onClick={() => setShowGuide(false)}
         >
           <div

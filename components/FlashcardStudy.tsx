@@ -155,7 +155,7 @@ export function FlashcardStudy({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center px-4 ff-fade"
+      className="fixed inset-0 z-50 ff-veil flex items-center justify-center px-4 ff-fade"
       onClick={close}
     >
       <div

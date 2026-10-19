@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
-import { SilverOrb } from "@/components/SilverOrb";
+import { KnowledgeBubble } from "@/components/KnowledgeBubble";
 import { trackEvent } from "@/lib/tracking";
 
 type Source = { id: number; title: string; url: string; site: string };
@@ -39,12 +39,12 @@ export default function Apprendre() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Les images partent du centre de la boule et volent jusqu'à leur place.
+  // Les images sortent de la bulle et volent jusqu'à leur place.
   const imagesRef = useRef<HTMLUListElement>(null);
   useLayoutEffect(() => {
     const list = imagesRef.current;
     if (!list || status !== "done") return;
-    const slot = document.querySelector<HTMLElement>(".ff-silver-slot, .ff-orb");
+    const slot = document.querySelector<HTMLElement>(".ff-kb");
     const from = slot?.getBoundingClientRect();
     list.querySelectorAll<HTMLElement>("li.ff-fly").forEach((li, i) => {
       if (from) {
@@ -170,12 +170,12 @@ export default function Apprendre() {
       <AppShell size="normal">
       <div className="relative z-[1] w-full max-w-2xl mx-auto pt-2 pb-44 flex flex-col items-center">
         <div className={showResult ? "mb-6" : "mt-6 mb-8"}>
-          <SilverOrb thinking={status === "loading"} done={status === "done"} compact={showResult} shift={shift} />
+          <KnowledgeBubble thinking={status === "loading"} done={status === "done"} compact={showResult} shift={shift} />
         </div>
 
         {!showResult && (
           <div className="text-center ff-fade-up">
-            <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Que veux-tu savoir ?</h1>
+            <h1 className="ff-title mb-3">Que veux-tu savoir&nbsp;?</h1>
             <p className="text-black/60 text-sm sm:text-base max-w-sm mx-auto mb-6">
               Pose ta question. Tu reçois une réponse claire, des images et des liens pour aller plus loin.
             </p>

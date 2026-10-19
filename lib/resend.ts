@@ -31,18 +31,24 @@ export function emailLayout(
   ctaUrl: string = "https://fishflow.fr/generer",
   unsubscribeUrl?: string
 ) {
+  // Même univers que le site : un bandeau d'eau profonde en haut, le message sur une « plaque » claire,
+  // le bouton bleu FishFlow (texte foncé : contraste 7,7:1). Styles en ligne seulement (les boîtes mail l'exigent).
   return `
-  <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 20px; background:#ffffff;">
-    <div style="text-align:center;margin-bottom:28px;">
-      <img src="https://fishflow.fr/brand/logo-email.png" width="48" height="48" alt="FishFlow" style="vertical-align:middle;margin-right:8px;" />
-      <span style="font-size:20px;font-weight:700;color:#111111;vertical-align:middle;">FishFlow</span>
+  <div style="background:#DCEFF9;padding:24px 12px;">
+  <div style="font-family: Arial, Helvetica, sans-serif; max-width: 480px; margin: 0 auto;">
+    <div style="background:#0B3352;background-image:linear-gradient(180deg,#11476E,#0B3352);border-radius:24px 24px 0 0;padding:22px 20px;text-align:center;">
+      <img src="https://fishflow.fr/brand/logo-email.png" width="44" height="44" alt="FishFlow" style="vertical-align:middle;margin-right:8px;" />
+      <span style="font-size:21px;font-weight:800;color:#EAF6FF;vertical-align:middle;letter-spacing:-0.3px;">Fish<span style="color:#38BDF8;">Flow</span></span>
     </div>
-    ${content}
-    <div style="text-align:center;margin:28px 0 8px;">
-      <a href="${ctaUrl}" style="background:#0369A1;color:#ffffff;padding:12px 30px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;">${ctaLabel}</a>
+    <div style="background:#ffffff;border-radius:0 0 20px 20px;padding:28px 22px 26px;color:#052036;font-size:15px;line-height:1.55;">
+      ${content}
+      <div style="text-align:center;margin:26px 0 4px;">
+        <a href="${ctaUrl}" style="background:#38BDF8;color:#052036;padding:13px 30px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;">${ctaLabel}</a>
+      </div>
     </div>
-    <p style="color:#6B7280;font-size:12px;text-align:center;margin-top:24px;">FishFlow : tes fiches de révision, faites à partir de tes cours</p>
-    ${unsubscribeUrl ? `<p style="text-align:center;margin-top:8px;"><a href="${unsubscribeUrl}" style="color:#6B7280;font-size:12px;">Ne plus recevoir ces e-mails</a></p>` : ""}
+    <p style="color:#2D506B;font-size:12px;text-align:center;margin-top:18px;">FishFlow : révise en profondeur, à partir de tes propres cours.</p>
+    ${unsubscribeUrl ? `<p style="text-align:center;margin-top:6px;"><a href="${unsubscribeUrl}" style="color:#2D506B;font-size:12px;">Ne plus recevoir ces e-mails</a></p>` : ""}
+  </div>
   </div>`;
 }
 

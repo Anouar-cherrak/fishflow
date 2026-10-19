@@ -21,10 +21,12 @@ export async function GET(req: Request) {
     `<!DOCTYPE html>
     <html lang="fr">
       <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Désinscription — FishFlow</title></head>
-      <body style="font-family: Arial, sans-serif; text-align:center; padding:60px 20px; color:#111111;">
-        <h1 style="font-size:22px;margin-bottom:12px;">Tu es désinscrit des emails FishFlow</h1>
-        <p style="color:#555555;">Tu ne recevras plus d'emails de relance ou d'annonce. Les emails essentiels liés à ton compte (confirmation, sécurité) continueront d'être envoyés.</p>
-        <a href="https://fishflow.fr" style="display:inline-block;margin-top:24px;color:#15803D;font-weight:600;text-decoration:none;">Retour à FishFlow</a>
+      <body style="margin:0;min-height:100vh;font-family: Arial, sans-serif; text-align:center; padding:60px 20px; color:#052036; background:linear-gradient(180deg,#E4F5FE,#9AD3EF);box-sizing:border-box;">
+        <div style="max-width:460px;margin:0 auto;background:#FBFEFF;border-radius:28px 28px 20px 20px;padding:32px 24px;box-shadow:0 24px 48px -30px rgba(5,32,54,.45);">
+          <h1 style="font-size:22px;margin:0 0 12px;">Tu es désinscrit des emails FishFlow</h1>
+          <p style="color:#2D506B;margin:0;line-height:1.55;">Tu ne recevras plus d'emails de relance ou d'annonce. Les emails essentiels liés à ton compte (confirmation, sécurité) continueront d'être envoyés.</p>
+          <a href="https://fishflow.fr" style="display:inline-block;margin-top:24px;background:#38BDF8;color:#052036;font-weight:700;text-decoration:none;padding:12px 26px;border-radius:999px;">Retour à FishFlow</a>
+        </div>
       </body>
     </html>`,
     { headers: { "Content-Type": "text/html; charset=utf-8" } }

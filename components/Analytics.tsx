@@ -62,9 +62,9 @@ export function Analytics() {
             background: "var(--ff-surface, #111)",
             color: "var(--ff-fg, #fff)",
             border: "1px solid var(--ff-line, rgba(128,128,128,.35))",
-            borderRadius: 16,
-            padding: 16,
-            boxShadow: "0 12px 40px rgba(0,0,0,.35)",
+            borderRadius: "28px 28px 20px 20px",
+            padding: 18,
+            boxShadow: "var(--ff-plate-shadow, 0 12px 40px rgba(0,0,0,.35))",
             fontSize: 14,
             lineHeight: 1.45,
           }}
@@ -83,10 +83,10 @@ export function Analytics() {
                 flex: 1,
                 minHeight: 44,
                 borderRadius: 999,
-                border: "1px solid var(--ff-line, rgba(128,128,128,.5))",
-                background: "transparent",
+                border: "1.5px solid var(--ff-line, rgba(128,128,128,.5))",
+                background: "var(--ff-bg, transparent)",
                 color: "inherit",
-                fontWeight: 600,
+                fontWeight: 700,
                 cursor: "pointer",
               }}
             >
@@ -98,10 +98,10 @@ export function Analytics() {
                 flex: 1,
                 minHeight: 44,
                 borderRadius: 999,
-                border: "1px solid var(--ff-line, rgba(128,128,128,.5))",
-                background: "transparent",
+                border: "1.5px solid var(--ff-line, rgba(128,128,128,.5))",
+                background: "var(--ff-bg, transparent)",
                 color: "inherit",
-                fontWeight: 600,
+                fontWeight: 700,
                 cursor: "pointer",
               }}
             >

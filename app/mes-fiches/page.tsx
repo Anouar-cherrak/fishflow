@@ -423,7 +423,7 @@ export default function MesFiches() {
 
       {movingFicheId && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-[70] bg-[#000000]/50 backdrop-blur-sm flex items-center justify-center px-4"
+          className="fixed inset-0 z-[70] ff-veil flex items-center justify-center px-4"
           onClick={() => setMovingFicheId(null)}
         >
           <div

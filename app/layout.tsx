@@ -15,7 +15,8 @@ const figtree = Figtree({
 });
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["opsz"],
+  // Les titres n'utilisent qu'une épaisseur : un seul petit fichier (l'affichage du titre ne l'attend presque pas).
+  weight: "800",
   variable: "--font-display",
   display: "swap",
 });

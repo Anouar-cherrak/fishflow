@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { RaieImg } from "@/components/Logo";
 import { Manta } from "@/components/ocean/Manta";
+import { TextureCanvas } from "@/components/ocean/TextureCanvas";
 import { TrackedLink } from "@/components/TrackedLink";
 import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 import { trackEvent } from "@/lib/tracking";
@@ -357,9 +358,8 @@ export function Landing() {
       {/* ===== L'eau : lumière, reflets, neige marine, la raie au loin, bulles. Fixe, derrière tout, jamais cliquable. ===== */}
       <div className="fx" aria-hidden="true">
         <div className="fx-light">
-          <span className="fx-rays" />
-          <span className="fx-caustic a" />
-          <span className="fx-caustic b" />
+          <TextureCanvas className="fx-rays" src="/ocean/rays.webp" />
+          <TextureCanvas className="fx-caustic" src="/ocean/caustic-top.webp" tileW={560} />
         </div>
         <div className="fx-snow far">{SNOW_FAR.map((s, i) => <i key={i} style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.s, height: s.s }} />)}{SNOW_FAR.map((s, i) => <i key={`b${i}`} style={{ left: `${s.x}%`, top: `${100 + s.y}%`, width: s.s, height: s.s }} />)}</div>
         <div className="fx-manta"><Manta /></div>
@@ -399,8 +399,8 @@ export function Landing() {
         <section className="hero" data-depth="0" aria-labelledby="t-hero">
           <div className="surface" aria-hidden="true">
             <span className="surface-sky" />
-            <span className="surface-ripple a" />
-            <span className="surface-ripple b" />
+            <TextureCanvas className="surface-ripple a" src="/ocean/caustic-a.webp" tileW={520} tileH={120} />
+            <TextureCanvas className="surface-ripple b" src="/ocean/caustic-a.webp" tileW={740} tileH={150} />
             <span className="surface-sun" />
           </div>
           <div className="wrap hero-grid">

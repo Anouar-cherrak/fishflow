@@ -27,7 +27,7 @@
 .lp :where(button) { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 .lp :focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 8px; }
 .lp h1, .lp h2, .lp h3, .lp .amount, .lp .brand { font-family: var(--font-display); }
-.lp h2 { font-size: clamp(32px, 7.4vw, 60px); line-height: 1.02; font-weight: 800; letter-spacing: -0.035em; text-wrap: balance; font-variation-settings: "opsz" 96; }
+.lp h2 { font-size: clamp(32px, 7.4vw, 60px); line-height: 1.02; font-weight: 800; letter-spacing: -0.035em; text-wrap: balance; }
 .lp h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; }
 .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 16px; }
 @media (min-width: 900px) { .wrap { padding: 0 40px; } }
@@ -89,12 +89,12 @@
 main, footer, .sticky-cta { position: relative; z-index: 2; }
 .fx-light { position: absolute; inset: 0; }
 /* Rayons de soleil : une seule image (scripts/ocean/rays.html, 30 Ko) qui se balance doucement. */
-.fx-rays { position: absolute; left: -15%; right: -15%; top: -4%; height: 100vh; background: url(/ocean/rays.webp) center top / 100% 100% no-repeat; opacity: var(--rays-op, 0.95);
+.fx-rays { position: absolute; left: -15%; right: -15%; top: -4%; height: 100vh; width: 130%; opacity: 0; transition: opacity 1.2s ease;
   transform-origin: 50% 0; animation: lp-sway 14s ease-in-out infinite alternate; }
 .lp[data-theme="dark"] { --rays-op: 0.32; }
 @keyframes lp-sway { from { transform: translate3d(-3%, 0, 0) scaleX(1); } to { transform: translate3d(3%, 0, 0) scaleX(1.06); } }
 /* Reflets : texture de caustiques avec son fondu déjà dans l'image (aucun masque à recalculer). */
-.fx-caustic { position: absolute; left: 0; right: -560px; top: 0; height: 58vh; background: url(/ocean/caustic-top.webp) 0 0 / 560px 100% repeat-x; opacity: var(--caustic-op);
+.fx-caustic { position: absolute; left: 0; right: -560px; top: 0; width: calc(100% + 560px); height: 58vh; opacity: 0; transition: opacity 1.2s ease;
   animation: lp-caustic 24s linear infinite; }
 .fx-caustic.b { display: none; }
 @keyframes lp-caustic { to { transform: translate3d(-560px, 0, 0); } }
@@ -122,9 +122,11 @@ main, footer, .sticky-cta { position: relative; z-index: 2; }
   -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 60%, transparent); }
 .surface-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #FFFFFF 0, #EAF8FF 40%, rgba(234, 248, 255, 0) 100%); }
 .lp[data-theme="dark"] .surface-sky { background: linear-gradient(180deg, #3D7BA6 0, #1A5580 45%, rgba(17, 71, 110, 0) 100%); }
-.surface-ripple { position: absolute; inset: 0 -50% 0 0; background-image: url(/ocean/caustic-a.webp); background-size: 520px 120px; opacity: 0.9; animation: lp-ripple 18s linear infinite; }
-.surface-ripple.b { background-size: 740px 150px; opacity: 0.6; animation-duration: 27s; animation-direction: reverse; }
-.lp[data-theme="dark"] .surface-ripple { opacity: 0.35; }
+.surface-ripple { position: absolute; left: 0; top: 0; width: calc(100% + 760px); height: 100%; opacity: 0; transition: opacity 1.2s ease; animation: lp-ripple 18s linear infinite; }
+.surface-ripple[data-ready] { opacity: 0.9; }
+.surface-ripple.b[data-ready] { opacity: 0.6; }
+.surface-ripple.b { animation-duration: 27s; animation-direction: reverse; }
+.lp[data-theme="dark"] .surface-ripple[data-ready] { opacity: 0.35; }
 @keyframes lp-ripple { to { transform: translate3d(-520px, 0, 0); } }
 .surface-ripple.b { animation-name: lp-ripple-b; }
 @keyframes lp-ripple-b { to { transform: translate3d(-740px, 0, 0); } }
@@ -133,7 +135,7 @@ main, footer, .sticky-cta { position: relative; z-index: 2; }
 @media (min-width: 900px) { .surface { height: 180px; margin-top: -66px; } .surface-sun { top: 60px; width: 260px; height: 90px; } }
 
 .hero-grid { display: grid; gap: 28px; padding-top: 8px; }
-.h-hero { font-size: clamp(48px, 15vw, 128px); line-height: 0.92; font-weight: 800; letter-spacing: -0.045em; font-variation-settings: "opsz" 96; text-wrap: balance; }
+.h-hero { font-size: clamp(48px, 15vw, 128px); line-height: 0.92; font-weight: 800; letter-spacing: -0.045em; text-wrap: balance; }
 .lead { font-size: clamp(18px, 2vw, 22px); line-height: 1.45; margin-top: 18px; max-width: 34ch; color: var(--ink-2); }
 .lp[data-theme="dark"] .lead { color: #C7DDED; }
 .start { margin-top: 22px; display: grid; gap: 10px; max-width: 560px; padding: 8px; border-radius: 26px; background: var(--plate); border: 1px solid var(--line);
@@ -273,20 +275,21 @@ main, footer, .sticky-cta { position: relative; z-index: 2; }
 .cmp-note { font-size: 14px; color: var(--ink-2); }
 @media (min-width: 900px) { .price { padding: 120px 0; } .plans { grid-template-columns: 1fr 1fr; max-width: 940px; gap: 20px; } }
 
-.jelly-scene { inset: 0; overflow: hidden; }
+/* Les méduses vivent dans l'eau libre au-dessus et entre les blocs, jamais derrière un titre. */
+.jelly-scene { inset: -150px 0 0; overflow: hidden; }
 .jl { position: absolute; width: 90px; filter: drop-shadow(0 0 14px rgba(200, 236, 255, 0.35)); }
 .jl svg { display: block; width: 100%; height: auto; overflow: visible; }
 .jl-bell { position: relative; transform-origin: 50% 70%; animation: lp-pulse 3s var(--ease-in-out) infinite; animation-play-state: paused; }
 .jl-tent, .jl-arms { position: absolute; left: 0; top: 18%; width: 100%; transform-origin: 50% 0; animation: lp-trail 3s var(--ease-in-out) infinite; animation-play-state: paused; }
 .jl-arms { animation-delay: -0.4s; }
-.jl.j1 { left: 72%; top: 6%; animation: lp-jelly-drift 16s ease-in-out infinite alternate; animation-play-state: paused; }
-.jl.j2 { left: 8%; top: 40%; width: 60px; opacity: 0.75; animation: lp-jelly-drift 21s ease-in-out -6s infinite alternate; animation-play-state: paused; }
+.jl.j1 { left: 72%; top: 0; animation: lp-jelly-drift 16s ease-in-out infinite alternate; animation-play-state: paused; }
+.jl.j2 { left: 3%; top: 38%; width: 60px; opacity: 0.75; animation: lp-jelly-drift 21s ease-in-out -6s infinite alternate; animation-play-state: paused; }
 .jl.j3 { left: 86%; top: 62%; width: 52px; opacity: 0.6; animation: lp-jelly-drift 19s ease-in-out -11s infinite alternate; animation-play-state: paused; }
 [data-scene][data-on="true"] .jl, [data-scene][data-on="true"] .jl-bell, [data-scene][data-on="true"] .jl-tent, [data-scene][data-on="true"] .jl-arms { animation-play-state: running; }
 @keyframes lp-pulse { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.06, 0.84); } 60% { transform: scale(0.97, 1.04); } }
 @keyframes lp-trail { 0%, 100% { transform: scaleY(1) skewX(0); } 45% { transform: scaleY(1.07) skewX(4deg); } 75% { transform: scaleY(0.98) skewX(-3deg); } }
 @keyframes lp-jelly-drift { from { transform: translate3d(0, 30px, 0) rotate(-4deg); } to { transform: translate3d(-24px, -50px, 0) rotate(5deg); } }
-@media (max-width: 899px) { .jl.j3 { display: none; } .jl.j1 { left: 76%; top: 2%; width: 70px; } .jl.j2 { top: 52%; left: 2%; } }
+@media (max-width: 899px) { .jl.j3, .jl.j2 { display: none; } .jl.j1 { left: 68%; top: 6px; width: 64px; } }
 @media (min-width: 900px) { .jl.j1 { width: 120px; } .jl.j2 { width: 76px; } .jl.j3 { width: 64px; } }
 
 /* ---------- 800 m : questions ---------- */
@@ -339,3 +342,8 @@ footer a { color: #EAF6FF; min-height: 44px; display: inline-flex; align-items: 
   .fx-manta { transform: translate3d(calc(100vw - 180px), 70vh, 0) rotate(160deg); }
   .fx-bub { display: none; }
 }
+
+/* Décors dessinés en canvas (components/ocean/TextureCanvas.tsx) : visibles une fois prêts. */
+.fx-rays[data-ready] { opacity: var(--rays-op, 0.95); }
+.fx-caustic[data-ready] { opacity: var(--caustic-op); }
+canvas.fx-rays, canvas.fx-caustic, canvas.surface-ripple { display: block; }

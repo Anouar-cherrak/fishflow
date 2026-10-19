@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { Manta } from "@/components/ocean/Manta";
+import { TextureCanvas } from "@/components/ocean/TextureCanvas";
 
 // L'eau autour des pages de l'application : la lumière qui descend, des reflets du soleil, des particules
 // en suspension, quelques bulles et, de temps en temps, un banc de poissons au loin.
@@ -47,8 +48,8 @@ export function FarSchool({ y = "38%", delay = "-20s" }: { y?: string; delay?: s
 export function Ocean() {
   return (
     <div className="ff-ocean" aria-hidden="true">
-      <span className="ff-rays" />
-      <span className="ff-caustic" />
+      <TextureCanvas className="ff-rays" src="/ocean/rays.webp" />
+      <TextureCanvas className="ff-caustic" src="/ocean/caustic-top.webp" tileW={560} />
       <div className="ff-snow">
         {SNOW.map((s, i) => (
           <i key={i} style={{ "--x": s.x, "--y": s.y, "--s": `${s.s}px`, "--d": `${s.d}s`, "--delay": `${s.delay}s`, "--dx": s.dx, "--dy": s.dy } as CSSProperties} />
@@ -62,24 +63,20 @@ export function Ocean() {
   );
 }
 
-// Un petit coin de mer dans une carte, un bandeau ou un état vide : reflets du soleil, bulles et,
-// si « fish », une raie au loin. Toujours derrière le texte. Le bloc parent a la classe « ff-deco-host ».
+// Un petit coin de mer dans une carte, un bandeau ou un état vide : reflets du soleil et quelques bulles,
+// toujours derrière le texte. Le bloc parent a la classe « ff-deco-host ». (« fish » et « y » : anciens réglages, ignorés.)
 const DECO_BUBBLES = [
   { x: "8%", s: 8, d: 7, delay: -1 },
   { x: "16%", s: 5, d: 9, delay: -5 },
   { x: "26%", s: 10, d: 11, delay: -3 },
 ];
-export function SeaDecor({ fish = true, y = "64%" }: { fish?: boolean; y?: string }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function SeaDecor(_props: { fish?: boolean; y?: string }) {
   return (
     <span className="ff-deco" aria-hidden="true">
       {DECO_BUBBLES.map((b, i) => (
         <i key={i} style={{ "--x": b.x, "--s": `${b.s}px`, "--d": `${b.d}s`, "--delay": `${b.delay}s` } as CSSProperties} />
       ))}
-      {fish && (
-        <b style={{ "--y": y } as CSSProperties}>
-          <Manta rim={false} />
-        </b>
-      )}
     </span>
   );
 }

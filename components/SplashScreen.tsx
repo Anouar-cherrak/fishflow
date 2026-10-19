@@ -29,7 +29,7 @@ export function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] bg-[#173f63] flex flex-col items-center justify-center transition-opacity duration-400 ${
+      className={`ff-splash fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-400 ${
         fading ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -45,7 +45,7 @@ export function SplashScreen() {
       />
 
       <p
-        className="text-[#ffffff] font-semibold text-lg mt-4"
+        className="ff-wordmark text-[#EAF6FF] text-xl mt-4"
         style={{
           opacity: 0,
           animation: "ff-fade-up 0.5s ease forwards 0.9s",

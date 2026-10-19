@@ -11,6 +11,7 @@ import { track } from "@/lib/track";
 import type { User } from "@supabase/supabase-js";
 import { LIMITS } from "@/lib/limits";
 import { FishSchool } from "@/components/Ocean";
+import { burstBubbles } from "@/lib/bubbles";
 
 type Mode = "text" | "pdf" | "photo";
 type OutputKey = "summary" | "sheet" | "flashcards" | "quiz";
@@ -281,6 +282,8 @@ function GenererContent() {
       }
 
       setProgress(100);
+      // Fiche prête : une gerbe de bulles remonte pendant qu'on l'ouvre.
+      burstBubbles();
       // Une fiche enregistrée a sa propre adresse ; sinon on garde la page de secours.
       const destination = inserted?.id ? `/fiche/${inserted.id}?nouvelle=1` : "/result";
       setTimeout(() => router.push(destination), 150);
@@ -349,8 +352,8 @@ function GenererContent() {
   return (
     <AppShell size="wide">
       {loading && (
-        <div role="status" aria-live="polite" className="fixed inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[70] px-6 text-center">
-          {/* Un petit banc de poissons nage pendant que la fiche se prépare. */}
+        <div role="status" aria-live="polite" className="ff-dive fixed inset-0 flex flex-col items-center justify-center z-[70] px-6 text-center">
+          {/* La raie nage pendant que la fiche se prépare. */}
           <FishSchool />
           <p className="text-black font-semibold text-lg mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
           <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
