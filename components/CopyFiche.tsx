@@ -53,6 +53,8 @@ export function CopyFiche({
       if (String(error.message).includes("FREE_LIMIT")) {
         setFull(true);
         setMsg("Ton historique gratuit est plein (5 fiches). Supprime une ancienne fiche, ou passe Pro pour garder toutes tes fiches.");
+      } else if (String(error.message).includes("DAILY_LIMIT")) {
+        setMsg("Tu as enregistré beaucoup de fiches aujourd'hui (40 au maximum par jour). Réessaie demain.");
       } else {
         setMsg("La copie n'a pas marché. Réessaie dans un instant.");
       }

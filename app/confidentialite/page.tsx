@@ -40,6 +40,8 @@ export default function Confidentialite() {
               <li><strong className="text-black">OpenAI</strong> — traitement des contenus soumis pour générer les fiches de révision</li>
               <li><strong className="text-black">Stripe</strong> — traitement des paiements pour l'abonnement FishFlow Pro</li>
               <li><strong className="text-black">Vercel</strong> — hébergement du site</li>
+              <li><strong className="text-black">Resend</strong> — envoi des e-mails (code d'inscription, mot de passe oublié, rappels)</li>
+              <li><strong className="text-black">Wikipédia</strong> — recherche des articles pour « Apprendre » (seuls des mots-clés tirés de ta question sont envoyés, jamais ton compte)</li>
             </ul>
             <p className="mt-2">
               Ces prestataires peuvent traiter tes données dans le cadre strict de la fourniture de
@@ -50,8 +52,14 @@ export default function Confidentialite() {
           <section>
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">4. Conservation des données</h2>
             <p>
-              Tes données sont conservées tant que ton compte est actif. Tu peux demander la
-              suppression de ton compte et de tes données à tout moment.
+              Tes données sont conservées tant que ton compte est actif. Tu peux supprimer ton compte
+              et toutes tes données à tout moment (Paramètres), et les télécharger avant.
+            </p>
+            <p className="mt-2">
+              Sécurité : pour bloquer les robots (essais de mots de passe, envois en masse), FishFlow compte
+              les demandes pendant quelques minutes à quelques heures. Ces compteurs ne gardent qu'une empreinte
+              chiffrée de ton adresse IP et de ton e-mail, jamais l'adresse elle-même, et sont effacés
+              automatiquement (au plus un jour).
             </p>
           </section>
 
