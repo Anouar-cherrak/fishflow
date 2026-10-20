@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test:limites": "node --test tests/limites.test.mjs",
     "test:securite": "node --test tests/securite.test.mjs",
-    "test": "node --test tests/limites.test.mjs tests/securite.test.mjs"
+    "test": "node --test tests/limites.test.mjs tests/securite.test.mjs tests/stripe.test.mjs",
+    "test:stripe": "node --test tests/stripe.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

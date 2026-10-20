@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site-url";
 import { isProUser } from "@/lib/usage";
 
 export const runtime = "nodejs";
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const origin = req.headers.get("origin") || "http://localhost:3000";
+  const origin = siteUrl(req);
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",

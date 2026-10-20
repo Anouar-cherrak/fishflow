@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site-url";
 
 export const runtime = "nodejs";
 
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const origin = req.headers.get("origin") || "https://fishflow.fr";
+  const origin = siteUrl(req);
 
   const session = await stripe.billingPortal.sessions.create({
     customer: profile.stripe_customer_id,
