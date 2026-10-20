@@ -3,7 +3,8 @@ import { pendingCopyPath } from "@/components/CopyFiche";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabase, preloadSupabase } from "@/lib/supabase/lazy";
+import { preloadSupabase } from "@/lib/supabase/lazy";
+import { postAuth } from "@/lib/auth-client";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
 import { track } from "@/lib/track";
@@ -12,17 +13,6 @@ declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
   }
-}
-
-// Messages de Supabase traduits en français simple.
-function frenchAuthError(msg: string): string {
-  const m = msg.toLowerCase();
-  if (m.includes("already registered") || m.includes("already exists")) return "Un compte existe déjà avec cet email. Connecte-toi plutôt.";
-  if (m.includes("weak") || m.includes("pwned") || m.includes("leaked")) return "Ce mot de passe est trop facile à deviner. Choisis-en un autre.";
-  if (m.includes("password")) return "Ton mot de passe doit faire au moins 6 caractères.";
-  if (m.includes("email") && (m.includes("invalid") || m.includes("valid"))) return "Cette adresse email n'est pas valide. Vérifie-la.";
-  if (m.includes("rate") || m.includes("too many") || m.includes("seconds")) return "Trop d'essais d'un coup. Attends une minute puis réessaie.";
-  return "Le compte n'a pas pu être créé. Vérifie ton adresse email, puis réessaie.";
 }
 
 export default function Signup() {
@@ -42,22 +32,18 @@ export default function Signup() {
   const handleSignup = async () => {
     setLoading(true);
     setMessage(null);
-    const supabase = await getSupabase();
+    // Inscription par le serveur : limite d'emails envoyés, et même réponse que l'email soit déjà inscrit ou non.
+    const result = await postAuth("signup", { email, password });
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: undefined },
-    });
-
-    if (error) {
-      setMessage(frenchAuthError(error.message));
+    if (!result.ok) {
+      if (result.field) setFieldError({ [result.field]: result.error });
+      else setMessage(result.error ?? null);
       setLoading(false);
       return;
     }
 
     setStep("code");
-    setMessage("Un code vient de t'être envoyé par email.");
+    setMessage(result.message ?? "Un code vient de t'être envoyé par email.");
     setCooldown(60);
     setLoading(false);
   };
@@ -73,23 +59,18 @@ export default function Signup() {
     if (cooldown > 0) return;
     setMessage(null);
     setCooldown(60);
-    const { error } = await (await getSupabase()).auth.resend({ type: "signup", email });
-    setMessage(error ? "Impossible de renvoyer le code pour l'instant. Réessaie dans une minute." : "Nouveau code envoyé. Regarde aussi dans tes spams.");
+    const result = await postAuth("resend", { email });
+    setMessage(result.ok ? "Nouveau code envoyé. Regarde aussi dans tes spams." : result.error ?? null);
   };
 
   const handleVerify = async () => {
     setLoading(true);
     setMessage(null);
-    const supabase = await getSupabase();
+    // Vérification par le serveur (blocage progressif après 3 mauvais codes) : il pose lui-même le cookie de session.
+    const result = await postAuth("verify", { email, code });
 
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: code,
-      type: "signup",
-    });
-
-    if (error) {
-      setMessage("Ce code ne marche pas : il est faux ou trop ancien. Vérifie-le, ou demande un nouveau code.");
+    if (!result.ok) {
+      setMessage(result.error ?? null);
       setLoading(false);
       return;
     }
@@ -115,7 +96,7 @@ export default function Signup() {
           if (step === "form") {
             const next: { email?: string; password?: string } = {};
             if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = email.trim() ? "Cette adresse email semble incomplète. Exemple : toi@exemple.com" : "Écris ton adresse email. Exemple : toi@exemple.com";
-            if (password.length < 6) next.password = "Choisis un mot de passe d'au moins 6 caractères.";
+            if (password.length < 8) next.password = "Choisis un mot de passe d'au moins 8 caractères.";
             setFieldError(next);
             if (!next.email && !next.password) handleSignup();
           }
@@ -148,14 +129,14 @@ export default function Signup() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
-              placeholder="6 caractères minimum"
+              placeholder="8 caractères minimum"
               aria-invalid={!!fieldError.password || undefined}
               aria-describedby={fieldError.password ? "password-error" : "password-help"}
             />
             {fieldError.password ? (
               <p id="password-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.password}</p>
             ) : (
-              <p id="password-help" className="text-xs text-black/60 -mt-3 mb-4">Au moins 6 caractères. Évite « 123456 » : il est refusé.</p>
+              <p id="password-help" className="text-xs text-black/60 -mt-3 mb-4">Au moins 8 caractères. Évite « 12345678 » : il est refusé.</p>
             )}
 
             <label className="flex items-center gap-2 text-sm text-black/70 min-h-[44px] -mt-2 mb-2 cursor-pointer">

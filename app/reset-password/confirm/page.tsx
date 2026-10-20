@@ -30,8 +30,8 @@ function ConfirmContent() {
   }, []);
 
   const handleSubmit = async () => {
-    if (password.length < 6) {
-      setError("Le mot de passe doit faire au moins 6 caractères.");
+    if (password.length < 8) {
+      setError("Le mot de passe doit faire au moins 8 caractères.");
       return;
     }
     if (password !== confirmPassword) {
@@ -79,7 +79,7 @@ function ConfirmContent() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
-          placeholder="Au moins 6 caractères"
+          placeholder="Au moins 8 caractères"
         />
 
         <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Confirme le mot de passe</label>

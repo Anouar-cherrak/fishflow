@@ -13,7 +13,7 @@ const SKIP_EXACT = new Set([
   "/sitemap.xml",
   "/robots.txt",
 ]);
-const SKIP_PREFIXES = ["/p/", "/api/stripe/webhook", "/api/cron", "/api/admin", "/api/unsubscribe"];
+const SKIP_PREFIXES = ["/p/", "/api/stripe/webhook", "/api/cron", "/api/admin", "/api/unsubscribe", "/api/auth/"];
 
 export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;

@@ -81,8 +81,8 @@ export default function Parametres() {
   };
 
   const handleChangePassword = async () => {
-    if (newPassword.length < 6) {
-      setPasswordMessage("Le mot de passe doit faire au moins 6 caractères.");
+    if (newPassword.length < 8) {
+      setPasswordMessage("Le mot de passe doit faire au moins 8 caractères.");
       return;
     }
     setPasswordLoading(true);
@@ -234,7 +234,7 @@ export default function Parametres() {
               placeholder="Nouveau mot de passe"
               className="w-full min-h-[44px] px-3 border border-black/15 rounded-lg mb-1 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
             />
-            <p id="new-password-help" className="text-xs text-black/60 mb-3">6 caractères minimum.</p>
+            <p id="new-password-help" className="text-xs text-black/60 mb-3">8 caractères minimum.</p>
             {passwordMessage && <p role="status" className="text-sm text-black/70 mb-3">{passwordMessage}</p>}
             <button
               type="button"

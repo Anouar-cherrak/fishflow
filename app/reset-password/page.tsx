@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { postAuth } from "@/lib/auth-client";
 import { AuthLayout } from "@/components/AuthLayout";
 
 export default function ResetPasswordRequest() {
@@ -14,13 +14,11 @@ export default function ResetPasswordRequest() {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password/confirm`,
-    });
+    // Par le serveur : limite d'envois par adresse et par IP, et même réponse que le compte existe ou non.
+    const result = await postAuth("reset", { email: email.trim() });
     setLoading(false);
-    if (error) {
-      setError("Le lien n'a pas pu être envoyé. Vérifie ton adresse email, puis réessaie.");
+    if (!result.ok) {
+      setError(result.error ?? "Le lien n'a pas pu être envoyé. Vérifie ton adresse email, puis réessaie.");
       return;
     }
     setSent(true);

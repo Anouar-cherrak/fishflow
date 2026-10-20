@@ -4,7 +4,8 @@ import { pendingCopyPath } from "@/components/CopyFiche";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSupabase, preloadSupabase } from "@/lib/supabase/lazy";
+import { preloadSupabase } from "@/lib/supabase/lazy";
+import { postAuth } from "@/lib/auth-client";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
 
@@ -21,15 +22,11 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     setError(null);
-    const supabase = await getSupabase();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    // Connexion par le serveur (blocage progressif après 3 erreurs) : il pose lui-même le cookie de session.
+    const result = await postAuth("login", { email, password });
 
-    if (error) {
-      setError(
-        error.message.toLowerCase().includes("not confirmed")
-          ? "Ton email n'est pas encore confirmé. Refais l'inscription avec le même email pour recevoir un nouveau code (pense aux spams)."
-          : "Email ou mot de passe incorrect. Vérifie les deux, ou utilise « Mot de passe oublié ? »."
-      );
+    if (!result.ok) {
+      setError(result.error ?? null);
       setLoading(false);
       return;
     }
