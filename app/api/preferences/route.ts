@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { readJson } from "@/lib/security/validate";
 
 export const runtime = "nodejs";
 
@@ -37,7 +38,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
   }
 
-  const body = await req.json();
+  const body = await readJson(req, 1000);
+  if (!body) return NextResponse.json({ error: "Demande invalide." }, { status: 400 });
 
   // Whitelist strict des colonnes modifiables depuis ce endpoint — jamais is_pro, stripe_customer_id, etc.
   const update: Record<string, boolean> = {};

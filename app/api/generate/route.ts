@@ -5,6 +5,8 @@ import { costUsd, EngineError, makeContext, normalizeFiche, runEngine, transcrib
 import { isProUser } from "@/lib/usage";
 import { LIMITS } from "@/lib/limits";
 import { recordCost, reserveFor } from "@/lib/quota";
+import { clientIp, fingerprint, limiter, tooMany } from "@/lib/security/limiter";
+import { imageType, isPdf, withTimeout } from "@/lib/security/files";
 
 export const runtime = "nodejs";
 // Le moteur fait plusieurs étapes (plan, rédaction, contrôle, cartes) : il lui faut plus d'une minute sur un long cours.
@@ -18,12 +20,30 @@ const MAX_PHOTOS = 4;
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 const OUTPUT_KEYS = new Set<string>(["summary", "sheet", "flashcards", "quiz"]);
+const DIFFICULTIES = new Set(["facile", "moyen", "difficile"]);
+const LENGTHS = new Set(["court", "moyen", "detaille"]);
+// Garde-fous contre les fichiers piégés ou énormes (la limite d'envoi de Vercel est d'environ 4,5 Mo de toute façon).
+const MAX_BODY_BYTES = 4.5 * 1024 * 1024;
+const MAX_PDF_PAGES = 80;
+const PDF_READ_MS = 20_000;
+
+class PdfRefused extends Error {}
 
 async function extractPdfText(file: File): Promise<string> {
   const buffer = new Uint8Array(await file.arrayBuffer());
-  const pdf = await getDocumentProxy(buffer);
-  const { text } = await extractText(pdf, { mergePages: true });
-  return text;
+  // Le vrai contenu doit être un PDF (pas seulement le nom du fichier).
+  if (!isPdf(buffer)) throw new PdfRefused("Ce fichier n'est pas un vrai PDF. Choisis un fichier PDF, ou utilise « Photo » pour une image.");
+  return withTimeout(
+    (async () => {
+      const pdf = await getDocumentProxy(buffer);
+      if (pdf.numPages > MAX_PDF_PAGES) {
+        throw new PdfRefused(`Ce PDF a ${pdf.numPages} pages : ${MAX_PDF_PAGES} au maximum. Garde seulement les pages du chapitre à réviser.`);
+      }
+      const { text } = await extractText(pdf, { mergePages: true });
+      return text;
+    })(),
+    PDF_READ_MS
+  );
 }
 
 export async function POST(req: Request) {
@@ -35,6 +55,16 @@ export async function POST(req: Request) {
       { error: "Connecte-toi pour générer une fiche." },
       { status: 401 }
     );
+  }
+
+  // Limite de rythme dès l'arrivée, AVANT de lire les fichiers : un script ne peut pas faire travailler le serveur en boucle.
+  const early = await limiter.check([
+    { key: `generer:${fingerprint("user", user.id)}`, limit: 8, windowSeconds: 60 },
+    { key: `generer:${fingerprint("ip", clientIp(req))}`, limit: 25, windowSeconds: 60 },
+  ]);
+  if (early) return tooMany(early, "Doucement : trop de demandes en une minute. Attends un petit instant, puis réessaie.");
+  if (Number(req.headers.get("content-length") ?? "0") > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "Ton envoi est trop lourd (4 Mo au maximum). Envoie moins de fichiers à la fois." }, { status: 413 });
   }
 
   const pro = await isProUser(user.id);
@@ -68,12 +98,17 @@ export async function POST(req: Request) {
     );
   }
 
-  const mode = formData.get("mode") as string;
-  const outputsRaw = (formData.get("outputs") as string) || "summary,sheet,flashcards,quiz";
+  const field = (name: string) => {
+    const v = formData.get(name);
+    return typeof v === "string" ? v : "";
+  };
+  const mode = field("mode");
+  const outputsRaw = field("outputs").slice(0, 100) || "summary,sheet,flashcards,quiz";
   // On ne garde que les sorties connues : une valeur inventée ferait payer une génération vide.
   const outputs = Array.from(new Set(outputsRaw.split(",").filter((o) => OUTPUT_KEYS.has(o)))) as OutputKey[];
-  const difficulty = (formData.get("difficulty") as string) || "moyen";
-  const length = (formData.get("length") as string) || "moyen";
+  // Seulement des valeurs connues : rien d'inventé n'est recopié dans les consignes de l'IA.
+  const difficulty = DIFFICULTIES.has(field("difficulty")) ? field("difficulty") : "moyen";
+  const length = LENGTHS.has(field("length")) ? field("length") : "moyen";
 
   if (outputs.length === 0) {
     return NextResponse.json(
@@ -96,7 +131,7 @@ export async function POST(req: Request) {
 
   try {
     if (mode === "text") {
-      const text = formData.get("text") as string;
+      const text = field("text");
       if (!text || text.trim().length < 10) {
         return NextResponse.json(
           { error: "Ton cours est trop court. Colle au moins quelques phrases, puis réessaie." },
@@ -107,9 +142,9 @@ export async function POST(req: Request) {
       if (text.length > MAX_CHARS && !cheapRegen) return tooLong(text.length);
       sourceText = text.slice(0, MAX_CHARS);
     } else if (mode === "pdf") {
-      const files = formData.getAll("files") as File[];
-      const singleFile = formData.get("file") as File | null;
-      const allFiles = files.length > 0 ? files : singleFile ? [singleFile] : [];
+      const files = formData.getAll("files").filter((f): f is File => f instanceof File);
+      const singleFile = formData.get("file");
+      const allFiles = files.length > 0 ? files : singleFile instanceof File ? [singleFile] : [];
 
       if (allFiles.length === 0) {
         return NextResponse.json({ error: "Le PDF n'est pas arrivé. Choisis ton fichier à nouveau, puis réessaie." }, { status: 400 });
@@ -118,7 +153,10 @@ export async function POST(req: Request) {
       if (allFiles.length > MAX_PDF_FILES) {
         return NextResponse.json({ error: `${MAX_PDF_FILES} PDF au maximum à la fois.` }, { status: 400 });
       }
-      if (allFiles.some((f) => !(f instanceof File) || (f.type && !/pdf$/i.test(f.type)))) {
+      if (allFiles.reduce((sum, f) => sum + f.size, 0) > MAX_BODY_BYTES) {
+        return NextResponse.json({ error: "Ces PDF sont trop lourds ensemble (4 Mo au maximum). Envoie-en moins à la fois." }, { status: 413 });
+      }
+      if (allFiles.some((f) => f.type && !/pdf$/i.test(f.type))) {
         return NextResponse.json({ error: "Ce fichier n'est pas un PDF. Choisis un fichier qui finit par .pdf, ou utilise « Photo » pour une image." }, { status: 400 });
       }
 
@@ -136,7 +174,9 @@ export async function POST(req: Request) {
       for (const f of allFiles) {
         const extracted = await extractPdfText(f);
         if (extracted.trim().length > 0) {
-          textParts.push(`--- Document : ${f.name} ---\n${extracted}`);
+          // Le nom du fichier est raccourci et nettoyé avant d'être montré à l'IA.
+          const name = f.name.replace(/[\r\n]/g, " ").slice(0, 80);
+          textParts.push(`--- Document : ${name} ---\n${extracted}`);
         }
       }
       const text = textParts.join("\n\n");
@@ -178,14 +218,25 @@ export async function POST(req: Request) {
         );
       }
 
-      images = await Promise.all(
-        photos.map(async (f) => `data:${f.type};base64,${Buffer.from(await f.arrayBuffer()).toString("base64")}`)
-      );
+      const buffers = await Promise.all(photos.map(async (f) => new Uint8Array(await f.arrayBuffer())));
+      // Le vrai contenu doit être une image (pas un autre fichier renommé en « .jpg »).
+      const types = buffers.map(imageType);
+      if (types.some((t) => !t)) {
+        return NextResponse.json(
+          { error: "Ce fichier n'est pas une vraie photo. Utilise une image JPG, PNG ou WebP." },
+          { status: 400 }
+        );
+      }
+      images = buffers.map((b, i) => `data:${types[i]};base64,${Buffer.from(b).toString("base64")}`);
     } else {
       return NextResponse.json({ error: "Mode invalide." }, { status: 400 });
     }
   } catch (err) {
-    console.error("Erreur lecture/extraction fichier:", err);
+    if (err instanceof PdfRefused) return NextResponse.json({ error: err.message }, { status: 400 });
+    if ((err as { code?: string })?.code === "TIMEOUT") {
+      return NextResponse.json({ error: "Ce PDF est trop long à lire. Garde seulement les pages du chapitre à réviser, puis réessaie." }, { status: 400 });
+    }
+    console.error("Erreur lecture/extraction fichier:", (err as Error)?.message || err);
     return NextResponse.json(
       { error: "Ce fichier n'a pas pu être lu. Il est peut-être abîmé : essaie avec un autre fichier." },
       { status: 400 }

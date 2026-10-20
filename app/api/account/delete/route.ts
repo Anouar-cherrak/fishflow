@@ -21,11 +21,12 @@ export async function POST() {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (profile?.is_pro && profile?.stripe_customer_id) {
+  if (profile?.stripe_customer_id) {
     try {
-      const subs = await stripe.subscriptions.list({ customer: profile.stripe_customer_id, status: "active" });
+      // Tous les abonnements encore en cours (actif, impayé, en essai…), pas seulement « actif » : plus rien ne doit être prélevé.
+      const subs = await stripe.subscriptions.list({ customer: profile.stripe_customer_id, status: "all" });
       for (const sub of subs.data) {
-        await stripe.subscriptions.cancel(sub.id);
+        if (sub.status !== "canceled" && sub.status !== "incomplete_expired") await stripe.subscriptions.cancel(sub.id);
       }
     } catch (err) {
       console.error("Erreur annulation abonnement Stripe lors de la suppression du compte:", err);

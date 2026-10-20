@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { isProUser } from "@/lib/usage";
 import { recordCost, reserveFor } from "@/lib/quota";
 import { answerQuestion, apprendreCostUsd } from "@/lib/apprendre-engine";
+import { clientIp, fingerprint, limiter, tooMany } from "@/lib/security/limiter";
+import { readJson } from "@/lib/security/validate";
 
 export const runtime = "nodejs";
 // Recherche dans Wikipédia + lecture des articles + réponse : environ 10 à 20 secondes.
@@ -24,13 +26,16 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return fail("Connecte-toi pour utiliser cette fonctionnalité.", 401);
 
-  let question = "";
-  try {
-    const body = (await req.json()) as { question?: unknown };
-    question = asText(body.question);
-  } catch {
-    return fail("Ta question n'a pas pu être lue. Réessaie.", 400);
-  }
+  // Limite de rythme dès l'arrivée (en plus des limites d'usage plus bas).
+  const early = await limiter.check([
+    { key: `apprendre:${fingerprint("user", user.id)}`, limit: 8, windowSeconds: 60 },
+    { key: `apprendre:${fingerprint("ip", clientIp(req))}`, limit: 25, windowSeconds: 60 },
+  ]);
+  if (early) return tooMany(early, "Doucement : trop de questions en une minute. Attends un petit instant, puis réessaie.");
+
+  const body = await readJson(req, 4000);
+  if (!body) return fail("Ta question n'a pas pu être lue. Réessaie.", 400);
+  const question = asText(body.question);
   if (question.length < MIN_QUESTION) return fail("Écris une question un peu plus longue.", 400);
   if (question.length > MAX_QUESTION) return fail(`Ta question est trop longue : ${MAX_QUESTION} caractères au maximum. Raccourcis-la.`, 400);
 

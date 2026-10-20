@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { limitByIp } from "@/lib/security/limiter";
+import { readJson } from "@/lib/security/validate";
 
 export const runtime = "nodejs";
 
@@ -12,7 +14,10 @@ const ONCE = new Set(["signup", "first_fiche"]);
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as { name?: unknown; source?: unknown };
+    // Un script ne peut pas remplir la table des mesures : 30 événements par minute et par adresse IP au plus.
+    if (await limitByIp(req, "track", 30)) return new NextResponse(null, { status: 204 });
+    const body = (await readJson(req, 1000)) as { name?: unknown; source?: unknown } | null;
+    if (!body) return new NextResponse(null, { status: 204 });
     const name = typeof body.name === "string" ? body.name : "";
     if (!ALLOWED.has(name)) return new NextResponse(null, { status: 204 });
 
