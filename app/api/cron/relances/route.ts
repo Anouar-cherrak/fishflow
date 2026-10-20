@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendMail, emailLayout, unsubscribeHeaders } from "@/lib/resend";
 import { isCronAuthorized } from "@/lib/cron-auth";
+import { unsubscribeUrl } from "@/lib/unsubscribe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -65,7 +66,7 @@ export async function GET(req: Request) {
             `<p style="color:#333333;font-size:15px;">Un nouveau mois commence : tes fiches gratuites sont de retour ! Transforme un nouveau cours en fiche de révision en quelques secondes.</p>`,
             undefined,
             undefined,
-            `https://fishflow.fr/api/unsubscribe?id=${user.id}`
+            unsubscribeUrl(user.id)
           ),
           headers: unsubscribeHeaders(user.id),
         });
@@ -99,7 +100,7 @@ export async function GET(req: Request) {
               `<p style="color:#333333;font-size:15px;">Tu n'as pas créé de fiche depuis un moment. Un cours à réviser ? FishFlow en fait une fiche en quelques secondes.</p>`,
               undefined,
               undefined,
-              `https://fishflow.fr/api/unsubscribe?id=${user.id}`
+              unsubscribeUrl(user.id)
             ),
             headers: unsubscribeHeaders(user.id),
           });

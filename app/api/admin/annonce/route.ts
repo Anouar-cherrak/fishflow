@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendMail, emailLayout, unsubscribeHeaders } from "@/lib/resend";
 import { isCronAuthorized } from "@/lib/cron-auth";
+import { unsubscribeUrl } from "@/lib/unsubscribe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
           `<p style="color:#333333;font-size:15px;">${message}</p>`,
           undefined,
           undefined,
-          `https://fishflow.fr/api/unsubscribe?id=${user.id}`
+          unsubscribeUrl(user.id)
         ),
         headers: unsubscribeHeaders(user.id),
       });

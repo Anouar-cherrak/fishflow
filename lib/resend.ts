@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { unsubscribeUrl as signedUnsubscribeUrl } from "./unsubscribe";
 
 // Créé seulement au premier envoi : le build n'a pas besoin de la clé.
 let client: Resend | null = null;
@@ -54,7 +55,7 @@ export function emailLayout(
 
 // Fabrique le header List-Unsubscribe (norme reconnue par Gmail/Outlook pour juger la réputation d'un expéditeur).
 export function unsubscribeHeaders(userId: string) {
-  const url = `https://fishflow.fr/api/unsubscribe?id=${userId}`;
+  const url = signedUnsubscribeUrl(userId);
   return {
     "List-Unsubscribe": `<${url}>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

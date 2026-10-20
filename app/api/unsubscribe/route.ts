@@ -1,12 +1,15 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isValidUnsubscribe } from "@/lib/unsubscribe";
 
 export const runtime = "nodejs";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function optOut(req: Request): Promise<boolean> {
-  const userId = new URL(req.url).searchParams.get("id");
-  if (!userId || !UUID.test(userId)) return false;
+  const params = new URL(req.url).searchParams;
+  const userId = params.get("id");
+  // Le lien doit porter la signature de FishFlow : on ne peut pas désinscrire quelqu'un d'autre en devinant son identifiant.
+  if (!userId || !UUID.test(userId) || !isValidUnsubscribe(userId, params.get("t"))) return false;
   const admin = createAdminClient();
   await admin.from("profiles").update({ email_opt_out: true }).eq("id", userId);
   return true;
@@ -14,7 +17,10 @@ async function optOut(req: Request): Promise<boolean> {
 
 export async function GET(req: Request) {
   if (!(await optOut(req))) {
-    return new Response("Lien invalide.", { status: 400 });
+    return new Response("Ce lien n'est pas valable. Pour ne plus recevoir d'e-mails, va dans FishFlow, puis Paramètres.", {
+      status: 400,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
 
   return new Response(

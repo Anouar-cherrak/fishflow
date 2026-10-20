@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendMail, emailLayout, unsubscribeHeaders } from "@/lib/resend";
 import { isCronAuthorized } from "@/lib/cron-auth";
+import { unsubscribeUrl } from "@/lib/unsubscribe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -67,7 +68,7 @@ export async function GET(req: Request) {
           `<p style="color:#333333;font-size:15px;">Tu as <strong>${n} carte${n > 1 ? "s" : ""}</strong> à revoir aujourd'hui. Ça prend quelques minutes, et c'est comme ça que tu retiens pour de bon.</p>`,
           "Revoir mes cartes",
           "https://fishflow.fr/aujourdhui",
-          `https://fishflow.fr/api/unsubscribe?id=${userId}`
+          unsubscribeUrl(userId)
         ),
         headers: unsubscribeHeaders(userId),
       });
