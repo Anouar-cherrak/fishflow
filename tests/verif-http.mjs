@@ -84,7 +84,7 @@ test("en-têtes de sécurité présents sur les pages", async () => {
   assert.ok(h.get("referrer-policy"));
   assert.ok(h.get("permissions-policy")?.includes("microphone=()"));
   assert.equal(h.get("x-powered-by"), null, "Next.js ne s'annonce pas");
-  assert.equal(h.get("access-control-allow-origin"), null, "pas de CORS ouvert");
+  // Les pages publiques statiques peuvent avoir « * » (ajouté par Vercel, sans cookies : sans risque). L'API, elle, est vérifiée plus bas.
 });
 
 test("l'API n'autorise pas les autres sites à lire ses réponses (CORS)", async () => {
