@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { setDarkClass } from "@/lib/set-theme";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
@@ -33,7 +34,7 @@ export function ThemeToggle() {
   const toggle = () => {
     const next = !isDark;
     setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
+    setDarkClass(next);
     try {
       localStorage.setItem("ff-theme2", next ? "dark" : "light");
     } catch {}

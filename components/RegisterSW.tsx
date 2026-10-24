@@ -13,8 +13,9 @@ export function RegisterSW() {
 
     const register = () => {
       navigator.serviceWorker.register("/sw.js").then((registration) => {
-        // Vérifie s'il existe une nouvelle version toutes les 30 secondes
+        // Vérifie s'il existe une nouvelle version toutes les 30 secondes (pas quand l'onglet est caché : rien ne tourne pour rien)
         timer = window.setInterval(() => {
+          if (document.hidden) return;
           registration.update().catch(() => {});
         }, 30000);
 

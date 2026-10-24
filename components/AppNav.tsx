@@ -9,6 +9,7 @@ import { Wordmark } from "@/components/Logo";
 import { BrandMark } from "@/components/BrandMark";
 import { StreakFlame } from "@/components/StreakFlame";
 import { BottomTabs } from "@/components/BottomTabs";
+import { setDarkClass } from "@/lib/set-theme";
 
 const LINKS = [
   { href: "/aujourdhui", label: "Aujourd'hui", hint: "Ton objectif, tes cartes, ta progression" },
@@ -64,7 +65,7 @@ export function AppNav() {
   const toggleTheme = () => {
     const next = !dark;
     setDark(next);
-    document.documentElement.classList.toggle("dark", next);
+    setDarkClass(next);
     try {
       localStorage.setItem("ff-theme2", next ? "dark" : "light");
     } catch {}

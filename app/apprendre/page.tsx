@@ -260,7 +260,7 @@ export default function Apprendre() {
                           decoding="async"
                           className="w-full h-32 object-cover"
                         />
-                        <figcaption className="px-2 py-1.5 text-[11px] leading-snug text-black/50">
+                        <figcaption className="px-2 py-1.5 text-xs leading-snug text-black/50">
                           <a
                             href={image.pageUrl}
                             target="_blank"

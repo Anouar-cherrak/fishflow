@@ -270,7 +270,7 @@ export default function Examens() {
 
                 <div>
                   <div className="h-2.5 rounded-full bg-black/10 overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Cartes connues">
-                    <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${percent}%` }} />
+                    <div className="h-full rounded-full bg-accent transition-transform duration-500 ease-out" style={{ transform: `translateX(${percent - 100}%)` }} />
                   </div>
                   <p className="text-sm text-black/65 mt-2">{mastered} cartes connues sur {total}</p>
                 </div>

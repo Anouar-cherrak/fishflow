@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { FlameIcon, flameState } from "@/components/StreakFlame";
 import { AppShell } from "@/components/AppShell";
 import { SeaDecor } from "@/components/Ocean";
+import { PageSkeleton } from "@/components/PageSkeleton";
 import { questionOfTheDay } from "@/lib/curiosity";
 import {
   countDueCards,
@@ -119,7 +120,7 @@ export default function Aujourdhui() {
   if (!ready) {
     return (
       <AppShell size="wide">
-        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement...</p>
+        <PageSkeleton cards={3} />
       </AppShell>
     );
   }

@@ -358,8 +358,8 @@ function GenererContent() {
           <p className="text-black font-semibold text-lg mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
           <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
             <div
-              className="h-full ff-progress-shimmer transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
+              className="h-full ff-progress-shimmer w-full transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(${progress - 100}%)` }}
             />
           </div>
           <p className="text-black/60 text-sm mt-3">
@@ -536,7 +536,7 @@ function GenererContent() {
                   {files.map((f, i) => (
                     <li key={`${f.name}-${i}`} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-black/15 bg-white">
                       <PhotoThumb file={f} alt={`Page ${i + 1}`} />
-                      <span className="absolute left-1 top-1 text-[11px] font-bold px-1.5 rounded-full bg-[#000000]/70 text-[#ffffff]">{i + 1}</span>
+                      <span className="absolute left-1 top-1 text-xs font-bold px-1.5 rounded-full bg-[#000000]/70 text-[#ffffff]">{i + 1}</span>
                       <button
                         type="button"
                         aria-label={`Retirer la page ${i + 1}`}

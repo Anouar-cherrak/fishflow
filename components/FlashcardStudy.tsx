@@ -181,7 +181,7 @@ export function FlashcardStudy({
         </div>
 
         <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden mb-5">
-          <div className="h-full bg-accent transition-all duration-300" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-accent transition-transform duration-300" style={{ transform: `translateX(${progress - 100}%)` }} />
         </div>
 
         {done ? (

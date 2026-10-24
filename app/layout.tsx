@@ -6,6 +6,7 @@ import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ThemeSync } from "@/components/ThemeSync";
+import { ZoomGuard } from "@/components/ZoomGuard";
 
 // Deux polices seulement, préchargées : Figtree pour le texte, Bricolage Grotesque pour les titres.
 const figtree = Figtree({
@@ -50,6 +51,11 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#E4F5FE" },
     { media: "(prefers-color-scheme: dark)", color: "#0B243B" },
   ],
+  // Le site garde toujours sa taille normale, comme une appli : pas de zoom (voir aussi components/ZoomGuard.tsx).
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   // L'appli installée passe sous la barre d'état de l'iPhone : les marges « safe-area » du CSS laissent la place à l'encoche.
   viewportFit: "cover",
 };
@@ -75,6 +81,7 @@ export default function RootLayout({
         <RegisterSW />
         <SplashScreen />
         <ThemeSync />
+        <ZoomGuard />
         <OnboardingGate />
         {children}
 

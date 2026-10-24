@@ -9,6 +9,7 @@ import { TrackedLink } from "@/components/TrackedLink";
 import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 import { trackEvent } from "@/lib/tracking";
 import { burstBubbles } from "@/lib/bubbles";
+import { setDarkClass } from "@/lib/set-theme";
 import { depthClick, disableDepthSound, enableDepthSound } from "./depth-sound";
 import { AskShow, CardsShow, DailyShow, FicheShow, HeroStage, QuizShow, StepPaste, StepRead, StepReady } from "./Objects";
 
@@ -101,7 +102,7 @@ export function Landing() {
     setTheme(next);
     try {
       localStorage.setItem("ff-theme2", next);
-      document.documentElement.classList.toggle("dark", next === "dark");
+      setDarkClass(next === "dark");
     } catch {}
   };
 

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { SeaDecor } from "@/components/Ocean";
+import { PageSkeleton } from "@/components/PageSkeleton";
 import { countDueCards } from "@/lib/reviews";
 
 type FicheRow = {
@@ -164,7 +165,7 @@ export default function MesFiches() {
   if (loading) {
     return (
       <AppShell size="wide">
-        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement…</p>
+        <PageSkeleton />
       </AppShell>
     );
   }
@@ -347,7 +348,7 @@ export default function MesFiches() {
                 return (
                   <li
                     key={fiche.id}
-                    className="min-w-0 bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-4 ff-fade-up ff-card"
+                    className={`min-w-0 bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-4 ff-fade-up ff-card${i >= 12 ? " ff-lazy-item" : ""}`}
                     style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
                   >
                     <div className="min-w-0 flex-1">

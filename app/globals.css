@@ -93,7 +93,20 @@
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Même couleur que la page : pas de bande blanche quand l'iPhone « rebondit » en haut ou en bas. */
+  background: var(--ff-back);
 }
+/* Changement de thème (lib/set-theme.ts) : toutes les couleurs changent en même temps. */
+.ff-theme-switch, .ff-theme-switch * { transition: none !important; }
+/* Pas de zoom au pincement ni au double appui ; le défilement (vertical et horizontal) marche partout.
+   Sur chaque élément, car une zone qui défile seule (liste, tableau) repartirait sinon des réglages par défaut. */
+html, body, body * { touch-action: pan-x pan-y; }
+/* Appli installée : pas de rebond de toute la page (comme une vraie appli). Dans le navigateur, on garde
+   le « tirer pour actualiser ». Les zones qui défilent seules ne font pas défiler la page derrière elles. */
+@media (display-mode: standalone) { html, body { overscroll-behavior-y: none; } }
+.overflow-y-auto, .overflow-auto, .ff-tuto { overscroll-behavior-y: contain; }
+.overflow-x-auto, .overflow-auto { overscroll-behavior-x: contain; }
 body {
   font-family: var(--font-body);
   background: var(--ff-back);
@@ -103,7 +116,6 @@ body {
 .font-display, h1, h2 { font-family: var(--font-display); }
 h1, h2, h3 { text-wrap: balance; }
 ::selection { background: #FFF4B1; color: #002A59; }
-:where(button, a, [role="button"], summary, label) { touch-action: manipulation; }
 :where(button, [role="button"], .ff-primary, .ff-secondary, .ff-tab) { -webkit-user-select: none; user-select: none; }
 * { scrollbar-color: color-mix(in srgb, var(--ff-fg) 26%, transparent) transparent; }
 input, textarea, select { caret-color: var(--ff-accent); }
@@ -177,13 +189,15 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   position: absolute;
   left: 0;
   bottom: -2px;
-  width: 0;
+  width: 100%;
   height: 1px;
   background: currentColor;
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .ff-link-underline:hover::after {
-  width: 100%;
+  transform: scaleX(1);
 }
 
 .ff-input {
@@ -191,13 +205,19 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 }
 
 /* Empêche le zoom automatique de Safari iOS quand on touche un champ
-   (il zoome dès qu'un input a une taille de police < 16px). */
-@media (max-width: 640px) {
+   (il zoome dès qu'un input a une taille de police < 16px). Téléphones et tablettes (écran tactile, iPad compris). */
+@media (max-width: 640px), (pointer: coarse) {
   input,
   select,
   textarea {
     font-size: 16px;
   }
+}
+
+/* Téléphone : aucun texte sous 14 px, pour lire sans zoomer (les petits textes « text-xs » passent à 14 px).
+   Seules exceptions : les dessins miniatures de l'accueil et de l'aide, qui ne sont que des illustrations. */
+@media (max-width: 640px) {
+  :root { --text-xs: 0.875rem; --text-xs--line-height: calc(1.25 / 0.875); }
 }
 
 .ff-progress-shimmer {
@@ -209,6 +229,12 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 .ff-float {
   animation: floatSlow 5s ease-in-out infinite;
 }
+
+/* Squelette de chargement (components/PageSkeleton.tsx) : il « respire » par l'opacité seulement. */
+.ff-skel { border-radius: 14px; background: color-mix(in srgb, var(--ff-fg) 9%, transparent); animation: pulseGlow 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ff-skel { animation: none; } }
+/* Longue liste de fiches : les cartes hors de l'écran ne sont pas dessinées tant qu'on n'y arrive pas. */
+.ff-lazy-item { content-visibility: auto; contain-intrinsic-size: auto 240px; }
 
 .ff-glow-dot {
   animation: pulseGlow 2.4s ease-in-out infinite;
@@ -396,14 +422,14 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   padding: 10px 16px max(24px, env(safe-area-inset-bottom));
   clip-path: inset(0 0 100% 0);
   visibility: hidden;
-  transition: clip-path 0.55s var(--ff-ease-drawer), visibility 0s 0.55s;
+  transition: clip-path 0.25s var(--ff-ease-drawer), visibility 0s 0.25s;
 }
 @media (min-width: 768px) { .ff-menu { padding-inline: 32px; } }
 @media (min-width: 1024px) { .ff-menu { padding-inline: max(40px, calc((100% - 1280px) / 2 + 56px)); } }
 .ff-menu[data-open="true"] {
   clip-path: inset(0 0 0 0);
   visibility: visible;
-  transition: clip-path 0.55s var(--ff-ease-drawer), visibility 0s;
+  transition: clip-path 0.25s var(--ff-ease-drawer), visibility 0s;
 }
 .ff-menu-link {
   display: block;
@@ -412,7 +438,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   padding: 3px 0 8px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(26px, min(8vw, 4vh), 60px);
+  font-size: clamp(26px, min(8vw, 4svh), 60px);
   line-height: 1.05;
   letter-spacing: -0.035em;
   color: #EEF6FF;
@@ -421,7 +447,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 .ff-menu-link > span {
   display: block;
   transform: translateY(110%);
-  transition: transform 0.6s var(--ff-ease-out);
+  transition: transform 0.25s var(--ff-ease-out);
 }
 .ff-menu[data-open="true"] .ff-menu-link > span { transform: none; }
 .ff-menu[data-open="true"] .ff-menu-link:nth-child(2) > span { transition-delay: 30ms; }
@@ -476,6 +502,8 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 .bg-accent { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 58%); }
 button.bg-accent, a.bg-accent { transition: transform var(--ff-fast) var(--ff-ease-out), filter var(--ff-base) ease; }
 button.bg-accent:active:not(:disabled), a.bg-accent:active { transform: scale(0.97); }
+/* Les autres boutons (liens texte, puces, croix de fermeture) pâlissent un instant sous le doigt. */
+:where(button, [role="button"]):not(.ff-btn, .ff-card, .ff-round, .ff-tab, .ff-primary, .ff-secondary, .bg-accent, :disabled):active { opacity: 0.7; }
 .text-on-accent { color: var(--ff-on-accent); }
 
 /* Champs : un bassin clair, le bord s'allume en bleu au focus. */
@@ -490,7 +518,8 @@ button.bg-accent:active:not(:disabled), a.bg-accent:active { transform: scale(0.
 input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 
 /* Vignettes animées (explications en mouvement) */
-@keyframes ffBeam { from { top: -30%; } to { top: 110%; } }
+/* Le faisceau descend par transform (pas par « top ») : aucun recalcul de la page à chaque image. */
+@keyframes ffBeam { from { transform: translateY(0); } to { transform: translateY(290px); } } /* de -30 % à 110 % de la feuille (208 px) */
 @keyframes ffPop { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
 
 /* Animation du chargement : un cours est lu (le faisceau passe), puis la fiche se remplit. */
@@ -881,7 +910,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-height: 54px; border-radius: 20px; text-decoration: none;
   color: var(--ff-fg-2);
-  font-size: 12px; font-weight: 700;
+  font-size: 14px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap;
   transition: color var(--ff-base) ease, transform var(--ff-fast) var(--ff-ease-out), background-color var(--ff-base) ease;
 }
 .ff-tab:active { transform: scale(0.94); }
@@ -1051,6 +1080,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 
 /* Voile derrière les fenêtres : de l'eau profonde, légèrement floutée. */
 .ff-veil { background: rgba(0, 18, 52, 0.62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+/* Fenêtres (modales) : elles s'ouvrent vite et en douceur, sans attendre. */
+.ff-veil.ff-fade, .ff-veil .ff-fade-up { animation-duration: 0.2s; }
 /* Écran de démarrage de l'appli installée : la lumière descend dans l'eau profonde. */
 .ff-splash { background: radial-gradient(90% 60% at 50% -10%, rgba(141, 206, 255, 0.3), transparent 60%), linear-gradient(180deg, #013D7D, #011B46); }
 
