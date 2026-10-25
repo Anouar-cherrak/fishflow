@@ -132,7 +132,10 @@ export function FlashcardStudy({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") return;
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === "BUTTON" || target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+      // La carte elle-même a le focus au départ : les flèches doivent marcher dessus (Espace et Entrée la retournent déjà, comme un bouton).
+      const onCard = !!target?.closest(".ff-flip");
+      if (onCard && (e.key === " " || e.key === "Enter")) return;
+      if (target && !onCard && (target.tagName === "BUTTON" || target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
         return;
       }
       if (done) return;

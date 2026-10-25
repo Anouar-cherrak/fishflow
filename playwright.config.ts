@@ -11,6 +11,8 @@ export default defineConfig({
   timeout: 45_000,
   fullyParallel: true,
   workers: 4,
+  // Un test qui échoue est relancé une fois (le quiz a échoué 1 fois sur 112 passages : à surveiller).
+  retries: 1,
   reporter: [["list"]],
   use: { baseURL: BASE, trace: "off" },
   projects: [

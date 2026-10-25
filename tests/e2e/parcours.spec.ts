@@ -36,11 +36,12 @@ test("inscription : formulaire, code reçu, arrivée sur Générer", async ({ pa
   await page.getByLabel("Mot de passe", { exact: true }).fill("un-mot-de-passe-solide");
   await page.getByRole("button", { name: "Créer mon compte" }).click();
   await page.getByLabel("Code reçu par email").fill("123456");
+  await page.getByRole("button", { name: "Confirmer mon compte" }).click();
   await expect(page).toHaveURL(/\/generer/);
   expect(errors).toEqual([]);
 });
 
-test("connexion puis déconnexion", async ({ page, context }, info) => {
+test("connexion", async ({ page, context }) => {
   await page.route("**/api/auth/login", async (r) => {
     await signIn(context);
     await r.fulfill({ json: { message: "ok" } });
@@ -51,10 +52,15 @@ test("connexion puis déconnexion", async ({ page, context }, info) => {
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page).toHaveURL(/\/generer/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Crée ta fiche");
+});
 
+test("déconnexion", async ({ page, context }) => {
+  await signIn(context);
+  await page.goto("/generer");
   await page.getByRole("button", { name: "Ouvrir le menu" }).click();
   await page.getByRole("button", { name: "Déconnexion" }).click();
-  await expect(page).toHaveURL(new RegExp(`${info.project.use.baseURL ?? ""}/?$`));
+  // Retour à l'accueil.
+  await expect(page).toHaveURL(/:\d+\/?$/);
 });
 
 test("génération d'une fiche : chargement par étapes, puis la fiche", async ({ page, context }) => {
@@ -69,7 +75,7 @@ test("génération d'une fiche : chargement par étapes, puis la fiche", async (
   await page.getByRole("button", { name: "Créer ma fiche", exact: true }).click();
   const loader = page.locator(".ff-loader");
   await expect(loader).toBeVisible();
-  await expect(loader.getByText("Je lis ton cours…")).toBeVisible();
+  await expect(loader.locator("li", { hasText: "Je lis ton cours…" })).toBeVisible();
   // L'écran couvre toute la page (rien ne transparaît, rien ne passe devant).
   const box = await loader.boundingBox();
   const vp = page.viewportSize()!;
@@ -88,7 +94,7 @@ test("création en erreur : message clair et Réessayer", async ({ page, context
   await page.goto("/generer");
   await page.locator("#cours").fill("Un cours de test. ".repeat(10));
   await page.getByRole("button", { name: "Créer ma fiche", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("Service surchargé");
+  await expect(page.locator(".ff-loader [role=alert]")).toContainText("Service surchargé");
   await page.getByRole("button", { name: "Réessayer" }).click();
   await expect(page).toHaveURL(/\/fiche\/f0/);
   expect(calls).toBe(2);
@@ -108,8 +114,10 @@ test("flashcards : retourner chaque carte et finir la série", async ({ page, co
 test("quiz : répondre et voir son score", async ({ page, context }) => {
   await signIn(context);
   await page.goto("/fiche/f0");
+  await page.waitForLoadState("networkidle");
   const quiz = page.getByText("Que produit la photosynthèse ?");
   await quiz.scrollIntoViewIfNeeded();
+  await expect(page.getByRole("button", { name: /Du glucose et de l'O₂/ })).toBeVisible();
   await page.getByRole("button", { name: /Du glucose et de l'O₂/ }).click();
   await page.getByRole("button", { name: "Question suivante" }).click();
   await page.getByRole("button", { name: /Par les stomates/ }).click();
@@ -132,6 +140,8 @@ test("paiement (mode test simulé) : Passer Pro ouvre le paiement", async ({ pag
 
 test("accessibilité (axe) : aucune erreur grave sur les pages principales", async ({ page, context }) => {
   await signIn(context);
+  // Page immobile : on mesure les couleurs finales, pas un élément en plein fondu d'apparition.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   for (const path of ["/", "/login", "/pricing", "/generer", "/mes-fiches", "/fiche/f0", "/aujourdhui", "/parametres", "/cgu"]) {
     await page.goto(path);
     await page.waitForLoadState("networkidle");
