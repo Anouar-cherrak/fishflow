@@ -62,3 +62,9 @@ fs.writeFileSync("public/favicon.ico", ico([[16, fav[16]], [32, fav[32]], [48, f
 fs.writeFileSync(`${OUT}/logo-email.png`, await png(tuile, 120));
 
 console.log("Raie :", d.length, "caractères de tracé. Fichiers :", fs.readdirSync(OUT).join(", "));
+
+// Le tracé de la raie, pour les animations dessinées dans les pages (raie qui nage, raie qui passe).
+fs.writeFileSync(
+  "lib/raie-path.ts",
+  `// Généré par scripts/brand.mjs depuis brand/raie.svg (ne pas modifier à la main).\nexport const RAIE_VIEWBOX = "0 0 512 418";\nexport const RAIE_PATH =\n  "${d}";\n`
+);

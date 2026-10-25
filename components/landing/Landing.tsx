@@ -12,6 +12,8 @@ import { burstBubbles } from "@/lib/bubbles";
 import { setDarkClass } from "@/lib/set-theme";
 import { depthClick, disableDepthSound, enableDepthSound } from "./depth-sound";
 import { AskShow, CardsShow, DailyShow, FicheShow, HeroStage, QuizShow, StepPaste, StepRead, StepReady } from "./Objects";
+import { Angler, DeepDefs, Jellies, MantaPass, School, Surface } from "./Deep";
+import { FAQ, TRUST } from "./content";
 
 type Theme = "light" | "dark";
 
@@ -76,6 +78,11 @@ export function Landing() {
   const root = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [theme, setTheme] = useState<Theme>("dark");
+  // Lumière qui baisse en descendant : moins forte en clair (le texte sombre reste lisible sur l'eau).
+  const dimMax = useRef(0.55);
+  useEffect(() => {
+    dimMax.current = theme === "dark" ? 0.55 : 0.16;
+  }, [theme]);
   const [signedIn, setSignedIn] = useState(false);
   const [sound, setSound] = useState(false);
   const soundRef = useRef(false);
@@ -142,6 +149,14 @@ export function Landing() {
     const tilt = el.querySelector<HTMLElement>(".stage-tilt");
     const shows = Array.from(el.querySelectorAll<HTMLElement>(".feature-show, .steps-grid .mini"));
     const marquee = el.querySelector<HTMLElement>(".marquee-track");
+    const dim = el.querySelector<HTMLElement>(".dp-dim");
+
+    // Petit appareil, économie de données ou de batterie : moins de décor.
+    const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+    if ((nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 3 || nav.connection?.saveData) el.classList.add("lp-lite");
+    // Onglet caché : tout s'arrête.
+    const onVisibility = () => el.classList.toggle("lp-paused", document.hidden);
+    document.addEventListener("visibilitychange", onVisibility);
 
     let vh = 0, maxY = 1, flowTop = 0, flowH = 1, storyTop = 0, storyH = 1, total = 1;
     let showMid: number[] = [];
@@ -168,6 +183,7 @@ export function Landing() {
       const meters = Math.round((y / maxY) * 1000);
       if (meters !== shown) {
         shown = meters;
+        if (dim && !reduce) dim.style.opacity = ((meters / 1000) * dimMax.current).toFixed(3);
         const s = String(meters).padStart(4, " ");
         cols.forEach((c, i) => {
           c.dataset.blank = String(s[i] === " ");
@@ -233,17 +249,23 @@ export function Landing() {
     const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
     frame();
 
-    // Appui sur un bouton : une petite gerbe de bulles part du doigt ou de la souris.
+    // Les bulles suivent le doigt et la souris : une gerbe sur un bouton, quelques bulles ailleurs, un fin sillage à la souris.
     const onPress = (e: PointerEvent) => {
       if (reduce) return;
       const t = (e.target as HTMLElement | null)?.closest(".btn");
       if (t) burstBubbles(e.clientX, e.clientY, 10);
+      else if (!(e.target as HTMLElement | null)?.closest("input, textarea, summary, a, button")) burstBubbles(e.clientX, e.clientY, 3);
     };
     window.addEventListener("pointerdown", onPress, { passive: true });
+    let lastTrail = 0;
     const onPointer = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       pointer.x = e.clientX / window.innerWidth - 0.5;
       pointer.y = e.clientY / window.innerHeight - 0.5;
+      if (!reduce && e.timeStamp - lastTrail > 160 && Math.abs(e.movementX) + Math.abs(e.movementY) > 6) {
+        lastTrail = e.timeStamp;
+        burstBubbles(e.clientX, e.clientY, 1);
+      }
       kick();
     };
 
@@ -287,6 +309,7 @@ export function Landing() {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("pointerdown", onPress);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.clearTimeout(late);
       io?.disconnect();
       scenes.disconnect();
@@ -305,6 +328,8 @@ export function Landing() {
   return (
     <div className="lp" data-theme={theme} ref={root}>
       <a className="skip" href="#top">Aller au contenu</a>
+      <DeepDefs />
+      <div className="dp-dim" aria-hidden="true" />
 
       <div className="fx" aria-hidden="true">
         <TextureCanvas className="fx-rays" src="/ocean/rays.webp" />
@@ -353,6 +378,7 @@ export function Landing() {
       <main id="top">
         {/* ===== Accueil ===== */}
         <section className="hero" aria-labelledby="t-hero">
+          <Surface />
           <div className="wrap hero-grid">
             <div className="hero-copy">
               <h1 id="t-hero">Révise en profondeur.</h1>
@@ -385,6 +411,7 @@ export function Landing() {
 
           {/* ===== L'histoire ===== */}
           <section className="story" aria-labelledby="t-story">
+            <MantaPass />
             <div className="wrap">
               <h2 id="t-story" className="sr-only">Pourquoi FishFlow</h2>
               <p className="story-text">
@@ -396,6 +423,7 @@ export function Landing() {
 
           {/* ===== Trois gestes ===== */}
           <section className="steps" id="comment" aria-labelledby="t-steps">
+            <School />
             <div className="wrap">
               <h2 id="t-steps" data-reveal>Trois gestes, moins d&apos;une minute.</h2>
               <ol className="steps-grid">
@@ -408,6 +436,7 @@ export function Landing() {
 
           {/* ===== Ce que tu reçois ===== */}
           <section className="features" aria-label="Ce que tu reçois">
+            <Jellies />
             {FEATURES.map(({ id, title, text, Show }, i) => (
               <article key={id} className={`feature${i % 2 ? " flip" : ""}`} aria-labelledby={`t-${id}`}>
                 <div className="wrap feature-grid">
@@ -472,16 +501,33 @@ export function Landing() {
           </div>
         </section>
 
+        {/* ===== Confiance ===== */}
+        <section className="trust" aria-labelledby="t-trust">
+          <div className="wrap">
+            <h2 id="t-trust" data-reveal>Tes cours restent à toi.</h2>
+            <ul className="trust-grid">
+              {TRUST.map(({ title, text }, i) => (
+                <li key={title} data-reveal style={{ "--i": i } as CSSProperties}>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="trust-more">
+              Le détail est dans la <Link href="/confidentialite">politique de confidentialité</Link>.
+            </p>
+          </div>
+        </section>
+
         {/* ===== Questions ===== */}
         <section className="faq-sec" aria-labelledby="t-faq">
           <div className="wrap">
             <h2 id="t-faq" data-reveal>Questions fréquentes.</h2>
             <div className="faq" data-reveal>
-              <details><summary>Comment ça marche, concrètement&nbsp;?</summary><p>Tu crées ton compte gratuit. Tu colles ton cours (ou tu envoies un PDF, ou une photo de tes notes) et tu appuies sur «&nbsp;Créer ma fiche&nbsp;». Moins d&apos;une minute plus tard, tu as ta fiche, tes flashcards et ton quiz. Ensuite, FishFlow te dit chaque jour quelles cartes revoir.</p></details>
-              <details><summary>C&apos;est pour qui&nbsp;?</summary><p>Pour toute personne qui a un cours à apprendre&nbsp;: collège, lycée, études supérieures, concours, formation. Il te faut juste ton cours, en texte, en PDF ou en photo.</p></details>
-              <details><summary>C&apos;est gratuit&nbsp;?</summary><p>Oui pour commencer&nbsp;: 3 fiches par mois et un essai d&apos;Apprendre, sans carte bancaire. Avec Pro, tu peux créer jusqu&apos;à 100 fiches par mois.</p></details>
-              <details><summary>Je peux arrêter Pro quand je veux&nbsp;?</summary><p>Oui, en un clic dans Paramètres. Tu gardes Pro jusqu&apos;à la fin du mois déjà payé.</p></details>
-              <details><summary>Les réponses sont-elles vraies&nbsp;?</summary><p>Pour les fiches, elles viennent de ton propre cours. Pour les questions d&apos;Apprendre, c&apos;est une IA qui répond&nbsp;: elle peut se tromper, donc pour un détail important, vérifie dans les liens proposés ou dans ton cours.</p></details>
+              {/* Espace insécable avant « ? » et « : » (typographie française). */}
+              {FAQ.map(({ q, a }) => (
+                <details key={q}><summary>{q.replace(/ ([?:])/g, " $1")}</summary><p>{a.replace(/ ([?:;])/g, " $1")}</p></details>
+              ))}
             </div>
           </div>
         </section>
@@ -489,6 +535,7 @@ export function Landing() {
         {/* ===== Le fond : la fin de la plongée ===== */}
         <section className="final" aria-labelledby="t-end">
           <TextureCanvas className="final-caustic" src="/ocean/caustic-top.webp" tileW={560} />
+          <Angler />
           <div className="wrap final-in" data-reveal>
             <BrandMark size={72} className="final-mark" />
             <h2 id="t-end">Plonge avec ton prochain cours.</h2>

@@ -14,9 +14,8 @@
   --shadow-sm: 0 1px 1px rgba(0, 49, 107, 0.06), 0 10px 20px -10px rgba(0, 49, 107, 0.3);
   --ray-op: 0.95; --caustic-op: 0.75; --flow: #0058A0; --bubble: rgba(255, 255, 255, 0.9);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --ease-io: cubic-bezier(0.77, 0, 0.175, 1); --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  /* Le fond (l'eau qui s'approfondit) est défini plus bas, avec la surface (« La Descente »). */
   position: relative; min-height: 100vh; min-height: 100svh; overflow-x: clip; color: var(--ink); font-family: var(--font-body);
-  /* L'eau s'approfondit doucement jusqu'au fond de la page (puis la fin, en eau profonde). */
-  background: linear-gradient(180deg, #E6F4FF 0, var(--bg) 520px, #B3DDFF 32%, #97D0FF 58%, var(--bg-2) 100%);
 }
 .lp[data-theme="dark"] {
   --bg: #031F45; --bg-2: #02193D; --ink: #EEF6FF; --ink-2: #A6CAF2; --ink-3: #8AB2E0;
@@ -25,7 +24,6 @@
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 12px 24px -10px rgba(0, 0, 0, 0.5), 0 44px 80px -30px rgba(0, 0, 0, 0.8);
   --shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 22px -12px rgba(0, 0, 0, 0.6);
   --ray-op: 0.22; --caustic-op: 0.14; --flow: #46B5FF; --bubble: rgba(196, 228, 255, 0.55);
-  background: linear-gradient(180deg, #033A7B 0, var(--bg) 760px, var(--bg) 70%, var(--bg-2) 100%);
 }
 .lp *, .lp *::before, .lp *::after { box-sizing: border-box; }
 .lp :where(h1, h2, h3, p, ul, ol) { margin: 0; }
@@ -442,3 +440,136 @@ footer a { color: #EEF6FF; min-height: 44px; display: inline-flex; align-items: 
 .plan.pro.in::after, .lp:not(.lp-js) .plan.pro::after { animation: lp-shine 6s var(--ease-io) 0.6s infinite; }
 @keyframes lp-shine { 0% { transform: rotate(18deg) translateX(-120%); } 30%, 100% { transform: rotate(18deg) translateX(520%); } }
 @media (prefers-reduced-motion: reduce) { .stage, .plan.pro::after { animation: none !important; } .lp-js h2 { clip-path: none !important; } }
+
+/* =====================================================================
+   « La Descente » : la page part de la surface et descend jusqu'aux abysses (components/landing/Deep.tsx).
+   Décors derrière le texte, sans clic possible, immobiles hors de l'écran, quand l'onglet est caché
+   ou avec prefers-reduced-motion ; allégés sur les petits appareils (classe lp-lite).
+   ===================================================================== */
+.lp { --sky: 72px; --wave-back: #74C0F6; --wave-front: #B6DEFF; --sky-top: #9BD4FF; --sky-bottom: #F2FAFF; --dim-max: 0.16;
+  background: linear-gradient(180deg, var(--wave-front) 0, var(--bg) 520px, #B3DDFF 32%, #97D0FF 58%, var(--bg-2) 100%); }
+.lp[data-theme="dark"] { --wave-back: #0A4A8C; --wave-front: #063F82; --sky-top: #020F27; --sky-bottom: #0A2C5C; --dim-max: 0.55;
+  background: linear-gradient(180deg, var(--wave-front) 0, var(--bg) 760px, var(--bg) 55%, #021433 82%, #010A1C 100%); }
+@media (min-width: 900px) { .lp { --sky: 116px; } }
+.lp section > .wrap { position: relative; z-index: 1; }
+
+/* Plus on descend, moins il y a de lumière (l'opacité suit le défilement, Landing.tsx). */
+.dp-dim { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: #010B1F; opacity: 0; will-change: opacity; }
+
+/* ---------- La surface ---------- */
+.hero { padding-top: calc(var(--sky) + 26px); }
+@media (min-width: 900px) { .hero { padding-top: calc(var(--sky) + 40px); } }
+.dp-surface { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--sky) + 22px); pointer-events: none; overflow: hidden; }
+.dp-sky { position: absolute; inset: 0 0 18px; background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); }
+.dp-sun { position: absolute; right: 13%; top: 22%; width: 34px; height: 34px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #FFFBE6, #FFE27A 60%, #FFC94D);
+  box-shadow: 0 0 0 10px rgba(255, 233, 150, 0.35), 0 0 46px 18px rgba(255, 226, 122, 0.55); }
+.lp[data-theme="dark"] .dp-sun { background: #EAF3FF; box-shadow: inset -9px -4px 0 0 #B9D4F5, 0 0 30px 6px rgba(184, 220, 255, 0.28); }
+.dp-star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #EAF3FF; opacity: 0; }
+.lp[data-theme="dark"] .dp-star { opacity: 0.85; animation: dp-twinkle 3.4s ease-in-out infinite alternate; }
+.lp[data-theme="dark"] .dp-star:nth-child(odd) { animation-delay: -1.7s; }
+@keyframes dp-twinkle { to { opacity: 0.25; } }
+@media (min-width: 900px) { .dp-sun { width: 48px; height: 48px; } }
+
+.dp-wave { position: absolute; left: 0; bottom: 0; width: 200%; height: 26px; animation: dp-roll 14s linear infinite; }
+.dp-wave-back { bottom: 8px; fill: var(--wave-back); animation-duration: 22s; animation-direction: reverse; }
+.dp-wave-front { fill: var(--wave-front); }
+@keyframes dp-roll { to { transform: translate3d(-50%, 0, 0); } }
+
+/* Le poisson qui saute : une courbe hors de l'eau toutes les 12 s (la première peu après l'arrivée). */
+.dp-jump { position: absolute; left: 18%; bottom: 6px; width: 44px; height: 22px; }
+@media (min-width: 900px) { .dp-jump { left: 46%; width: 54px; height: 27px; } }
+.dp-jump .dp-fish { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transform-origin: 50% 50%; animation: dp-leap 12s cubic-bezier(0.37, 0, 0.63, 1) 1.4s infinite; }
+@keyframes dp-leap {
+  0% { opacity: 0; transform: translate3d(70px, 26px, 0) rotate(40deg); }
+  2% { opacity: 1; transform: translate3d(58px, 4px, 0) rotate(38deg); }
+  6% { transform: translate3d(30px, -34px, 0) rotate(0deg); }
+  10% { opacity: 1; transform: translate3d(2px, -2px, 0) rotate(-38deg); }
+  12%, 100% { opacity: 0; transform: translate3d(-8px, 26px, 0) rotate(-44deg); }
+}
+.dp-splash { position: absolute; left: 70px; bottom: 6px; width: 5px; height: 5px; border-radius: 50%; background: #fff; opacity: 0; animation: dp-drop 12s ease-out 1.4s infinite; }
+.dp-splash.b { left: 64px; width: 4px; height: 4px; animation-name: dp-drop-b; }
+.dp-splash.c { left: 0; animation-delay: 2.6s; }
+@keyframes dp-drop { 0% { opacity: 0; transform: none; } 1% { opacity: 0.95; } 5%, 100% { opacity: 0; transform: translate3d(8px, -22px, 0); } }
+@keyframes dp-drop-b { 0% { opacity: 0; transform: none; } 1% { opacity: 0.9; } 5%, 100% { opacity: 0; transform: translate3d(-10px, -16px, 0); } }
+
+/* ---------- Les profondeurs ---------- */
+.dp-zone { position: absolute; z-index: 0; pointer-events: none; }
+.dp-fish { display: block; overflow: visible; }
+
+/* Banc (10 m) : il traverse de droite à gauche, chaque poisson ondule. */
+.dp-school-zone { left: 0; right: 0; top: 30px; height: 80px; overflow: hidden; }
+.dp-school { position: absolute; left: 0; top: 30px; animation: dp-cross 34s linear infinite; }
+.dp-school .dp-fish { position: absolute; left: var(--fx); top: var(--fy); width: 34px; height: 17px; opacity: 0.75; transform: scale(var(--fs)); animation: dp-wiggle 0.9s ease-in-out var(--fd) infinite alternate; }
+.lp[data-theme="dark"] .dp-school .dp-fish { opacity: 0.6; }
+@keyframes dp-cross { from { transform: translate3d(110vw, 0, 0); } to { transform: translate3d(-40vw, -24px, 0); } }
+@keyframes dp-wiggle { from { transform: scale(var(--fs)) rotate(-4deg); } to { transform: scale(var(--fs)) translate3d(0, 2px, 0) rotate(3deg); } }
+
+/* La raie (40 m) : elle passe en planant, de gauche à droite, en battant doucement des ailes. */
+.dp-manta-zone { left: 0; right: 0; top: 0; height: 100%; overflow: hidden; }
+.dp-manta { position: absolute; left: 0; top: 18%; width: 170px; animation: dp-glide 28s linear infinite; }
+.dp-manta svg { display: block; width: 100%; height: auto; overflow: visible; opacity: 0.5; transform-origin: 50% 45%; animation: dp-flap 2.8s ease-in-out infinite alternate; }
+.lp[data-theme="dark"] .dp-manta svg { opacity: 0.42; }
+@media (min-width: 900px) { .dp-manta { width: 260px; } }
+@keyframes dp-glide { from { transform: translate3d(-45vw, 120px, 0) rotate(-8deg); } 50% { transform: translate3d(45vw, 30px, 0) rotate(-4deg); } to { transform: translate3d(125vw, 70px, 0) rotate(-10deg); } }
+@keyframes dp-flap { from { transform: scaleY(1) skewX(0); } to { transform: scaleY(0.82) skewX(-4deg); } }
+
+/* Les méduses (200 m) : elles montent et descendent, la cloche pulse, les filaments ondulent. */
+.dp-jelly-zone { left: 0; right: 0; top: 10%; height: 80%; }
+.dp-jelly { position: absolute; left: var(--jx); top: var(--jy); width: 70px; transform: scale(var(--js)); transform-origin: 50% 0; }
+.dp-jelly svg { display: block; width: 100%; height: auto; overflow: visible; animation: dp-bob 8s ease-in-out var(--jd) infinite alternate; }
+.dp-bell { transform-origin: 45px 50px; animation: dp-pulse 2.4s ease-in-out var(--jd) infinite; }
+.dp-tent { transform-origin: 45px 52px; animation: dp-sway 3.2s ease-in-out var(--jd) infinite alternate; }
+.dp-jelly-glow { opacity: 0.35; }
+.lp[data-theme="dark"] .dp-jelly-glow { opacity: 1; }
+.lp:not([data-theme="dark"]) .dp-jelly { opacity: 0.8; }
+@media (min-width: 900px) { .dp-jelly { width: 96px; } }
+@keyframes dp-bob { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(8px, -46px, 0); } }
+@keyframes dp-pulse { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.06, 0.88); } }
+@keyframes dp-sway { from { transform: skewX(-7deg); } to { transform: skewX(7deg) scaleY(0.94); } }
+
+/* La baudroie (1 000 m), dans l'eau profonde de la fin : sa lanterne s'allume et s'éteint. */
+.dp-angler { position: absolute; left: 3%; bottom: 10%; width: 150px; pointer-events: none; animation: dp-lurk 11s ease-in-out infinite alternate; }
+.dp-angler svg { display: block; width: 100%; height: auto; overflow: visible; }
+.dp-lure-glow { animation: dp-lantern 2.8s ease-in-out infinite alternate; }
+@media (min-width: 900px) { .dp-angler { left: 6%; width: 230px; bottom: 16%; } }
+@media (max-width: 899px) { .dp-angler { opacity: 0.55; } }
+@keyframes dp-lurk { to { transform: translate3d(34px, -10px, 0); } }
+@keyframes dp-lantern { from { opacity: 0.35; } to { opacity: 1; } }
+
+/* Immobiles hors de l'écran, et partout quand l'onglet est caché. */
+.dp-surface:not([data-on="true"]) *, .dp-zone:not([data-on="true"]) *, .dp-angler:not([data-on="true"]), .dp-angler:not([data-on="true"]) *,
+.lp-paused *, .lp-paused *::before, .lp-paused *::after { animation-play-state: paused !important; }
+/* Petit appareil ou économie de données : deux poissons, une méduse, moins de bulles. */
+.lp-lite .dp-school .dp-fish:nth-child(n+3), .lp-lite .dp-jelly:nth-child(n+2), .lp-lite .bubbles i:nth-child(n+3) { display: none; }
+
+.feature { position: relative; z-index: 1; }
+.story, .steps, .features, .trust { position: relative; }
+
+/* ---------- Confiance ---------- */
+.trust { padding: 24px 0 72px; }
+.trust > .wrap { display: grid; gap: 22px; }
+.trust-grid { display: grid; gap: 12px; }
+.trust-grid li { padding: 22px; border-radius: 24px 24px 18px 18px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow-sm); display: grid; gap: 6px; }
+.trust-grid h3 { font-size: 19px; display: flex; align-items: center; gap: 10px; }
+.trust-grid h3::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; border: 2.5px solid var(--brand); }
+.trust-grid p { color: var(--ink-2); line-height: 1.5; }
+.trust-more { color: var(--ink-2); font-size: 15px; }
+.trust-more a { color: var(--ink); font-weight: 700; text-underline-offset: 3px; }
+@media (min-width: 900px) { .trust { padding: 48px 0 110px; } .trust-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+
+/* ---------- Téléphone : la scène de l'accueil tient dans l'écran, sans être coupée ---------- */
+@media (max-width: 899px) {
+  .stage { height: 340px; }
+  .stage-tilt { transform: rotateX(8deg) rotateY(-6deg) scale(0.86); }
+  .fiche-top small { display: none; }
+  .gauge-sound { display: none; }
+}
+
+/* Mouvement réduit : la scène reste posée (raie au milieu, banc visible, poisson sous l'eau). */
+@media (prefers-reduced-motion: reduce) {
+  .dp-school { transform: translate3d(60vw, 0, 0); }
+  .dp-manta { transform: translate3d(50vw, 40px, 0) rotate(-6deg); }
+  .dp-jump { display: none; }
+  .dp-dim { display: none; }
+}
