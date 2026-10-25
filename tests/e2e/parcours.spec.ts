@@ -122,7 +122,7 @@ test("quiz : répondre et voir son score", async ({ page, context }) => {
   await page.getByRole("button", { name: "Question suivante" }).click();
   await page.getByRole("button", { name: /Par les stomates/ }).click();
   await page.getByRole("button", { name: "Voir mon score" }).click();
-  await expect(page.getByText("100%")).toBeVisible();
+  await expect(page.getByText("2 / 2 bonnes réponses")).toBeVisible();
 });
 
 test("paiement (mode test simulé) : Passer Pro ouvre le paiement", async ({ page, context }) => {
