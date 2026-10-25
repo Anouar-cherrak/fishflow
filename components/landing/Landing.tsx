@@ -11,8 +11,7 @@ import { trackEvent } from "@/lib/tracking";
 import { burstBubbles } from "@/lib/bubbles";
 import { setDarkClass } from "@/lib/set-theme";
 import { depthClick, disableDepthSound, enableDepthSound } from "./depth-sound";
-import { AskShow, CardsShow, DailyShow, FicheShow, HeroStage, QuizShow, StepPaste, StepRead, StepReady } from "./Objects";
-import { DeepDefs, Jellies, MantaPass, School, Surface } from "./Deep";
+import type { ReactNode } from "react";
 import { FAQ, TRUST } from "./content";
 
 type Theme = "light" | "dark";
@@ -27,11 +26,11 @@ const STORY =
 const STORY_END = "Tu révises sans te noyer.";
 
 const FEATURES = [
-  { id: "fiche", title: "Une vraie fiche, pas un résumé flou.", text: "L'essentiel en quelques lignes, puis les points clés rangés en parties. Trois façons de l'afficher (Classique, Mémo ou Cornell), et un PDF à télécharger.", Show: FicheShow },
-  { id: "cartes", title: "Des flashcards prêtes à réviser.", text: "Tu retournes la carte et tu dis si tu savais. Une carte ratée revient demain ; une carte que tu connais revient plus tard, jusqu'à 30 jours.", Show: CardsShow },
-  { id: "quiz", title: "Un quiz pour vérifier que c'est acquis.", text: "Des questions tirées de ton cours. Quand tu te trompes, tu vois tout de suite la bonne réponse, et ton meilleur score est gardé.", Show: QuizShow },
-  { id: "jour", title: "Cinq minutes par jour, et ça reste.", text: "FishFlow te dit chaque jour quelles cartes revoir. Ta série grandit, ton objectif du jour se remplit, et le jour de l'examen tu n'as plus qu'à relire.", Show: DailyShow },
-  { id: "apprendre", title: "Une notion te bloque ? Pose ta question.", text: "Apprendre te répond clairement, avec ses sources et des images. Tu peux ensuite en faire une fiche en un geste.", Show: AskShow },
+  { id: "fiche", title: "Une vraie fiche, pas un résumé flou.", text: "L'essentiel en quelques lignes, puis les points clés rangés en parties. Trois façons de l'afficher (Classique, Mémo ou Cornell), et un PDF à télécharger." },
+  { id: "cartes", title: "Des flashcards prêtes à réviser.", text: "Tu retournes la carte et tu dis si tu savais. Une carte ratée revient demain ; une carte que tu connais revient plus tard, jusqu'à 30 jours." },
+  { id: "quiz", title: "Un quiz pour vérifier que c'est acquis.", text: "Des questions tirées de ton cours. Quand tu te trompes, tu vois tout de suite la bonne réponse, et ton meilleur score est gardé." },
+  { id: "jour", title: "Cinq minutes par jour, et ça reste.", text: "FishFlow te dit chaque jour quelles cartes revoir. Ta série grandit, ton objectif du jour se remplit, et le jour de l'examen tu n'as plus qu'à relire." },
+  { id: "apprendre", title: "Une notion te bloque ? Pose ta question.", text: "Apprendre te répond clairement, avec ses sources et des images. Tu peux ensuite en faire une fiche en un geste." },
 ];
 
 // Bulles d'ambiance : quelques-unes par « étage » de la page (valeurs fixes : même rendu serveur et navigateur).
@@ -74,7 +73,12 @@ function Gauge({ sound, onSound }: { sound: boolean; onSound: () => void }) {
   );
 }
 
-export function Landing() {
+// Les décors de « La Descente » (Deep.tsx) et les objets animés du produit (Objects.tsx) arrivent déjà dessinés par le serveur (app/page.tsx) :
+// ils ne pèsent rien dans le JavaScript envoyé au téléphone.
+export type DeepSlots = { defs: ReactNode; surface: ReactNode; manta: ReactNode; school: ReactNode; jellies: ReactNode;
+  hero: ReactNode; steps: ReactNode[]; shows: ReactNode[] };
+
+export function Landing({ deep }: { deep: DeepSlots }) {
   const root = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [theme, setTheme] = useState<Theme>("dark");
@@ -328,7 +332,7 @@ export function Landing() {
   return (
     <div className="lp" data-theme={theme} ref={root}>
       <a className="skip" href="#top">Aller au contenu</a>
-      <DeepDefs />
+      {deep.defs}
       <div className="dp-dim" aria-hidden="true" />
 
       <div className="fx" aria-hidden="true">
@@ -378,7 +382,7 @@ export function Landing() {
       <main id="top">
         {/* ===== Accueil ===== */}
         <section className="hero" aria-labelledby="t-hero">
-          <Surface />
+          {deep.surface}
           <div className="wrap hero-grid">
             <div className="hero-copy">
               <h1 id="t-hero">Révise en profondeur.</h1>
@@ -390,7 +394,7 @@ export function Landing() {
               </form>
               <p className="note">3 fiches gratuites par mois, sans carte bancaire.</p>
             </div>
-            <HeroStage />
+            {deep.hero}
           </div>
         </section>
 
@@ -411,7 +415,7 @@ export function Landing() {
 
           {/* ===== L'histoire ===== */}
           <section className="story" aria-labelledby="t-story">
-            <MantaPass />
+            {deep.manta}
             <div className="wrap">
               <h2 id="t-story" className="sr-only">Pourquoi FishFlow</h2>
               <p className="story-text">
@@ -423,21 +427,21 @@ export function Landing() {
 
           {/* ===== Trois gestes ===== */}
           <section className="steps" id="comment" aria-labelledby="t-steps">
-            <School />
+            {deep.school}
             <div className="wrap">
               <h2 id="t-steps" data-reveal>Trois gestes, moins d&apos;une minute.</h2>
               <ol className="steps-grid">
-                <li data-reveal style={{ "--i": 0 } as CSSProperties}><StepPaste /><h3><span>1</span>Colle ton cours</h3><p>Un texte, un PDF ou une photo de tes notes.</p></li>
-                <li data-reveal style={{ "--i": 1 } as CSSProperties}><StepRead /><h3><span>2</span>FishFlow le lit</h3><p>Il repère les idées importantes de ton cours.</p></li>
-                <li data-reveal style={{ "--i": 2 } as CSSProperties}><StepReady /><h3><span>3</span>Tout est prêt</h3><p>Ta fiche, tes flashcards et ton quiz t&apos;attendent.</p></li>
+                <li data-reveal style={{ "--i": 0 } as CSSProperties}>{deep.steps[0]}<h3><span>1</span>Colle ton cours</h3><p>Un texte, un PDF ou une photo de tes notes.</p></li>
+                <li data-reveal style={{ "--i": 1 } as CSSProperties}>{deep.steps[1]}<h3><span>2</span>FishFlow le lit</h3><p>Il repère les idées importantes de ton cours.</p></li>
+                <li data-reveal style={{ "--i": 2 } as CSSProperties}>{deep.steps[2]}<h3><span>3</span>Tout est prêt</h3><p>Ta fiche, tes flashcards et ton quiz t&apos;attendent.</p></li>
               </ol>
             </div>
           </section>
 
           {/* ===== Ce que tu reçois ===== */}
           <section className="features" aria-label="Ce que tu reçois">
-            <Jellies />
-            {FEATURES.map(({ id, title, text, Show }, i) => (
+            {deep.jellies}
+            {FEATURES.map(({ id, title, text }, i) => (
               <article key={id} className={`feature${i % 2 ? " flip" : ""}`} aria-labelledby={`t-${id}`}>
                 <div className="wrap feature-grid">
                   <div className="feature-copy" data-reveal>
@@ -445,7 +449,7 @@ export function Landing() {
                     <p>{text}</p>
                   </div>
                   <div className="feature-show" data-reveal="rise">
-                    <Show />
+                    {deep.shows[i]}
                   </div>
                 </div>
               </article>
