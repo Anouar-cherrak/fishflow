@@ -69,6 +69,7 @@ export const PRIVATE_ROUTES = [
   "/examens",
   "/parametres",
   "/reset-password/:path*",
+  "/auth/:path*",
 ];
 const NO_STORE = [{ key: "Cache-Control", value: "private, no-store, max-age=0" }];
 

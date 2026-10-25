@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { publicFicheData } from "../lib/public-fiche.ts";
 import { siteUrl } from "../lib/site-url.ts";
+import { safeNext } from "../lib/safe-next.ts";
 
 test("lien partagé : le cours d'origine (notes perso) n'est jamais envoyé", () => {
   const fiche = { title: "Révolution", summary: "…", flashcards: [{ question: "q", answer: "r" }], sourceText: "Mes notes privées + numéro de téléphone" };
@@ -20,4 +21,12 @@ test("mot de passe oublié / paiement : un faux site dans la demande ne sert jam
   assert.equal(siteUrl(req("https://fishflow.fr.site-pirate.example")), "https://fishflow.fr");
   assert.equal(siteUrl(req(null)), "https://fishflow.fr");
   assert.equal(siteUrl(req("https://www.fishflow.fr")), "https://www.fishflow.fr");
+});
+
+test("connexion Google : le retour ne renvoie jamais vers un autre site", () => {
+  assert.equal(safeNext("/generer"), "/generer");
+  assert.equal(safeNext("/p/abc?copier=1"), "/p/abc?copier=1");
+  for (const bad of ["//site-pirate.example", "/\\site-pirate.example", "https://site-pirate.example", "site-pirate.example", "/ x", "/\nx", "", null, undefined]) {
+    assert.equal(safeNext(bad), "/generer", String(bad));
+  }
 });

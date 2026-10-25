@@ -8,6 +8,7 @@ import { postAuth } from "@/lib/auth-client";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
 import { track } from "@/lib/track";
+import { GoogleButton } from "@/components/GoogleButton";
 
 declare global {
   interface Window {
@@ -107,6 +108,7 @@ export default function Signup() {
           <>
             <h1 className="text-2xl font-bold tracking-tight mb-1">Crée ton compte gratuit</h1>
             <p className="text-black/60 mb-6">Sans carte bancaire. Ta première fiche est prête en moins d&apos;une minute.</p>
+            <GoogleButton />
 
             <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
             <input id="field-1"

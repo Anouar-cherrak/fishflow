@@ -14,6 +14,7 @@ export default function Confidentialite() {
             <p>Lors de l'utilisation de FishFlow, nous collectons :</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li>Ton adresse email et mot de passe (lors de la création de compte)</li>
+              <li>Si tu choisis « Continuer avec Google » : ton adresse email, ton nom et ta photo de profil Google, transmis par Google. Nous ne recevons jamais ton mot de passe Google, ni tes contacts, tes mails ou tes fichiers.</li>
               <li>Les contenus que tu soumets pour génération (texte, PDF, photo)</li>
               <li>Les fiches générées, sauvegardées dans ton compte</li>
               <li>Des données techniques liées à ton abonnement (statut Pro, historique de paiement, gérées par Stripe)</li>
@@ -42,6 +43,7 @@ export default function Confidentialite() {
               <li><strong className="text-black">OpenAI</strong> — traitement des contenus soumis pour générer les fiches de révision</li>
               <li><strong className="text-black">Stripe</strong> — traitement des paiements pour l'abonnement FishFlow Pro</li>
               <li><strong className="text-black">Vercel</strong> — hébergement du site</li>
+              <li><strong className="text-black">Google</strong> — connexion avec ton compte Google, seulement si tu choisis « Continuer avec Google »</li>
               <li><strong className="text-black">Resend</strong> — envoi des e-mails (code d'inscription, mot de passe oublié, rappels)</li>
               <li><strong className="text-black">Wikipédia</strong> — recherche des articles pour « Apprendre » (seuls des mots-clés tirés de ta question sont envoyés, jamais ton compte)</li>
             </ul>

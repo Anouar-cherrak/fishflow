@@ -8,6 +8,7 @@ import { preloadSupabase } from "@/lib/supabase/lazy";
 import { postAuth } from "@/lib/auth-client";
 import { AuthLayout } from "@/components/AuthLayout";
 import { trackEvent } from "@/lib/tracking";
+import { GoogleButton } from "@/components/GoogleButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -54,6 +55,7 @@ export default function Login() {
       >
         <h1 className="text-2xl font-bold tracking-tight mb-1">Connexion</h1>
         <p className="text-black/60 mb-6">Retrouve tes fiches et tes révisions.</p>
+        <GoogleButton />
 
         <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
         <input id="field-1"
