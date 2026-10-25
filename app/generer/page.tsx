@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -162,7 +162,20 @@ function GenererContent() {
     });
   };
 
+  // Double clic : le bouton ne se grise qu'après une vérification réseau (compte gratuit), donc deux clics rapides
+  // lançaient deux fiches et consommaient deux crédits. Un seul lancement à la fois.
+  const busy = useRef(false);
   const handleGenerate = async () => {
+    if (busy.current) return;
+    busy.current = true;
+    try {
+      await generate();
+    } finally {
+      busy.current = false;
+    }
+  };
+
+  const generate = async () => {
     if (!user) {
       // Le cours déjà collé est gardé pendant l'inscription : il revient tout seul dans la zone de texte.
       try {
