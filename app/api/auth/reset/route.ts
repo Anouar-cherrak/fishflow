@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAuthClient } from "@/lib/supabase/server";
 import { clientIp, limiter, tooMany } from "@/lib/security/limiter";
-import { mailRules } from "@/lib/security/auth-limits";
+import { mailRules, STRICT } from "@/lib/security/auth-limits";
 import { asEmail, readJson } from "@/lib/security/validate";
 import { siteUrl } from "@/lib/site-url";
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const email = asEmail(body?.email);
   if (!email) return NextResponse.json({ error: "Cette adresse email n'est pas valide. Vérifie-la." }, { status: 400 });
 
-  const wait = await limiter.check(mailRules(req, "reset", email));
+  const wait = await limiter.check(mailRules(req, "reset", email), STRICT);
   if (wait) return tooMany(wait);
 
   // Adresse de retour choisie dans une liste fixe (lib/site-url.ts), jamais tirée de la demande ; Supabase la vérifie aussi.

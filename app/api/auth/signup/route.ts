@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAuthClient } from "@/lib/supabase/server";
 import { clientIp, limiter, tooMany } from "@/lib/security/limiter";
-import { mailRules } from "@/lib/security/auth-limits";
+import { mailRules, STRICT } from "@/lib/security/auth-limits";
 import { asEmail, asString, passwordProblem, readJson } from "@/lib/security/validate";
 
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   const problem = passwordProblem(password);
   if (problem) return NextResponse.json({ error: problem, field: "password" }, { status: 400 });
 
-  const wait = await limiter.check(mailRules(req, "signup", email));
+  const wait = await limiter.check(mailRules(req, "signup", email), STRICT);
   if (wait) return tooMany(wait);
 
   const supabase = await createAuthClient(clientIp(req));

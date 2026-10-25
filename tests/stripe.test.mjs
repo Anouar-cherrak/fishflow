@@ -39,3 +39,18 @@ test("un vieil événement rejoué (plus de 5 minutes) est refusé", () => {
 test("sans en-tête de signature, rien n'est accepté", () => {
   assert.throws(() => stripe.webhooks.constructEvent(payload, "", SECRET));
 });
+
+// Paiement (app/api/stripe/checkout/route.ts) : pas de deuxième abonnement, pas de deuxième page de paiement.
+import { checkoutIdempotencyKey, hasRunningSubscription } from "../lib/stripe-rules.ts";
+
+test("un abonnement encore en cours (même impayé) empêche d'en ouvrir un deuxième", () => {
+  for (const s of ["active", "trialing", "past_due", "unpaid", "incomplete"]) assert.equal(hasRunningSubscription(["canceled", s]), true, s);
+  assert.equal(hasRunningSubscription(["canceled", "incomplete_expired"]), false);
+  assert.equal(hasRunningSubscription([]), false);
+});
+
+test("double clic ou deux onglets dans la même minute : une seule page de paiement", () => {
+  const t = Date.UTC(2026, 9, 25, 20, 0, 10);
+  assert.equal(checkoutIdempotencyKey("u1", t), checkoutIdempotencyKey("u1", t + 40_000));
+  assert.notEqual(checkoutIdempotencyKey("u1", t), checkoutIdempotencyKey("u2", t));
+});

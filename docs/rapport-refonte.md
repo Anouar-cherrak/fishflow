@@ -40,12 +40,13 @@ Honnêtement : les objectifs « mobile ≥ 95 et LCP < 2,5 s » ne sont pas atte
 Critique : 0 prouvé. Élevé : 1. Moyen : 8. Faible : 13. Aucune clé trouvée dans le code ni l'historique.
 Corrigé dans le code (avec tests) : cours d'origine retiré des liens partagés, suppression de compte qui ne laisse plus un abonnement actif, adresse de retour du mot de passe oublié fixe, lecture d'IP unique, déconnexion qui vide le navigateur, bouton « Gérer les cookies », export RGPD complet, limite de taille en régénération, journaux sans détails.
 
-**Pas appliqué, j'attends ton accord** (touche la connexion ou le paiement) :
-1. CAPTCHA Turnstile (élevé) : sans lui, on peut attaquer Supabase directement et contourner nos blocages de connexion. Il faut l'activer dans Supabase, puis je branche le code.
-2. Blocage à 3 erreurs sur « email + IP » (et email seul à 10) : aujourd'hui, quelqu'un peut bloquer le compte d'un autre exprès.
-3. En cas de panne des compteurs, refuser la connexion au lieu de tout laisser passer. Risque : si le SQL de sécurité n'est pas installé, plus personne ne pourrait se connecter.
-4. Paiement : réutiliser le client Stripe existant et refuser un 2e abonnement (évite un double abonnement).
-5. Injection de consignes dans les cours : mettre le cours dans un message séparé (petite modification du moteur).
+**Appliqué après ton accord (25/10, soir)**, avec tests :
+1. Connexion : blocage à 3 erreurs pour « ce compte depuis cette adresse », 10 pour le compte depuis n'importe où, 10 par adresse IP. Un inconnu ne peut plus bloquer ton compte avec 3 faux mots de passe. Code d'inscription : toujours 3 erreurs par compte.
+2. Compteurs en panne (base qui ne répond pas, ou SQL de sécurité absent) : connexion, codes et e-mails refusés 1 minute au lieu de tout laisser passer. **Attention : si securite-2026-10.sql n'est pas installé, plus personne ne pourra se connecter.** Vérifie la partie 1 du SQL AVANT de publier.
+3. Paiement : le client Stripe existant est réutilisé, un 2e abonnement est refusé tant que le premier tourne, et un double clic dans la même minute ouvre la même page de paiement.
+4. Moteur : le cours (et la fiche, pour les régénérations) arrive dans un message séparé des consignes, présenté comme de la matière à réviser ; les phrases du cours qui ressemblent à des ordres sont ignorées. Les consignes du moteur sont inchangées, le cache OpenAI est gardé.
+
+**Encore en attente** : CAPTCHA Turnstile (à activer d'abord dans Supabase, puis je branche le code).
 
 ## Ce que TU dois faire (étape par étape)
 **Supabase** (SQL Editor) : coller la partie 1 de `supabase/securite-2026-10-25.sql` et m'envoyer le résultat. S'il manque des fonctions, coller `securite-2026-10.sql` et `limites-2026-10.sql`. Puis partie 2 (index unique du partage, et `data - 'sourceText'` dans `get_shared_fiche`). Ensuite, dans Auth : Turnstile (Bot protection), limites (Rate limits), « Leaked password protection », « Secure password change », URL du site `https://fishflow.fr` et seulement tes domaines en redirection ; lancer Security Advisor ; vider `cours-uploads` s'il ne sert plus.
@@ -56,9 +57,9 @@ Corrigé dans le code (avec tests) : cours d'origine retiré des liens partagés
 
 ## Les 10 principaux risques restants
 1. Scripts SQL de sécurité peut-être pas installés : toutes les limites seraient coupées.
-2. Pas de CAPTCHA : on peut attaquer Supabase directement.
-3. N'importe qui peut bloquer le compte d'un autre (3 erreurs).
-4. Double abonnement possible (deux paiements en parallèle).
+2. Pas encore de CAPTCHA : on peut attaquer Supabase directement.
+3. Une génération réelle n'a pas été testée avec la nouvelle séparation cours / consignes (pas de clé OpenAI ici) : faire 2 ou 3 fiches sur l'aperçu.
+4. Si le SQL de sécurité n'est pas installé, la connexion sera refusée partout (choix « refuser en cas de panne »).
 5. Le cours d'origine reste lisible via `get_shared_fiche` tant que la partie 2 du SQL n'est pas faite.
 6. Performance mobile non mesurée sur Vercel (aperçu protégé) : à vérifier avec PageSpeed après publication.
 7. Safari iPhone pas testé (seulement Chromium).
