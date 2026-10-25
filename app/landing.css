@@ -209,7 +209,7 @@ canvas.fx-rays, canvas.fx-caustic, canvas.final-caustic { display: block; }
 @keyframes lp-type { 0%, 6% { clip-path: inset(0 100% 0 0); } 50%, 92% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 100% 0 0); } }
 .caret { width: 2px; height: 18px; background: var(--brand); margin-left: 2px; animation: lp-caret 0.9s steps(2) infinite; }
 @keyframes lp-caret { to { opacity: 0; } }
-.steps-grid .mini-btn, .mini-btn { justify-self: start; padding: 9px 16px; border-radius: 999px; background: var(--brand); color: var(--on-brand); font-weight: 800; font-size: 13px; animation: lp-press 6s ease infinite both; }
+.steps-grid .mini-btn { justify-self: start; padding: 9px 16px; border-radius: 999px; background: var(--brand); color: var(--on-brand); font-weight: 800; font-size: 13px; animation: lp-press 6s ease infinite both; }
 @keyframes lp-press { 0%, 60% { transform: scale(1); } 64% { transform: scale(0.93); } 68%, 100% { transform: scale(1); } }
 .mini-line { font-size: 15px; color: var(--ink-2); }
 .mini-line mark { color: var(--ink); font-weight: 700; background: linear-gradient(transparent 55%, color-mix(in srgb, var(--brand) 45%, transparent) 55%) left / 0 100% no-repeat; animation: lp-mark 6s var(--ease-out) infinite both; }

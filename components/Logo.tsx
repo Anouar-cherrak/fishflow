@@ -5,8 +5,8 @@
 // Proportions du logo : largeur ≈ 1,22 × hauteur.
 export const RAIE_RATIO = 512 / 418;
 
-// « small » : ancien réglage (une image PNG plus petite), ignoré depuis que le logo est vectoriel.
-export function RaieImg({ width, height, className = "" }: { small?: boolean; width: number; height: number; className?: string }) {
+// L'image du logo, nette à toutes les tailles.
+export function RaieImg({ width, height, className = "" }: { width: number; height: number; className?: string }) {
   return <img src="/brand/raie.svg" alt="" width={width} height={height} className={className} draggable={false} />;
 }
 

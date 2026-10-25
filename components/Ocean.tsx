@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { RaieImg } from "@/components/Logo";
 import { TextureCanvas } from "@/components/ocean/TextureCanvas";
 
 // L'eau autour des pages de l'application : la lumière qui descend, des reflets du soleil, des particules

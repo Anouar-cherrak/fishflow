@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -100,10 +100,6 @@ function GenererContent() {
   const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string; manage?: boolean } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const settingsRef = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
-    if (settingsRef.current && window.matchMedia("(min-width: 1024px)").matches) settingsRef.current.open = true;
-  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -222,11 +218,13 @@ function GenererContent() {
       formData.append("file", file);
     }
 
+    // Fiche déjà créée (et décomptée) par le serveur : un souci réseau APRÈS ce moment ne doit jamais proposer « Réessayer ».
+    let generated: Record<string, unknown> | null = null;
     try {
       const res = await fetch("/api/generate", { method: "POST", body: formData });
       // Une réponse qui n'est pas du JSON (délai dépassé chez l'hébergeur, panne) : on l'explique simplement.
       const data = await res.json().catch(() => ({
-        error: "La création de ta fiche a pris trop de temps ou a échoué. Elle ne t'a pas été décomptée. Réessaie, ou coupe ton cours en deux s'il est long.",
+        error: "La création de ta fiche a pris trop de temps ou a échoué. Réessaie, ou coupe ton cours en deux s'il est long.",
       }));
 
       if (!res.ok) {
@@ -246,13 +244,14 @@ function GenererContent() {
         } else {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
           setLoading(true);
-          setLoadError(data.error || "Réessaie dans un instant. Elle ne t'a pas été décomptée.");
+          setLoadError(data.error || "Réessaie dans un instant.");
         }
         // Réponse d'erreur (serveur indisponible…) : on n'affiche pas de compteur plutôt qu'un « undefined ».
         fetch("/api/usage").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && typeof d.isPro === "boolean") setUsage(d); }).catch(() => {});
         return;
       }
 
+      generated = data;
       const title = data.title || data.summary?.slice(0, 40) || data.sheet?.[0]?.slice(0, 40) || "Fiche sans titre";
       const { data: inserted, error: insertError } = await supabase.from("fiches").insert({ title, data }).select().single();
 
@@ -279,9 +278,9 @@ function GenererContent() {
 
       trackEvent("generation_reussie", { mode, outputs: outputs.join(",") });
 
-      const updatedUsage = await fetch("/api/usage").then((r) => r.json());
-      setUsage(updatedUsage);
-      if (!updatedUsage.isPro) {
+      const updatedUsage = await fetch("/api/usage").then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      if (updatedUsage && typeof updatedUsage.isPro === "boolean") setUsage(updatedUsage);
+      if (updatedUsage && !updatedUsage.isPro) {
         trackEvent("quota_utilise", { remaining: updatedUsage.remaining });
       }
 
@@ -293,6 +292,14 @@ function GenererContent() {
       const destination = inserted?.id ? `/fiche/${inserted.id}?nouvelle=1` : "/result";
       setTimeout(() => router.push(destination), 450);
     } catch {
+      if (generated) {
+        // La fiche existe déjà : on l'ouvre (page de secours) au lieu d'en refaire une.
+        try {
+          localStorage.setItem("fishflow_result", JSON.stringify(generated));
+        } catch {}
+        router.push("/result");
+        return;
+      }
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
       setLoadError("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
     }
@@ -557,8 +564,8 @@ function GenererContent() {
 
         {/* Colonne de droite : ce que tu veux recevoir */}
         <div className="grid gap-6 ff-fade-up" style={{ animationDelay: "0.15s" }}>
-          {/* Réglages : repliés sur téléphone (le bouton « Créer ma fiche » reste près du cours), ouverts sur ordinateur. */}
-          <details ref={settingsRef} className="ff-settings">
+          {/* Réglages : repliés (une ligne résume les choix), ouverts d'un clic ; rien ne bouge à l'affichage. */}
+          <details className="ff-settings">
             <summary>
               <span>Réglages</span>
               <span className="ff-settings-sum">

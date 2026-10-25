@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { RAIE_PATH, RAIE_VIEWBOX } from "@/lib/raie-path";
 
@@ -23,11 +23,20 @@ export function FicheLoader({ step, progress, elapsed, error, onRetry, onBack }:
   const done = step >= LOADER_STEPS.length;
   const slow = !error && !done && elapsed >= 45;
   const verySlow = !error && !done && elapsed >= 90;
+  const box = useRef<HTMLDivElement>(null);
+
+  // Vraie fenêtre : tout le reste de la page devient inaccessible (clavier, lecteur d'écran) tant qu'elle est ouverte.
+  useEffect(() => {
+    const others = Array.from(document.body.children).filter((el) => el !== box.current && !el.hasAttribute("inert"));
+    others.forEach((el) => el.setAttribute("inert", ""));
+    box.current?.focus();
+    return () => others.forEach((el) => el.removeAttribute("inert"));
+  }, []);
 
   // Rendu directement dans <body> : la page qui apparaît en glissant (transform) piégerait sinon cet écran
   // dans son propre cadre, sous la barre du haut et les onglets.
   return createPortal(
-    <div className="ff-loader" data-state={error ? "error" : done ? "done" : "work"} aria-busy={!error && !done}>
+    <div ref={box} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Création de ta fiche" className="ff-loader outline-none" data-state={error ? "error" : done ? "done" : "work"} aria-busy={!error && !done}>
       <div className="ff-loader-in">
         <div className="ff-loader-swim" aria-hidden="true">
           <svg viewBox={RAIE_VIEWBOX} className="ff-loader-raie">
@@ -48,7 +57,7 @@ export function FicheLoader({ step, progress, elapsed, error, onRetry, onBack }:
             <h2>Ta fiche n&apos;a pas pu être créée.</h2>
             <p>{error}</p>
             <div className="ff-loader-actions">
-              <button type="button" className="ff-primary ff-btn" onClick={onRetry}>Réessayer</button>
+              <button type="button" className="ff-primary ff-btn" onClick={onRetry} autoFocus>Réessayer</button>
               <button type="button" className="ff-secondary" onClick={onBack}>Modifier mon cours</button>
             </div>
           </div>
