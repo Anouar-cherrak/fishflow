@@ -1095,7 +1095,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   background: linear-gradient(160deg, #91D5FF 0%, #46B5FF 50%, #0B92FF 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(0, 87, 166, 0.22), 0 8px 18px -8px rgba(0, 115, 205, 0.6); }
 .ff-mark::after { content: ""; position: absolute; left: -10%; right: -10%; top: -40%; height: 70%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.45), transparent); pointer-events: none; }
-.ff-mark > span { position: relative; z-index: 1; width: 72%; aspect-ratio: 512 / 420; background: #fff; -webkit-mask: url(/brand/logo.png) center / contain no-repeat; mask: url(/brand/logo.png) center / contain no-repeat; transform: translateY(2%); }
+.ff-mark > span { position: relative; z-index: 1; width: 72%; aspect-ratio: 512 / 420; background: #fff; -webkit-mask: url(/brand/raie.svg) center / contain no-repeat; mask: url(/brand/raie.svg) center / contain no-repeat; transform: translateY(2%); }
 .ff-brand:hover .ff-mark > span, .brand:hover .ff-mark > span { animation: ff-mark-flap 0.7s ease-in-out 2; }
 @keyframes ff-mark-flap { 30% { transform: translateY(-4%) scaleY(0.78) scaleX(1.05); } 60% { transform: translateY(1%) scaleY(1.05); } }
 .final-mark { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 10px rgba(70, 181, 255, 0.12), 0 0 60px rgba(70, 181, 255, 0.45), 0 24px 40px -16px rgba(0, 0, 0, 0.6); }

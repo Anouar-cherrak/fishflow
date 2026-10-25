@@ -36,7 +36,7 @@ export function SplashScreen() {
       {/* La raie arrive en douceur (simple apparition si l'animation est coupée). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/brand/logo.png"
+        src="/brand/raie.svg"
         alt=""
         aria-hidden="true"
         width={140}
