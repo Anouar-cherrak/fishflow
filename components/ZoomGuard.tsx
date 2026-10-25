@@ -4,9 +4,10 @@ import { useEffect } from "react";
 
 // Champs où un double appui sert à sélectionner un mot : on n'y touche pas.
 const EDITABLE = "input, textarea, select, [contenteditable]:not([contenteditable='false'])";
-// Touches de zoom du navigateur (Ctrl/Cmd + « + », « - », « 0 ») : par position de touche (AZERTY compris) et par caractère.
-const ZOOM_CODES = new Set(["Equal", "Minus", "Digit0", "NumpadAdd", "NumpadSubtract", "Numpad0"]);
-const ZOOM_KEYS = new Set(["+", "=", "-", "_", "0"]);
+// Touches de zoom du navigateur (Ctrl/Cmd + « + », « - ») : par position de touche (AZERTY compris) et par caractère.
+// Ctrl + 0 reste libre : il remet le site à sa taille normale (100 %) si le navigateur avait gardé un ancien zoom.
+const ZOOM_CODES = new Set(["Equal", "Minus", "NumpadAdd", "NumpadSubtract"]);
+const ZOOM_KEYS = new Set(["+", "=", "-", "_"]);
 
 /**
  * Le site garde toujours sa taille normale, comme une appli : pas de zoom au pincement, au double appui,
@@ -24,7 +25,7 @@ export function ZoomGuard() {
       if (e.ctrlKey) e.preventDefault();
     };
 
-    // Ordinateur : Ctrl/Cmd + « + », « - », « 0 ». Les autres raccourcis (copier, coller…) passent normalement.
+    // Ordinateur : Ctrl/Cmd + « + », « - ». Les autres raccourcis (copier, coller, Ctrl + 0…) passent normalement.
     const onKey = (e: KeyboardEvent) => {
       if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
       if (ZOOM_CODES.has(e.code) || ZOOM_KEYS.has(e.key)) e.preventDefault();
