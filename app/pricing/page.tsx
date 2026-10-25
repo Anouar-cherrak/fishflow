@@ -9,6 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { SeaDecor } from "@/components/Ocean";
 import { trackEvent } from "@/lib/tracking";
 import { TrackView } from "@/components/TrackView";
+import { FAQ } from "@/components/landing/content";
 
 // Seulement ce qui change entre Gratuit et Pro. Le reste est identique et résumé en une phrase sous le tableau.
 const ROWS: { label: string; free: string; pro: string }[] = [
@@ -154,6 +155,21 @@ export default function Pricing() {
           </div>
           <p className="text-sm text-black/65 mt-4">Dans les deux formules : la fiche, l'essentiel, les flashcards, le quiz, la révision avec rappels, l'objectif du jour et les 3 présentations (Classique, Mémo, Cornell).</p>
           <p className="text-xs text-black/50 mt-2">Paiement sécurisé par Stripe. Tes fiches restent privées.</p>
+
+          <section aria-labelledby="t-pricing-faq" className="mt-8">
+            <h2 id="t-pricing-faq" className="text-xl font-bold tracking-tight mb-3">Questions sur Pro</h2>
+            <div className="bg-surface border border-black/10 rounded-3xl divide-y divide-black/10">
+              {FAQ.filter((f) => /gratuit|arrêter|données|mes cours/i.test(f.q)).map(({ q, a }) => (
+                <details key={q} className="group px-5">
+                  <summary className="flex items-center justify-between gap-4 min-h-[56px] cursor-pointer list-none font-semibold [&::-webkit-details-marker]:hidden">
+                    {q}
+                    <span className="text-black/50 transition-transform duration-200 group-open:rotate-180" aria-hidden="true">⌄</span>
+                  </summary>
+                  <p className="pb-5 text-sm text-black/70 leading-relaxed">{a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </AppShell>

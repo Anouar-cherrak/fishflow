@@ -348,7 +348,7 @@ export default function MesFiches() {
                 return (
                   <li
                     key={fiche.id}
-                    className={`min-w-0 bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-4 ff-fade-up ff-card${i >= 12 ? " ff-lazy-item" : ""}`}
+                    className={`relative min-w-0 bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-3 ff-fade-up ff-card${i >= 12 ? " ff-lazy-item" : ""}`}
                     style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
                   >
                     <div className="min-w-0 flex-1">
@@ -393,24 +393,27 @@ export default function MesFiches() {
                               </span>
                             )}
                           </div>
-                          <h2 className="font-bold text-lg leading-snug text-black line-clamp-3 break-words">{fiche.title}</h2>
+                          {/* Toute la carte ouvre la fiche (le bouton s'étend sur la carte, les actions restent au-dessus). */}
+                          <h2 className="font-bold text-lg leading-snug text-black break-words pr-7">
+                            <button type="button" onClick={() => handleView(fiche)} className="ff-stretch text-left line-clamp-3">
+                              {fiche.title}
+                            </button>
+                          </h2>
+                          <span className="absolute right-5 top-5 text-black/40 text-xl leading-none" aria-hidden="true">›</span>
                         </>
                       )}
                       <p className="text-sm text-black/50 mt-2">
                         {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                       </p>
                     </div>
-                    <div className="grid grid-cols-3 gap-1 sm:flex sm:items-center sm:flex-wrap sm:-mx-2">
-                      <button type="button" onClick={() => handleView(fiche)} className="ff-primary text-sm min-h-[44px] sm:min-h-[40px] px-5 sm:mx-2 ff-btn col-span-3 sm:col-span-1 mb-1 sm:mb-0">
-                        Ouvrir et réviser
-                      </button>
+                    <div className="relative z-[1] flex items-center gap-1 -mx-2.5 -mb-2 border-t border-black/10 pt-2">
                       <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Renommer
                       </button>
                       <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Ranger cette fiche dans un dossier (par exemple une matière)">
                         Classer
                       </button>
-                      <button type="button" onClick={() => handleDelete(fiche.id)} className="text-sm text-black/60 hover:text-[var(--quiz-wrong-text)] transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
+                      <button type="button" onClick={() => handleDelete(fiche.id)} className="ml-auto text-sm text-black/60 hover:text-[var(--quiz-wrong-text)] transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
                         Supprimer
                       </button>
                     </div>

@@ -60,12 +60,3 @@ export function SeaDecor(_props: { fish?: boolean; y?: string }) {
   );
 }
 
-// Chargement : la raie du logo nage en rond, quelques bulles remontent.
-export function FishSchool() {
-  return (
-    <div className="ff-swim" aria-hidden="true">
-      <span className="ff-swim-raie"><RaieImg small={false} width={92} height={76} /></span>
-      <i /><i /><i />
-    </div>
-  );
-}
