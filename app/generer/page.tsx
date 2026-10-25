@@ -236,8 +236,11 @@ function GenererContent() {
     try {
       const res = await fetch("/api/generate", { method: "POST", body: formData });
       // Une réponse qui n'est pas du JSON (délai dépassé chez l'hébergeur, panne) : on l'explique simplement.
+      // 413 : l'hébergeur refuse l'envoi (plus de 4,5 Mo) avant même notre serveur, avec une page sans JSON.
       const data = await res.json().catch(() => ({
-        error: "La création de ta fiche a pris trop de temps ou a échoué. Réessaie, ou coupe ton cours en deux s'il est long.",
+        error: res.status === 413
+          ? "Ton fichier est trop lourd : 4 Mo au maximum. Garde seulement les pages du chapitre à réviser, ou prends-les en photo."
+          : "La création de ta fiche a pris trop de temps ou a échoué. Réessaie, ou coupe ton cours en deux s'il est long.",
       }));
 
       if (!res.ok) {
