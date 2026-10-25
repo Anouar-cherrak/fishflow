@@ -46,15 +46,6 @@ export function DeepDefs() {
           <stop offset="0" stopColor="#8FF5E0" stopOpacity=".5" />
           <stop offset="1" stopColor="#8FF5E0" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="dp-angler" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1B3E72" />
-          <stop offset="1" stopColor="#06162F" />
-        </linearGradient>
-        <radialGradient id="dp-lure" cx=".5" cy=".5" r=".5">
-          <stop offset="0" stopColor="#FFFBE0" />
-          <stop offset=".35" stopColor="#FFE680" />
-          <stop offset="1" stopColor="#FFD23F" stopOpacity="0" />
-        </radialGradient>
       </defs>
     </svg>
   );
@@ -146,21 +137,3 @@ export function Jellies() {
   );
 }
 
-/* La baudroie et sa lanterne, tout au fond (1 000 m). */
-export function Angler() {
-  return (
-    <div className="dp-angler" data-scene aria-hidden="true">
-      <svg viewBox="0 0 220 140">
-        <circle className="dp-lure-glow" cx="152" cy="12" r="34" fill="url(#dp-lure)" />
-        <path d="M74 36C92 10 128 4 150 10" stroke="#2A5A96" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <circle className="dp-lure" cx="152" cy="12" r="6" fill="#FFF6C2" />
-        <path d="M200 76c-8-22-30-40-62-42-40-2-74 18-86 44 12 26 46 46 86 44 32-2 54-20 62-46z" fill="url(#dp-angler)" />
-        <path d="M200 78 218 58v40z" fill="#0E2950" />
-        <path d="M60 80c10 12 26 16 42 13" stroke="#CFE6FF" strokeOpacity=".7" strokeWidth="3" strokeDasharray="4 5" fill="none" />
-        <path d="M120 44c18-2 40 6 52 20" stroke="rgba(141,206,255,.25)" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <circle cx="106" cy="62" r="6.5" fill="#FFE680" />
-        <circle cx="104.5" cy="60.5" r="2" fill="#fff" />
-      </svg>
-    </div>
-  );
-}

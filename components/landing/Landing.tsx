@@ -12,7 +12,7 @@ import { burstBubbles } from "@/lib/bubbles";
 import { setDarkClass } from "@/lib/set-theme";
 import { depthClick, disableDepthSound, enableDepthSound } from "./depth-sound";
 import { AskShow, CardsShow, DailyShow, FicheShow, HeroStage, QuizShow, StepPaste, StepRead, StepReady } from "./Objects";
-import { Angler, DeepDefs, Jellies, MantaPass, School, Surface } from "./Deep";
+import { DeepDefs, Jellies, MantaPass, School, Surface } from "./Deep";
 import { FAQ, TRUST } from "./content";
 
 type Theme = "light" | "dark";
@@ -535,7 +535,6 @@ export function Landing() {
         {/* ===== Le fond : la fin de la plongée ===== */}
         <section className="final" aria-labelledby="t-end">
           <TextureCanvas className="final-caustic" src="/ocean/caustic-top.webp" tileW={560} />
-          <Angler />
           <div className="wrap final-in" data-reveal>
             <BrandMark size={72} className="final-mark" />
             <h2 id="t-end">Plonge avec ton prochain cours.</h2>

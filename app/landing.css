@@ -528,17 +528,9 @@ footer a { color: #EEF6FF; min-height: 44px; display: inline-flex; align-items: 
 @keyframes dp-pulse { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.06, 0.88); } }
 @keyframes dp-sway { from { transform: skewX(-7deg); } to { transform: skewX(7deg) scaleY(0.94); } }
 
-/* La baudroie (1 000 m), dans l'eau profonde de la fin : sa lanterne s'allume et s'éteint. */
-.dp-angler { position: absolute; left: 3%; bottom: 10%; width: 150px; pointer-events: none; animation: dp-lurk 11s ease-in-out infinite alternate; }
-.dp-angler svg { display: block; width: 100%; height: auto; overflow: visible; }
-.dp-lure-glow { animation: dp-lantern 2.8s ease-in-out infinite alternate; }
-@media (min-width: 900px) { .dp-angler { left: 6%; width: 230px; bottom: 16%; } }
-@media (max-width: 899px) { .dp-angler { opacity: 0.55; } }
-@keyframes dp-lurk { to { transform: translate3d(34px, -10px, 0); } }
-@keyframes dp-lantern { from { opacity: 0.35; } to { opacity: 1; } }
 
 /* Immobiles hors de l'écran, et partout quand l'onglet est caché. */
-.dp-surface:not([data-on="true"]) *, .dp-zone:not([data-on="true"]) *, .dp-angler:not([data-on="true"]), .dp-angler:not([data-on="true"]) *,
+.dp-surface:not([data-on="true"]) *, .dp-zone:not([data-on="true"]) *,
 .lp-paused *, .lp-paused *::before, .lp-paused *::after { animation-play-state: paused !important; }
 /* Petit appareil ou économie de données : deux poissons, une méduse, moins de bulles. */
 .lp-lite .dp-school .dp-fish:nth-child(n+3), .lp-lite .dp-jelly:nth-child(n+2), .lp-lite .bubbles i:nth-child(n+3) { display: none; }
