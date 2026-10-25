@@ -29,7 +29,12 @@ export async function POST() {
         if (sub.status !== "canceled" && sub.status !== "incomplete_expired") await stripe.subscriptions.cancel(sub.id);
       }
     } catch (err) {
-      console.error("Erreur annulation abonnement Stripe lors de la suppression du compte:", err);
+      // On ne supprime PAS le compte : sinon l'abonnement continuerait d'être prélevé sans compte pour l'arrêter.
+      console.error("Erreur annulation abonnement Stripe lors de la suppression du compte:", err instanceof Error ? err.message : "inconnue");
+      return NextResponse.json(
+        { error: "Ton abonnement n'a pas pu être arrêté pour l'instant, donc ton compte n'a pas été supprimé. Réessaie dans quelques minutes." },
+        { status: 502 }
+      );
     }
   }
 
@@ -48,7 +53,7 @@ export async function POST() {
 
   const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
   if (deleteError) {
-    console.error("Erreur suppression compte auth:", deleteError);
+    console.error("Erreur suppression compte auth:", deleteError.message);
     return NextResponse.json({ error: "Erreur pendant la suppression. Contacte le support." }, { status: 500 });
   }
 

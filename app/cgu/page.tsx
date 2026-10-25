@@ -1,10 +1,12 @@
 import { AppShell } from "@/components/AppShell";
+import { LegalToc } from "@/components/LegalToc";
 
 export default function CGU() {
   return (
     <AppShell size="form">
       <article>
         <h1 className="ff-title mb-8">Conditions générales d'utilisation</h1>
+        <LegalToc />
 
         <div className="space-y-8 text-base text-black/75 leading-relaxed">
           <section>

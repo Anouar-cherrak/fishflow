@@ -33,10 +33,11 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "FishFlow",
   },
-  // Icônes générées depuis le logo par scripts/brand.mjs (tailles multiples de 48 px pour Google).
+  // Icônes générées depuis le logo vectoriel par scripts/brand.mjs (tailles multiples de 48 px pour Google).
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+      { url: "/brand/tuile.svg", type: "image/svg+xml", sizes: "any" },
       { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
       { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
       { url: "/favicon-192x192.png", type: "image/png", sizes: "192x192" },

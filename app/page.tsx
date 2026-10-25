@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { TrackView } from "@/components/TrackView";
 import { Landing as LandingView } from "@/components/landing/Landing";
+import { FAQ } from "@/components/landing/content";
+import { AskShow, CardsShow, DailyShow, FicheShow, HeroStage, QuizShow, StepPaste, StepRead, StepReady } from "@/components/landing/Objects";
+import { DeepDefs, Jellies, MantaPass, School, Surface } from "@/components/landing/Deep";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -52,12 +55,20 @@ export default function Landing() {
                 description:
                   "Transforme un cours, un PDF ou une photo en fiche de révision, résumé, flashcards et quiz grâce à l'IA.",
               },
+              {
+                "@type": "FAQPage",
+                mainEntity: FAQ.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+              },
             ],
           }),
         }}
       />
       <TrackView name="visit" />
-      <LandingView />
+      <LandingView deep={{ defs: <DeepDefs />, surface: <Surface />, manta: <MantaPass />, school: <School />, jellies: <Jellies />,
+          hero: <HeroStage />,
+          steps: [<StepPaste key="p" />, <StepRead key="r" />, <StepReady key="o" />],
+          // Même ordre que FEATURES dans Landing.tsx : fiche, cartes, quiz, jour, apprendre.
+          shows: [<FicheShow key="f" />, <CardsShow key="c" />, <QuizShow key="q" />, <DailyShow key="d" />, <AskShow key="a" />] }} />
     </>
   );
 }

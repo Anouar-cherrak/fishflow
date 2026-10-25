@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAuthClient } from "@/lib/supabase/server";
 import { clientIp, limiter, tooMany } from "@/lib/security/limiter";
-import { mailRules } from "@/lib/security/auth-limits";
+import { mailRules, STRICT } from "@/lib/security/auth-limits";
 import { waitText } from "@/lib/security/limiter-core";
 import { asEmail, readJson } from "@/lib/security/validate";
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const email = asEmail(body?.email);
   if (!email) return NextResponse.json({ error: "Cette adresse email n'est pas valide. Vérifie-la." }, { status: 400 });
 
-  const wait = await limiter.check(mailRules(req, "resend", email));
+  const wait = await limiter.check(mailRules(req, "resend", email), STRICT);
   if (wait) return tooMany(wait, `Tu as déjà demandé un code. Attends ${waitText(wait)}, puis réessaie (regarde aussi dans tes spams).`);
 
   const supabase = await createAuthClient(clientIp(req));

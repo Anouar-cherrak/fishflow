@@ -54,14 +54,36 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
 ];
 
+// Pages du compte (fiches, révisions, génération, paiement, réglages) : jamais gardées par un cache partagé (CDN, proxy).
+// Elles ne contiennent pas de données dans le HTML, mais la règle est stricte : rien du compte n'est mis en cache public.
+// tests/cache.test.mjs vérifie que chaque page et route ci-dessous reçoit bien « private, no-store ».
+export const PRIVATE_ROUTES = [
+  "/api/:path*",
+  "/generer",
+  "/mes-fiches",
+  "/fiche/:path*",
+  "/result",
+  "/aujourdhui",
+  "/reviser",
+  "/apprendre",
+  "/examens",
+  "/parametres",
+  "/reset-password/:path*",
+];
+const NO_STORE = [{ key: "Cache-Control", value: "private, no-store, max-age=0" }];
+
+// Fichiers publics sans empreinte dans leur nom (logo, icônes, textures de l'eau) : une semaine en cache, puis vérifiés en
+// arrière-plan. Les fichiers de /_next/static ont une empreinte : Next.js les sert déjà « immutable » pour un an.
+const STATIC_ASSET = [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=2592000" }];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
-      // Réponses des routes de l'API : jamais gardées en cache par le navigateur ni par un intermédiaire.
-      { source: "/api/:path*", headers: [{ key: "Cache-Control", value: "no-store" }] },
+      ...["/brand/:path*", "/icons/:path*", "/ocean/:path*", "/favicon.ico", "/favicon-:size.png", "/apple-touch-icon.png"].map((source) => ({ source, headers: STATIC_ASSET })),
+      ...PRIVATE_ROUTES.map((source) => ({ source, headers: NO_STORE })),
     ];
   },
 };

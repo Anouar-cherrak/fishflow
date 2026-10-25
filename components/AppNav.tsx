@@ -117,6 +117,8 @@ export function AppNav() {
 
   const logout = async () => {
     await (await getSupabase()).auth.signOut();
+    // Ordinateur partagé (CDI) : la dernière fiche ouverte ne reste pas dans ce navigateur.
+    try { localStorage.removeItem("fishflow_result"); } catch {}
     setEmail(null);
     setOpen(false);
     router.push("/");

@@ -2,6 +2,7 @@
 // Toutes les valeurs sont dans lib/limits.ts ; la logique est dans lib/quota-core.ts.
 
 import { createHash } from "node:crypto";
+import { clientIp } from "./security/limiter";
 import { createAdminClient } from "./supabase/admin";
 import { reserve as reserveCore, recordCost as recordCostCore, status as statusCore, type CounterStore, type Kind } from "./quota-core";
 import { refundUsage, reserveUsage } from "./usage";
@@ -34,8 +35,9 @@ const store: CounterStore = {
 
 // L'adresse IP n'est jamais stockée telle quelle : seulement une empreinte, effacée au bout de quelques minutes.
 function ipKey(req: Request): string | null {
-  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || req.headers.get("x-real-ip") || "";
-  if (!ip) return null;
+  // Même lecture de l'adresse que le reste du site (lib/security/limiter.ts).
+  const ip = clientIp(req);
+  if (ip === "local") return null;
   return createHash("sha256").update(`fishflow:${ip}`).digest("hex").slice(0, 24);
 }
 

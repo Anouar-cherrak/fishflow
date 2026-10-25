@@ -132,7 +132,10 @@ export function FlashcardStudy({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") return;
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === "BUTTON" || target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+      // La carte elle-même a le focus au départ : les flèches doivent marcher dessus (Espace et Entrée la retournent déjà, comme un bouton).
+      const onCard = !!target?.closest(".ff-flip");
+      if (onCard && (e.key === " " || e.key === "Enter")) return;
+      if (target && !onCard && (target.tagName === "BUTTON" || target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
         return;
       }
       if (done) return;
@@ -243,19 +246,24 @@ export function FlashcardStudy({
           </div>
         ) : (
           <>
+            {/* La carte se retourne vraiment (les deux faces ont la même place : rien ne saute). Une nouvelle carte arrive de la droite. */}
             <button
+              key={`${round}-${pos}`}
               type="button"
               data-autofocus
               onClick={() => setFlipped((f) => !f)}
-              className="w-full min-h-[220px] bg-white border border-black/10 rounded-xl p-6 text-left flex flex-col justify-between hover:border-black/25 transition"
+              className="ff-flip w-full text-left"
+              data-flipped={flipped}
             >
-              <span className="text-xs font-semibold text-black/60 uppercase tracking-wide">
-                {flipped ? "Réponse" : "Question"}
+              <span className="ff-flip-in">
+                {[false, true].map((back) => (
+                  <span key={String(back)} className="ff-flip-face bg-white border border-black/10" data-back={back} aria-hidden={back !== flipped}>
+                    <span className="text-xs font-semibold text-black/60 uppercase tracking-wide">{back ? "Réponse" : "Question"}</span>
+                    <span className={`my-4 ${back ? "text-black/80" : "text-black font-medium text-lg"}`}>{back ? current.answer : current.question}</span>
+                    <span className="text-xs text-black/60">{back ? "Touche pour revoir la question" : "Touche pour voir la réponse"}</span>
+                  </span>
+                ))}
               </span>
-              <span className={`my-4 ${flipped ? "text-black/80" : "text-black font-medium text-lg"}`}>
-                {flipped ? current.answer : current.question}
-              </span>
-              <span className="text-xs text-black/60">{flipped ? "Touche pour revoir la question" : "Touche pour voir la réponse"}</span>
             </button>
 
             <div className="grid grid-cols-2 gap-2 mt-4">

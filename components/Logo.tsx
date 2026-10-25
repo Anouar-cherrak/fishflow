@@ -1,30 +1,31 @@
 /* eslint-disable @next/next/no-img-element */
-// Le logo FishFlow : une raie manta bleu ciel (images générées par scripts/brand.mjs).
-// Le même bleu se voit bien en thème clair comme en thème sombre : une seule image.
+// Le logo FishFlow : la raie manta bleu ciel d'Anouar, en vectoriel (public/brand/raie.svg, tracé depuis son dessin).
+// Le même bleu se voit bien en thème clair comme en thème sombre : une seule image, nette à toutes les tailles.
 
 // Proportions du logo : largeur ≈ 1,22 × hauteur.
-export const RAIE_RATIO = 512 / 420;
+export const RAIE_RATIO = 512 / 418;
 
-export function RaieImg({ small, width, height, className = "" }: { small: boolean; width: number; height: number; className?: string }) {
-  return <img src={small ? "/brand/logo-sm.png" : "/brand/logo.png"} alt="" width={width} height={height} className={className} draggable={false} />;
+// L'image du logo, nette à toutes les tailles.
+export function RaieImg({ width, height, className = "" }: { width: number; height: number; className?: string }) {
+  return <img src="/brand/raie.svg" alt="" width={width} height={height} className={className} draggable={false} />;
 }
 
 // Le logo de la barre du haut et des menus. « size » = hauteur affichée, en pixels.
-// Il plane doucement ; au survol du lien (classe « ff-brand »), il bat des ailes et lâche une bulle.
+// Il plane doucement ; au survol du lien (classe « ff-brand »), il bat des ailes.
 export function Logo({ size = 36, className = "" }: { size?: number; className?: string }) {
   return (
     <span className={`ff-logo ${className}`} aria-hidden="true">
-      <RaieImg small width={Math.round(size * RAIE_RATIO)} height={size} className="select-none" />
+      <RaieImg width={Math.round(size * RAIE_RATIO)} height={size} className="select-none" />
       <i />
     </span>
   );
 }
 
-// « FishFlow » : « Flow » en bleu (la couleur du logo), avec une fine vague sous « Flow » au survol du lien.
+// « FishFlow » : « Flow » en bleu (la couleur du logo).
 export function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <span className={`ff-wordmark font-display font-semibold text-black ${className}`}>
-      Fish<span className="font-normal">Flow</span>
+    <span className={`ff-wordmark font-display text-black ${className}`}>
+      Fish<span>Flow</span>
     </span>
   );
 }

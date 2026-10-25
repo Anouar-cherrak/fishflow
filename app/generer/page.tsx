@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/tracking";
 import { track } from "@/lib/track";
 import type { User } from "@supabase/supabase-js";
 import { LIMITS } from "@/lib/limits";
-import { FishSchool } from "@/components/Ocean";
+import { FicheLoader, LOADER_STEPS } from "@/components/FicheLoader";
 import { burstBubbles } from "@/lib/bubbles";
 
 type Mode = "text" | "pdf" | "photo";
@@ -35,12 +35,9 @@ const OUTPUT_OPTIONS: { key: OutputKey; label: string }[] = [
   { key: "quiz", label: "Quiz" },
 ];
 
-const LOADING_MESSAGES = [
-  "Je lis ton cours…",
-  "Je repère les idées importantes…",
-  "J'écris ta fiche…",
-  "Je prépare les flashcards et le quiz…",
-];
+// Moment (en secondes) où chaque étape commence, d'après les durées habituelles du moteur (20 à 60 s).
+// La dernière étape reste affichée jusqu'à la vraie réponse : la barre ne dit jamais « fini » trop tôt.
+const STEP_AT = [0, 5, 14, 30];
 
 const FREE_FICHES_LIMIT = LIMITS.free.historyMax;
 const MAX_PHOTO_SIDE = 2000;
@@ -96,6 +93,8 @@ function GenererContent() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [usage, setUsage] = useState<UsageInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Erreur pendant la création : l'écran de chargement reste ouvert et propose de réessayer.
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [upgradeModal, setUpgradeModal] = useState<{ title: string; message: string; manage?: boolean } | null>(null);
@@ -137,25 +136,21 @@ function GenererContent() {
   }, [searchParams, router]);
 
   useEffect(() => {
-    if (!loading) {
-      setLoadingStep(0);
-      setProgress(0);
-      setElapsed(0);
-      return;
-    }
+    // Les compteurs repartent de zéro au lancement (handleGenerate).
+    if (!loading || loadError) return;
     const started = Date.now();
-    const messageInterval = setInterval(() => {
-      setLoadingStep((prev) => Math.min(prev + 1, LOADING_MESSAGES.length - 1));
-      setElapsed(Math.round((Date.now() - started) / 1000));
-    }, 3000);
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => (prev < 92 ? prev + (92 - prev) * 0.08 : prev));
-    }, 300);
-    return () => {
-      clearInterval(messageInterval);
-      clearInterval(progressInterval);
-    };
-  }, [loading]);
+    const tick = setInterval(() => {
+      const s = (Date.now() - started) / 1000;
+      setElapsed(Math.round(s));
+      const step = STEP_AT.filter((at) => s >= at).length - 1;
+      setLoadingStep((prev) => (prev >= LOADER_STEPS.length ? prev : step));
+      // Chaque étape remplit son quart de barre ; la dernière ralentit et s'arrête à 92 % jusqu'à la réponse.
+      const next = STEP_AT[step + 1] ?? STEP_AT[step] + 40;
+      const within = Math.min(1, (s - STEP_AT[step]) / (next - STEP_AT[step]));
+      setProgress((prev) => (prev >= 100 ? prev : Math.min(92, Math.max(prev, (step + within * (step === 3 ? 0.68 : 1)) * 25))));
+    }, 250);
+    return () => clearInterval(tick);
+  }, [loading, loadError]);
 
   const toggleOutput = (key: OutputKey) => {
     setOutputs((prev) => {
@@ -199,6 +194,10 @@ function GenererContent() {
     }
 
     setError(null);
+    setLoadError(null);
+    setLoadingStep(0);
+    setProgress(0);
+    setElapsed(0);
     setLoading(true);
     const formData = new FormData();
     formData.append("mode", mode);
@@ -219,11 +218,13 @@ function GenererContent() {
       formData.append("file", file);
     }
 
+    // Fiche déjà créée (et décomptée) par le serveur : un souci réseau APRÈS ce moment ne doit jamais proposer « Réessayer ».
+    let generated: Record<string, unknown> | null = null;
     try {
       const res = await fetch("/api/generate", { method: "POST", body: formData });
       // Une réponse qui n'est pas du JSON (délai dépassé chez l'hébergeur, panne) : on l'explique simplement.
       const data = await res.json().catch(() => ({
-        error: "La création de ta fiche a pris trop de temps ou a échoué. Elle ne t'a pas été décomptée. Réessaie, ou coupe ton cours en deux s'il est long.",
+        error: "La création de ta fiche a pris trop de temps ou a échoué. Réessaie, ou coupe ton cours en deux s'il est long.",
       }));
 
       if (!res.ok) {
@@ -242,13 +243,15 @@ function GenererContent() {
           });
         } else {
           trackEvent("generation_echouee", { mode, reason: data.error || "erreur" });
-          setError(data.error || "Ta fiche n'a pas pu être créée. Réessaie dans un instant.");
+          setLoading(true);
+          setLoadError(data.error || "Réessaie dans un instant.");
         }
         // Réponse d'erreur (serveur indisponible…) : on n'affiche pas de compteur plutôt qu'un « undefined ».
         fetch("/api/usage").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && typeof d.isPro === "boolean") setUsage(d); }).catch(() => {});
         return;
       }
 
+      generated = data;
       const title = data.title || data.summary?.slice(0, 40) || data.sheet?.[0]?.slice(0, 40) || "Fiche sans titre";
       const { data: inserted, error: insertError } = await supabase.from("fiches").insert({ title, data }).select().single();
 
@@ -275,22 +278,30 @@ function GenererContent() {
 
       trackEvent("generation_reussie", { mode, outputs: outputs.join(",") });
 
-      const updatedUsage = await fetch("/api/usage").then((r) => r.json());
-      setUsage(updatedUsage);
-      if (!updatedUsage.isPro) {
+      const updatedUsage = await fetch("/api/usage").then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      if (updatedUsage && typeof updatedUsage.isPro === "boolean") setUsage(updatedUsage);
+      if (updatedUsage && !updatedUsage.isPro) {
         trackEvent("quota_utilise", { remaining: updatedUsage.remaining });
       }
 
       setProgress(100);
+      setLoadingStep(LOADER_STEPS.length);
       // Fiche prête : une gerbe de bulles remonte pendant qu'on l'ouvre.
       burstBubbles();
       // Une fiche enregistrée a sa propre adresse ; sinon on garde la page de secours.
       const destination = inserted?.id ? `/fiche/${inserted.id}?nouvelle=1` : "/result";
-      setTimeout(() => router.push(destination), 150);
+      setTimeout(() => router.push(destination), 450);
     } catch {
+      if (generated) {
+        // La fiche existe déjà : on l'ouvre (page de secours) au lieu d'en refaire une.
+        try {
+          localStorage.setItem("fishflow_result", JSON.stringify(generated));
+        } catch {}
+        router.push("/result");
+        return;
+      }
       trackEvent("generation_echouee", { mode, reason: "erreur_reseau" });
-      setError("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
-      setLoading(false);
+      setLoadError("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
     }
   };
 
@@ -352,21 +363,17 @@ function GenererContent() {
   return (
     <AppShell size="wide">
       {loading && (
-        <div role="status" aria-live="polite" className="ff-dive fixed inset-0 flex flex-col items-center justify-center z-[70] px-6 text-center">
-          {/* La raie nage pendant que la fiche se prépare. */}
-          <FishSchool />
-          <p className="text-black font-semibold text-lg mb-4 ff-fade">{LOADING_MESSAGES[loadingStep]}</p>
-          <div className="w-full max-w-xs h-1.5 bg-black/10 rounded-full overflow-hidden">
-            <div
-              className="h-full ff-progress-shimmer w-full transition-transform duration-300 ease-out"
-              style={{ transform: `translateX(${progress - 100}%)` }}
-            />
-          </div>
-          <p className="text-black/60 text-sm mt-3">
-            Ça prend en général 20 à 60 secondes. Reste sur cette page.
-            {elapsed >= 9 && <span className="block mt-1 tabular-nums" aria-hidden="true">{elapsed} s</span>}
-          </p>
-        </div>
+        <FicheLoader
+          step={loadingStep}
+          progress={progress}
+          elapsed={elapsed}
+          error={loadError}
+          onRetry={handleGenerate}
+          onBack={() => {
+            setLoading(false);
+            setLoadError(null);
+          }}
+        />
       )}
 
       {upgradeModal && (
@@ -385,7 +392,9 @@ function GenererContent() {
 
       <div className="mb-8 ff-fade-up">
         <h1 className="ff-title mb-3">Crée ta fiche de révision.</h1>
-        <p className="ff-lead">Donne ton cours (texte, PDF ou photo), puis appuie sur « Créer ma fiche ». Tu reçois une fiche, l&apos;essentiel, des flashcards et un quiz.</p>
+        <p className="ff-lead">
+          Donne ton cours (texte, PDF ou photo)<span className="max-sm:hidden">, puis appuie sur « Créer ma fiche »</span>. Tu reçois une fiche, l&apos;essentiel, des flashcards et un quiz.
+        </p>
       </div>
 
       {/* Ce qu'il reste, visible tout de suite (sans défiler), avec un lien vers ce que Pro change. */}
@@ -444,7 +453,7 @@ function GenererContent() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Colle ici ton cours, un article ou tes notes (quelques phrases au minimum)…"
-                className="w-full h-44 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-base ff-input resize-y"
+                className="w-full h-32 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-base ff-input resize-y"
               />
             </>
           )}
@@ -555,7 +564,15 @@ function GenererContent() {
 
         {/* Colonne de droite : ce que tu veux recevoir */}
         <div className="grid gap-6 ff-fade-up" style={{ animationDelay: "0.15s" }}>
-          <section aria-label="Options" className="grid gap-6">
+          {/* Réglages : repliés (une ligne résume les choix), ouverts d'un clic ; rien ne bouge à l'affichage. */}
+          <details className="ff-settings">
+            <summary>
+              <span>Réglages</span>
+              <span className="ff-settings-sum">
+                {{ facile: "Facile", moyen: "Moyen", difficile: "Difficile" }[difficulty]} · {{ court: "Court", moyen: "Moyen", detaille: "Détaillé" }[length]} · {outputs.length === OUTPUT_OPTIONS.length ? "tout" : `${outputs.length} sur ${OUTPUT_OPTIONS.length}`}
+              </span>
+            </summary>
+          <section aria-label="Options" className="grid gap-6 pt-4">
             <div className="grid grid-cols-2 gap-4" role="group" aria-label="Réglages de la fiche">
               <div>
                 <label htmlFor="niveau" className="text-sm font-semibold text-black/60 block mb-2">Niveau</label>
@@ -609,6 +626,7 @@ function GenererContent() {
             </fieldset>
 
           </section>
+          </details>
 
           {error && (
             <p role="alert" className="px-4 py-3 rounded-2xl border border-[#EF4444]/40 bg-[#EF4444]/10 text-sm text-black">

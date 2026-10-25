@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 const TABS: { href: string; label: string; icon: ReactNode; main?: boolean }[] = [
   {
@@ -42,14 +43,28 @@ const TABS: { href: string; label: string; icon: ReactNode; main?: boolean }[] =
 const HIDDEN = ["/apprendre", "/login", "/signup", "/reset-password"];
 
 // Barre d'onglets en bas de l'écran, sur téléphone seulement : les 4 pages du quotidien sous le pouce.
+// Chaque page recrée la barre : on se souvient de l'onglet précédent pour que la pastille parte de là.
+let lastTab = -1;
+
 export function BottomTabs() {
   const pathname = usePathname();
+  const [pill, setPill] = useState<number | null>(lastTab >= 0 ? lastTab : null);
+  useEffect(() => {
+    const now = TABS.findIndex((t) => pathname === t.href || pathname.startsWith(`${t.href}/`) || (t.href === "/mes-fiches" && pathname.startsWith("/fiche/")));
+    lastTab = now;
+    const raf = requestAnimationFrame(() => setPill(null));
+    return () => cancelAnimationFrame(raf);
+  }, [pathname]);
   if (HIDDEN.some((p) => pathname.startsWith(p))) return null;
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`) || (href === "/mes-fiches" && pathname.startsWith("/fiche/"));
+  const current = TABS.findIndex((t) => isActive(t.href));
 
   return (
-    <nav className="ff-tabs" aria-label="Navigation rapide">
+    <nav className="ff-tabs" aria-label="Navigation rapide" style={{ "--i": Math.max(0, pill ?? current) } as CSSProperties}>
+      {/* La pastille glisse sous l'onglet de la page ouverte (on voit d'où l'on vient). */}
+      <span className="ff-tab-pill" aria-hidden="true" data-on={current >= 0} />
       {TABS.map((tab) => {
-        const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`) || (tab.href === "/mes-fiches" && pathname.startsWith("/fiche/"));
+        const active = isActive(tab.href);
         return (
           <Link key={tab.href} href={tab.href} className="ff-tab" data-main={tab.main ? "true" : undefined} aria-current={active ? "page" : undefined}>
             <span className="ff-tab-icon" aria-hidden="true">

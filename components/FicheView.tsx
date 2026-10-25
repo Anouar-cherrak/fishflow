@@ -313,7 +313,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
   const sectionOpacity = (key: string) =>
     regeneratingKey === key ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity";
 
-  const actionClass = "ff-secondary w-full text-sm";
+  const actionClass = "ff-secondary ff-ghost w-full text-sm";
   const hasCards = (data.flashcards?.length ?? 0) > 0;
 
   const chooseTemplate = (key: Template) => {
@@ -431,7 +431,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               </Link>
             )}
             <p className="text-sm font-semibold text-accent mb-2">Fiche de révision</p>
-            <h1 className="ff-title">{data.title || "Ta fiche est prête."}</h1>
+            <h1 className="ff-title break-words" data-long={(data.title?.length ?? 0) > 60 || undefined}>{data.title || "Ta fiche est prête."}</h1>
             <p className="ff-lead mt-3">Ta fiche, l&apos;essentiel, les flashcards et le quiz, créés à partir de ton cours.</p>
           </div>
 
@@ -472,9 +472,12 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
               </button>
               {data.id && <ShareFiche ficheId={data.id} className={actionClass} />}
             </div>
-            <button type="button" onClick={handleClear} className="text-sm text-black/50 hover:text-black transition ff-link-underline justify-self-start mt-1 min-h-[44px]">
-              Supprimer cette fiche
-            </button>
+            {/* Action définitive : à part, sous un trait, en rouge discret. */}
+            <div className="mt-2 pt-2 border-t border-black/10">
+              <button type="button" onClick={handleClear} className="ff-danger-link">
+                Supprimer cette fiche
+              </button>
+            </div>
           </aside>
 
           <div className="lg:col-start-1 lg:row-start-2 min-w-0">

@@ -1,6 +1,7 @@
 // Limites de requêtes branchées sur la base Supabase (tables rate_windows et auth_failures, script supabase/securite-2026-10.sql).
 // Les compteurs sont dans la base (pas en mémoire) : ils tiennent même avec plusieurs serveurs Vercel en même temps.
-// Si le script SQL n'est pas encore installé, rien n'est bloqué (le site continue de marcher) et une alerte apparaît dans les journaux.
+// Si le script SQL n'est pas installé ou si la base ne répond pas : les routes ordinaires restent ouvertes (alerte dans les journaux),
+// mais la connexion, les codes et les e-mails (mode strict) sont refusés 1 minute : impossible d'en profiter pour tout essayer.
 
 import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
@@ -13,6 +14,7 @@ import {
   tooManyMessage,
   type LimiterStore,
   type LockKey,
+  type Mode,
   type Rule,
 } from "./limiter-core";
 
@@ -20,7 +22,7 @@ let warned = false;
 function missing(e: { message?: string } | null): null {
   if (!warned) {
     warned = true;
-    console.error("Limites de sécurité inactives (script supabase/securite-2026-10.sql à installer) :", e?.message ?? "inconnu");
+    console.error("Compteurs de sécurité indisponibles (script supabase/securite-2026-10.sql installé ?) : connexion et e-mails refusés, le reste passe.", e?.message ?? "inconnu");
   }
   return null;
 }
@@ -62,9 +64,9 @@ export function fingerprint(kind: string, value: string): string {
 }
 
 export const limiter = {
-  check: (rules: Rule[]) => checkRules(store, rules),
-  lock: (keys: LockKey[]) => currentLock(store, keys),
-  fail: (keys: LockKey[]) => failure(store, keys),
+  check: (rules: Rule[], mode?: Mode) => checkRules(store, rules, mode),
+  lock: (keys: LockKey[], mode?: Mode) => currentLock(store, keys, mode),
+  fail: (keys: LockKey[], mode?: Mode) => failure(store, keys, mode),
   ok: (keys: LockKey[]) => success(store, keys),
 };
 

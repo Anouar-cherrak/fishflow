@@ -1,15 +1,15 @@
 // Toutes les limites de la connexion, de l'inscription et des emails, au même endroit.
 import { clientIp, fingerprint } from "./limiter";
-import { AUTH_LOCK as LOCK, type LockKey, type Rule } from "./limiter-core";
+import { authLockKeys, type LockKey, type Rule } from "./limiter-core";
 
 const HOUR = 3600;
 
 export function keysFor(req: Request, action: "login" | "verify", email: string): LockKey[] {
-  return [
-    { key: `${action}:${fingerprint("email", email)}`, threshold: LOCK.perAccount },
-    { key: `${action}:${fingerprint("ip", clientIp(req))}`, threshold: LOCK.perIp },
-  ];
+  return authLockKeys(action, fingerprint("email", email), fingerprint("ip", clientIp(req)));
 }
+
+// Connexion, codes et e-mails : si les compteurs sont en panne, on refuse plutôt que de tout laisser passer.
+export const STRICT = { strict: true } as const;
 
 // Nombre d'essais (bons ou mauvais) : contre les scripts qui tapent en boucle.
 export function attemptRules(req: Request, action: "login" | "verify"): Rule[] {

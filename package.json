@@ -9,9 +9,11 @@
     "lint": "eslint",
     "test:limites": "node --test tests/limites.test.mjs",
     "test:securite": "node --test tests/securite.test.mjs",
-    "test": "node --test tests/limites.test.mjs tests/securite.test.mjs tests/stripe.test.mjs",
+    "test": "node --test tests/limites.test.mjs tests/securite.test.mjs tests/stripe.test.mjs tests/cache.test.mjs tests/securite-partage.test.mjs",
     "test:stripe": "node --test tests/stripe.test.mjs",
-    "verif:http": "node --test tests/verif-http.mjs"
+    "test:cache": "node --test tests/cache.test.mjs tests/securite-partage.test.mjs",
+    "verif:http": "node --test tests/verif-http.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
@@ -27,6 +29,8 @@
     "unpdf": "^1.8.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "1.56.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
