@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { BrandMark } from "@/components/BrandMark";
 import { TextureCanvas } from "@/components/ocean/TextureCanvas";
 import { TrackedLink } from "@/components/TrackedLink";
+import { CookieChoice } from "@/components/CookieChoice";
 import { hasAuthCookie } from "@/lib/supabase/has-auth-cookie";
 import { trackEvent } from "@/lib/tracking";
 import { burstBubbles } from "@/lib/bubbles";
@@ -564,6 +565,7 @@ export function Landing({ deep }: { deep: DeepSlots }) {
             <Link href="/mentions-legales">Mentions légales</Link>
             <Link href="/cgu">CGU</Link>
             <Link href="/confidentialite">Confidentialité</Link>
+            <CookieChoice className="cookie-link" />
           </div>
         </div>
       </footer>

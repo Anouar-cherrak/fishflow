@@ -1,3 +1,4 @@
+import { publicFicheData } from "@/lib/public-fiche";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,7 +21,9 @@ async function load(id: string): Promise<Shared | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_shared_fiche", { p_share: id });
   if (error || !Array.isArray(data) || data.length === 0) return null;
-  return data[0] as Shared;
+  const shared = data[0] as Shared;
+  // Le cours d'origine ne quitte jamais le compte de son auteur (ni à l'écran, ni dans le code de la page, ni dans la copie).
+  return { ...shared, data: publicFicheData(shared.data) } as Shared;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { extractText, getDocumentProxy } from "unpdf";
 import { createClient } from "@/lib/supabase/server";
-import { costUsd, EngineError, makeContext, normalizeFiche, runEngine, transcribeImages, type OutputKey } from "@/lib/fiche-engine";
+import { costUsd, EngineError, makeContext, ficheToText, normalizeFiche, runEngine, transcribeImages, type OutputKey } from "@/lib/fiche-engine";
 import { isProUser } from "@/lib/usage";
 import { LIMITS } from "@/lib/limits";
 import { recordCost, reserveFor } from "@/lib/quota";
@@ -122,6 +122,8 @@ export async function POST(req: Request) {
   try {
     const raw = formData.get("fiche");
     if (typeof raw === "string" && raw.length < 80000) existingFiche = normalizeFiche(JSON.parse(raw));
+    // Une fiche plus longue que la limite de la formule (gratuit : 15 000 caractères) ne passe pas par la régénération.
+    if (existingFiche && ficheToText(existingFiche).length > MAX_CHARS) existingFiche = null;
   } catch {}
   // Refaire seulement les flashcards, le quiz ou l'essentiel d'une fiche existante : peu coûteux, compté à part.
   const cheapRegen = !!existingFiche && !outputs.includes("sheet");

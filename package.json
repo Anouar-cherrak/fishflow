@@ -9,9 +9,9 @@
     "lint": "eslint",
     "test:limites": "node --test tests/limites.test.mjs",
     "test:securite": "node --test tests/securite.test.mjs",
-    "test": "node --test tests/limites.test.mjs tests/securite.test.mjs tests/stripe.test.mjs tests/cache.test.mjs",
+    "test": "node --test tests/limites.test.mjs tests/securite.test.mjs tests/stripe.test.mjs tests/cache.test.mjs tests/securite-partage.test.mjs",
     "test:stripe": "node --test tests/stripe.test.mjs",
-    "test:cache": "node --test tests/cache.test.mjs",
+    "test:cache": "node --test tests/cache.test.mjs tests/securite-partage.test.mjs",
     "verif:http": "node --test tests/verif-http.mjs",
     "test:e2e": "playwright test"
   },

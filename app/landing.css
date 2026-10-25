@@ -382,7 +382,8 @@ canvas.fx-rays, canvas.fx-caustic, canvas.final-caustic { display: block; }
 footer { background: #00173E; color: #A6CAF2; padding: 24px 0 calc(28px + env(safe-area-inset-bottom)); font-size: 14px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
 footer .links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
-footer a { color: #EEF6FF; min-height: 44px; display: inline-flex; align-items: center; }
+footer a, footer .cookie-link { color: #EEF6FF; min-height: 44px; display: inline-flex; align-items: center; }
+footer .cookie-link { text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
 
 /* ---------- Bouton collant (téléphone) ---------- */
 .sticky-cta { position: fixed !important; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 40; display: flex; transform: translate3d(0, 140%, 0); transition: transform 340ms cubic-bezier(0.32, 0.72, 0, 1); }

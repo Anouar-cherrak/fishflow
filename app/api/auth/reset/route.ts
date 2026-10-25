@@ -3,6 +3,7 @@ import { createAuthClient } from "@/lib/supabase/server";
 import { clientIp, limiter, tooMany } from "@/lib/security/limiter";
 import { mailRules } from "@/lib/security/auth-limits";
 import { asEmail, readJson } from "@/lib/security/validate";
+import { siteUrl } from "@/lib/site-url";
 
 export const runtime = "nodejs";
 
@@ -15,10 +16,9 @@ export async function POST(req: Request) {
   const wait = await limiter.check(mailRules(req, "reset", email));
   if (wait) return tooMany(wait);
 
-  // Adresse de retour fixée par le serveur (et vérifiée par Supabase dans sa liste d'adresses autorisées).
-  const origin = new URL(req.url).origin;
+  // Adresse de retour choisie dans une liste fixe (lib/site-url.ts), jamais tirée de la demande ; Supabase la vérifie aussi.
   const supabase = await createAuthClient(clientIp(req));
-  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/reset-password/confirm` });
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${siteUrl(req)}/reset-password/confirm` });
   if (error?.status === 429) return tooMany(60);
   if (error) console.error("Mot de passe oublié : envoi refusé", error.status, error.code);
   return NextResponse.json({ ok: true });

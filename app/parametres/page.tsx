@@ -1,5 +1,6 @@
 "use client";
 
+import { CookieChoice } from "@/components/CookieChoice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -110,6 +111,7 @@ export default function Parametres() {
       }
       const supabase = createClient();
       await supabase.auth.signOut();
+      try { localStorage.removeItem("fishflow_result"); } catch {}
       router.push("/");
     } catch {
       alert("La connexion a été coupée. Vérifie ton internet, puis réessaie.");
@@ -157,6 +159,7 @@ export default function Parametres() {
             >
               Revoir le tutoriel
             </button>
+            <CookieChoice className="mt-1 block text-sm font-semibold underline underline-offset-4 min-h-[44px]" />
           </div>
 
           <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
