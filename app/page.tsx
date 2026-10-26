@@ -91,12 +91,9 @@ export default function Landing() {
             <p className="lp-sheet-title">{EXAMPLE.title}</p>
             <p className="lp-sheet-k">L&apos;essentiel</p>
             <EssentielList lines={EXAMPLE.essentiel} />
-            {EXAMPLE.fiche.sections.map((s) => (
-              <div key={s.title} className="lp-sheet-part">
-                <p className="lp-sheet-k">{s.title}</p>
-                <FicheSectionBody blocks={s.blocks} />
-              </div>
-            ))}
+            <div className="lp-sheet-part">
+              <FicheSectionBody blocks={[EXAMPLE.piege]} />
+            </div>
           </div>
           <figcaption>Exemple de fiche, à partir d&apos;un cours de SVT sur la photosynthèse.</figcaption>
         </figure>
@@ -147,8 +144,9 @@ export default function Landing() {
       <section className="lp-section" aria-labelledby="t-faq">
         <h2 id="t-faq" className="ff-h2">Questions</h2>
         <div className="ff-faq">
-          {FAQ.map(({ q, a }) => (
-            <details key={q}>
+          {/* La première question (ChatGPT) est l'objection de tout le monde : sa réponse est ouverte d'office. */}
+          {FAQ.map(({ q, a }, i) => (
+            <details key={q} open={i === 0}>
               <summary>{fr(q)}</summary>
               <p>{fr(a)}</p>
             </details>

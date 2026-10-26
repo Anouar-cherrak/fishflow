@@ -9,7 +9,7 @@
 .lp-lead { margin: 16px 0 28px; max-width: 40ch; font-size: clamp(17px, 1.7vw, 19px); color: var(--ff-fg-2); }
 .lp-cta { width: 100%; }
 @media (min-width: 480px) { .lp-cta { width: auto; padding: 0 32px; } }
-.lp-note { margin-top: 12px; font-size: 15px; color: var(--ff-fg-2); }
+.lp-note { margin-top: 12px; font-size: 16px; font-weight: 500; color: var(--ff-fg-2); }
 
 /* La fiche d'exemple : le seul objet en relief de la page (c'est le produit). */
 .lp-example { margin: 0; }
@@ -17,7 +17,7 @@
 .lp-sheet li { font-size: 16px; }
 .lp-sheet-title { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.2; margin-bottom: 16px; }
 .lp-sheet-k { font-size: 14px; font-weight: 700; color: var(--ff-accent-strong); margin-bottom: 8px; }
-.lp-sheet-part { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--ff-line); }
+.lp-sheet-part { margin-top: 20px; }
 .lp-example figcaption { margin-top: 12px; font-size: 15px; color: var(--ff-fg-2); }
 
 /* Sections : beaucoup d'air, séparées par un filet. */

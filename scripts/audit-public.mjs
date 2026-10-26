@@ -1,5 +1,5 @@
 // Captures, poids et contrôle d'accessibilité (axe) des pages publiques, sur le site lancé en local.
-// Usage : node scripts/audit-public.mjs <dossier-de-sortie>   (BASE=http://localhost:3000 par défaut)
+// Usage : node scripts/audit-public.mjs <dossier-de-sortie>   (BASE=http://localhost:3000 par défaut, ONLY=accueil pour une seule page)
 import { chromium } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -12,11 +12,12 @@ const PAGES = {
   cgu: "/cgu", confidentialite: "/confidentialite", mentions: "/mentions-legales",
   "fiche-partagee": "/p/11111111-1111-4111-8111-111111111111", introuvable: "/cette-page-nexiste-pas",
 };
+if (process.env.ONLY) for (const k of Object.keys(PAGES)) if (!process.env.ONLY.split(",").includes(k)) delete PAGES[k];
 mkdirSync(OUT, { recursive: true });
 const report = {};
 const browser = await chromium.launch();
 for (const theme of ["dark", "light"]) {
-  for (const width of [390, 1280]) {
+  for (const width of (process.env.WIDTHS || "390,1280").split(",").map(Number)) {
     const ctx = await browser.newContext({ viewport: { width, height: width < 800 ? 844 : 800 }, colorScheme: theme, serviceWorkers: "block", deviceScaleFactor: 1, isMobile: width < 800, hasTouch: width < 800 });
     await ctx.addInitScript((t) => { try { localStorage.setItem("ff-theme2", t); localStorage.setItem("ff-consent", "no"); } catch {} }, theme);
     for (const [name, path] of Object.entries(PAGES)) {
@@ -32,10 +33,13 @@ for (const theme of ["dark", "light"]) {
       const r = (report[key] = { path, width, theme });
       r.ko = Math.round(bytes / 1024);
       r.h1 = await page.locator("h1").count();
-      if (theme === "dark") {
-        await page.screenshot({ path: `${OUT}/${name}-${width}-haut.png` });
-        await page.screenshot({ path: `${OUT}/${name}-${width}-page.png`, fullPage: true });
-      }
+      const shot = theme === "dark" ? `${name}-${width}` : `${name}-${width}-clair`;
+      await page.screenshot({ path: `${OUT}/${shot}-haut.png` });
+      await page.screenshot({ path: `${OUT}/${shot}-page.png`, fullPage: true });
+      // Zones tactiles de moins de 44 px (boutons, liens hors d'une phrase, résumés de questions).
+      r.petitesCibles = await page.evaluate(() => Array.from(document.querySelectorAll("a, button, summary, input, textarea, select"))
+        .filter((el) => { const b = el.getBoundingClientRect(); return b.width > 0 && b.height > 0 && b.height < 44 && !el.closest("p, li, figcaption"); })
+        .map((el) => (el.textContent || el.tagName).trim().slice(0, 30)));
       for (const w of width < 800 ? [360, 390, 768] : []) {
         await page.setViewportSize({ width: w, height: 844 });
         await page.waitForTimeout(150);
@@ -45,7 +49,7 @@ for (const theme of ["dark", "light"]) {
       const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
       r.axe = axe.violations.map((v) => ({ id: v.id, impact: v.impact, n: v.nodes.length, ex: v.nodes.slice(0, 3).map((n) => n.target.join(" ")) }));
       await page.close();
-      console.log(key, r.ko + " Ko", "axe:", r.axe.map((v) => `${v.id}(${v.n})`).join(", ") || "rien", r.debordement ? "DÉBORDE " + JSON.stringify(r.debordement) : "");
+      console.log(key, r.ko + " Ko", "axe:", r.axe.map((v) => `${v.id}(${v.n})`).join(", ") || "rien", r.debordement ? "DÉBORDE " + JSON.stringify(r.debordement) : "", r.petitesCibles.length ? "PETITES CIBLES " + JSON.stringify(r.petitesCibles) : "");
     }
     await ctx.close();
   }
