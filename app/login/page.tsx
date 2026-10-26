@@ -53,45 +53,45 @@ export default function Login() {
           handleLogin();
         }}
       >
-        <h1 className="text-2xl font-bold tracking-tight mb-1">Connexion</h1>
-        <p className="text-black/60 mb-6">Retrouve tes fiches et tes révisions.</p>
+        <h1 className="ff-h2 mb-2">Connexion</h1>
+        <p className="ff-muted mb-6">Retrouve tes fiches et tes révisions.</p>
         <GoogleButton />
 
-        <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
+        <label htmlFor="field-1" className="ff-label">Email</label>
         <input id="field-1"
           type="email"
           autoComplete="email"
           inputMode="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+          className="ff-field mb-5"
           placeholder="toi@exemple.com"
           aria-invalid={!!fieldError.email || undefined}
           aria-describedby={fieldError.email ? "email-error" : undefined}
         />
-        {fieldError.email && <p id="email-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.email}</p>}
+        {fieldError.email && <p id="email-error" role="alert" className="ff-error -mt-3 mb-5">{fieldError.email}</p>}
 
-        <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Mot de passe</label>
+        <label htmlFor="field-2" className="ff-label">Mot de passe</label>
         <input id="field-2"
           type="password"
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-2 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+          className="ff-field mb-2"
           placeholder="Ton mot de passe"
           aria-invalid={!!fieldError.password || undefined}
           aria-describedby={fieldError.password ? "password-error" : undefined}
         />
-        {fieldError.password && <p id="password-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] mb-2">{fieldError.password}</p>}
+        {fieldError.password && <p id="password-error" role="alert" className="ff-error mb-2">{fieldError.password}</p>}
 
         <p className="text-right mb-4">
-          <Link href="/reset-password" className="inline-flex items-center min-h-[44px] text-sm text-black/60 hover:text-black hover:underline transition">
+          <Link href="/reset-password" className="ff-link inline-flex items-center min-h-[44px] text-[15px]">
             Mot de passe oublié ?
           </Link>
         </p>
 
         {error && (
-          <p role="alert" className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
+          <p role="alert" className="ff-alert mb-4">
             {error}
           </p>
         )}
@@ -99,17 +99,17 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+          className="ff-primary w-full"
         >
           {loading ? "Connexion…" : "Se connecter"}
         </button>
       </form>
 
-        <p className="text-sm text-black/50 text-center mt-4">
+        <p className="ff-muted text-center mt-6">
           Pas encore de compte ?{" "}
-          <button type="button" onClick={() => router.push("/signup")} className="inline-flex items-center min-h-[44px] px-1 text-black underline underline-offset-4 font-medium">
+          <Link href="/signup" className="ff-link inline-flex items-center min-h-[44px] px-1">
             Créer un compte
-          </button>
+          </Link>
         </p>
     </AuthLayout>
   );

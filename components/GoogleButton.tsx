@@ -45,7 +45,7 @@ export function GoogleButton() {
         type="button"
         onClick={handleClick}
         disabled={loading}
-        className="w-full min-h-[48px] rounded-full font-semibold bg-white text-black border border-black/15 hover:border-black/40 transition disabled:opacity-30 inline-flex items-center justify-center gap-3 ff-btn"
+        className="ff-secondary w-full gap-3 disabled:opacity-40"
       >
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -56,11 +56,11 @@ export function GoogleButton() {
         {loading ? "Ouverture de Google…" : "Continuer avec Google"}
       </button>
       {error && (
-        <p role="alert" className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mt-3 ff-fade">
+        <p role="alert" className="ff-alert mt-3">
           {error}
         </p>
       )}
-      <p className="flex items-center gap-3 text-xs text-black/60 mt-6" aria-hidden="true">
+      <p className="flex items-center gap-3 text-[15px] ff-muted mt-6" aria-hidden="true">
         <span className="h-px flex-1 bg-black/15" />
         ou avec ton email
         <span className="h-px flex-1 bg-black/15" />

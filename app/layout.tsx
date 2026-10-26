@@ -52,11 +52,9 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#E4F5FE" },
     { media: "(prefers-color-scheme: dark)", color: "#0B243B" },
   ],
-  // Le site garde toujours sa taille normale, comme une appli : pas de zoom (voir aussi components/ZoomGuard.tsx).
+  // Zoom libre (accessibilité). Seul le zoom accidentel du double appui est évité (components/ZoomGuard.tsx).
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   // L'appli installée passe sous la barre d'état de l'iPhone : les marges « safe-area » du CSS laissent la place à l'encoche.
   viewportFit: "cover",
 };

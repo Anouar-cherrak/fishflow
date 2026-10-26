@@ -11,6 +11,8 @@ function ConfirmContent() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Champ concerné par l'erreur (1 = mot de passe, 2 = confirmation) : l'erreur s'affiche sous ce champ.
+  const [bad, setBad] = useState<1 | 2 | null>(null);
   const [done, setDone] = useState(false);
   const router = useRouter();
 
@@ -31,13 +33,16 @@ function ConfirmContent() {
 
   const handleSubmit = async () => {
     if (password.length < 8) {
-      setError("Le mot de passe doit faire au moins 8 caractères.");
+      setBad(1);
+      setError("Choisis un mot de passe d'au moins 8 caractères.");
       return;
     }
     if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setBad(2);
+      setError("Les deux mots de passe ne sont pas pareils. Retape-le à l'identique.");
       return;
     }
+    setBad(null);
     setLoading(true);
     setError(null);
     const supabase = createClient();
@@ -54,8 +59,8 @@ function ConfirmContent() {
   if (done) {
     return (
       <AuthLayout>
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Mot de passe mis à jour</h1>
-        <p className="text-black/60" role="status">Redirection…</p>
+        <h1 className="ff-h2 mb-2">Mot de passe mis à jour</h1>
+        <p className="ff-muted" role="status">Redirection…</p>
       </AuthLayout>
     );
   }
@@ -66,42 +71,48 @@ function ConfirmContent() {
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
-          if (!loading && ready && password && confirmPassword) handleSubmit();
+          if (!loading && ready) handleSubmit();
         }}
       >
-        <h1 className="text-2xl font-bold tracking-tight mb-1">Nouveau mot de passe</h1>
-        <p className="text-black/60 mb-6">Choisis un nouveau mot de passe pour ton compte.</p>
+        <h1 className="ff-h2 mb-2">Nouveau mot de passe</h1>
+        <p className="ff-muted mb-6">Choisis un nouveau mot de passe pour ton compte.</p>
 
-        <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Nouveau mot de passe</label>
+        <label htmlFor="field-1" className="ff-label">Nouveau mot de passe</label>
         <input id="field-1"
           type="password"
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+          className="ff-field mb-5"
           placeholder="Au moins 8 caractères"
+          aria-invalid={bad === 1 || undefined}
+          aria-describedby={bad === 1 ? "pwd-error" : undefined}
         />
+        {bad === 1 && <p id="pwd-error" role="alert" className="ff-error -mt-3 mb-5">{error}</p>}
 
-        <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Confirme le mot de passe</label>
+        <label htmlFor="field-2" className="ff-label">Confirme le mot de passe</label>
         <input id="field-2"
           type="password"
           autoComplete="new-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+          className="ff-field mb-5"
           placeholder="Retape le mot de passe"
+          aria-invalid={bad === 2 || undefined}
+          aria-describedby={bad === 2 ? "pwd2-error" : undefined}
         />
+        {bad === 2 && <p id="pwd2-error" role="alert" className="ff-error -mt-3 mb-5">{error}</p>}
 
-        {error && (
-          <p role="alert" className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
+        {error && !bad && (
+          <p role="alert" className="ff-alert mb-4">
             {error}
           </p>
         )}
 
         <button
           type="submit"
-          disabled={loading || !ready || !password || !confirmPassword}
-          className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+          disabled={loading || !ready}
+          className="ff-primary w-full"
         >
           {loading ? "Mise à jour…" : "Mettre à jour le mot de passe"}
         </button>

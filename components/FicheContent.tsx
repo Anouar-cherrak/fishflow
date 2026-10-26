@@ -93,13 +93,13 @@ export function FicheSectionBody({ blocks }: { blocks: FicheBlock[] }) {
   );
 }
 
-// Version simple (page de partage) : une carte par partie.
+// Version simple (page de partage) : les parties l'une sous l'autre, séparées par un filet.
 export function FicheContent({ fiche, sectionRef }: { fiche: Fiche; sectionRef?: (i: number, el: HTMLElement | null) => void }) {
   return (
-    <div className="grid gap-4">
+    <div className="grid">
       {fiche.sections.map((s, i) => (
-        <section key={i} ref={sectionRef ? (el) => sectionRef(i, el) : undefined} className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
-          <h3 className="text-lg font-bold tracking-tight text-black mb-3">
+        <section key={i} ref={sectionRef ? (el) => sectionRef(i, el) : undefined} className="py-6 border-t border-black/15">
+          <h3 className="ff-h3 text-black mb-3">
             <span className="text-accent tabular-nums mr-2">{i + 1}.</span>
             {s.title}
           </h3>

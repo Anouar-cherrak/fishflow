@@ -50,31 +50,29 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
   const structured = fiche.data.fiche?.sections?.length ? fiche.data.fiche : null;
 
   const summaryCard = summary && (
-    <section className="bg-surface rounded-3xl border border-black/10 p-6 sm:p-8">
-      <h2 className="text-xl font-bold tracking-tight mb-3">{essentiel?.length ? "L'essentiel en 5 lignes" : "Résumé"}</h2>
+    <section>
+      <h2 className="ff-h2 mb-4">{essentiel?.length ? "L'essentiel en 5 lignes" : "Résumé"}</h2>
       {essentiel?.length ? (
         <EssentielList lines={essentiel} />
       ) : (
-        <p className="text-black/80 leading-relaxed text-base sm:text-lg max-w-[68ch]">{summary}</p>
+        <p className="text-black/80 ff-measure">{summary}</p>
       )}
     </section>
   );
 
   return (
-    <AppShell size="normal">
-      <article className="grid gap-8">
+    <AppShell size="form" publicPage>
+      <article className="grid gap-12">
         <header>
-          <p className="text-sm font-semibold text-accent mb-2">Fiche de révision partagée</p>
           <h1 className="ff-title">{fiche.title || "Fiche de révision"}</h1>
-          <div className="mt-4">
-            <CopyFiche shareId={id} title={fiche.title} data={fiche.data as Record<string, unknown>} className="ff-primary ff-btn" />
-          </div>
+          <p className="ff-muted mt-2 mb-6">Une fiche de révision partagée avec FishFlow.</p>
+          <CopyFiche shareId={id} title={fiche.title} data={fiche.data as Record<string, unknown>} className="ff-primary" />
         </header>
 
         {structured ? (
           <>
             <section>
-              <h2 className="text-xl font-bold tracking-tight mb-3 px-1">Fiche de révision</h2>
+              <h2 className="ff-h2 mb-2">Fiche de révision</h2>
               <FicheContent fiche={structured} />
             </section>
             {summaryCard}
@@ -85,13 +83,10 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
 
         {!structured && sheet && sheet.length > 0 && (
           <section>
-            <h2 className="text-xl font-bold tracking-tight mb-3 px-1">À retenir</h2>
-            <ul className="grid gap-2.5 md:grid-cols-2">
+            <h2 className="ff-h2 mb-4">À retenir</h2>
+            <ul className="ff-list ff-measure text-black/80">
               {sheet.map((point, i) => (
-                <li key={i} className="bg-surface rounded-2xl border border-black/10 p-4 flex gap-3">
-                  <span className="mt-2 w-2 h-2 rounded-full bg-accent shrink-0" aria-hidden="true" />
-                  <span className="text-black/80">{point}</span>
-                </li>
+                <li key={i}>{point}</li>
               ))}
             </ul>
           </section>
@@ -99,26 +94,25 @@ export default async function SharedFichePage({ params }: { params: Promise<{ id
 
         {flashcards && flashcards.length > 0 && (
           <section>
-            <h2 className="text-xl font-bold tracking-tight mb-3 px-1">Flashcards ({flashcards.length})</h2>
-            <ul className="grid gap-3 md:grid-cols-2">
+            <h2 className="ff-h2 mb-4">Flashcards ({flashcards.length})</h2>
+            <p className="ff-muted mb-4">Touche une question pour voir la réponse.</p>
+            <div className="ff-faq">
               {flashcards.map((card, i) => (
-                <li key={i} className="bg-surface rounded-2xl border border-black/10 p-4">
-                  <details>
-                    <summary className="cursor-pointer font-semibold min-h-[44px] flex items-center">{card.question}</summary>
-                    <p className="text-black/70 mt-2">{card.answer}</p>
-                  </details>
-                </li>
+                <details key={i}>
+                  <summary>{card.question}</summary>
+                  <p>{card.answer}</p>
+                </details>
               ))}
-            </ul>
+            </div>
           </section>
         )}
 
-        <section className="rounded-3xl border border-accent/60 bg-surface p-6 sm:p-8 grid gap-4 justify-items-start">
-          <h2 className="text-2xl font-extrabold tracking-tight">Fais la même chose avec ton cours.</h2>
-          <p className="text-black/70 max-w-[52ch]">
+        <section className="pt-10 border-t border-black/15 grid gap-4 justify-items-start">
+          <h2 className="ff-h2">Fais la même chose avec ton cours.</h2>
+          <p className="ff-muted ff-measure">
             Colle ton cours, envoie un PDF ou prends-le en photo. FishFlow en fait une fiche, des flashcards{quiz && quiz.length > 0 ? " et un quiz" : ""}, en quelques secondes. 3 fiches gratuites par mois.
           </p>
-          <Link href="/signup" className="ff-secondary ff-btn">Essayer gratuitement</Link>
+          <Link href="/signup" className="ff-secondary">Essayer gratuitement</Link>
         </section>
       </article>
     </AppShell>

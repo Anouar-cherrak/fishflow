@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Dossiers de skills installés en local (pas du code du site).
+    "agent/**", "data/**", "skills/**", ".agents/**", ".claude/**", "graphify-out/**",
   ]),
 ]);
 

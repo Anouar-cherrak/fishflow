@@ -3,6 +3,7 @@ import { pendingCopyPath } from "@/components/CopyFiche";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { preloadSupabase } from "@/lib/supabase/lazy";
 import { postAuth } from "@/lib/auth-client";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -106,73 +107,70 @@ export default function Signup() {
       >
         {step === "form" ? (
           <>
-            <h1 className="text-2xl font-bold tracking-tight mb-1">Crée ton compte gratuit</h1>
-            <p className="text-black/60 mb-6">Sans carte bancaire. Ta première fiche est prête en moins d&apos;une minute.</p>
+            <h1 className="ff-h2 mb-2">Crée ton compte gratuit</h1>
+            <p className="ff-muted mb-6">Sans carte bancaire. Ta première fiche est prête en moins d&apos;une minute.</p>
             <GoogleButton />
 
-            <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
+            <label htmlFor="field-1" className="ff-label">Email</label>
             <input id="field-1"
               type="email"
               autoComplete="email"
               inputMode="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+              className="ff-field mb-5"
               placeholder="toi@exemple.com"
               aria-invalid={!!fieldError.email || undefined}
               aria-describedby={fieldError.email ? "email-error" : undefined}
             />
-            {fieldError.email && <p id="email-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.email}</p>}
+            {fieldError.email && <p id="email-error" role="alert" className="ff-error -mt-3 mb-5">{fieldError.email}</p>}
 
-            <label htmlFor="field-2" className="text-sm font-semibold text-black/60 block mb-1.5">Mot de passe</label>
+            <label htmlFor="field-2" className="ff-label">Mot de passe</label>
             <input id="field-2"
               type={showPwd ? "text" : "password"}
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+              className="ff-field mb-5"
               placeholder="8 caractères minimum"
               aria-invalid={!!fieldError.password || undefined}
               aria-describedby={fieldError.password ? "password-error" : "password-help"}
             />
             {fieldError.password ? (
-              <p id="password-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)] -mt-3 mb-4">{fieldError.password}</p>
+              <p id="password-error" role="alert" className="ff-error -mt-3 mb-5">{fieldError.password}</p>
             ) : (
-              <p id="password-help" className="text-xs text-black/60 -mt-3 mb-4">Au moins 8 caractères. Évite « 12345678 » : il est refusé.</p>
+              <p id="password-help" className="ff-hint -mt-3 mb-4">Au moins 8 caractères. Évite « 12345678 » : il est refusé.</p>
             )}
 
-            <label className="flex items-center gap-2 text-sm text-black/70 min-h-[44px] -mt-2 mb-2 cursor-pointer">
-              <input type="checkbox" checked={showPwd} onChange={(e) => setShowPwd(e.target.checked)} className="w-4 h-4 accent-[var(--ff-accent)]" />
+            <label className="flex items-center gap-3 text-[15px] min-h-[44px] -mt-2 mb-2 cursor-pointer">
+              <input type="checkbox" checked={showPwd} onChange={(e) => setShowPwd(e.target.checked)} className="w-5 h-5 accent-[var(--ff-accent)]" />
               Afficher le mot de passe
             </label>
 
             {message && (
-              <p role="alert" className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mb-4 ff-fade">
+              <p role="alert" className="ff-alert mb-4">
                 {message}
               </p>
             )}
 
-            <p role="note" className="text-sm text-black/80 mb-4">
+            <p role="note" className="text-[15px] ff-muted mb-5">
               Tu vas recevoir un code par email. <strong>Regarde aussi dans tes spams</strong> (courrier indésirable).
             </p>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+              className="ff-primary w-full"
             >
               {loading ? "Envoi du code…" : "Créer mon compte"}
             </button>
 
-            <p className="text-xs text-black/40 text-center mt-4">
-              Tes données restent privées. Aucune carte bancaire demandée.
-            </p>
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold tracking-tight mb-1">Vérifie ton email</h1>
-            <p className="text-black/60 mb-2">Tape le code reçu à l&apos;adresse {email}.</p>
-            <p role="note" className="text-sm text-black bg-white border border-accent rounded-2xl p-3 mb-6">
+            <h1 className="ff-h2 mb-2">Vérifie ton email</h1>
+            <p className="ff-muted mb-2">Tape le code reçu à l&apos;adresse {email}.</p>
+            <p role="note" className="ff-alert mb-6">
               <strong>Pense aux spams.</strong> Le mail avec ton code arrive souvent dans le courrier indésirable. Il vient de FishFlow.
             </p>
 
@@ -186,12 +184,12 @@ export default function Signup() {
               autoFocus
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className="w-full min-h-[56px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+              className="ff-field mb-5 min-h-[56px] text-center text-2xl tracking-[0.3em]"
               placeholder="000000"
             />
 
             {message && (
-              <p role="alert" className="text-sm text-black bg-white border border-black/20 rounded-2xl p-3 mb-4 ff-fade">
+              <p role="alert" className="ff-alert mb-4">
                 {message}
               </p>
             )}
@@ -199,7 +197,7 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading || code.length < 6}
-              className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+              className="ff-primary w-full"
             >
               {loading ? "Vérification…" : "Confirmer mon compte"}
             </button>
@@ -208,7 +206,7 @@ export default function Signup() {
               type="button"
               onClick={handleResend}
               disabled={cooldown > 0}
-              className="w-full mt-3 text-sm text-black/70 hover:text-black transition disabled:opacity-50 min-h-[44px]"
+              className="ff-secondary w-full mt-3 disabled:opacity-40"
             >
               {cooldown > 0 ? `Renvoyer le code (${cooldown} s)` : "Renvoyer le code"}
             </button>
@@ -216,23 +214,23 @@ export default function Signup() {
             <button
               type="button"
               onClick={() => { setStep("form"); setMessage(null); setCode(""); }}
-              className="w-full mt-3 text-sm text-black/60 hover:text-black transition min-h-[44px]"
+              className="ff-link w-full mt-3 min-h-[44px]"
             >
-              ← Modifier l'email
+              Modifier l'email
             </button>
-            <p className="text-xs text-black/60 text-center mt-2">
+            <p className="text-[15px] ff-muted text-center mt-2">
               Tu avais déjà un compte avec cet email ? Dans ce cas, aucun code n&apos;est envoyé :{" "}
-              <button type="button" onClick={() => router.push("/login")} className="underline">connecte-toi</button>.
+              <Link href="/login" className="ff-link">connecte-toi</Link>.
             </p>
           </>
         )}
       </form>
 
-        <p className="text-sm text-black/50 text-center mt-4">
+        <p className="ff-muted text-center mt-6">
           Déjà un compte ?{" "}
-          <button type="button" onClick={() => router.push("/login")} className="inline-flex items-center min-h-[44px] px-1 text-black underline underline-offset-4 font-medium">
+          <Link href="/login" className="ff-link inline-flex items-center min-h-[44px] px-1">
             Se connecter
-          </button>
+          </Link>
         </p>
     </AuthLayout>
   );

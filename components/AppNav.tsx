@@ -166,7 +166,13 @@ export function AppNav() {
             )}
           </svg>
         </button>
-        <button
+        {/* Visiteur : un simple lien pour se connecter (ou créer un compte depuis la page de connexion), pas de menu. */}
+        {authReady && !email && (
+          pathname === "/login"
+            ? <Link href="/signup" className="ff-bar-link">Créer un compte</Link>
+            : <Link href="/login" className="ff-bar-link">Se connecter</Link>
+        )}
+        {email && <button
           ref={buttonRef}
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -178,7 +184,7 @@ export function AppNav() {
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
             <path d="M4 8h14M4 14h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
-        </button>
+        </button>}
       </div>
 
     </header>
@@ -222,16 +228,6 @@ export function AppNav() {
             <button type="button" onClick={logout} className="min-h-[44px] px-5 rounded-full border border-current/30 text-sm font-semibold">
               Déconnexion
             </button>
-          </div>
-        )}
-        {authReady && !email && (
-          <div className="flex flex-wrap gap-3">
-            <Link href="/login" onClick={() => setOpen(false)} className="min-h-[44px] px-5 inline-flex items-center rounded-full border border-current/30 text-sm font-semibold">
-              Connexion
-            </Link>
-            <Link href="/signup" onClick={() => setOpen(false)} className="min-h-[44px] px-5 inline-flex items-center rounded-full bg-accent text-on-accent text-sm font-semibold">
-              Créer un compte
-            </Link>
           </div>
         )}
       </div>

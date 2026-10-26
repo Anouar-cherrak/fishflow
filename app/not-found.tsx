@@ -1,22 +1,17 @@
 import Link from "next/link";
-import { Ocean } from "@/components/Ocean";
+import { AppShell } from "@/components/AppShell";
 
 // Page affichée quand un lien n'existe pas (ou plus : par exemple une fiche dont le partage a été arrêté).
 export default function NotFound() {
   return (
-    <main className="ff-frame px-5 py-10 text-center">
-      <Ocean />
-      <div className="m-auto max-w-[420px]">
-        <p className="text-sm font-bold mb-3" style={{ color: "var(--ff-accent)" }}>Page introuvable</p>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">Ce lien ne mène nulle part.</h1>
-        <p className="mb-7" style={{ opacity: 0.65 }}>
-          La page n&apos;existe pas, ou la personne a arrêté de partager cette fiche.
+    <AppShell size="form" publicPage>
+      <div className="py-10 sm:py-16">
+        <h1 className="ff-title mb-3">Cette page n&apos;existe pas.</h1>
+        <p className="ff-muted ff-measure mb-8">
+          Le lien est peut-être faux, ou la personne a arrêté de partager cette fiche.
         </p>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Link href="/" className="ff-primary ff-btn">Retour à l&apos;accueil</Link>
-          <Link href="/generer" className="ff-secondary">Créer une fiche</Link>
-        </div>
+        <Link href="/" className="ff-primary">Retour à l&apos;accueil</Link>
       </div>
-    </main>
+    </AppShell>
   );
 }

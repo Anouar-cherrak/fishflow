@@ -3,12 +3,12 @@ import { LegalToc } from "@/components/LegalToc";
 
 export default function CGU() {
   return (
-    <AppShell size="form">
+    <AppShell size="form" publicPage>
       <article>
         <h1 className="ff-title mb-8">Conditions générales d'utilisation</h1>
         <LegalToc />
 
-        <div className="space-y-8 text-base text-black/75 leading-relaxed">
+        <div className="space-y-8 text-black/80 leading-relaxed ff-measure">
           <section>
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">1. Objet</h2>
             <p>

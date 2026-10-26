@@ -10,6 +10,7 @@ export default function ResetPasswordRequest() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -27,8 +28,8 @@ export default function ResetPasswordRequest() {
   if (sent) {
     return (
       <AuthLayout>
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Email envoyé</h1>
-        <p className="text-black/60">
+        <h1 className="ff-h2 mb-2">Email envoyé</h1>
+        <p className="ff-muted">
           Si un compte existe avec cette adresse, tu vas recevoir un lien pour choisir un nouveau mot de passe. <strong>Regarde aussi dans tes spams.</strong>
         </p>
       </AuthLayout>
@@ -41,40 +42,46 @@ export default function ResetPasswordRequest() {
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
-          if (!loading && email) handleSubmit();
+          if (loading) return;
+          const bad = /^S+@S+.S+$/.test(email.trim()) ? null : email.trim() ? "Cette adresse email semble incomplète. Exemple : toi@exemple.com" : "Écris ton adresse email. Exemple : toi@exemple.com";
+          setEmailError(bad);
+          if (!bad) handleSubmit();
         }}
       >
-        <h1 className="text-2xl font-bold tracking-tight mb-1">Mot de passe oublié</h1>
-        <p className="text-black/60 mb-6">Tape ton adresse email : on t&apos;envoie un lien pour choisir un nouveau mot de passe.</p>
+        <h1 className="ff-h2 mb-2">Mot de passe oublié</h1>
+        <p className="ff-muted mb-6">Tape ton adresse email : on t&apos;envoie un lien pour choisir un nouveau mot de passe.</p>
 
-        <label htmlFor="field-1" className="text-sm font-semibold text-black/60 block mb-1.5">Email</label>
+        <label htmlFor="field-1" className="ff-label">Email</label>
         <input id="field-1"
           type="email"
           autoComplete="email"
           inputMode="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl mb-4 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent ff-input"
+          className="ff-field mb-5"
           placeholder="toi@exemple.com"
+          aria-invalid={!!emailError || undefined}
+          aria-describedby={emailError ? "email-error" : undefined}
         />
+        {emailError && <p id="email-error" role="alert" className="ff-error -mt-3 mb-5">{emailError}</p>}
 
         {error && (
-          <p role="alert" className="text-sm text-black bg-surface border border-black/20 rounded-2xl p-3 mb-4 font-medium ff-fade">
+          <p role="alert" className="ff-alert mb-4">
             {error}
           </p>
         )}
 
         <button
           type="submit"
-          disabled={loading || !email}
-          className="w-full min-h-[48px] rounded-full font-semibold bg-accent text-on-accent hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+          disabled={loading}
+          className="ff-primary w-full"
         >
           {loading ? "Envoi…" : "Envoyer le lien"}
         </button>
       </form>
 
-        <p className="text-sm text-black/50 text-center mt-4">
-          <Link href="/login" className="text-black hover:underline font-medium ff-link-underline">
+        <p className="text-center mt-6">
+          <Link href="/login" className="ff-link inline-flex items-center min-h-[44px]">
             Retour à la connexion
           </Link>
         </p>

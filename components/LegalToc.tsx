@@ -15,12 +15,12 @@ export function LegalToc() {
   }, []);
   if (items.length < 3) return null;
   return (
-    <nav aria-label="Sommaire" className="mb-8 bg-surface border border-black/10 rounded-2xl p-4 sm:p-5">
-      <p className="text-sm font-semibold text-black/70 mb-2">Sommaire</p>
-      <ol className="grid gap-1 sm:grid-cols-2 sm:gap-x-6">
+    <nav aria-label="Sommaire" className="mb-10 pb-6 border-b border-black/15">
+      <p className="font-semibold mb-1">Sommaire</p>
+      <ol className="grid sm:grid-cols-2 sm:gap-x-6">
         {items.map((it) => (
           <li key={it.id}>
-            <a href={`#${it.id}`} className="inline-flex min-h-[44px] items-center text-sm font-medium text-black/80 underline decoration-black/20 underline-offset-4 hover:decoration-current">
+            <a href={`#${it.id}`} className="ff-link inline-flex min-h-[44px] items-center font-medium">
               {it.label}
             </a>
           </li>

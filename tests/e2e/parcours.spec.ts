@@ -146,8 +146,6 @@ test("accessibilité (axe) : aucune erreur grave sur les pages principales", asy
     await page.goto(path);
     await page.waitForLoadState("networkidle");
     const { violations } = await new AxeBuilder({ page: page as never })
-      // Le zoom est bloqué volontairement (demande du propriétaire) : seule règle écartée.
-      .disableRules(["meta-viewport"])
       .analyze();
     const serious = violations.filter((v) => v.impact === "serious" || v.impact === "critical");
     expect(serious.map((v) => `${path} : ${v.id} (${v.nodes.length})`)).toEqual([]);

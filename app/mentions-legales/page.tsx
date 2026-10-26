@@ -3,12 +3,12 @@ import { LegalToc } from "@/components/LegalToc";
 
 export default function MentionsLegales() {
   return (
-    <AppShell size="form">
+    <AppShell size="form" publicPage>
       <article>
         <h1 className="ff-title mb-8">Mentions légales</h1>
         <LegalToc />
 
-        <div className="space-y-8 text-base text-black/75 leading-relaxed">
+        <div className="space-y-8 text-black/80 leading-relaxed ff-measure">
           <section>
             <h2 className="text-xl font-bold tracking-tight text-black mb-2">Éditeur du site</h2>
             <p>

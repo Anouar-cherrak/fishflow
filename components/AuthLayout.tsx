@@ -1,35 +1,11 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
-import { BrandMark } from "@/components/BrandMark";
 
-// Page de connexion / inscription : sur ordinateur, le message de FishFlow à gauche et le formulaire à droite.
-// Sur téléphone, la tuile du logo et la promesse au-dessus du formulaire, le tout centré dans l'écran (pas de grand vide).
+// Connexion, inscription, mot de passe : un seul formulaire, centré, sans rien autour (docs/design-simple.md).
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <AppShell size="wide">
-      <div className="grid gap-8 lg:gap-20 lg:grid-cols-2 items-center min-h-[calc(100svh-190px)] lg:min-h-[60svh] content-center">
-        <div className="hidden lg:grid gap-7 content-center ff-fade-up relative">
-          <p className="ff-title" aria-hidden="true">Révise en profondeur.</p>
-          <p className="ff-lead">Colle un cours, FishFlow en fait une fiche de révision, des flashcards et un quiz. Tu poses aussi n&apos;importe quelle question, avec les sources.</p>
-          <ul className="grid gap-3 text-black/80">
-            {["3 fiches gratuites par mois", "Sans carte bancaire", "Tes fiches restent privées"].map((t) => (
-              <li key={t} className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full border-2 border-accent" aria-hidden="true" />
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="w-full max-w-md mx-auto lg:mx-0 lg:justify-self-center ff-fade-up">
-          <div className="lg:hidden flex items-center gap-3 mb-5" aria-hidden="true">
-            <BrandMark size={48} />
-            <p className="font-display font-extrabold text-xl leading-tight tracking-tight">Révise en profondeur.</p>
-          </div>
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-9">
-            {children}
-          </div>
-        </div>
-      </div>
+    <AppShell size="form" publicPage>
+      <div className="w-full max-w-[420px] mx-auto sm:pt-6">{children}</div>
     </AppShell>
   );
 }
