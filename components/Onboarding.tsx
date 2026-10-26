@@ -132,7 +132,7 @@ export function Onboarding() {
 
   return createPortal(
     <div className="ff-tuto-back ff-fade" data-tuto>
-      <div role="dialog" aria-modal="true" aria-labelledby="tuto-title" className="ff-tuto ff-fade-up">
+      <div role="dialog" aria-modal="true" aria-labelledby="tuto-title" className="ff-tuto">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm text-black/55" aria-live="polite">
             Étape {step + 1} sur {STEPS.length}

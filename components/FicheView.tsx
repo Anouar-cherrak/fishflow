@@ -426,13 +426,12 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
         <div className="grid gap-8 lg:gap-x-12 lg:gap-y-6 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
           <div ref={logoRef} className="lg:col-start-1 lg:row-start-1">
             {!exporting && (
-              <Link href="/mes-fiches" className="inline-flex items-center gap-1 min-h-[44px] -mt-2 mb-1 text-sm font-semibold text-black/70 hover:text-black">
-                <span aria-hidden="true">←</span> Mes fiches
+              <Link href="/mes-fiches" className="inline-flex items-center gap-1 min-h-[44px] -mt-2 mb-1 text-[15px] font-semibold text-black/75 hover:text-black">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+                Mes fiches
               </Link>
             )}
-            <p className="text-sm font-semibold text-accent mb-2">Fiche de révision</p>
             <h1 className="ff-title break-words" data-long={(data.title?.length ?? 0) > 60 || undefined}>{data.title || "Ta fiche est prête."}</h1>
-            <p className="ff-lead mt-3">Ta fiche, l&apos;essentiel, les flashcards et le quiz, créés à partir de ton cours.</p>
           </div>
 
           <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-28 grid gap-3" aria-label="Actions sur la fiche">
@@ -441,7 +440,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                 type="button"
                 onClick={handleDownloadPDF}
                 disabled={downloading}
-                className={hasCards ? actionClass : "ff-primary w-full text-sm ff-btn col-span-2 lg:col-span-1"}
+                className={hasCards ? actionClass : "ff-primary w-full text-sm col-span-2 lg:col-span-1"}
               >
                 {downloading ? (
                   <>
@@ -452,9 +451,6 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   "Télécharger en PDF"
                 )}
               </button>
-              <button type="button" onClick={() => router.push("/generer")} className={`${actionClass} ff-desk-only`}>
-                Nouvelle fiche
-              </button>
               {data.flashcards !== undefined && data.flashcards.length > 0 && (
                 <button
                   type="button"
@@ -462,14 +458,11 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                     trackEvent("flashcards_etude_ouverte");
                     setStudying(true);
                   }}
-                  className="ff-primary w-full text-sm ff-btn col-span-2 lg:col-span-1 order-first"
+                  className="ff-primary w-full text-sm col-span-2 lg:col-span-1 order-first"
                 >
                   Étudier les flashcards
                 </button>
               )}
-              <button type="button" onClick={() => router.push("/mes-fiches")} className={`${actionClass} ff-desk-only`}>
-                Mes fiches
-              </button>
               {data.id && <ShareFiche ficheId={data.id} className={actionClass} />}
             </div>
             {/* Action définitive : à part, sous un trait, en rouge discret. */}
@@ -484,17 +477,10 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
             {justCreated && !exporting && (
               <div role="status" className="mb-6 bg-surface border border-accent/60 rounded-2xl p-5">
                 <p className="font-semibold mb-1">Ta fiche est prête et enregistrée dans « Mes fiches ».</p>
-                <p className="text-sm text-black/70 mb-4">Lis-la, puis entraîne-toi : les flashcards reviendront aussi dans « Réviser ».</p>
-                <div className="flex flex-wrap gap-3">
-                  {hasCards && (
-                    <button type="button" onClick={() => setStudying(true)} className="ff-primary text-sm ff-btn">
-                      Étudier les flashcards
-                    </button>
-                  )}
-                  <button type="button" onClick={() => setJustCreated(false)} className="ff-secondary text-sm">
-                    D&apos;accord
-                  </button>
-                </div>
+                <p className="text-[15px] ff-muted mb-4">Lis-la, puis entraîne-toi : les flashcards reviendront aussi dans « Réviser ».</p>
+                <button type="button" onClick={() => setJustCreated(false)} className="ff-secondary text-sm">
+                  D&apos;accord
+                </button>
               </div>
             )}
             {showNudge && (
@@ -502,15 +488,15 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                 <p className="font-semibold mb-1">
                   {remaining === 0 ? "Tu as utilisé tes 3 fiches gratuites ce mois-ci." : "Il te reste 1 fiche gratuite ce mois-ci."}
                 </p>
-                <p className="text-sm text-black/65 mb-4 max-w-[60ch]">
+                <p className="text-[15px] ff-muted mb-4 max-w-[60ch]">
                   Avec Pro : 100 fiches par mois, toutes tes fiches gardées, des quiz de 12 questions, 20 questions par jour dans Apprendre,
                   tes cartes difficiles et ta progression sur 30 jours.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <button type="button" onClick={() => { trackEvent("pro_nudge_clic"); router.push("/pricing"); }} className="ff-primary text-sm ff-btn">
+                  <button type="button" onClick={() => { trackEvent("pro_nudge_clic"); router.push("/pricing"); }} className="ff-secondary text-sm">
                     Voir Pro
                   </button>
-                  <button type="button" onClick={hideNudge} className="ff-secondary text-sm">
+                  <button type="button" onClick={hideNudge} className="ff-link min-h-[44px] px-2 text-sm">
                     Plus tard
                   </button>
                 </div>
@@ -533,7 +519,7 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-black/50 mt-2">{TEMPLATES.find((t) => t.key === template)?.hint}</p>
+              <p className="text-sm ff-muted mt-2">{TEMPLATES.find((t) => t.key === template)?.hint}</p>
             </div>
 
             {/* Nouvelle fiche : la fiche complète d'abord, puis l'essentiel. Ancienne fiche : résumé puis points clés. */}
@@ -602,10 +588,10 @@ export function FicheView({ initialData }: { initialData: FishFlowResult }) {
                   {bestScore !== null && (
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-black/60">
+                        <span className="text-sm text-black/60">
                           {bestScore >= 80 ? "Fiche maîtrisée" : "Meilleur score"}
                         </span>
-                        <span className="text-xs font-semibold text-black">{bestScore}%</span>
+                        <span className="text-sm font-semibold text-black">{bestScore}%</span>
                       </div>
                       <div className="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
                         <div

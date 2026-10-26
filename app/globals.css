@@ -24,9 +24,6 @@
 
   /* Espaces (multiples de 4 px) */
   --ff-s1: 4px; --ff-s2: 8px; --ff-s3: 12px; --ff-s4: 16px; --ff-s5: 24px; --ff-s6: 32px; --ff-s7: 48px; --ff-s8: 64px; --ff-s9: 96px;
-  /* Rayons : une plaque est plus arrondie en haut (la lumière arrive par là) qu'en bas. */
-  --ff-r-plate: 28px 28px 20px 20px;
-  --ff-r-inner: 18px 18px 14px 14px;
   --ff-r-field: 16px;
   --ff-r-pill: 999px;
   /* Durées et courbes */
@@ -48,12 +45,7 @@
   --ff-on-accent: #002A59;      /* texte sur les boutons bleus (7,7:1) */
   --ff-ok: #00BC90; --ff-ok-soft: #DDFDF2;
   --ff-warn: #AF8500; --ff-bad: #EC140A; --ff-bad-soft: #FFECEA;
-  --ff-glow: rgba(255, 248, 197, 0.75);  /* lueur du soleil */
-  --ff-ray: rgba(255, 252, 221, 0.55);   /* rayons */
-  --ff-snow: rgba(255, 255, 255, 0.7);   /* particules en suspension */
-  --ff-silhouette: #04346C;               /* silhouettes lointaines */
   --ff-plate-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 26px 50px -28px rgba(0, 49, 107, 0.55), 0 2px 8px -4px rgba(0, 49, 107, 0.18);
-  --ff-sea-1: #DBEFFF; --ff-sea-2: #B3DDFF; --ff-sea-3: #91CDFF;
 }
 
 :root.dark {
@@ -70,12 +62,7 @@
   --ff-on-accent: #031D37;
   --ff-ok: #43FFA2; --ff-ok-soft: rgba(8, 251, 134, 0.16);
   --ff-warn: #FFE333; --ff-bad: #FFBAB1; --ff-bad-soft: rgba(255, 96, 75, 0.16);
-  --ff-glow: rgba(141, 206, 255, 0.22);
-  --ff-ray: rgba(184, 220, 255, 0.13);
-  --ff-snow: rgba(209, 233, 255, 0.45);
-  --ff-silhouette: #01122E;
   --ff-plate-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 30px 60px -34px rgba(0, 0, 0, 0.8), 0 2px 10px -4px rgba(0, 0, 0, 0.4);
-  --ff-sea-1: #034389; --ff-sea-2: #013269; --ff-sea-3: #011B46;
   color-scheme: dark;
 }
 
@@ -122,38 +109,20 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 .tabular-nums, time { font-variant-numeric: tabular-nums; }
 
 /* Plaques : toute carte de l'appli (fond « surface » arrondi) reçoit la lumière d'en haut. */
-.bg-surface.rounded-3xl, .bg-white.rounded-3xl, .ff-plate {
-  border-radius: var(--ff-r-plate);
-  box-shadow: var(--ff-plate-shadow);
-}
-.rounded-2xl.bg-surface, .rounded-2xl.bg-white { border-radius: var(--ff-r-inner); }
+/* Cartes : plates, un filet et un rayon (docs/design-simple.md). Pas d'ombre. */
+.bg-surface.rounded-3xl, .bg-white.rounded-3xl, .ff-plate { border-radius: 20px; }
+.rounded-2xl.bg-surface, .rounded-2xl.bg-white { border-radius: 14px; }
 .ff-plate { background: var(--ff-surface); border: 1px solid var(--ff-line); }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
-}
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
 }
 @keyframes pulseGlow {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
 
-/* Apparition des blocs d'une page : ils remontent de l'eau, sans flou (rapide, une seule fois). */
-.ff-fade-up {
-  animation: fadeInUp 0.5s var(--ff-ease-out) backwards;
-}
 .ff-fade {
   animation: fadeIn 0.5s ease both;
 }
@@ -163,11 +132,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   transition: transform var(--ff-base) var(--ff-ease-out), box-shadow var(--ff-base) ease, border-color var(--ff-base) ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .ff-card:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--ff-accent) 55%, transparent);
-    box-shadow: var(--ff-plate-shadow), 0 18px 40px -22px color-mix(in srgb, var(--ff-accent) 55%, transparent);
-  }
+  .ff-card:hover { border-color: color-mix(in srgb, var(--ff-accent) 55%, transparent); }
 }
 .ff-card:active { transform: scale(0.985); }
 
@@ -219,103 +184,23 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   :root { --text-xs: 0.875rem; --text-xs--line-height: calc(1.25 / 0.875); }
 }
 
-.ff-progress-shimmer {
-  background: linear-gradient(90deg, var(--ff-accent) 0%, #8DCEFF 50%, var(--ff-accent) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
-}
-
-.ff-float {
-  animation: floatSlow 5s ease-in-out infinite;
-}
-
 /* Squelette de chargement (components/PageSkeleton.tsx) : il « respire » par l'opacité seulement. */
 .ff-skel { border-radius: 14px; background: color-mix(in srgb, var(--ff-fg) 9%, transparent); animation: pulseGlow 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .ff-skel { animation: none; } }
 /* Longue liste de fiches : les cartes hors de l'écran ne sont pas dessinées tant qu'on n'y arrive pas. */
 .ff-lazy-item { content-visibility: auto; contain-intrinsic-size: auto 240px; }
 
-.ff-glow-dot {
-  animation: pulseGlow 2.4s ease-in-out infinite;
-}
+/* ===== Apprendre : la raie (components/KnowledgeBubble.tsx). Immobile ; elle « respire » pendant que la réponse se prépare. ===== */
+.ff-kb { width: clamp(72px, 18vw, 104px); aspect-ratio: 512 / 420; background: #2AA9E8;
+  -webkit-mask: url(/brand/raie.svg) center / contain no-repeat; mask: url(/brand/raie.svg) center / contain no-repeat; }
+.ff-kb[data-compact="true"] { width: 56px; }
+.ff-kb[data-state="thinking"] { animation: pulseGlow 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ff-kb { animation: none !important; } }
 
-.ff-underline-grow {
-  display: inline-block;
-  position: relative;
-}
-.ff-underline-grow::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 3px;
-  background: var(--ff-fg);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ff-underline-grow.is-active::after {
-  transform: scaleX(1);
-}
-/* ===== Apprendre : la bulle d'eau (components/KnowledgeBubble.tsx) ===== */
-.ff-kb { --kb-size: clamp(120px, 34vw, 230px); position: relative; width: var(--kb-size); aspect-ratio: 1; transition: width 0.6s var(--ff-ease-out); }
-.ff-kb[data-compact="true"] { --kb-size: clamp(84px, 22vw, 108px); }
-.ff-kb-body { position: absolute; inset: 0; border-radius: 50%; animation: ff-kb-wobble 7s ease-in-out infinite;
-  background:
-    radial-gradient(circle at 50% 50%, transparent 55%, rgba(255, 255, 255, 0.10) 64%, rgba(209, 234, 255, 0.55) 69.5%, rgba(255, 255, 255, 0.9) 70.5%, transparent 71.5%),
-    radial-gradient(circle at 62% 70%, rgba(141, 206, 255, 0.22), transparent 55%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 60%, transparent 71%);
-  box-shadow: 0 30px 60px -30px rgba(0, 42, 89, 0.45); }
-:root.dark .ff-kb-body { box-shadow: 0 0 60px -10px rgba(141, 206, 255, 0.25); }
-/* Film irisé, comme une vraie bulle (teinte qui tourne lentement). */
-.ff-kb-film { position: absolute; inset: 0; border-radius: 50%; opacity: 0.55; filter: hue-rotate(var(--kb-hue, 0deg));
-  background: conic-gradient(from 20deg, rgba(117, 255, 238, 0.55), rgba(141, 206, 255, 0.15), rgba(255, 201, 220, 0.5), rgba(255, 248, 197, 0.35), rgba(117, 255, 238, 0.55));
-  -webkit-mask-image: radial-gradient(circle, transparent 60%, #000 69%, transparent 71%); mask-image: radial-gradient(circle, transparent 60%, #000 69%, transparent 71%);
-  animation: ff-kb-spin 14s linear infinite; }
-.ff-kb-shine { position: absolute; left: 20%; top: 14%; width: 30%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0)); transform: rotate(-28deg); }
-.ff-kb-shine.b { left: auto; right: 22%; top: auto; bottom: 18%; width: 14%; height: 8%; opacity: 0.6; transform: rotate(-28deg); }
-.ff-kb-rise { position: absolute; inset: 20%; pointer-events: none; }
-.ff-kb-rise i { position: absolute; bottom: 0; left: calc(18% + var(--n, 0) * 15%); width: 8px; height: 8px; border-radius: 50%; opacity: 0;
-  border: 1px solid rgba(255, 255, 255, 0.85); background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.9) 0 16%, transparent 50%); }
-.ff-kb-rise i:nth-child(1) { --n: 0; } .ff-kb-rise i:nth-child(2) { --n: 1; width: 5px; height: 5px; } .ff-kb-rise i:nth-child(3) { --n: 2; } .ff-kb-rise i:nth-child(4) { --n: 3; width: 6px; height: 6px; } .ff-kb-rise i:nth-child(5) { --n: 4; width: 4px; height: 4px; }
-.ff-kb[data-state="thinking"] .ff-kb-body { animation-duration: 1.6s; }
-.ff-kb[data-state="thinking"] .ff-kb-film { animation-duration: 3s; }
-.ff-kb[data-state="thinking"] .ff-kb-rise i { animation: ff-kb-up 1.4s ease-in infinite; }
-.ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(2) { animation-delay: 0.3s; } .ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(3) { animation-delay: 0.6s; }
-.ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(4) { animation-delay: 0.9s; } .ff-kb[data-state="thinking"] .ff-kb-rise i:nth-child(5) { animation-delay: 1.15s; }
-.ff-kb[data-state="done"] .ff-kb-body { animation: ff-kb-settle 0.9s var(--ff-ease-out), ff-kb-wobble 7s ease-in-out 0.9s infinite; }
-@keyframes ff-kb-wobble { 0%, 100% { transform: scale(1, 1) translateY(0); } 33% { transform: scale(1.025, 0.975) translateY(-4px); } 66% { transform: scale(0.98, 1.02) translateY(2px); } }
-@keyframes ff-kb-spin { to { transform: rotate(360deg); } }
-@keyframes ff-kb-up { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-120%) scale(1.1); opacity: 0; } }
-@keyframes ff-kb-settle { 0% { transform: scale(1.08, 0.92); } 50% { transform: scale(0.96, 1.04); } 100% { transform: none; } }
-@media (prefers-reduced-motion: reduce) { .ff-kb *, .ff-kb { animation: none !important; } }
+/* Moins de mouvement demandé : les fondus restent instantanés. */
+@media (prefers-reduced-motion: reduce) { .ff-fade { animation-duration: 0.01ms; } }
 
-/* Les images « sortent » de la boule, depuis le haut, vers leur place. */
-@keyframes ffFly {
-  from { opacity: 0; transform: translate3d(var(--fx, 0px), var(--fy, -70px), 0) scale(0.2) rotate(var(--fr, 0deg)); }
-  25% { opacity: 1; }
-  to { opacity: 1; transform: none; }
-}
-.ff-fly { opacity: 0; }
-.ff-fly.ff-fly-go {
-  animation: ffFly 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  position: relative;
-  z-index: 2;
-}
-
-/* Pour les personnes qui demandent moins de mouvement : tout reste lisible, rien ne bouge. */
-@media (prefers-reduced-motion: reduce) {
-  .ff-fly,
-  .ff-fade-up,
-  .ff-fade {
-    animation-duration: 0.01ms;
-  }
-}
-
-/* ===== Cadre commun des pages de l'application =====
-   Le fond est de l'eau : lumière du soleil en haut (clair) ou eau profonde éclairée d'en haut (sombre).
-   Les décors (components/Ocean.tsx) sont fixes, derrière le contenu. */
+/* ===== Cadre commun des pages de l'application : fond uni bleu nuit (sombre) ou blanc bleuté (clair) ===== */
 .ff-frame {
   position: relative;
   isolation: isolate;
@@ -324,9 +209,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   display: flex;
   flex-direction: column;
   color: var(--ff-fg);
-  background:
-    radial-gradient(120% 60% at 50% -10%, var(--ff-glow), transparent 60%),
-    linear-gradient(180deg, var(--ff-sea-1) 0, var(--ff-sea-2) 640px, var(--ff-sea-3) 1600px);
+  background: var(--ff-page);
 }
 .ff-main {
   width: 100%;
@@ -367,9 +250,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  background: color-mix(in srgb, var(--ff-surface) 86%, transparent);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  backdrop-filter: blur(12px) saturate(1.2);
+  background: var(--ff-page);
   border-bottom: 1px solid var(--ff-line);
 }
 .ff-bar { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
@@ -414,9 +295,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   inset: 0;
   z-index: 60;
   color: #EEF6FF;
-  background:
-    radial-gradient(90% 50% at 50% -10%, rgba(141, 206, 255, 0.22), transparent 60%),
-    linear-gradient(180deg, #013D7D, #011B46 70%);
+  background: #011B46;
   display: flex;
   flex-direction: column;
   padding: 10px 16px max(24px, env(safe-area-inset-bottom));
@@ -438,24 +317,13 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
   padding: 3px 0 8px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(26px, min(8vw, 4svh), 60px);
+  font-size: clamp(24px, 6vw, 32px);
   line-height: 1.05;
   letter-spacing: -0.035em;
   color: #EEF6FF;
   text-decoration: none;
 }
-.ff-menu-link > span {
-  display: block;
-  transform: translateY(110%);
-  transition: transform 0.25s var(--ff-ease-out);
-}
-.ff-menu[data-open="true"] .ff-menu-link > span { transform: none; }
-.ff-menu[data-open="true"] .ff-menu-link:nth-child(2) > span { transition-delay: 30ms; }
-.ff-menu[data-open="true"] .ff-menu-link:nth-child(3) > span { transition-delay: 60ms; }
-.ff-menu[data-open="true"] .ff-menu-link:nth-child(4) > span { transition-delay: 90ms; }
-.ff-menu[data-open="true"] .ff-menu-link:nth-child(5) > span { transition-delay: 120ms; }
-.ff-menu[data-open="true"] .ff-menu-link:nth-child(n+6) > span { transition-delay: 150ms; }
-@media (hover: hover) and (pointer: fine) { .ff-menu-link:hover > span { transform: translateX(10px); } }
+.ff-menu-link > span { display: block; }
 .ff-menu-title { font-weight: inherit; }
 .ff-menu-link[aria-current="page"] .ff-menu-title { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 8px; text-decoration-color: #46B5FF; }
 .ff-menu-link small { display: block; font-family: var(--font-body); font-size: 15px; font-weight: 500; letter-spacing: 0; line-height: 1.5; margin-top: 4px; padding-bottom: 2px; color: #A6CAF2; }
@@ -502,7 +370,7 @@ input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--ff-f
 main h2[id] { scroll-margin-top: 96px; }
 
 /* Volet de réglages (Générer) : une ligne résume les choix, on l'ouvre pour les changer. */
-.ff-settings { border: 1px solid var(--ff-line); border-radius: var(--ff-r-inner); background: var(--ff-surface); padding: 4px 16px; }
+.ff-settings { border: 1px solid var(--ff-line); border-radius: 14px; background: var(--ff-surface); padding: 4px 16px; }
 .ff-settings > summary { list-style: none; cursor: pointer; min-height: 52px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
 .ff-settings > summary::-webkit-details-marker { display: none; }
 .ff-settings > summary::after { content: ""; margin-left: auto; flex: none; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform var(--ff-base) var(--ff-ease-out); }
@@ -522,8 +390,7 @@ main h2[id] { scroll-margin-top: 96px; }
 .ff-danger-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--quiz-wrong-text); text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px; transition: text-decoration-color var(--ff-base) ease; }
 @media (hover: hover) and (pointer: fine) { .ff-danger-link:hover { text-decoration-color: currentColor; } }
 
-/* Bouton bleu Tailwind (bg-accent) : même pilule éclairée et même réponse à l'appui. */
-.bg-accent { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 58%); }
+/* Bouton bleu Tailwind (bg-accent) : même pilule unie que .ff-primary, même réponse à l'appui. */
 button.bg-accent, a.bg-accent { transition: transform var(--ff-fast) var(--ff-ease-out), filter var(--ff-base) ease; }
 button.bg-accent:active:not(:disabled), a.bg-accent:active { transform: scale(0.97); }
 /* Les autres boutons (liens texte, puces, croix de fermeture) pâlissent un instant sous le doigt. */
@@ -543,51 +410,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 
 /* Vignettes animées (explications en mouvement) */
 /* Le faisceau descend par transform (pas par « top ») : aucun recalcul de la page à chaque image. */
-@keyframes ffBeam { from { transform: translateY(0); } to { transform: translateY(290px); } } /* de -30 % à 110 % de la feuille (208 px) */
 @keyframes ffPop { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
-
-/* Animation du chargement : un cours est lu (le faisceau passe), puis la fiche se remplit. */
-.ff-doc-anim {
-  position: relative;
-  width: 168px;
-  height: 208px;
-  border: 1px solid var(--ff-line);
-  border-radius: 20px;
-  background: var(--ff-surface);
-  padding: 22px 18px;
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  overflow: hidden;
-}
-.ff-doc-anim span {
-  display: block;
-  height: 10px;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--ff-fg) 14%, transparent);
-  animation: ffFill 2.4s ease-in-out infinite;
-}
-.ff-doc-anim span:nth-child(2) { width: 82%; animation-delay: 0.25s; }
-.ff-doc-anim span:nth-child(3) { width: 94%; animation-delay: 0.5s; }
-.ff-doc-anim span:nth-child(4) { width: 60%; animation-delay: 0.75s; }
-.ff-doc-anim span:nth-child(5) { width: 76%; animation-delay: 1s; }
-.ff-doc-anim i {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 56px;
-  top: -30%;
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ff-accent) 40%, transparent), transparent);
-  animation: ffBeam 2.4s ease-in-out infinite;
-}
-@keyframes ffFill {
-  0%, 20% { background: color-mix(in srgb, var(--ff-fg) 14%, transparent); }
-  45%, 100% { background: var(--ff-accent); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ff-doc-anim span, .ff-doc-anim i { animation: none; }
-  .ff-doc-anim span { background: var(--ff-accent); }
-}
 
 /* Le PDF est toujours exporté en clair */
 .ff-force-light {
@@ -596,33 +419,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   --color-surface: #F6F6F7;
   color: #1F1F1F;
 }
-
-/* Les cinq cases de révision : une carte monte de case en case */
-.ff-boxes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-items: end; height: 150px; list-style: none; padding: 0; margin: 0; }
-.ff-boxes li { display: grid; gap: 8px; justify-items: center; align-content: end; height: 100%; }
-.ff-box-card {
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid var(--ff-line);
-  background: var(--ff-surface);
-  height: calc(28px + var(--i) * 18px);
-  position: relative;
-  overflow: hidden;
-}
-.ff-box-card::after {
-  content: "";
-  position: absolute;
-  inset: auto 6px 6px 6px;
-  height: 10px;
-  border-radius: 4px;
-  background: var(--ff-accent);
-  opacity: 0;
-  animation: ffClimb 7.5s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 1.2s);
-}
-@keyframes ffClimb { 0% { opacity: 0; transform: translateY(14px); } 6%, 14% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .ff-box-card::after { animation: none; opacity: 1; } }
-
 
 /* Tutoriel de bienvenue */
 .ff-tuto-back { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; }
@@ -870,47 +666,18 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   min-height: 46px; padding: 0 14px 0 12px; border-radius: 999px;
   border: 1px solid var(--ff-line); background: var(--ff-surface);
   font-weight: 800; font-size: 15px; color: var(--ff-fg); text-decoration: none;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
+  transition: transform var(--ff-fast) var(--ff-ease-out);
 }
-.ff-streak:hover { transform: scale(1.05); }
-.ff-streak:active { transform: scale(0.94); }
-.ff-streak[data-state="lit"] { border-color: rgba(255, 160, 33, 0.55); }
+.ff-streak:active { transform: scale(0.97); }
 .ff-streak[data-state="out"] { color: color-mix(in srgb, var(--ff-fg) 60%, transparent); }
 
 .ff-flame { overflow: visible; }
 .ff-flame-outer, .ff-flame-mid, .ff-flame-core { transform-origin: 16px 38px; }
-.ff-flame[data-state="lit"] { filter: drop-shadow(0 0 5px rgba(255, 160, 33, 0.6)); animation: ffFlameGlow 2.2s ease-in-out infinite; }
-.ff-flame[data-state="lit"] .ff-flame-outer { animation: ffFlameDance 1.5s ease-in-out infinite; }
-.ff-flame[data-state="lit"] .ff-flame-mid { animation: ffFlameDance 1.05s ease-in-out infinite reverse; }
-.ff-flame[data-state="lit"] .ff-flame-core { animation: ffFlameCore 0.75s ease-in-out infinite alternate; }
-.ff-flame[data-state="lit"] .ff-flame-sparks circle { animation: ffFlameSpark 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
-.ff-flame[data-state="lit"] .ff-flame-sparks circle:nth-child(2) { animation-delay: 0.6s; }
-.ff-flame[data-state="lit"] .ff-flame-sparks circle:nth-child(3) { animation-delay: 1.2s; }
+.ff-flame-sparks { display: none; }
 /* Série à entretenir : la flamme est plus petite et plus calme, comme une braise qui attend. */
 .ff-flame[data-state="waiting"] { opacity: 0.8; filter: saturate(0.7); transform: scale(0.86); }
-.ff-flame[data-state="waiting"] .ff-flame-outer, .ff-flame[data-state="waiting"] .ff-flame-mid, .ff-flame[data-state="waiting"] .ff-flame-core { animation: ffFlameDance 2.8s ease-in-out infinite; }
-.ff-flame[data-state="waiting"] .ff-flame-sparks { display: none; }
 .ff-flame-pop { animation: ffFlamePop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
 
-@keyframes ffFlameDance {
-  0%, 100% { transform: scale(1, 1) skewX(0deg); }
-  25% { transform: scale(0.96, 1.05) skewX(-3deg); }
-  50% { transform: scale(1.03, 0.96) skewX(2.5deg); }
-  75% { transform: scale(0.98, 1.06) skewX(-1.5deg); }
-}
-@keyframes ffFlameCore {
-  from { transform: scale(0.92, 0.9); opacity: 0.85; }
-  to { transform: scale(1.04, 1.1); opacity: 1; }
-}
-@keyframes ffFlameSpark {
-  0% { transform: translateY(6px) scale(1); opacity: 0; }
-  20% { opacity: 1; }
-  100% { transform: translateY(-9px) scale(0.3); opacity: 0; }
-}
-@keyframes ffFlameGlow {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 160, 33, 0.5)); }
-  50% { filter: drop-shadow(0 0 8px rgba(255, 183, 77, 0.85)); }
-}
 @keyframes ffFlamePop {
   0% { transform: scale(0.4); }
   60% { transform: scale(1.35); }
@@ -920,41 +687,22 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   .ff-flame, .ff-flame * { animation: none !important; }
 }
 
-/* ===== Barre d'onglets du bas (téléphone) : une plaque qui flotte au-dessus du pouce ===== */
+/* ===== Barre d'onglets du bas (téléphone et tablette) : posée en bas, sous le pouce ===== */
 .ff-tabs {
-  position: fixed; left: max(10px, env(safe-area-inset-left, 0px)); right: max(10px, env(safe-area-inset-right, 0px));
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 40;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 6px;
-  background: color-mix(in srgb, var(--ff-surface) 92%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
-  border: 1px solid var(--ff-line); border-radius: 26px;
-  box-shadow: 0 18px 40px -18px rgba(0, 42, 89, 0.55), 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: 4px max(8px, env(safe-area-inset-left, 0px)) calc(4px + env(safe-area-inset-bottom, 0px));
+  background: var(--ff-page); border-top: 1px solid var(--ff-line);
 }
 .ff-tab {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  min-height: 54px; border-radius: 20px; text-decoration: none;
-  color: var(--ff-fg-2);
-  font-size: 14px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap;
-  transition: color var(--ff-base) ease, transform var(--ff-fast) var(--ff-ease-out), background-color var(--ff-base) ease;
+  min-height: 56px; text-decoration: none; color: var(--ff-fg-2);
+  font-size: 14px; font-weight: 600; white-space: nowrap;
 }
-.ff-tab:active { transform: scale(0.94); }
-.ff-tab { position: relative; z-index: 1; }
-.ff-tab[aria-current="page"] { color: var(--ff-fg); }
-/* Pastille de l'onglet ouvert : une seule, qui glisse d'un onglet à l'autre (colonnes de (100 % − 12 px − 3 × 2 px) / 4). */
-.ff-tab-pill { position: absolute; left: 6px; top: 6px; bottom: 6px; width: calc((100% - 18px) / 4); border-radius: 20px; pointer-events: none;
-  background: color-mix(in srgb, var(--ff-accent) 18%, transparent);
-  transform: translate3d(calc(var(--i, 0) * (100% + 2px)), 0, 0); transition: transform var(--ff-base) var(--ff-ease-out), opacity var(--ff-base) ease; }
-.ff-tab-pill[data-on="false"] { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .ff-tab-pill { transition: none; } }
-.ff-tab-icon { display: grid; place-items: center; width: 44px; height: 26px; border-radius: 999px; transition: background-color var(--ff-base) ease, color var(--ff-base) ease; }
-.ff-tab[aria-current="page"] .ff-tab-icon { color: var(--ff-accent-strong); }
-.ff-tab[data-main="true"] .ff-tab-icon { background-color: var(--ff-accent); background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%); color: var(--ff-on-accent); }
-.ff-tab[data-main="true"][aria-current="page"] .ff-tab-icon { color: var(--ff-on-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ff-accent) 32%, transparent); }
-/* La page laisse la place à la barre pour que rien ne soit caché dessous. */
-@media (max-width: 767px) {
-  .ff-frame:has(.ff-tabs) .ff-main { padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
-}
-@media (min-width: 768px) { .ff-tabs { display: none; } }
+.ff-tab[aria-current="page"] { color: var(--ff-accent-strong); font-weight: 800; }
+.ff-tab-icon { display: grid; place-items: center; height: 26px; }
+.ff-frame:has(.ff-tabs) .ff-main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 1024px) { .ff-tabs { display: none; } .ff-frame:has(.ff-tabs) .ff-main { padding-bottom: 96px; } }
 
 /* ===== Téléphone : rien ne doit élargir la page =====
    Dans une grille Tailwind sans colonnes définies, un long titre ou un long bouton gonfle la colonne
@@ -963,117 +711,13 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 .ff-main { overflow-wrap: break-word; }
 .ff-main :where(button, a, input, select, textarea, svg, img, canvas) { overflow-wrap: normal; }
 
-/* ===== L'eau autour des pages de l'appli (components/Ocean.tsx) =====
-   Calme : lumière qui descend, reflets du soleil, particules en suspension, et de temps en temps
-   un banc de poissons au loin. Uniquement transform et opacity, fixe, derrière le contenu, jamais cliquable. */
-.ff-ocean { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
-/* Rayons de soleil : une seule image légère (public/ocean/rays.webp) qui se balance ; pas de flou calculé. */
-.ff-rays { position: absolute; left: -15%; right: -15%; top: -6%; height: 90vh; width: 130%; opacity: 0; transition: opacity 1.2s ease; transform-origin: 50% 0; animation: ff-sway 16s ease-in-out infinite alternate; }
-:root { --ff-rays-op: 1; }
-:root.dark { --ff-rays-op: 0.28; }
-@keyframes ff-sway { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, 0, 0) scaleX(1.05); } }
-/* Reflets du soleil : deux réseaux de lumière qui glissent l'un sur l'autre (comme au fond d'une piscine, en très doux). */
-.ff-caustic { position: absolute; left: 0; right: -560px; top: 0; width: calc(100% + 560px); height: 55vh; opacity: 0; transition: opacity 1.2s ease;
-  animation: ff-caustic 28s linear infinite; }
-@keyframes ff-caustic { to { transform: translate3d(-560px, 0, 0); } }
-/* Texture de caustiques (scripts/ocean/caustic.html, rendue en WebGL puis compressée : 35 Ko, répétable). */
-:root { --ff-caustic-img: url(/ocean/caustic-a.webp); --ff-caustic-op: 0.75; }
-:root.dark { --ff-caustic-op: 0.16; }
-/* Particules en suspension : de la « neige marine » qui dérive très lentement. */
-.ff-snow { position: absolute; inset: 0; }
-.ff-snow i { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); border-radius: 50%; background: var(--ff-snow); opacity: 0.8; animation: ff-drift var(--d) ease-in-out var(--delay) infinite alternate; }
-@keyframes ff-drift { to { transform: translate3d(var(--dx), var(--dy), 0); opacity: 0.25; } }
-/* Banc de poissons au loin : petites silhouettes floues qui traversent, très rarement. */
-.ff-school-far { position: absolute; left: 0; top: var(--y, 38%); width: 200px; height: 80px; color: var(--ff-silhouette); opacity: 0.16; filter: blur(0.6px);
-  animation: ff-school-cross 70s linear var(--delay, -20s) infinite; }
-.ff-school-far svg { width: 100%; height: 100%; overflow: visible; }
-.ff-school-far g { animation: ff-school-bob 6s ease-in-out infinite alternate; }
-@keyframes ff-school-cross { from { transform: translate3d(-240px, 0, 0); } 40%, to { transform: translate3d(calc(100vw + 60px), -40px, 0); } }
-@keyframes ff-school-bob { to { transform: translateY(10px) scaleX(0.94); } }
-/* Bulles : rares, avec un fin reflet. */
-.ff-bub { position: absolute; bottom: -20px; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%; opacity: 0;
-  border: 1px solid color-mix(in srgb, #fff 70%, transparent);
-  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.85) 0 14%, rgba(255, 255, 255, 0.08) 36%, transparent 64%);
-  animation: ff-rise var(--d) linear var(--delay) infinite; }
-@keyframes ff-rise {
-  0% { transform: translate3d(0, 0, 0); opacity: 0; }
-  10% { opacity: 0.8; }
-  50% { transform: translate3d(calc(var(--drift) * -0.6), -55vh, 0); }
-  90% { opacity: 0.5; }
-  100% { transform: translate3d(var(--drift), -110vh, 0); opacity: 0; }
-}
-@media (max-width: 767px) {
-  .ff-snow i:nth-child(2n), .ff-bub:nth-of-type(2n) { display: none; }
-  .ff-caustic + .ff-caustic { display: none; }
-}
-
-/* ===== Petits coins de mer dans les cartes et les états vides (<SeaDecor />) =====
-   Le bloc parent a la classe « ff-deco-host » : la lumière et les bulles passent DERRIÈRE le texte. */
-.ff-deco-host { position: relative; isolation: isolate; overflow: hidden; }
-.ff-deco { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; container-type: size; }
-.ff-deco::before { content: ""; position: absolute; inset: -40% -20% 30% -20%; background-image: var(--ff-caustic-img); background-size: 300px 300px; opacity: var(--ff-caustic-op);
-  -webkit-mask-image: radial-gradient(70% 70% at 80% 0%, #000, transparent); mask-image: radial-gradient(70% 70% at 80% 0%, #000, transparent);
-  animation: ff-caustic3 30s linear infinite; }
-@keyframes ff-caustic3 { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-300px, 0, 0); } }
-.ff-deco i { position: absolute; bottom: -14px; right: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--ff-accent) 45%, transparent);
-  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.7) 0 14%, transparent 50%);
-  opacity: 0; animation: ff-deco-rise var(--d) linear var(--delay) infinite; }
-@keyframes ff-deco-rise {
-  0% { transform: translate3d(0, 0, 0); opacity: 0; }
-  15% { opacity: 1; }
-  80% { opacity: 0.7; }
-  100% { transform: translate3d(-6px, -105cqh, 0); opacity: 0; }
-}
-.ff-deco b { position: absolute; right: 6%; top: var(--y, 64%); width: 120px; color: var(--ff-silhouette); opacity: 0.12; filter: blur(0.8px);
-  animation: ff-deco-glide 9s ease-in-out infinite alternate; }
-@keyframes ff-deco-glide { from { transform: translate3d(0, 0, 0) rotate(-8deg); } to { transform: translate3d(-24px, -10px, 0) rotate(-2deg); } }
-
-/* Pages : elles apparaissent en douceur. */
-/* « backwards » et pas « both » : une fois finie, l'animation ne laisse aucun transform (sinon les fenêtres fixes de la page y restent piégées). */
-.ff-main { animation: ff-page-in 0.3s ease-out backwards; }
-@keyframes ff-page-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-/* Fiche prête : une gerbe de bulles qui remonte (déclenchée une fois par burstBubbles()). */
-.ff-burst { position: fixed; z-index: 70; pointer-events: none; width: 10px; height: 10px; border-radius: 50%;
-  border: 1.5px solid color-mix(in srgb, #fff 80%, transparent);
-  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.9) 0 16%, rgba(141, 206, 255, 0.15) 40%, transparent 66%); }
-
-@media (prefers-reduced-motion: reduce) {
-  .ff-ocean *, .ff-deco *, .ff-deco::before, .ff-main { animation: none !important; }
-  .ff-bub, .ff-deco i { display: none; }
-}
-
-/* ===== Logo (barre du haut, menu) : le dessin d'Anouar, qui plane doucement ===== */
+/* ===== Logo (barre du haut, menu) ===== */
 .ff-logo { position: relative; display: inline-flex; flex-shrink: 0; }
-.ff-logo img { display: block; transform-origin: 50% 55%; animation: ff-logo-glide 7s ease-in-out infinite; }
-@keyframes ff-logo-glide {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-3deg) scaleY(1); }
-  25% { transform: translate3d(0, -2px, 0) rotate(0deg) scaleY(0.94); }
-  50% { transform: translate3d(0, -1px, 0) rotate(3deg) scaleY(1); }
-  75% { transform: translate3d(0, 1px, 0) rotate(0deg) scaleY(0.95); }
-}
-@media (hover: hover) and (pointer: fine) {
-  .ff-brand:hover .ff-logo img { animation: ff-logo-flap 0.7s ease-in-out 2; }
-}
-.ff-brand:focus-visible .ff-logo img { animation: ff-logo-flap 0.7s ease-in-out 2; }
-@keyframes ff-logo-flap {
-  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1) scaleX(1); }
-  30% { transform: translate3d(0, -3px, 0) scaleY(0.72) scaleX(1.06); }
-  60% { transform: translate3d(0, -1px, 0) scaleY(1.06) scaleX(0.97); }
-}
 .ff-logo i { display: none; }
 .ff-wordmark { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; }
 /* Clair : bleu un peu plus foncé que #008EFD pour atteindre 4,5:1 sur le fond blanc bleuté. */
 .ff-wordmark > span { color: #0070D0; font-weight: 800; }
 :root.dark .ff-wordmark > span { color: #46B5FF; }
-@media (prefers-reduced-motion: reduce) {
-  .ff-logo img { animation: none !important; }
-}
-
-/* Connexion / inscription (ordinateur) : une raie passe au loin derrière le message. */
-.ff-auth-manta { position: absolute; right: -10%; top: -40%; width: 260px; opacity: 0.14; transform: rotate(-16deg); filter: blur(1px); pointer-events: none; }
-
 /* ===== Flashcards : la carte se retourne (components/FlashcardStudy.tsx) ===== */
 .ff-flip { display: block; perspective: 1100px; border-radius: 18px; animation: ff-card-in var(--ff-base) var(--ff-ease-out) backwards; }
 .ff-flip-in { display: grid; transform-style: preserve-3d; transition: transform 420ms var(--ff-ease-out); }
@@ -1096,10 +740,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 /* ===== Création d'une fiche (components/FicheLoader.tsx) : on plonge, la raie nage, les étapes se cochent =====
    Fond opaque (rien ne transparaît derrière), tailles fixes (rien ne saute quand les étapes avancent). */
 .ff-loader { position: fixed; inset: 0; z-index: 70; overflow-y: auto; color: var(--ff-fg); isolation: isolate;
-  background: radial-gradient(110% 55% at 50% -8%, var(--ff-glow), transparent 62%), linear-gradient(180deg, var(--ff-sea-1), var(--ff-sea-2) 55%, var(--ff-sea-3));
-  animation: fadeIn var(--ff-base) ease-out both; }
-.ff-loader::before { content: ""; position: absolute; left: -15%; right: -15%; top: 0; height: 75vh; z-index: -1; pointer-events: none;
-  background: url(/ocean/rays.webp) center top / 100% 100% no-repeat; opacity: var(--ff-rays-op, 0.7); animation: ff-sway 9s ease-in-out infinite alternate; }
+  background: var(--ff-page); animation: fadeIn var(--ff-base) ease-out both; }
 .ff-loader-in { min-height: 100%; width: 100%; max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: 16px;
   padding: max(28px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom)); text-align: center; }
 
@@ -1115,7 +756,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   75% { transform: translate3d(0, 12px, 0) rotate(-2deg); }
 }
 @keyframes ff-ld-flap { from { transform: scaleY(1) skewX(0); } to { transform: scaleY(0.8) skewX(-5deg); } }
-.ff-loader-swim i { position: absolute; left: 46%; bottom: 18px; width: 9px; height: 9px; border-radius: 50%; opacity: 0;
+.ff-loader-swim i { display: none; position: absolute; left: 46%; bottom: 18px; width: 9px; height: 9px; border-radius: 50%; opacity: 0;
   border: 1.4px solid color-mix(in srgb, var(--ff-fg) 45%, transparent);
   background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.9) 0 18%, transparent 55%);
   animation: ff-ld-bub 2.8s ease-out infinite; }
@@ -1147,12 +788,12 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 .ff-loader-steps li[data-state="done"] .ff-loader-dot svg { transform: none; }
 
 .ff-loader-bar { width: 100%; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--ff-fg) 12%, transparent); overflow: hidden; }
-.ff-loader-bar i { display: block; height: 100%; border-radius: inherit; transform-origin: left; background: linear-gradient(90deg, var(--ff-accent), #8DCEFF);
+.ff-loader-bar i { display: block; height: 100%; border-radius: inherit; transform-origin: left; background: var(--ff-accent);
   transition: transform 700ms var(--ff-ease-out); }
 .ff-loader-note { min-height: 3em; margin: 0; font-size: 15px; line-height: 1.5; color: var(--ff-fg-2); }
 
 /* Le squelette de la fiche : il « respire » ; chaque bloc se teinte quand son étape est faite. */
-.ff-loader-sheet { width: 100%; padding: 18px; display: grid; gap: 9px; text-align: left; border-radius: var(--ff-r-plate); background: var(--ff-surface); border: 1px solid var(--ff-line); box-shadow: var(--ff-plate-shadow); }
+.ff-loader-sheet { width: 100%; padding: 18px; display: grid; gap: 9px; text-align: left; border-radius: 20px; background: var(--ff-surface); border: 1px solid var(--ff-line); }
 .ff-loader-sheet > span, .ff-loader-sheet .cards span { display: block; height: 10px; border-radius: 6px; background: color-mix(in srgb, var(--ff-fg) 10%, transparent);
   animation: pulseGlow 1.6s ease-in-out infinite; transition: background-color 400ms ease; }
 .ff-loader-sheet .t { height: 18px; width: 58%; margin-bottom: 4px; }
@@ -1173,17 +814,12 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   .ff-loader-swim i { display: none; }
 }
 
-/* Voile derrière les fenêtres : de l'eau profonde, légèrement floutée. */
-.ff-veil { background: rgba(0, 18, 52, 0.62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+/* Voile derrière les fenêtres : un aplat sombre (sans flou), pour isoler la fenêtre. */
+.ff-veil { background: rgba(0, 18, 52, 0.7); }
 /* Fenêtres (modales) : elles s'ouvrent vite et en douceur, sans attendre. */
-.ff-veil.ff-fade, .ff-veil .ff-fade-up { animation-duration: 0.2s; }
+.ff-veil.ff-fade, .ff-veil .{ animation-duration: 0.2s; }
 /* Écran de démarrage de l'appli installée : la lumière descend dans l'eau profonde. */
-.ff-splash { background: radial-gradient(90% 60% at 50% -10%, rgba(141, 206, 255, 0.3), transparent 60%), linear-gradient(180deg, #013D7D, #011B46); }
-
-.ff-rays[data-ready] { opacity: var(--ff-rays-op, 0.85); }
-.ff-caustic[data-ready] { opacity: var(--ff-caustic-op); }
-/* Cartes : seulement des bulles (une texture dans chaque carte serait prise pour l'élément principal). */
-.ff-deco::before { display: none; }
+.ff-splash { background: #011B46; }
 
 /* ===== Logo : la raie (dessin d'Anouar) en blanc dans une tuile bleue en relief, comme une icône d'appli ===== */
 .ff-mark { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 28%; overflow: hidden;
@@ -1191,8 +827,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(0, 87, 166, 0.22), 0 8px 18px -8px rgba(0, 115, 205, 0.6); }
 .ff-mark::after { content: ""; position: absolute; left: -10%; right: -10%; top: -40%; height: 70%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.45), transparent); pointer-events: none; }
 .ff-mark > span { position: relative; z-index: 1; width: 72%; aspect-ratio: 512 / 420; background: #fff; -webkit-mask: url(/brand/raie.svg) center / contain no-repeat; mask: url(/brand/raie.svg) center / contain no-repeat; transform: translateY(2%); }
-.ff-brand:hover .ff-mark > span, .brand:hover .ff-mark > span { animation: ff-mark-flap 0.7s ease-in-out 2; }
-@keyframes ff-mark-flap { 30% { transform: translateY(-4%) scaleY(0.78) scaleX(1.05); } 60% { transform: translateY(1%) scaleY(1.05); } }
 @media (prefers-reduced-motion: reduce) { .ff-mark > span { animation: none !important; } }
 
 
@@ -1204,8 +838,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ff-accent); }
 :root.dark { --ff-page: #011B46; }
 
 /* Cadre calme : <AppShell publicPage> (pas d'océan animé, pas de flou sous la barre). */
-.ff-frame[data-calm] { background: var(--ff-page); }
-.ff-frame[data-calm] .ff-bar { background: var(--ff-page); -webkit-backdrop-filter: none; backdrop-filter: none; }
 .ff-frame[data-calm] .ff-main { font-size: 17px; line-height: 1.6; }
 
 .ff-h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; }

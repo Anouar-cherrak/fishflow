@@ -82,7 +82,7 @@ export default function CGU() {
             <p>Pour toute question relative à ces CGU : anouarcherrak68100@gmail.com</p>
           </section>
 
-          <p className="text-sm text-black/50 pt-6 border-t border-black/10">
+          <p className="text-sm text-black/65 pt-6 border-t border-black/10">
             Dernière mise à jour : 11/08/2026
           </p>
         </div>

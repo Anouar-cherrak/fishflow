@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useDialog } from "@/lib/use-dialog";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { SeaDecor } from "@/components/Ocean";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { countDueCards } from "@/lib/reviews";
 
@@ -193,35 +193,30 @@ export default function MesFiches() {
 
   return (
     <AppShell size="wide">
-      <div className="flex flex-wrap items-end justify-between gap-4 mb-8 ff-fade-up">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
         <div>
-          <h1 className="ff-title mb-2">Mes fiches.</h1>
+          <h1 className="ff-title mb-2">Mes fiches</h1>
           <p className="ff-lead">
             {fiches.length === 0
               ? "Ici, tu retrouves toutes tes fiches. Tu peux les classer par matière."
               : `${fiches.length} fiche${fiches.length > 1 ? "s" : ""} au total, dont ${thisMonthCount} ce mois-ci.`}
           </p>
         </div>
-        <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
+        <button type="button" onClick={() => router.push("/generer")} className="ff-primary">
           Nouvelle fiche
         </button>
       </div>
 
       {dueCount > 0 && (
-        <div className="ff-deco-host mb-8 bg-surface border border-accent/50 rounded-3xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 ff-fade-up">
-          <SeaDecor fish={false} />
-          <p className="text-black">
-            <span className="font-extrabold text-xl mr-1">{dueCount}</span> carte{dueCount > 1 ? "s" : ""} à réviser aujourd&apos;hui
-          </p>
-          <button type="button" onClick={() => router.push("/reviser")} className="ff-primary text-sm ff-btn shrink-0">
-            Réviser
-          </button>
-        </div>
+        <p className="mb-8 -mt-4">
+          <strong>{dueCount}</strong> carte{dueCount > 1 ? "s" : ""} à réviser aujourd&apos;hui.{" "}
+          <Link href="/reviser" className="ff-link inline-flex items-center min-h-[44px]">Réviser maintenant</Link>
+        </p>
       )}
 
       <div className="grid gap-6 lg:gap-10 grid-cols-[minmax(0,1fr)] lg:grid-cols-[230px_minmax(0,1fr)] items-start">
         {/* Dossiers */}
-        <div className="ff-fade-up min-w-0">
+        <div className="min-w-0">
           <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0" role="group" aria-label="Dossiers">
             <button type="button" aria-pressed={activeFolder === "all"} onClick={() => setActiveFolder("all")} className={tabClass(activeFolder === "all")}>
               Toutes ({fiches.length})
@@ -241,11 +236,11 @@ export default function MesFiches() {
                 <button
                   type="button"
                   onClick={() => deleteFolder(folder.id)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full text-current opacity-60 hover:opacity-100 text-sm"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 grid place-items-center rounded-full text-current opacity-75 hover:opacity-100"
                   aria-label={`Supprimer le dossier ${folder.name}`}
                   title="Supprimer le dossier"
                 >
-                  ✕
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
                 </button>
               </div>
             ))}
@@ -260,7 +255,7 @@ export default function MesFiches() {
               type="button"
               onClick={() => setShowNewFolder(!showNewFolder)}
               aria-expanded={showNewFolder}
-              className="shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold border border-dashed border-black/30 text-black/60 hover:border-accent hover:text-black transition whitespace-nowrap lg:w-full lg:rounded-2xl"
+              className="shrink-0 min-h-[44px] px-4 rounded-full text-sm font-semibold border border-dashed border-black/40 text-black/75 hover:border-accent hover:text-black transition whitespace-nowrap lg:w-full lg:rounded-2xl"
             >
               + Nouveau dossier (matière)
             </button>
@@ -275,7 +270,7 @@ export default function MesFiches() {
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 placeholder="Matière (ex : Anglais, Droit…)"
-                className="w-full min-h-[44px] px-3 border border-black/15 rounded-xl mb-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent"
+                className="ff-field mb-3"
                 autoFocus
               />
               <div className="flex items-center gap-2 mb-3 flex-wrap" role="group" aria-label="Couleur du dossier">
@@ -295,13 +290,13 @@ export default function MesFiches() {
                 ))}
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={createFolder} disabled={!newFolderName.trim()} className="ff-primary text-sm min-h-[44px] ff-btn">
+                <button type="button" onClick={createFolder} disabled={!newFolderName.trim()} className="ff-secondary text-sm">
                   Créer
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowNewFolder(false); setNewFolderName(""); }}
-                  className="text-sm px-4 rounded-full text-black/60 hover:text-black transition min-h-[44px]"
+                  className="text-sm px-4 rounded-full ff-muted hover:text-black transition min-h-[44px]"
                 >
                   Annuler
                 </button>
@@ -314,21 +309,20 @@ export default function MesFiches() {
         <div className="min-w-0">
           {fiches.length > 3 && (
             <div className="mb-5">
-              <label htmlFor="fiche-search" className="text-sm font-semibold text-black/70 block mb-1.5">Chercher une fiche</label>
+              <label htmlFor="fiche-search" className="ff-label">Chercher une fiche</label>
               <input
                 id="fiche-search"
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Ex : Révolution, cellule…"
-                className="w-full min-h-[48px] px-4 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                className="ff-field"
               />
             </div>
           )}
           {filteredFiches.length === 0 ? (
-            <div className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-10 text-center ff-fade-up grid gap-4 justify-items-center">
-              <SeaDecor y="80%" />
-              <p className="text-black/60">
+            <div className="py-10 text-center grid gap-5 justify-items-center">
+              <p className="ff-muted max-w-[48ch]">
                 {fiches.length === 0
                   ? "Tu n'as pas encore de fiche. Crée la première : colle un cours, envoie un PDF ou une photo."
                   : needle
@@ -336,20 +330,19 @@ export default function MesFiches() {
                     : "Aucune fiche dans ce dossier. Utilise « Classer » sur une fiche pour la ranger ici."}
               </p>
               {fiches.length === 0 && (
-                <button type="button" onClick={() => router.push("/generer")} className="ff-primary ff-btn">
+                <button type="button" onClick={() => router.push("/generer")} className="ff-primary">
                   Créer ma première fiche
                 </button>
               )}
             </div>
           ) : (
-            <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="grid border-t border-black/15">
               {filteredFiches.map((fiche, i) => {
                 const ficheFolder = folders.find((f) => f.id === fiche.folder_id);
                 return (
                   <li
                     key={fiche.id}
-                    className={`relative min-w-0 bg-surface border border-black/10 rounded-3xl p-5 flex flex-col gap-3 ff-fade-up ff-card${i >= 12 ? " ff-lazy-item" : ""}`}
-                    style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}
+                    className={`relative min-w-0 py-4 border-b border-black/15 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4${i >= 12 ? " ff-lazy-item" : ""}`}
                   >
                     <div className="min-w-0 flex-1">
                       {editingId === fiche.id ? (
@@ -370,50 +363,43 @@ export default function MesFiches() {
                           <button type="button" onClick={() => saveTitle(fiche.id)} disabled={saving} className="text-sm font-semibold text-accent shrink-0 disabled:opacity-50 min-h-[44px] px-1">
                             OK
                           </button>
-                          <button type="button" onClick={cancelEditing} className="text-sm text-black/50 shrink-0 min-h-[44px] px-1">
+                          <button type="button" onClick={cancelEditing} className="text-sm ff-muted shrink-0 min-h-[44px] px-1">
                             Annuler
                           </button>
                         </div>
                       ) : (
                         <>
-                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <div className="flex items-center gap-3 flex-wrap empty:hidden">
                             {ficheFolder && (
-                              <span className="inline-flex items-center gap-1.5 text-xs text-black/60">
+                              <span className="inline-flex items-center gap-1.5 text-sm ff-muted">
                                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: ficheFolder.color }} aria-hidden="true" />
                                 {ficheFolder.name}
                               </span>
                             )}
                             {fiche.best_score !== null && (
-                              <span
-                                className={`text-xs px-2 py-0.5 rounded-full font-semibold shrink-0 ${
-                                  fiche.best_score >= 80 ? "bg-accent text-on-accent" : "bg-white border border-black/15 text-black/60"
-                                }`}
-                              >
-                                Quiz {fiche.best_score}%
-                              </span>
+                              <span className="text-sm ff-muted shrink-0">Quiz : {fiche.best_score} %</span>
                             )}
                           </div>
                           {/* Toute la carte ouvre la fiche (le bouton s'étend sur la carte, les actions restent au-dessus). */}
-                          <h2 className="font-bold text-lg leading-snug text-black break-words pr-7">
+                          <h2 className="font-bold text-lg leading-snug text-black break-words">
                             <button type="button" onClick={() => handleView(fiche)} className="ff-stretch text-left line-clamp-3">
                               {fiche.title}
                             </button>
                           </h2>
-                          <span className="absolute right-5 top-5 text-black/40 text-xl leading-none" aria-hidden="true">›</span>
                         </>
                       )}
-                      <p className="text-sm text-black/50 mt-2">
+                      <p className="text-sm ff-muted mt-1">
                         {new Date(fiche.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                       </p>
                     </div>
-                    <div className="relative z-[1] flex items-center gap-1 -mx-2.5 -mb-2 border-t border-black/10 pt-2">
-                      <button type="button" onClick={() => startEditing(fiche)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
+                    <div className="relative z-[1] flex items-center gap-1 -mx-2.5 sm:mx-0 shrink-0">
+                      <button type="button" onClick={() => startEditing(fiche)} className="text-sm ff-muted hover:text-black transition px-2.5 min-h-[44px] rounded-full">
                         Renommer
                       </button>
-                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm text-black/60 hover:text-black transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white" title="Ranger cette fiche dans un dossier (par exemple une matière)">
+                      <button type="button" onClick={() => setMovingFicheId(fiche.id)} className="text-sm ff-muted hover:text-black transition px-2.5 min-h-[44px] rounded-full" title="Ranger cette fiche dans un dossier (par exemple une matière)">
                         Classer
                       </button>
-                      <button type="button" onClick={() => handleDelete(fiche.id)} className="ml-auto text-sm text-black/60 hover:text-[var(--quiz-wrong-text)] transition px-2.5 min-h-[44px] sm:min-h-[40px] rounded-full hover:bg-white">
+                      <button type="button" onClick={() => handleDelete(fiche.id)} className="ml-auto sm:ml-0 text-sm ff-muted hover:text-[var(--quiz-wrong-text)] transition px-2.5 min-h-[44px] rounded-full">
                         Supprimer
                       </button>
                     </div>
@@ -435,7 +421,7 @@ export default function MesFiches() {
             role="dialog"
             aria-modal="true"
             aria-label="Ranger la fiche dans un dossier"
-            className="bg-surface border border-black/10 rounded-3xl shadow-xl p-4 w-full max-w-xs"
+            className="bg-surface border border-black/10 rounded-3xl p-4 w-full max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-sm font-semibold text-black mb-3 px-1">Ranger cette fiche dans…</p>
@@ -453,7 +439,7 @@ export default function MesFiches() {
                 {folder.name}
               </button>
             ))}
-            {folders.length === 0 && <p className="text-xs text-black/50 px-3 py-2">Crée d&apos;abord un dossier (par exemple une matière) avec « + Nouveau dossier (matière) ».</p>}
+            {folders.length === 0 && <p className="text-sm ff-muted px-3 py-2">Crée d&apos;abord un dossier (par exemple une matière) avec « + Nouveau dossier (matière) ».</p>}
             <button type="button" onClick={() => setMovingFicheId(null)} className="ff-secondary w-full mt-2 text-sm">
               Annuler
             </button>

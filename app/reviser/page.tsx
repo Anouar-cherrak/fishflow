@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { SeaDecor } from "@/components/Ocean";
 import { FlashcardStudy } from "@/components/FlashcardStudy";
 import { recordReviewResults, getProgress, type Progress } from "@/lib/reviews";
 import { trackEvent } from "@/lib/tracking";
@@ -172,26 +171,25 @@ export default function Reviser() {
 
   return (
     <AppShell size="normal">
-      <div className="mb-8 ff-fade-up">
-        <h1 className="ff-title mb-3">Réviser.</h1>
+      <div className="mb-8">
+        <h1 className="ff-title mb-3">Réviser</h1>
         <p className="ff-lead">Chaque jour, tu revois les cartes du jour. Tu dis si tu savais, et FishFlow choisit quand te les remontrer.</p>
       </div>
 
       {stats && (
-        <ul className="grid grid-cols-3 gap-3 sm:gap-5 mb-8 ff-fade-up" aria-label="Ta progression">
+        <ul className="grid grid-cols-3 gap-3 sm:gap-5 mb-8" aria-label="Ta progression">
           {stats.map((st) => (
             <li key={st.label} className="bg-surface border border-black/10 rounded-3xl p-4 sm:p-6 ff-card">
               <p className="text-3xl sm:text-5xl font-extrabold tracking-tight text-black">{st.value}</p>
-              <p className="text-xs sm:text-sm text-black/60 mt-1">{st.label}</p>
+              <p className="text-sm sm:text-sm text-black/60 mt-1">{st.label}</p>
             </li>
           ))}
         </ul>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] items-stretch">
-        <section aria-live="polite" className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-7 sm:p-10 flex flex-col justify-center ff-fade-up">
-          <SeaDecor y="82%" />
-          {status === "loading" && <p className="text-black/50">Chargement…</p>}
+        <section aria-live="polite" className="bg-surface border border-black/10 rounded-3xl p-7 sm:p-10 flex flex-col justify-center">
+          {status === "loading" && <p className="text-black/65">Chargement…</p>}
 
           {status === "empty" && !finished && (
             <>
@@ -219,7 +217,7 @@ export default function Reviser() {
                   : `carte${dueTotal > 1 ? "s" : ""} à réviser aujourd'hui`}
               </p>
               {dueTotal > cards.length ? (
-                <p className="text-sm text-black/50 mb-6">On commence par les {cards.length} plus urgentes. Le reste, ce sera pour demain.</p>
+                <p className="text-sm text-black/65 mb-6">On commence par les {cards.length} plus urgentes. Le reste, ce sera pour demain.</p>
               ) : (
                 <div className="mb-6" />
               )}
@@ -253,7 +251,7 @@ export default function Reviser() {
           )}
         </section>
 
-        <section aria-label="Comment ça marche" className="border border-black/10 rounded-3xl p-7 sm:p-10 ff-fade-up" style={{ animationDelay: "0.1s" }}>
+        <section aria-label="Comment ça marche" className="border border-black/10 rounded-3xl p-7 sm:p-10" style={{ animationDelay: "0.1s" }}>
           <h2 className="text-xl font-bold tracking-tight mb-4">Comment ça marche</h2>
           <ol className="grid gap-4">
             {[

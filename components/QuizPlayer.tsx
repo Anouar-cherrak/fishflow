@@ -64,17 +64,17 @@ export function QuizPlayer({
     return (
       <div className="border border-black/10 rounded-xl p-6 bg-surface text-center">
         <p className="text-3xl font-bold text-black mb-1">{score}%</p>
-        <p className="text-sm text-black/60 mb-4">
+        <p className="text-[15px] ff-muted mb-4">
           {correctCount} / {quiz.length} bonnes réponses
         </p>
-        <p className={`text-sm font-medium mb-4 ${mastered ? "text-accent-strong" : "text-black/60"}`}>
+        <p className={`text-sm font-medium mb-4 ${mastered ? "text-accent-strong" : "ff-muted"}`}>
           {mastered ? "Fiche maîtrisée !" : "Continue, tu y es presque."}
         </p>
-        {saving && <p className="text-xs text-black/60 mb-3">Enregistrement du score…</p>}
+        {saving && <p className="text-sm ff-muted mb-3" role="status">Enregistrement du score…</p>}
         <button
           type="button"
           onClick={restart}
-          className="text-sm px-5 min-h-[44px] rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
+          className="ff-primary text-sm"
         >
           Refaire le quiz
         </button>
@@ -87,7 +87,7 @@ export function QuizPlayer({
   return (
     <div className="border border-black/10 rounded-xl p-6 bg-surface">
       <div className="flex items-center justify-between mb-4 gap-2">
-        <p className="text-xs font-semibold text-black/60 uppercase tracking-wide shrink-0">
+        <p className="text-sm font-semibold ff-muted shrink-0">
           Question {current + 1} / {quiz.length}
         </p>
         <div className="flex flex-wrap justify-end gap-1 min-w-0" aria-hidden="true">
@@ -100,42 +100,42 @@ export function QuizPlayer({
         </div>
       </div>
 
-      <p className="font-medium text-black mb-4">{q.question}</p>
+      <p className="text-lg font-semibold leading-snug text-black mb-4">{q.question}</p>
 
       <div className="space-y-2 mb-5">
         {q.options.map((opt, i) => {
-          let style = "bg-white border-black/10 text-black/80";
+          let style = "bg-white border-black/20 text-black";
           if (selected !== null) {
             if (i === q.correctIndex) {
               style = "bg-[var(--quiz-correct-bg)] border-[var(--quiz-correct-border)] text-[var(--quiz-correct-text)] font-medium";
             } else if (i === selected) {
               style = "bg-[var(--quiz-wrong-bg)] border-[var(--quiz-wrong-border)] text-[var(--quiz-wrong-text)]";
             } else {
-              style = "bg-white border-black/10 text-black/40";
+              style = "bg-white border-black/10 text-black/60";
             }
           }
-          const mark = selected === null ? null : i === q.correctIndex ? "✓" : i === selected ? "✗" : null;
+          const mark = selected === null ? null : i === q.correctIndex ? "ok" : i === selected ? "ko" : null;
           return (
             <button
               key={i}
               type="button"
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`w-full min-h-[48px] text-left px-4 py-3 rounded-lg border text-sm transition flex items-center justify-between gap-3 ${style}`}
+              className={`w-full min-h-[52px] text-left px-4 py-3 rounded-xl border text-base transition-colors flex items-center justify-between gap-3 ${style}`}
             >
               <span>{opt}</span>
               {mark && (
-                <span className="shrink-0 font-bold" aria-hidden="true">
-                  {mark}
-                </span>
+                <svg className="shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  {mark === "ok" ? <path d="M5 12.5l4.5 4.5L19 7.5" /> : <path d="M6 6l12 12M18 6L6 18" />}
+                </svg>
               )}
-              {mark && <span className="sr-only">{mark === "✓" ? " (bonne réponse)" : " (ta réponse, fausse)"}</span>}
+              {mark && <span className="sr-only">{mark === "ok" ? " (bonne réponse)" : " (ta réponse, fausse)"}</span>}
             </button>
           );
         })}
       </div>
 
-      <p role="status" aria-live="polite" className={`text-sm font-medium ${selected !== null ? "mb-4" : "sr-only"}`}>
+      <p role="status" aria-live="polite" className={`text-base font-semibold ${selected !== null ? "mb-4" : "sr-only"}`}>
         {selected === null
           ? ""
           : selected === q.correctIndex
@@ -147,7 +147,7 @@ export function QuizPlayer({
         <button
           type="button"
           onClick={handleNext}
-          className="w-full min-h-[48px] rounded-full bg-accent text-on-accent font-semibold hover:bg-accent-strong transition ff-btn"
+          className="ff-primary w-full"
         >
           {current + 1 < quiz.length ? "Question suivante" : "Voir mon score"}
         </button>

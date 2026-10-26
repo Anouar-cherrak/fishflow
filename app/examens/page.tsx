@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { SeaDecor } from "@/components/Ocean";
 import { trackEvent } from "@/lib/tracking";
 
 type Exam = { id: string; title: string; exam_date: string; fiche_ids: string[] };
@@ -137,9 +136,9 @@ export default function Examens() {
 
   return (
     <AppShell size="normal">
-      <div className="flex flex-wrap items-end justify-between gap-4 mb-8 ff-fade-up">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
         <div>
-          <h1 className="ff-title mb-2">Mes examens.</h1>
+          <h1 className="ff-title mb-2">Mes examens</h1>
           <p className="ff-lead">Tu as un examen bientôt ? Donne la date et choisis tes fiches. FishFlow te dit combien de cartes revoir chaque jour.</p>
         </div>
         {status === "ready" && !creating && exams.length > 0 && (
@@ -149,7 +148,7 @@ export default function Examens() {
         )}
       </div>
 
-      {status === "loading" && <p className="text-black/50 text-sm py-16 text-center" role="status">Chargement…</p>}
+      {status === "loading" && <p className="text-black/65 text-sm py-16 text-center" role="status">Chargement…</p>}
 
       {status === "unavailable" && (
         <div className="bg-surface border border-black/10 rounded-3xl p-8 text-center">
@@ -159,7 +158,7 @@ export default function Examens() {
       )}
 
       {status === "ready" && creating && (
-        <form onSubmit={create} className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8 mb-8 grid gap-5 ff-fade-up">
+        <form onSubmit={create} className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-8 mb-8 grid gap-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <label htmlFor="exam-title" className="text-sm font-semibold text-black/70">1. Le nom de l&apos;examen</label>
@@ -214,13 +213,13 @@ export default function Examens() {
                     <label className="flex items-center gap-3 min-h-[44px] px-3 rounded-xl border border-black/10 bg-white cursor-pointer">
                       <input type="checkbox" checked={selected.includes(f.id)} onChange={() => toggle(f.id)} className="w-5 h-5 accent-[var(--ff-accent)]" />
                       <span className="flex-1 min-w-0 truncate">{f.title}</span>
-                      <span className="text-xs text-black/50 shrink-0">{f.cards} cartes</span>
+                      <span className="text-sm text-black/65 shrink-0">{f.cards} cartes</span>
                     </label>
                   </li>
                 ))}
               </ul>
               {errorField === "fiches" && <p id="exam-error" role="alert" className="text-sm text-[var(--quiz-wrong-text)]">{error}</p>}
-              {selected.length > 0 && <p className="text-xs text-black/60" aria-live="polite">{selected.length} fiche{selected.length > 1 ? "s" : ""} choisie{selected.length > 1 ? "s" : ""}</p>}
+              {selected.length > 0 && <p className="text-sm text-black/60" aria-live="polite">{selected.length} fiche{selected.length > 1 ? "s" : ""} choisie{selected.length > 1 ? "s" : ""}</p>}
               </>
             )}
           </fieldset>
@@ -234,8 +233,7 @@ export default function Examens() {
       )}
 
       {status === "ready" && exams.length === 0 && !creating && (
-        <div className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-8 sm:p-10 text-center grid gap-4 justify-items-center ff-fade-up">
-          <SeaDecor y="80%" />
+        <div className="bg-surface border border-black/10 rounded-3xl p-8 sm:p-10 text-center grid gap-4 justify-items-center">
           <p className="font-semibold text-lg">Aucun examen pour l&apos;instant.</p>
           <p className="text-black/60 max-w-[46ch]">Ajoute la date de ton prochain examen et choisis les fiches qui comptent. Ensuite, FishFlow te dit chaque jour combien de cartes revoir, pour être prêt à temps.</p>
           <button type="button" onClick={() => setCreating(true)} className="ff-primary ff-btn">Ajouter mon premier examen</button>
@@ -244,7 +242,7 @@ export default function Examens() {
 
       {status === "ready" && exams.length > 0 && (
         <ul className="grid gap-5 md:grid-cols-2">
-          {exams.map((exam, i) => {
+          {exams.map((exam) => {
             const left = daysLeft(exam.exam_date);
             const ids = new Set(exam.fiche_ids);
             const total = fiches.filter((f) => ids.has(f.id)).reduce((sum, f) => sum + f.cards, 0);
@@ -256,7 +254,7 @@ export default function Examens() {
             const percent = total > 0 ? Math.min(100, Math.round((mastered / total) * 100)) : 0;
             const past = left < 0;
             return (
-              <li key={exam.id} className="bg-surface border border-black/10 rounded-3xl p-6 grid gap-4 ff-fade-up min-w-0" style={{ animationDelay: `${Math.min(i * 0.06, 0.3)}s` }}>
+              <li key={exam.id} className="bg-surface border border-black/10 rounded-3xl p-6 grid gap-4 min-w-0">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h2 className="text-xl font-bold tracking-tight break-words">{exam.title}</h2>
@@ -264,7 +262,7 @@ export default function Examens() {
                   </div>
                   <p className="text-right shrink-0">
                     <span className="block text-3xl font-extrabold leading-none">{past ? "—" : left === 0 ? "J" : left}</span>
-                    <span className="text-xs text-black/60">{past ? "terminé" : left === 0 ? "aujourd'hui" : left === 1 ? "jour" : "jours"}</span>
+                    <span className="text-sm text-black/60">{past ? "terminé" : left === 0 ? "aujourd'hui" : left === 1 ? "jour" : "jours"}</span>
                   </p>
                 </div>
 

@@ -48,7 +48,7 @@ export function SplashScreen() {
         className="ff-wordmark text-[#EAF6FF] text-xl mt-4"
         style={{
           opacity: 0,
-          animation: "ff-fade-up 0.5s ease forwards 0.9s",
+          animation: "0.5s ease forwards 0.9s",
         }}
       >
         FishFlow
@@ -58,12 +58,12 @@ export function SplashScreen() {
         @keyframes ff-pop {
           to { opacity: 1; transform: scale(1); }
         }
-        @keyframes ff-fade-up {
+        @keyframes {
           from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @media (prefers-reduced-motion: reduce) {
-          [style*="ff-pop"], [style*="ff-fade-up"] { animation: none !important; opacity: 1 !important; transform: none !important; }
+          [style*="ff-pop"], [style*=""] { animation: none !important; opacity: 1 !important; transform: none !important; }
         }
       `}</style>
     </div>

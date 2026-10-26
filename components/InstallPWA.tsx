@@ -66,7 +66,7 @@ export function InstallPWA() {
     <div className="mb-4 bg-surface border border-black/10 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap">
       <div>
         <p className="text-sm font-semibold text-black">Mets FishFlow sur ton écran d&apos;accueil</p>
-        <p className="text-xs text-black/60">Tu l&apos;ouvres ensuite comme une appli, en un geste.</p>
+        <p className="text-sm text-black/60">Tu l&apos;ouvres ensuite comme une appli, en un geste.</p>
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
@@ -115,7 +115,7 @@ export function InstallPWA() {
             ) : (
               <>
                 <p className="text-sm text-black/70 mb-3">Sur Chrome ou Edge (ordinateur, Android) : clique sur la petite icône d&apos;installation, à droite dans la barre d&apos;adresse.</p>
-                <p className="text-xs text-black/60">
+                <p className="text-sm text-black/60">
                   Si tu ne la vois pas : ouvre le menu du navigateur (⋮ en haut à droite) puis choisis « Installer FishFlow ».
                 </p>
               </>

@@ -52,7 +52,7 @@ export default function MentionsLegales() {
             </p>
           </section>
 
-          <p className="text-sm text-black/50 pt-6 border-t border-black/10">
+          <p className="text-sm text-black/65 pt-6 border-t border-black/10">
             Dernière mise à jour : 11/08/2026
           </p>
         </div>

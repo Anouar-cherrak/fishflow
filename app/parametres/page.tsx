@@ -122,7 +122,7 @@ export default function Parametres() {
   if (checking) {
     return (
       <AppShell size="normal">
-        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement…</p>
+        <p className="text-black/65 text-sm py-24 text-center" role="status">Chargement…</p>
       </AppShell>
     );
   }
@@ -131,26 +131,26 @@ export default function Parametres() {
     <AppShell size="normal">
       <div>
         <div>
-          <div className="mb-8 ff-fade-up">
-            <h1 className="ff-title mb-3">Paramètres.</h1>
+          <div className="mb-8">
+            <h1 className="ff-title mb-3">Paramètres</h1>
             <p className="ff-lead">Ton compte, ton abonnement et tes données.</p>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 items-start">
+          <div className="grid max-w-2xl">
 
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-black/55 mb-3">Compte</p>
-            <p className="text-sm text-black/70 mb-1">{user?.email}</p>
-            <p className="text-sm text-black/60">{isPro ? "FishFlow Pro actif" : "Compte gratuit"}</p>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold mb-3">Compte</h2>
+            <p className="text-[15px] ff-muted mb-1">{user?.email}</p>
+            <p className="text-[15px] ff-muted">{isPro ? "FishFlow Pro actif" : "Compte gratuit"}</p>
             {left && (
-              <p className="text-sm text-black/50 mt-1">
+              <p className="text-[15px] ff-muted mt-1">
                 Il te reste {left.month} fiche{left.month > 1 ? "s" : ""} ce mois-ci
                 {left.day !== null && left.day < left.month ? `, dont ${left.day} aujourd'hui` : ""}.
               </p>
             )}
           </div>
 
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-black/55 mb-3">Apparence</p>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold mb-3">Apparence</h2>
             <ThemeToggle />
             <button
               type="button"
@@ -162,8 +162,8 @@ export default function Parametres() {
             <CookieChoice className="mt-1 block text-sm font-semibold underline underline-offset-4 min-h-[44px]" />
           </div>
 
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-black/55 mb-3">Notifications</p>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold mb-3">Notifications</h2>
             <button
               type="button"
               role="switch"
@@ -174,7 +174,7 @@ export default function Parametres() {
             >
               <span className="text-sm font-medium text-black text-left">
                 Recevoir les e-mails de rappel
-                <span className="block text-xs text-black/60 font-normal mt-0.5">
+                <span className="block text-sm ff-muted font-normal mt-0.5">
                   Tes cartes à revoir et les nouveautés de FishFlow
                 </span>
               </span>
@@ -192,8 +192,8 @@ export default function Parametres() {
             </button>
           </div>
 
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-black/55 mb-3">Mes données</p>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold mb-3">Mes données</h2>
             <a
               href="/api/account/export"
               download
@@ -203,8 +203,8 @@ export default function Parametres() {
             </a>
           </div>
 
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-black/55 mb-3">Abonnement</p>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold mb-3">Abonnement</h2>
             {isPro ? (
               <button
                 type="button"
@@ -218,15 +218,16 @@ export default function Parametres() {
               <button
                 type="button"
                 onClick={() => router.push("/pricing")}
-                className="ff-primary w-full text-sm ff-btn"
+                className="ff-primary w-full text-sm"
               >
                 Passer Pro — 4,99 €/mois
               </button>
             )}
           </div>
 
-          <div className="bg-surface border border-black/10 rounded-3xl p-6 sm:p-7 ff-card ff-fade-up">
-            <label htmlFor="new-password" className="text-sm font-semibold text-black/55 mb-3 block">Mot de passe</label>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold mb-3">Mot de passe</h2>
+            <label htmlFor="new-password" className="ff-label">Nouveau mot de passe</label>
             <input
               id="new-password"
               type="password"
@@ -235,10 +236,10 @@ export default function Parametres() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Nouveau mot de passe"
-              className="w-full min-h-[44px] px-3 border border-black/15 rounded-lg mb-1 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
+              className="ff-field"
             />
-            <p id="new-password-help" className="text-xs text-black/60 mb-3">8 caractères minimum.</p>
-            {passwordMessage && <p role="status" className="text-sm text-black/70 mb-3">{passwordMessage}</p>}
+            <p id="new-password-help" className="ff-hint mb-3">8 caractères minimum.</p>
+            {passwordMessage && <p role="status" className="text-[15px] ff-muted mb-3">{passwordMessage}</p>}
             <button
               type="button"
               onClick={handleChangePassword}
@@ -249,8 +250,8 @@ export default function Parametres() {
             </button>
           </div>
 
-          <div className="bg-surface border border-red-500/40 rounded-3xl p-6 sm:p-7 md:col-span-2 ff-card ff-fade-up">
-            <p className="text-sm font-semibold text-[var(--quiz-wrong-text)] mb-3">Supprimer mon compte</p>
+          <div className="py-6 border-t border-black/15">
+            <h2 className="text-lg font-bold text-[var(--quiz-wrong-text)] mb-3">Supprimer mon compte</h2>
             {!showDeleteConfirm ? (
               <button
                 type="button"
@@ -261,7 +262,7 @@ export default function Parametres() {
               </button>
             ) : (
               <div>
-                <p id="delete-help" className="text-sm text-black/70 mb-3">
+                <p id="delete-help" className="text-[15px] ff-muted mb-3">
                   C&apos;est <strong>définitif</strong> : ton compte, toutes tes fiches et ton abonnement seront supprimés.
                   Pour confirmer, tape <strong>SUPPRIMER</strong> en majuscules.
                 </p>
@@ -273,7 +274,7 @@ export default function Parametres() {
                   aria-describedby="delete-help"
                   value={deleteText}
                   onChange={(e) => setDeleteText(e.target.value)}
-                  className="w-full min-h-[44px] px-3 border border-black/15 rounded-lg mb-3 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
+                  className="ff-field mb-3"
                   placeholder="SUPPRIMER"
                 />
                 <div className="flex gap-2">

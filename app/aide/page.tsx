@@ -7,8 +7,8 @@ import { APPRENDRE, AUJOURDHUI, EXAMENS, GENERER, PARTAGER, REVISER } from "@/co
 export default function Aide() {
   return (
     <AppShell size="wide">
-      <div className="mb-8 ff-fade-up">
-        <h1 className="ff-title mb-2">Aide.</h1>
+      <div className="mb-8">
+        <h1 className="ff-title mb-2">Aide</h1>
         <p className="ff-lead max-w-[60ch]">
           Une petite animation de 15 secondes pour chaque fonction. Elles défilent toutes seules : tu peux les mettre en
           pause ou choisir une étape.

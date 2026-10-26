@@ -45,7 +45,7 @@ export default function FichePage() {
   if (status === "loading") {
     return (
       <AppShell size="form">
-        <p className="text-black/50 text-sm py-24 text-center" role="status">Chargement…</p>
+        <p className="text-black/65 text-sm py-24 text-center" role="status">Chargement…</p>
       </AppShell>
     );
   }

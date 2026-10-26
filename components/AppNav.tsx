@@ -11,11 +11,15 @@ import { StreakFlame } from "@/components/StreakFlame";
 import { BottomTabs } from "@/components/BottomTabs";
 import { setDarkClass } from "@/lib/set-theme";
 
+// Les 4 pages du quotidien : barre du bas (téléphone, tablette) ou barre du haut (ordinateur).
+const DAILY = [
+  { href: "/aujourdhui", label: "Aujourd'hui" },
+  { href: "/generer", label: "Générer" },
+  { href: "/mes-fiches", label: "Mes fiches" },
+  { href: "/reviser", label: "Réviser" },
+];
+// Le menu : tout le reste, une fois.
 const LINKS = [
-  { href: "/aujourdhui", label: "Aujourd'hui", hint: "Ton objectif, tes cartes, ta progression" },
-  { href: "/generer", label: "Générer", hint: "Crée une fiche à partir d'un cours" },
-  { href: "/mes-fiches", label: "Mes fiches", hint: "Retrouve toutes tes fiches" },
-  { href: "/reviser", label: "Réviser", hint: "Tes cartes du jour" },
   { href: "/examens", label: "Examens", hint: "Prépare une date d'examen" },
   { href: "/apprendre", label: "Apprendre", hint: "Pose une question, comprends vite" },
   { href: "/aide", label: "Aide", hint: "De petites animations pour tout comprendre" },
@@ -136,7 +140,7 @@ export function AppNav() {
       {/* Ordinateur : les quatre pages du quotidien sont toujours à portée (sur téléphone, c'est la barre du bas). */}
       {authReady && email && (
         <nav className="ff-navlinks" aria-label="Raccourcis">
-          {LINKS.filter((l) => ["/aujourdhui", "/generer", "/mes-fiches", "/reviser"].includes(l.href)).map((l) => {
+          {DAILY.map((l) => {
             const active = pathname === l.href || pathname.startsWith(`${l.href}/`) || (l.href === "/mes-fiches" && pathname.startsWith("/fiche/"));
             return (
               <Link key={l.href} href={l.href} aria-current={active ? "page" : undefined}>

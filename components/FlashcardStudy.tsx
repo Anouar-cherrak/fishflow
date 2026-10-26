@@ -162,7 +162,7 @@ export function FlashcardStudy({
       onClick={close}
     >
       <div
-        className="w-full max-w-md bg-surface rounded-2xl p-5 ff-fade-up max-h-[90dvh] overflow-y-auto"
+        className="w-full max-w-md bg-surface rounded-2xl p-5 max-h-[90dvh] overflow-y-auto"
         ref={boxRef}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -170,16 +170,16 @@ export function FlashcardStudy({
         aria-label="Étudier les flashcards"
       >
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-semibold text-black/60 uppercase tracking-wide" aria-live="polite">
+          <p className="text-[15px] font-semibold ff-muted" aria-live="polite">
             {done ? "Terminé" : round === 1 ? `Carte ${pos + 1} / ${deck.length}` : `Tour ${round} · carte ${pos + 1} / ${deck.length}`}
           </p>
           <button
             type="button"
             onClick={close}
-            className="w-11 h-11 -mr-2 -my-2 flex items-center justify-center rounded-full text-black/60 hover:text-black text-xl leading-none"
+            className="w-11 h-11 -mr-2 -my-2 flex items-center justify-center rounded-full ff-muted hover:text-black"
             aria-label="Fermer"
           >
-            ✕
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
           </button>
         </div>
 
@@ -192,7 +192,7 @@ export function FlashcardStudy({
             <p className="text-4xl font-extrabold text-black mb-1 tabular-nums">
               {firstTryKnown} / {total}
             </p>
-            <p className="text-sm text-black/60 mb-3">réussies du premier coup</p>
+            <p className="text-[15px] ff-muted mb-3">réussies du premier coup</p>
             <p className="font-semibold text-black mb-4">
               {firstTryKnown / total >= 0.9
                 ? "Excellent, tu maîtrises ces cartes !"
@@ -200,7 +200,7 @@ export function FlashcardStudy({
                   ? "Bien joué, encore un petit effort."
                   : "C'est en revoyant qu'on retient. Tu vas y arriver."}
             </p>
-            <ul className="grid gap-2 text-sm text-left bg-white border border-black/10 rounded-xl p-4 mb-4">
+            <ul className="grid gap-2 text-[15px] text-left border-y border-black/15 py-3 mb-4">
               <li className="flex justify-between gap-3">
                 <span className="text-black/65">Reviendront demain</span>
                 <strong className="tabular-nums">{total - firstTryKnown}</strong>
@@ -223,7 +223,7 @@ export function FlashcardStudy({
                   <strong className="block text-lg leading-tight">
                     {streak.streak} jour{streak.streak > 1 ? "s" : ""} d'affilée
                   </strong>
-                  <span className="text-xs text-black/60">Reviens demain pour garder ta flamme allumée.</span>
+                  <span className="text-sm ff-muted">Reviens demain pour garder ta flamme allumée.</span>
                 </p>
               </div>
             )}
@@ -231,14 +231,14 @@ export function FlashcardStudy({
               <button
                 type="button"
                 onClick={restart}
-                className="flex-1 min-h-[44px] rounded-full border border-black/15 text-sm font-medium text-black hover:bg-white transition"
+                className="ff-secondary flex-1 text-sm"
               >
                 Recommencer
               </button>
               <button
                 type="button"
                 onClick={close}
-                className="flex-1 min-h-[44px] rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition ff-btn"
+                className="ff-primary flex-1 text-sm"
               >
                 Fermer
               </button>
@@ -258,20 +258,20 @@ export function FlashcardStudy({
               <span className="ff-flip-in">
                 {[false, true].map((back) => (
                   <span key={String(back)} className="ff-flip-face bg-white border border-black/10" data-back={back} aria-hidden={back !== flipped}>
-                    <span className="text-xs font-semibold text-black/60 uppercase tracking-wide">{back ? "Réponse" : "Question"}</span>
-                    <span className={`my-4 ${back ? "text-black/80" : "text-black font-medium text-lg"}`}>{back ? current.answer : current.question}</span>
-                    <span className="text-xs text-black/60">{back ? "Touche pour revoir la question" : "Touche pour voir la réponse"}</span>
+                    <span className="text-sm font-semibold ff-muted">{back ? "Réponse" : "Question"}</span>
+                    <span className={`my-4 text-black ${back ? "text-lg" : "text-xl font-semibold leading-snug"}`}>{back ? current.answer : current.question}</span>
+                    <span className="text-sm ff-muted">{back ? "Touche pour revoir la question" : "Touche la carte pour voir la réponse"}</span>
                   </span>
                 ))}
               </span>
             </button>
 
-            <div className="grid grid-cols-2 gap-2 mt-4">
+            <div className={`grid grid-cols-2 gap-2 mt-4 ${flipped ? "" : "invisible"}`}>
               <button
                 type="button"
                 onClick={() => answer(false)}
                 disabled={!flipped}
-                className="min-h-[48px] rounded-full border border-black/15 text-sm font-medium text-black hover:bg-white transition disabled:opacity-30 disabled:hover:bg-transparent"
+                className="ff-secondary text-base"
               >
                 À revoir
               </button>
@@ -279,14 +279,13 @@ export function FlashcardStudy({
                 type="button"
                 onClick={() => answer(true)}
                 disabled={!flipped}
-                className="min-h-[48px] rounded-full bg-accent text-on-accent text-sm font-semibold hover:bg-accent-strong transition disabled:opacity-30 ff-btn"
+                className="ff-primary text-base"
               >
                 Je savais
               </button>
             </div>
 
-            {!flipped && <p className="text-center text-xs text-black/60 mt-3 sm:hidden">Retourne la carte pour pouvoir répondre.</p>}
-            <p className="hidden sm:block text-center text-xs text-black/60 mt-3">
+            <p className="hidden sm:block text-center text-sm ff-muted mt-3">
               Espace : retourner · ← à revoir · → je savais · Échap : fermer
             </p>
           </>

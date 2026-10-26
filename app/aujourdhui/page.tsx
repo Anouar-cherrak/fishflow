@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { FlameIcon, flameState } from "@/components/StreakFlame";
 import { AppShell } from "@/components/AppShell";
-import { SeaDecor } from "@/components/Ocean";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { questionOfTheDay } from "@/lib/curiosity";
 import {
@@ -143,30 +142,28 @@ export default function Aujourdhui() {
 
   return (
     <AppShell size="wide">
-      <div className="mb-6 sm:mb-8 ff-fade-up">
-        <h1 className="ff-title mb-2">Aujourd&apos;hui.</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="ff-title mb-2">Aujourd&apos;hui</h1>
         <p className="ff-lead first-letter:uppercase">{todayLabel}</p>
       </div>
 
       {ficheTotal === 0 && (
-        <section className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-5 sm:p-8 mb-6 ff-fade-up">
-          <SeaDecor />
-          <h2 className="text-xl font-bold tracking-tight mb-2">Commence ici.</h2>
-          <p className="text-black/65 mb-5 max-w-[60ch]">
+        <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8 mb-6">
+          <h2 className="text-xl font-bold tracking-tight mb-2">Commence ici</h2>
+          <p className="ff-muted mb-5 max-w-[60ch]">
             Colle un cours, un article ou une photo de tes notes : tu obtiens une fiche, des flashcards et un quiz.
             Tu peux aussi poser une question.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/generer" className="ff-primary ff-btn">Créer ma première fiche</Link>
-            <Link href="/apprendre" className="ff-secondary">Poser une question</Link>
+            <Link href="/generer" className="ff-primary">Créer ma première fiche</Link>
+            <Link href="/apprendre" className="ff-link inline-flex items-center min-h-[48px] px-2">Poser une question</Link>
           </div>
         </section>
       )}
 
       <div className="grid gap-6 lg:gap-8 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start">
         <div className="grid gap-6 min-w-0">
-          <section className="ff-deco-host bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="goal-title">
-            <SeaDecor fish={false} />
+          <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="goal-title">
             <div className="flex items-center gap-4 sm:gap-6">
               <div className="relative shrink-0 w-[92px] h-[92px] sm:w-[120px] sm:h-[120px]">
                 <svg viewBox="0 0 120 120" className="w-full h-full" aria-hidden="true">
@@ -188,7 +185,7 @@ export default function Aujourdhui() {
                 <div className="absolute inset-0 grid place-items-center text-center">
                   <div>
                     <p className="text-xl sm:text-2xl font-extrabold leading-none tabular-nums">{doneToday}</p>
-                    <p className="text-xs text-black/55 mt-1">sur {goal}</p>
+                    <p className="text-sm ff-muted mt-1">sur {goal}</p>
                   </div>
                 </div>
               </div>
@@ -196,7 +193,7 @@ export default function Aujourdhui() {
                 <h2 id="goal-title" className="text-lg sm:text-xl font-bold tracking-tight mb-1">
                   {reached ? "Objectif atteint." : "Ton objectif du jour"}
                 </h2>
-                <p className="text-black/65 text-sm">
+                <p className="ff-muted text-[15px]">
                   {reached
                     ? "Bravo. Tout ce que tu révises en plus, c'est du bonus."
                     : `${goal - doneToday} carte${goal - doneToday > 1 ? "s" : ""} à réviser pour y arriver.`}
@@ -204,8 +201,9 @@ export default function Aujourdhui() {
               </div>
             </div>
 
-            <p className="mt-5 mb-2 text-xs text-black/55">Cartes à réviser par jour</p>
-            <div className="grid grid-cols-4 gap-2 sm:flex sm:flex-wrap sm:items-center" role="group" aria-label="Choisir ton objectif quotidien">
+            <details className="mt-5">
+            <summary className="inline-flex items-center min-h-[44px] cursor-pointer text-[15px] font-semibold ff-muted">Changer mon objectif ({goal} cartes par jour)</summary>
+            <div className="grid grid-cols-4 gap-2 mt-2 sm:flex sm:flex-wrap sm:items-center" role="group" aria-label="Choisir ton objectif quotidien">
               {GOALS.map((n) => (
                 <button
                   key={n}
@@ -214,27 +212,28 @@ export default function Aujourdhui() {
                   aria-pressed={goal === n}
                   aria-label={`${n} cartes par jour`}
                   className={`min-h-[44px] sm:px-4 rounded-full border text-sm font-semibold transition ${
-                    goal === n ? "bg-black text-white border-black" : "border-black/15 text-black/65 hover:border-black/40"
+                    goal === n ? "bg-black text-white border-black" : "border-black/25 text-black/75 hover:border-black/50"
                   }`}
                 >
                   {n}<span className="hidden sm:inline">&nbsp;cartes</span>
                 </button>
               ))}
             </div>
+            </details>
 
             <div className="mt-5">
               {due > 0 ? (
-                <Link href="/reviser" className="ff-primary ff-btn w-full sm:w-auto">
+                <Link href="/reviser" className="ff-primary w-full sm:w-auto">
                   Réviser {Math.min(due, 20)} carte{Math.min(due, 20) > 1 ? "s" : ""} maintenant
                 </Link>
               ) : ficheTotal > 0 && !reached ? (
-                <Link href="/reviser" className="ff-primary ff-btn w-full sm:w-auto">
+                <Link href="/reviser" className="ff-primary w-full sm:w-auto">
                   Découvrir de nouvelles cartes
                 </Link>
               ) : (
-                <p className="text-sm text-black/60">
+                <p className="text-[15px] ff-muted">
                   Rien à revoir pour le moment : tes prochaines cartes reviendront au bon moment.{" "}
-                  <Link href="/generer" className="underline text-black">Créer une fiche</Link>
+                  <Link href="/generer" className="ff-link">Créer une fiche</Link>
                 </p>
               )}
             </div>
@@ -248,12 +247,12 @@ export default function Aujourdhui() {
                   <li key={f.id}>
                     <Link href={`/fiche/${f.id}`} className="flex items-center justify-between gap-3 min-h-[48px] py-2 border-b border-black/10 last:border-0 hover:text-accent transition">
                       <span className="font-medium truncate">{f.title}</span>
-                      <span aria-hidden="true">›</span>
+                      <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
                     </Link>
                   </li>
                 ))}
               </ul>
-              <Link href="/mes-fiches" className="inline-block mt-3 text-sm underline text-black/65 min-h-[44px] leading-[44px]">
+              <Link href="/mes-fiches" className="ff-link inline-flex items-center mt-2 min-h-[44px] text-[15px]">
                 Toutes mes fiches
               </Link>
             </section>
@@ -265,34 +264,34 @@ export default function Aujourdhui() {
             <h2 id="prog-title" className="text-xl font-bold tracking-tight mb-4">Ta progression</h2>
             <dl className="grid grid-cols-3 gap-3 mb-6">
               <div>
-                <dt className="text-xs text-black/55">Série</dt>
+                <dt className="text-sm ff-muted">Série</dt>
                 <dd className="text-2xl font-extrabold tabular-nums flex items-center gap-1.5">
                   <FlameIcon state={flameState(progress?.streak ?? 0, progress?.activeToday ?? false)} size={20} />
                   {progress?.streak ?? 0}
-                  <span className="text-sm font-medium text-black/55">j</span>
+                  <span className="text-sm font-medium ff-muted">j</span>
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-black/55">Cartes suivies</dt>
+                <dt className="text-sm ff-muted">Cartes suivies</dt>
                 <dd className="text-2xl font-extrabold tabular-nums">{progress?.tracked ?? 0}</dd>
               </div>
               <div>
-                <dt className="text-xs text-black/55">Maîtrisées</dt>
+                <dt className="text-sm ff-muted">Maîtrisées</dt>
                 <dd className="text-2xl font-extrabold tabular-nums">{progress?.mastered ?? 0}</dd>
               </div>
             </dl>
 
             {logOk ? (
               <>
-                <p className="text-sm text-black/60 mb-2">Cartes révisées, {isPro ? "30" : "7"} derniers jours</p>
+                <p className="text-sm ff-muted mb-2">Cartes révisées, {isPro ? "30" : "7"} derniers jours</p>
                 <DaysChart counts={counts} label={`Cartes révisées par jour sur les ${isPro ? 30 : 7} derniers jours`} />
               </>
             ) : (
-              <p className="text-sm text-black/55">Le détail par jour apparaîtra dès ta première révision.</p>
+              <p className="text-sm ff-muted">Le détail par jour apparaîtra dès ta première révision.</p>
             )}
           </section>
 
-          {isPro ? (
+          {isPro && (
             <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="hard-title">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <h2 id="hard-title" className="text-xl font-bold tracking-tight">Tes cartes difficiles</h2>
@@ -308,7 +307,7 @@ export default function Aujourdhui() {
                     <li key={i} className="border-b border-black/10 last:border-0 pb-3 last:pb-0">
                       <p className="font-medium">{h.question}</p>
                       <p className="text-sm text-black/60 mt-0.5">{h.answer}</p>
-                      <p className="text-xs text-black/45 mt-1">
+                      <p className="text-sm ff-muted mt-1">
                         {h.ficheTitle} · ratée {h.wrong} fois
                       </p>
                     </li>
@@ -316,24 +315,15 @@ export default function Aujourdhui() {
                 </ul>
               )}
             </section>
-          ) : (
-            <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="hard-title">
-              <h2 id="hard-title" className="text-xl font-bold tracking-tight mb-2">Tes cartes difficiles</h2>
-              <p className="text-sm text-black/65 mb-4 max-w-[52ch]">
-                Avec Pro, FishFlow te montre les cartes que tu rates le plus, ton taux de réussite et ta progression sur
-                30 jours, pour savoir quoi retravailler.
-              </p>
-              <Link href="/pricing" className="ff-secondary text-sm">Voir ce que contient Pro</Link>
-            </section>
           )}
 
           {/* En dernier : la question du jour (Apprendre) est un bonus, la révision passe avant. */}
           <section className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-8" aria-labelledby="curio-title">
             <h2 id="curio-title" className="text-xl font-bold tracking-tight mb-3">Une question pour aujourd&apos;hui</h2>
-            <p className="text-lg text-black/85 mb-5 max-w-[48ch]">{question}</p>
+            <p className="text-lg mb-5 max-w-[48ch]">{question}</p>
             {/* Plus de question possible (essai gratuit utilisé, ou limite du jour) : on le dit au lieu d'envoyer vers un mur. */}
             {apprendreLeft === 0 && (
-              <p className="text-sm text-black/65 mb-4 max-w-[48ch]">
+              <p className="text-[15px] ff-muted mb-4 max-w-[48ch]">
                 {isPro
                   ? "Tu as posé toutes tes questions du jour. Reviens demain !"
                   : "Tu as utilisé ta question gratuite. Avec Pro, tu peux en poser 20 par jour."}
@@ -349,8 +339,8 @@ export default function Aujourdhui() {
                   Voir Pro
                 </Link>
               ) : null}
-              <button type="button" onClick={() => setOffset((o) => o + 1)} className="ff-secondary w-full sm:w-auto">
-                Une autre
+              <button type="button" onClick={() => setOffset((o) => o + 1)} className="ff-link min-h-[48px] px-2">
+                Une autre question
               </button>
             </div>
           </section>

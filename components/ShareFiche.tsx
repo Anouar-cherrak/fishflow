@@ -67,13 +67,13 @@ export function ShareFiche({ ficheId, className }: { ficheId: string; className:
 
   return (
     <div className="col-span-2 lg:col-span-1 grid gap-2 rounded-2xl border border-black/10 bg-surface p-3">
-      <label htmlFor="share-link" className="text-xs font-semibold text-black/60">Lien de ta fiche</label>
+      <label htmlFor="share-link" className="text-sm font-semibold text-black/60">Lien de ta fiche</label>
       <input
         id="share-link"
         readOnly
         value={url}
         onFocus={(e) => e.currentTarget.select()}
-        className="w-full min-h-[44px] px-3 rounded-xl border border-black/15 bg-white text-xs"
+        className="w-full min-h-[44px] px-3 rounded-xl border border-black/15 bg-white text-sm"
       />
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={copy} className="ff-primary text-sm min-h-[44px] ff-btn">
@@ -83,8 +83,8 @@ export function ShareFiche({ ficheId, className }: { ficheId: string; className:
           Arrêter le partage
         </button>
       </div>
-      <p className="text-xs text-black/50">Toute personne qui a ce lien peut lire ta fiche. Ton cours d&apos;origine n&apos;est pas partagé.</p>
-      {error && <p className="text-xs text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
+      <p className="text-sm text-black/65">Toute personne qui a ce lien peut lire ta fiche. Ton cours d&apos;origine n&apos;est pas partagé.</p>
+      {error && <p className="text-sm text-[var(--quiz-wrong-text)]" role="alert">{error}</p>}
     </div>
   );
 }

@@ -406,45 +406,45 @@ function GenererContent() {
         />
       )}
 
-      <div className="mb-8 ff-fade-up">
-        <h1 className="ff-title mb-3">Crée ta fiche de révision.</h1>
+      <div className="mb-8">
+        <h1 className="ff-title mb-3">Crée ta fiche de révision</h1>
         <p className="ff-lead">
-          Donne ton cours (texte, PDF ou photo)<span className="max-sm:hidden">, puis appuie sur « Créer ma fiche »</span>. Tu reçois une fiche, l&apos;essentiel, des flashcards et un quiz.
+          Colle ton cours, ou envoie un PDF ou une photo. Tu reçois une fiche, l&apos;essentiel, des flashcards et un quiz.
         </p>
       </div>
 
       {/* Ce qu'il reste, visible tout de suite (sans défiler), avec un lien vers ce que Pro change. */}
       {user && usage && (
-        <p className="mb-5 -mt-4 text-sm text-black/70 ff-fade-up" aria-live="polite">
+        <p className="mb-5 -mt-4 text-[15px] ff-muted" aria-live="polite">
           {usage.isPro
             ? proLeftText
             : usage.remaining === 0
-              ? "Tu as utilisé tes fiches gratuites de ce mois-ci."
+              ? `Tu as utilisé tes fiches gratuites de ce mois-ci. Elles reviennent ${usage.resetMonth ?? "le mois prochain"}.`
               : `Il te reste ${usage.remaining} fiche${(usage.remaining ?? 0) > 1 ? "s" : ""} gratuite${(usage.remaining ?? 0) > 1 ? "s" : ""} ce mois-ci.`}{" "}
           {!usage.isPro && (
-            <a href="/pricing" className="underline font-semibold whitespace-nowrap">
+            <a href="/pricing" className="ff-link whitespace-nowrap">
               Ce que Pro change
             </a>
           )}
         </p>
       )}
 
-      <div className="ff-fade-up" style={{ animationDelay: "0.05s" }}>
+      <div>
         <InstallPWA />
       </div>
 
       {!user && !checkingAuth && (
-        <div className="mb-6 px-4 py-3 rounded-xl text-sm bg-surface text-black/80 ff-fade-up">
+        <div className="ff-alert mb-6">
           Pour créer une fiche, il te faut un compte gratuit (3 fiches par mois, sans carte bancaire).{" "}
-          <a href="/signup" className="underline font-semibold">Créer mon compte</a> ou{" "}
-          <a href="/login" className="underline font-semibold">me connecter</a>.
+          <a href="/signup" className="ff-link">Créer mon compte</a> ou{" "}
+          <a href="/login" className="ff-link">me connecter</a>.
         </div>
       )}
 
       <div className="grid gap-6 lg:gap-10 lg:grid-cols-[1.3fr_1fr] items-start">
         {/* Colonne de gauche : le cours */}
-        <section aria-label="Ton cours" className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-7 ff-fade-up" style={{ animationDelay: "0.1s" }}>
-          <p className="text-sm font-semibold text-black/70 mb-2" id="source-label">D&apos;où vient ton cours ?</p>
+        <section aria-label="Ton cours" className="bg-surface border border-black/10 rounded-3xl p-5 sm:p-7">
+          <p className="ff-label" id="source-label">D&apos;où vient ton cours ?</p>
           <div className="flex gap-1 mb-5 bg-white border border-black/10 rounded-full p-1" role="group" aria-labelledby="source-label">
             {(["text", "pdf", "photo"] as Mode[]).map((m) => (
               <button
@@ -469,7 +469,7 @@ function GenererContent() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Colle ici ton cours, un article ou tes notes (quelques phrases au minimum)…"
-                className="w-full h-32 sm:h-64 lg:h-[22rem] p-4 border border-black/15 rounded-2xl text-black placeholder-black/35 bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-base ff-input resize-y"
+                className="ff-field h-40 sm:h-64 lg:h-[22rem] py-3 resize-y"
               />
             </>
           )}
@@ -480,7 +480,7 @@ function GenererContent() {
                 <span className="text-black font-semibold mb-1">
                   {files.length > 0 ? `${files.length} fichier${files.length > 1 ? "s" : ""} sélectionné${files.length > 1 ? "s" : ""}` : "Choisir un ou plusieurs PDF"}
                 </span>
-                <span className="text-black/60 text-sm">Avec Pro, tu peux mettre plusieurs PDF dans une seule fiche.</span>
+                <span className="ff-muted text-[15px]">Avec Pro, tu peux mettre plusieurs PDF dans une seule fiche.</span>
                 <input
                   type="file"
                   accept="application/pdf"
@@ -492,9 +492,9 @@ function GenererContent() {
               {files.length > 0 && (
                 <ul className="mt-3 space-y-1">
                   {files.map((f, i) => (
-                    <li key={i} className="text-sm text-black/60 flex items-center justify-between px-1">
+                    <li key={i} className="text-[15px] ff-muted flex items-center justify-between px-1">
                       <span className="truncate">{f.name}</span>
-                      <button type="button" aria-label={`Retirer ${f.name}`} onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="text-black/40 hover:text-black shrink-0 ml-2 w-8 h-8">✕</button>
+                      <button type="button" aria-label={`Retirer ${f.name}`} onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="ff-muted hover:text-black shrink-0 ml-2 w-11 h-11 grid place-items-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
                     </li>
                   ))}
                 </ul>
@@ -505,7 +505,7 @@ function GenererContent() {
           {mode === "pdf" && !isMultiPdfPro && (
             <label className={dropClass} {...dropProps(isPdf, false)}>
               <span className="text-black font-semibold mb-1">{file ? file.name : "Choisir un PDF"}</span>
-              <span className="text-black/50 text-sm">{file ? "Fichier sélectionné ✓" : <><span className="ff-desk-only">ou glisse-dépose ton fichier ici</span><span className="ff-mobile-only">Touche ici pour choisir</span></>}</span>
+              <span className="ff-muted text-[15px]">{file ? "Fichier sélectionné" : <><span className="ff-desk-only">ou glisse-dépose ton fichier ici</span><span className="ff-mobile-only">Touche ici pour choisir</span></>}</span>
               <input
                 type="file"
                 accept="application/pdf"
@@ -533,7 +533,7 @@ function GenererContent() {
                   <span className="text-black font-semibold mb-1">
                     {files.length === 0 ? "Choisir une photo" : "Ajouter une page"}
                   </span>
-                  <span className="text-black/50 text-sm">
+                  <span className="ff-muted text-[15px]">
                     {files.length === 0 ? (
                       <>
                         <span className="ff-desk-only">ou glisse-dépose tes photos ici. </span>
@@ -561,14 +561,14 @@ function GenererContent() {
                   {files.map((f, i) => (
                     <li key={`${f.name}-${i}`} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-black/15 bg-white">
                       <PhotoThumb file={f} alt={`Page ${i + 1}`} />
-                      <span className="absolute left-1 top-1 text-xs font-bold px-1.5 rounded-full bg-[#000000]/70 text-[#ffffff]">{i + 1}</span>
+                      <span className="absolute left-1 top-1 text-sm font-bold px-1.5 rounded-full bg-[#000000]/70 text-[#ffffff]">{i + 1}</span>
                       <button
                         type="button"
                         aria-label={`Retirer la page ${i + 1}`}
                         onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
                         className="absolute right-0 top-0 w-9 h-9 flex items-center justify-center text-[#ffffff] text-sm"
                       >
-                        <span className="w-6 h-6 rounded-full bg-[#000000]/70 flex items-center justify-center" aria-hidden="true">✕</span>
+                        <span className="w-6 h-6 rounded-full bg-[#000000]/70 flex items-center justify-center" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></span>
                       </button>
                     </li>
                   ))}
@@ -579,7 +579,7 @@ function GenererContent() {
         </section>
 
         {/* Colonne de droite : ce que tu veux recevoir */}
-        <div className="grid gap-6 ff-fade-up" style={{ animationDelay: "0.15s" }}>
+        <div className="grid gap-6">
           {/* Réglages : repliés (une ligne résume les choix), ouverts d'un clic ; rien ne bouge à l'affichage. */}
           <details className="ff-settings">
             <summary>
@@ -591,49 +591,49 @@ function GenererContent() {
           <section aria-label="Options" className="grid gap-6 pt-4">
             <div className="grid grid-cols-2 gap-4" role="group" aria-label="Réglages de la fiche">
               <div>
-                <label htmlFor="niveau" className="text-sm font-semibold text-black/60 block mb-2">Niveau</label>
+                <label htmlFor="niveau" className="ff-label">Niveau</label>
                 <select
                   id="niveau"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
+                  className="ff-field px-3"
                 >
                   <option value="facile">Facile</option>
                   <option value="moyen">Moyen</option>
                   <option value="difficile">Difficile</option>
                 </select>
-                <p className="text-xs text-black/60 mt-1.5">Des mots simples, ou plus techniques.</p>
+                <p className="ff-hint">Des mots simples, ou plus techniques.</p>
               </div>
               <div>
-                <label htmlFor="longueur" className="text-sm font-semibold text-black/60 block mb-2">Longueur</label>
+                <label htmlFor="longueur" className="ff-label">Longueur</label>
                 <select
                   id="longueur"
                   value={length}
                   onChange={(e) => setLength(e.target.value as Length)}
-                  className="w-full min-h-[48px] px-3 border border-black/15 rounded-2xl bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-accent ff-input"
+                  className="ff-field px-3"
                 >
                   <option value="court">Court</option>
                   <option value="moyen">Moyen</option>
                   <option value="detaille">Détaillé</option>
                 </select>
-                <p className="text-xs text-black/60 mt-1.5">Court : le principal. Détaillé : plus de cartes.</p>
+                <p className="ff-hint">Court : le principal. Détaillé : plus de cartes.</p>
               </div>
             </div>
             <fieldset>
-              <legend className="text-sm font-semibold text-black/60 mb-3">Ce que tu veux recevoir (coche au moins une case)</legend>
+              <legend className="ff-label mb-3">Ce que tu veux recevoir (au moins une case)</legend>
               <div className="grid grid-cols-2 gap-2">
                 {OUTPUT_OPTIONS.map((opt) => (
                   <label
                     key={opt.key}
-                    className={`flex items-center gap-2 min-h-[48px] px-4 rounded-2xl border cursor-pointer text-sm font-medium transition ${
-                      outputs.includes(opt.key) ? "bg-surface border-accent text-black" : "bg-white border-black/15 text-black/55 hover:border-black/40"
+                    className={`flex items-center gap-3 min-h-[48px] px-4 rounded-2xl border cursor-pointer text-[15px] font-medium ${
+                      outputs.includes(opt.key) ? "border-accent text-black" : "border-black/25 text-black/75"
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={outputs.includes(opt.key)}
                       onChange={() => toggleOutput(opt.key)}
-                      className="accent-[var(--ff-accent)] w-4 h-4"
+                      className="accent-[var(--ff-accent)] w-5 h-5"
                     />
                     {opt.label}
                   </label>
@@ -645,7 +645,7 @@ function GenererContent() {
           </details>
 
           {error && (
-            <p role="alert" className="px-4 py-3 rounded-2xl border border-[#EF4444]/40 bg-[#EF4444]/10 text-sm text-black">
+            <p role="alert" className="ff-alert border-[var(--quiz-wrong-border)]">
               {error}
             </p>
           )}
@@ -654,48 +654,17 @@ function GenererContent() {
             type="button"
             onClick={handleGenerate}
             disabled={!canGenerate}
-            className="ff-primary w-full text-base ff-btn"
+            className="ff-primary w-full text-base"
           >
             {loading ? "Création en cours…" : !user ? "Créer mon compte pour continuer" : "Créer ma fiche"}
           </button>
           {!loading && user && !canGenerate && (mode === "text" ? !text : files.length === 0 && !file) && (
-            <p className="text-sm text-black/60 text-center -mt-3">
+            <p className="text-[15px] ff-muted text-center -mt-3">
               {mode === "text" ? "Colle d'abord ton cours dans la zone de texte." : mode === "pdf" ? "Choisis d'abord ton fichier PDF." : "Ajoute d'abord une photo de ton cours."}
             </p>
           )}
 
-          {proLeftText && <p className="text-xs text-black/50 text-center -mt-2">{proLeftText}</p>}
 
-          {user && usage && !usage.isPro && (
-            <section aria-label="Ton offre" className="bg-surface border border-black/10 rounded-3xl overflow-hidden">
-              <p className={`px-5 py-3 text-sm font-semibold ${usage.remaining === 0 ? "text-accent" : "text-black/80"}`}>
-                {usage.remaining === 0
-                  ? `Tu as utilisé tes ${LIMITS.free.fichesPerMonth} fiches gratuites de ce mois-ci. Elles reviennent ${usage.resetMonth ?? "le mois prochain"}.`
-                  : `Il te reste ${usage.remaining} fiche${usage.remaining! > 1 ? "s" : ""} gratuite${usage.remaining! > 1 ? "s" : ""} ce mois-ci.`}
-              </p>
-              <div className="px-5 pb-5 grid grid-cols-2 gap-4 border-t border-black/10 pt-4">
-                <div>
-                  <p className="text-xs font-semibold text-black/50 mb-2">Gratuit</p>
-                  <p className="text-sm text-black/65">{LIMITS.free.fichesPerMonth} fiches par mois</p>
-                  <p className="text-sm text-black/65">Cours jusqu'à 7 pages</p>
-                  <p className="text-sm text-black/65">5 fiches gardées</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-accent mb-2">Pro</p>
-                  <p className="text-sm font-medium">{LIMITS.pro.fichesPerMonth} fiches par mois</p>
-                  <p className="text-sm font-medium">Cours jusqu'à 15 pages</p>
-                  <p className="text-sm font-medium">Plusieurs PDF dans une fiche</p>
-                  <p className="text-sm font-medium">Quiz de 12 questions et lecture à voix haute</p>
-                  <p className="text-sm font-medium">Toutes tes fiches gardées</p>
-                </div>
-              </div>
-              <div className="px-5 pb-5">
-                <button type="button" onClick={() => router.push("/pricing")} className="ff-secondary w-full text-sm">
-                  Voir Pro, 4,99 € par mois
-                </button>
-              </div>
-            </section>
-          )}
         </div>
       </div>
     </AppShell>
